@@ -2,6 +2,7 @@ import log from 'electron-log/main'
 import { appendFileSync, existsSync, mkdirSync, renameSync, rmSync, statSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { CONFIG_DIR } from '@mkagent/shared/config'
+import { installStdioEpipeGuard } from './stdio-error-guard'
 
 export default log
 
@@ -22,6 +23,13 @@ function resolveDebugMode(): boolean {
 }
 
 export const isDebugMode = resolveDebugMode()
+
+const disableConsoleTransport = () => {
+  log.transports.console.level = false
+}
+
+installStdioEpipeGuard(process.stdout, disableConsoleTransport)
+installStdioEpipeGuard(process.stderr, disableConsoleTransport)
 log.initialize()
 
 if (isDebugMode) {
