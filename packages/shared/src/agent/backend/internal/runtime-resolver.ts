@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { basename, dirname, join, resolve } from 'node:path';
 import type { BackendHostRuntimeContext } from '../types.ts';
 
 export interface ResolvedBackendRuntimePaths {
@@ -18,6 +18,15 @@ function firstExistingPath(candidates: string[]): string | undefined {
   return candidates.find(candidate => existsSync(candidate));
 }
 
+function isBunExecutablePath(candidate: string): boolean {
+  const name = basename(candidate).toLowerCase();
+  return name === 'bun' || name === 'bun.exe';
+}
+
+function firstExistingBunPath(candidates: string[]): string | undefined {
+  return firstExistingPath(candidates.filter(isBunExecutablePath));
+}
+
 function resolveUpwards(base: string, relativePath: string, maxLevels = 4): string | undefined {
   let directory = resolve(base);
   for (let level = 0; level <= maxLevels; level++) {
@@ -32,16 +41,18 @@ function resolveUpwards(base: string, relativePath: string, maxLevels = 4): stri
 
 function resolveBundledRuntimePath(hostRuntime: BackendHostRuntimeContext): string | undefined {
   const binary = process.platform === 'win32' ? 'bun.exe' : 'bun';
-  const bundled = firstExistingPath([
+  const bundled = firstExistingBunPath([
     ...(hostRuntime.resourcesPath ? [join(hostRuntime.resourcesPath, 'vendor', 'bun', binary)] : []),
     join(hostRuntime.appRootPath, 'vendor', 'bun', binary),
+    ...(!hostRuntime.isPackaged && process.env.MKAGENT_BUN ? [process.env.MKAGENT_BUN] : []),
   ]);
   if (bundled) return bundled;
   if (hostRuntime.isPackaged) return undefined;
   try {
-    const command = process.platform === 'win32' ? 'where' : 'which';
-    const system = execFileSync(command, ['bun'], { encoding: 'utf-8' }).trim();
-    return system && existsSync(system) ? system : undefined;
+    const command = process.platform === 'win32' ? 'where.exe' : 'which';
+    const executable = process.platform === 'win32' ? 'bun.exe' : 'bun';
+    const system = execFileSync(command, [executable], { encoding: 'utf-8' });
+    return firstExistingBunPath(system.split(/\r?\n/).map(path => path.trim()).filter(Boolean));
   } catch {
     return undefined;
   }
@@ -94,11 +105,14 @@ function resolveRipgrepPath(hostRuntime: BackendHostRuntimeContext): string | un
 export function resolveBackendRuntimePaths(
   hostRuntime: BackendHostRuntimeContext,
 ): ResolvedBackendRuntimePaths {
-  const bundledRuntimePath = hostRuntime.nodeRuntimePath ?? resolveBundledRuntimePath(hostRuntime);
+  const explicitRuntimePath = hostRuntime.nodeRuntimePath
+    ? firstExistingBunPath([hostRuntime.nodeRuntimePath])
+    : undefined;
+  const bundledRuntimePath = explicitRuntimePath ?? resolveBundledRuntimePath(hostRuntime);
   return {
     interceptorBundlePath: resolveInterceptorBundlePath(hostRuntime),
     piServerPath: resolvePiServerPath(hostRuntime),
-    nodeRuntimePath: hostRuntime.nodeRuntimePath ?? bundledRuntimePath ?? process.execPath,
+    nodeRuntimePath: bundledRuntimePath,
     bundledRuntimePath,
   };
 }

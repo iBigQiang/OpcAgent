@@ -1379,7 +1379,7 @@
       "reason": "Craft test adapted to the retained Lite feature set or strengthened for retained behavior"
     },
     "packages/shared/src/agent/__tests__/pi-agent-error-handling.test.ts": {
-      "sha256": "d11d73c2f945c0f298c93b67248f9df8c91d26523f90c627c150d0b1f71e25f3",
+      "sha256": "993a3941fc3be1385ed0f977c526d4892ba4798fbba3894b7e3579c1dad6fb73",
       "reason": "Craft test adapted to the retained Lite feature set or strengthened for retained behavior"
     },
     "packages/shared/src/agent/__tests__/pi-agent-stderr-buffer.test.ts": {
@@ -1435,7 +1435,7 @@
       "reason": "Craft test adapted to the retained Lite feature set or strengthened for retained behavior"
     },
     "packages/shared/src/agent/backend/__tests__/runtime-resolver.test.ts": {
-      "sha256": "981fabd5ef9135faa681469c40feb39439ac176a8b7ba79ca685370d5ffbe3e4",
+      "sha256": "052225086e63a95a90640f9da48b8c90cc9e9a746271714cd08e796388c2b770",
       "reason": "Craft test adapted to the retained Lite feature set or strengthened for retained behavior"
     },
     "packages/shared/src/agent/backend/base-event-adapter.ts": {
@@ -1463,7 +1463,7 @@
       "reason": "Craft shared module reduced to retained Pi, session, configuration, Skill, and UI behavior"
     },
     "packages/shared/src/agent/backend/internal/runtime-resolver.ts": {
-      "sha256": "d45e7586f0204c2253a3f70f415dcc2c5aebf71dced4fbe751dc04caea4bed4b",
+      "sha256": "34edbb4cb24a87460705e6b80170c8be8c86dcd3cb0e75f04b373964f1fca108",
       "reason": "Craft shared module reduced to retained Pi, session, configuration, Skill, and UI behavior"
     },
     "packages/shared/src/agent/backend/pi/constants.ts": {
@@ -1579,7 +1579,7 @@
       "reason": "Craft Sources agent runtime restored with minimal MkAgent Pi, Browser, branch-session, permission, and background-task compatibility adaptations."
     },
     "packages/shared/src/agent/pi-agent.ts": {
-      "sha256": "36f4fc969a95befb319a3b5dcc3af280544e470883208586bd9097c2ebc7dcaf",
+      "sha256": "cc3620124bc0b4e05a88d12d2b1f51cf956fcdcd394967bdbdded6276a1d056e",
       "reason": "Craft Sources agent runtime restored with minimal MkAgent Pi, Browser, branch-session, permission, and background-task compatibility adaptations."
     },
     "packages/shared/src/agent/powershell-parser.ps1": {
@@ -2095,7 +2095,7 @@
       "reason": "Craft build or quality automation adapted to MkAgent targets and the pinned lineage checks"
     },
     "scripts/electron-dev.ts": {
-      "sha256": "e7904127c947e7d5215a7a50bdcabda2172e0645a7ba43d481d39d90b6ee2203",
+      "sha256": "b59293be4ad11868e9dd96b26da9d83a054473415f1c50a84379a3bbf031c022",
       "reason": "Craft build or quality automation adapted to MkAgent targets and the pinned lineage checks"
     },
     "scripts/install-app.ps1": {

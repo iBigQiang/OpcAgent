@@ -161,6 +161,7 @@ export class PiAgent extends BaseAgent {
   private readline: ReadlineInterface | null = null;
   private subprocessReady: Promise<void> | null = null;
   private subprocessReadyResolve: (() => void) | null = null;
+  private subprocessReadyReject: ((error: Error) => void) | null = null;
 
   // Pi session ID (managed by subprocess, reported back)
   private piSessionId: string | null = null;
@@ -374,16 +375,21 @@ export class PiAgent extends BaseAgent {
       throw new Error('piServerPath not configured. Cannot spawn Pi subprocess.');
     }
 
-    const nodePath = runtime.paths?.node || process.execPath;
+    const nodePath = runtime.paths?.node;
+    if (!nodePath) {
+      throw new Error('Bun runtime not configured. Cannot spawn Pi subprocess.');
+    }
     const cwd = this.resolvedCwd();
 
     this.debug(`Spawning Pi subprocess: ${nodePath} ${piServerPath}`);
     this.resetSubprocessErrorDedup();
 
     // Set up ready promise before spawning
-    this.subprocessReady = new Promise<void>((resolve) => {
+    const readyPromise = new Promise<void>((resolve, reject) => {
       this.subprocessReadyResolve = resolve;
+      this.subprocessReadyReject = reject;
     });
+    this.subprocessReady = readyPromise;
 
     // Build session ID and session dir path upfront (used for spawn env + init command)
     const sessionId = this.config.session?.id || `agent-${Date.now()}`;
@@ -456,12 +462,7 @@ export class PiAgent extends BaseAgent {
       this.handleSubprocessExit(code, signal);
     });
 
-    child.on('error', (error) => {
-      this.debug(`Subprocess error: ${error.message}`);
-      this.resetSubprocessErrorDedup();
-      this.eventQueue.enqueue({ type: 'error', message: `Pi subprocess error: ${error.message}` });
-      this.eventQueue.complete();
-    });
+    child.on('error', (error) => this.handleSubprocessError(error));
 
     const sessionPath = this.config.session
       ? getSessionPath(this.config.workspace.rootPath, sessionId)
@@ -496,7 +497,7 @@ export class PiAgent extends BaseAgent {
     });
 
     // Wait for subprocess to report ready
-    await this.subprocessReady;
+    await readyPromise;
     this.debug('Pi subprocess is ready');
 
     // Ensure auto-compaction is explicitly enabled for embedded sessions.
@@ -697,6 +698,8 @@ export class PiAgent extends BaseAgent {
           this.config.onSdkSessionIdUpdate?.(this.piSessionId!);
         }
         this.subprocessReadyResolve?.();
+        this.subprocessReadyResolve = null;
+        this.subprocessReadyReject = null;
         break;
 
       case 'event':
@@ -1489,18 +1492,29 @@ export class PiAgent extends BaseAgent {
   /**
    * Handle subprocess exit.
    */
+  private handleSubprocessError(error: Error): void {
+    this.debug(`Subprocess error: ${error.message}`);
+    this.rejectSubprocessReady(new Error(`Pi subprocess failed to start: ${error.message}`));
+    this.readline?.close();
+    this.readline = null;
+    this.subprocess = null;
+    this.resetSubprocessErrorDedup();
+    this.eventQueue.enqueue({ type: 'error', message: `Pi subprocess error: ${error.message}` });
+    this.eventQueue.complete();
+  }
+
   private handleSubprocessExit(code: number | null, signal: string | null): void {
     this.debug(`Pi subprocess exited: code=${code}, signal=${signal}`);
+
+    const exitReason = signal ? `signal ${signal}` : `code ${code}`;
+    this.rejectSubprocessReady(new Error(`Pi subprocess exited unexpectedly (${exitReason})`));
 
     this.subprocess = null;
     this.readline = null;
     this.resetSubprocessErrorDedup();
-    this.subprocessReady = null;
-    this.subprocessReadyResolve = null;
 
     // If we were processing, emit error + complete
     if (this._isProcessing) {
-      const exitReason = signal ? `signal ${signal}` : `code ${code}`;
       this.eventQueue.enqueue({
         type: 'error',
         message: `Pi subprocess exited unexpectedly (${exitReason})`,
@@ -1510,7 +1524,6 @@ export class PiAgent extends BaseAgent {
 
     // Reject pending mini completions with error (not null) so callers
     // get a meaningful error instead of silently returning "no response"
-    const exitReason = signal ? `signal ${signal}` : `code ${code}`;
     for (const [, pending] of this.pendingMiniCompletions) {
       pending.reject(new Error(`Pi subprocess exited unexpectedly (${exitReason})`));
     }
@@ -2143,6 +2156,7 @@ export class PiAgent extends BaseAgent {
     }
 
     const pid = child.pid;
+    this.rejectSubprocessReady(new Error('Pi subprocess stopped before ready.'));
     const waitForExit = new Promise<{ code: number | null; signal: string | null }>((resolve) => {
       if (child.exitCode !== null || child.signalCode) {
         resolve({ code: child.exitCode, signal: child.signalCode });
@@ -2181,6 +2195,7 @@ export class PiAgent extends BaseAgent {
     }
     this.subprocessReady = null;
     this.subprocessReadyResolve = null;
+    this.subprocessReadyReject = null;
     this.callbackPort = 0;
     this.preToolMetadataByCallId.clear();
     this.adapter.resetOverflowState();
@@ -2196,6 +2211,7 @@ export class PiAgent extends BaseAgent {
    * Kill the subprocess and clean up resources.
    */
   private killSubprocess(): void {
+    this.rejectSubprocessReady(new Error('Pi subprocess stopped before ready.'));
     if (this.readline) {
       this.readline.close();
       this.readline = null;
@@ -2212,8 +2228,6 @@ export class PiAgent extends BaseAgent {
       this.subprocess = null;
     }
 
-    this.subprocessReady = null;
-    this.subprocessReadyResolve = null;
     this.callbackPort = 0;
     this.preToolMetadataByCallId.clear();
 
@@ -2297,6 +2311,14 @@ export class PiAgent extends BaseAgent {
   // ============================================================
   // Helpers
   // ============================================================
+
+  private rejectSubprocessReady(error: Error): void {
+    const reject = this.subprocessReadyReject;
+    this.subprocessReady = null;
+    this.subprocessReadyResolve = null;
+    this.subprocessReadyReject = null;
+    reject?.(error);
+  }
 
   /**
    * Resolve working directory to an absolute path.

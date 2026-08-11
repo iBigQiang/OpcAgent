@@ -186,6 +186,7 @@ function getElectronEnv(): Record<string, string> {
     MKAGENT_APP_NAME: process.env.MKAGENT_APP_NAME || "MkAgent",
     MKAGENT_DEEPLINK_SCHEME: process.env.MKAGENT_DEEPLINK_SCHEME || "mkagent",
     MKAGENT_INSTANCE_NUMBER: process.env.MKAGENT_INSTANCE_NUMBER || "",
+    MKAGENT_BUN: process.env.MKAGENT_BUN || process.execPath,
   };
 }
 

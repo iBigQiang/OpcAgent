@@ -90,6 +90,68 @@ describe('resolveBundledRuntimePath', () => {
     const paths = resolveBackendRuntimePaths({ appRootPath: appRoot, resourcesPath, isPackaged: true });
     expect(paths.bundledRuntimePath).toBe(bundled);
   });
+
+  it('honors MKAGENT_BUN when PATH lookup is unavailable', () => {
+    const appRoot = join(tmpBase, 'env-override');
+    const binary = process.platform === 'win32' ? 'bun.exe' : 'bun';
+    const configured = join(tmpBase, 'configured', binary);
+    mkdirSync(join(tmpBase, 'configured'), { recursive: true });
+    writeFileSync(configured, 'stub');
+
+    const previousBun = process.env.MKAGENT_BUN;
+    const previousPath = process.env.PATH;
+    process.env.MKAGENT_BUN = configured;
+    process.env.PATH = '';
+
+    try {
+      const paths = resolveBackendRuntimePaths({ appRootPath: appRoot, isPackaged: false });
+      expect(paths.bundledRuntimePath).toBe(configured);
+      expect(paths.nodeRuntimePath).toBe(configured);
+    } finally {
+      if (previousBun === undefined) delete process.env.MKAGENT_BUN;
+      else process.env.MKAGENT_BUN = previousBun;
+      if (previousPath === undefined) delete process.env.PATH;
+      else process.env.PATH = previousPath;
+    }
+  });
+
+  it('does not fall back to the host process when packaged Bun is unavailable', () => {
+    const appRoot = join(tmpBase, 'missing-runtime');
+    const previousBun = process.env.MKAGENT_BUN;
+    delete process.env.MKAGENT_BUN;
+
+    try {
+      const paths = resolveBackendRuntimePaths({ appRootPath: appRoot, isPackaged: true });
+      expect(paths.bundledRuntimePath).toBeUndefined();
+      expect(paths.nodeRuntimePath).toBeUndefined();
+    } finally {
+      if (previousBun === undefined) delete process.env.MKAGENT_BUN;
+      else process.env.MKAGENT_BUN = previousBun;
+    }
+  });
+
+  it('rejects Node executables passed as Bun runtime overrides', () => {
+    const appRoot = join(tmpBase, 'invalid-runtime');
+    const invalidRuntime = join(tmpBase, process.platform === 'win32' ? 'node.exe' : 'node');
+    mkdirSync(tmpBase, { recursive: true });
+    writeFileSync(invalidRuntime, 'stub');
+    const previousBun = process.env.MKAGENT_BUN;
+    process.env.MKAGENT_BUN = invalidRuntime;
+
+    try {
+      const fromEnvironment = resolveBackendRuntimePaths({ appRootPath: appRoot, isPackaged: true });
+      const fromHostOverride = resolveBackendRuntimePaths({
+        appRootPath: appRoot,
+        isPackaged: true,
+        nodeRuntimePath: invalidRuntime,
+      });
+      expect(fromEnvironment.nodeRuntimePath).toBeUndefined();
+      expect(fromHostOverride.nodeRuntimePath).toBeUndefined();
+    } finally {
+      if (previousBun === undefined) delete process.env.MKAGENT_BUN;
+      else process.env.MKAGENT_BUN = previousBun;
+    }
+  });
 });
 
 describe('resolveRipgrepPath', () => {

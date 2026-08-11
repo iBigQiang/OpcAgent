@@ -121,4 +121,72 @@ describe('PiAgent subprocess error handling', () => {
 
     agent.destroy()
   })
+
+  it('rejects startup readiness when the subprocess exits before ready', async () => {
+    const agent = new PiAgent(createConfig())
+    const ready = new Promise<void>((resolve, reject) => {
+      ;(agent as any).subprocessReadyResolve = resolve
+      ;(agent as any).subprocessReadyReject = reject
+    })
+    ;(agent as any).subprocessReady = ready
+
+    ;(agent as any).handleSubprocessExit(1, null)
+
+    const outcome = await Promise.race([
+      ready.then(
+        () => 'resolved',
+        (error: Error) => error.message,
+      ),
+      Bun.sleep(100).then(() => 'pending'),
+    ])
+
+    expect(outcome).toBe('Pi subprocess exited unexpectedly (code 1)')
+    agent.destroy()
+  })
+
+  it('clears rejected startup state so a later attempt can retry', async () => {
+    const agent = new PiAgent(createConfig())
+    const ready = new Promise<void>((resolve, reject) => {
+      ;(agent as any).subprocessReadyResolve = resolve
+      ;(agent as any).subprocessReadyReject = reject
+    })
+    ;(agent as any).subprocessReady = ready
+    ;(agent as any).subprocess = { stdin: { writable: false } }
+
+    ;(agent as any).handleSubprocessError(new Error('startup failed'))
+
+    const outcome = await ready.then(
+      () => 'resolved',
+      (error: Error) => error.message,
+    )
+    expect(outcome).toBe('Pi subprocess failed to start: startup failed')
+    expect((agent as any).subprocess).toBeNull()
+    expect((agent as any).subprocessReady).toBeNull()
+    expect((agent as any).subprocessReadyResolve).toBeNull()
+    expect((agent as any).subprocessReadyReject).toBeNull()
+    agent.destroy()
+  })
+
+  it('rejects startup readiness when the subprocess is stopped explicitly', async () => {
+    const agent = new PiAgent(createConfig())
+    const ready = new Promise<void>((resolve, reject) => {
+      ;(agent as any).subprocessReadyResolve = resolve
+      ;(agent as any).subprocessReadyReject = reject
+    })
+    ;(agent as any).subprocessReady = ready
+    ;(agent as any).subprocess = {
+      stdin: { writable: true, write: () => true },
+      kill: () => true,
+    }
+
+    ;(agent as any).killSubprocess()
+
+    const outcome = await ready.then(
+      () => 'resolved',
+      (error: Error) => error.message,
+    )
+    expect(outcome).toBe('Pi subprocess stopped before ready.')
+    expect((agent as any).subprocess).toBeNull()
+    agent.destroy()
+  })
 })
