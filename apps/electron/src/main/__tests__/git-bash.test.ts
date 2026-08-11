@@ -2,7 +2,12 @@ import { describe, it, expect, beforeEach, afterEach } from 'bun:test'
 import { mkdtempSync, rmSync, writeFileSync } from 'fs'
 import { tmpdir } from 'os'
 import { join } from 'path'
-import { isGitBashExecutablePath, isUsableGitBashPath, validateGitBashPath } from '@mkagent/server-core/services'
+import {
+  deriveGitBashPathsFromGitPaths,
+  isGitBashExecutablePath,
+  isUsableGitBashPath,
+  validateGitBashPath,
+} from '@mkagent/server-core/services'
 
 let tempDir: string
 
@@ -19,6 +24,19 @@ describe('git-bash helpers', () => {
     expect(isGitBashExecutablePath('C:\\Program Files\\Git\\bin\\bash.exe')).toBe(true)
     expect(isGitBashExecutablePath('/tmp/git/bin/bash.exe')).toBe(true)
     expect(isGitBashExecutablePath('/tmp/git/bin/sh.exe')).toBe(false)
+  })
+
+  it('derives Git Bash paths from custom Git installations on PATH', () => {
+    const whereOutput = [
+      'D:\\Git\\cmd\\git.exe',
+      'C:\\Tools\\Git\\cmd\\git.exe',
+      'D:\\Git\\cmd\\git.exe',
+    ].join('\r\n')
+
+    expect(deriveGitBashPathsFromGitPaths(whereOutput)).toEqual([
+      'D:\\Git\\bin\\bash.exe',
+      'C:\\Tools\\Git\\bin\\bash.exe',
+    ])
   })
 
   it('rejects non-bash executable names', async () => {

@@ -1,4 +1,5 @@
 import { stat } from 'fs/promises'
+import { win32 } from 'path'
 
 /**
  * Basic file-name validation for Git Bash executable paths.
@@ -6,6 +7,29 @@ import { stat } from 'fs/promises'
  */
 export function isGitBashExecutablePath(filePath: string): boolean {
   return /(?:^|[\\/])bash\.exe$/i.test(filePath.trim())
+}
+
+/**
+ * Derive Git Bash locations from `where git` output on Windows.
+ * Git for Windows exposes git.exe from <root>\cmd and bash.exe from <root>\bin.
+ */
+export function deriveGitBashPathsFromGitPaths(whereOutput: string): string[] {
+  const candidates: string[] = []
+  const seen = new Set<string>()
+
+  for (const line of whereOutput.split(/\r?\n/)) {
+    const gitPath = line.trim()
+    if (!/(?:^|[\\/])git\.exe$/i.test(gitPath)) continue
+
+    const bashPath = win32.join(win32.dirname(gitPath), '..', 'bin', 'bash.exe')
+    const key = bashPath.toLowerCase()
+    if (seen.has(key)) continue
+
+    seen.add(key)
+    candidates.push(bashPath)
+  }
+
+  return candidates
 }
 
 /**

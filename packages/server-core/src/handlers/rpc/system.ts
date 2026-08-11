@@ -5,7 +5,7 @@ import { execSync } from 'child_process'
 import { RPC_CHANNELS } from '@mkagent/shared/protocol'
 import { getWorkspaceByNameOrId, getGitBashPath, setGitBashPath, clearGitBashPath } from '@mkagent/shared/config'
 import { classifyExternalUrl, formatBlockedUrlError } from '@mkagent/shared/utils/url-safety'
-import { isUsableGitBashPath, validateGitBashPath } from '@mkagent/server-core/services'
+import { deriveGitBashPathsFromGitPaths, isUsableGitBashPath, validateGitBashPath } from '@mkagent/server-core/services'
 import { validateFilePath, getWorkspaceAllowedDirs } from '@mkagent/server-core/handlers'
 import type { RpcServer } from '@mkagent/server-core/transport'
 import type { HandlerDeps } from '../handler-deps'
@@ -208,6 +208,23 @@ export function registerSystemCoreHandlers(server: RpcServer, deps: HandlerDeps)
         setGitBashPath(bashPath)
         return { found: true, path: bashPath, platform }
       }
+    }
+
+    try {
+      const gitPaths = execSync('where git', {
+        encoding: 'utf-8',
+        stdio: ['pipe', 'pipe', 'pipe'],
+        timeout: 5000,
+      })
+      for (const bashPath of deriveGitBashPathsFromGitPaths(gitPaths)) {
+        if (await isUsableGitBashPath(bashPath)) {
+          process.env.MKAGENT_GIT_BASH_PATH = bashPath
+          setGitBashPath(bashPath)
+          return { found: true, path: bashPath, platform }
+        }
+      }
+    } catch {
+      // git is not available on PATH
     }
 
     try {
