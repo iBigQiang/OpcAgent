@@ -57,6 +57,8 @@ const DRIVER_REGISTRY: Record<AgentProvider, ProviderDriver> = {
   pi: piDriver,
 };
 
+const CUSTOM_ENDPOINT_CONNECTION_TEST_TIMEOUT_MS = 150_000;
+
 function getProviderDriver(provider: AgentProvider): ProviderDriver {
   const driver = DRIVER_REGISTRY[provider];
   if (!driver) {
@@ -619,6 +621,10 @@ export async function testBackendConnection(args: {
   try {
     const testModel = args.model;
     const providerType = args.connection?.providerType ?? getDefaultProviderType(args.provider);
+    const timeoutMs = args.timeoutMs
+      ?? (providerType === 'pi_compat' ? CUSTOM_ENDPOINT_CONNECTION_TEST_TIMEOUT_MS : 20_000);
+    const requiresFullPiProbe = providerType === 'pi_compat'
+      && args.connection?.customEndpoint?.api === 'anthropic-messages';
     const now = Date.now();
     const authType: LlmAuthType = (
       providerType === 'pi_compat'
@@ -635,6 +641,7 @@ export async function testBackendConnection(args: {
       createdAt: now,
       piAuthProvider: args.connection?.piAuthProvider,
       customEndpoint: args.connection?.customEndpoint,
+      ...(providerType === 'pi_compat' && testModel ? { models: [testModel] } : {}),
       ...(args.baseUrl?.trim() ? { baseUrl: args.baseUrl.trim() } : {}),
     } as LlmConnection;
 
@@ -647,7 +654,7 @@ export async function testBackendConnection(args: {
     };
 
     const { driver, resolvedPaths } = resolveDriverRuntime(args.provider, args.hostRuntime);
-    if (driver.testConnection) {
+    if (driver.testConnection && !requiresFullPiProbe) {
       const driverResult = await driver.testConnection({
         provider: args.provider,
         apiKey: trimmedKey,
@@ -656,7 +663,7 @@ export async function testBackendConnection(args: {
         connection: args.connection,
         hostRuntime: args.hostRuntime,
         resolvedPaths,
-        timeoutMs: args.timeoutMs ?? 20000,
+        timeoutMs,
       });
       // null = driver declined to handle; fall through to generic subprocess test
       if (driverResult !== null) return driverResult;
@@ -686,16 +693,17 @@ export async function testBackendConnection(args: {
       return `${message}\n--- subprocess stderr (last ~8KB) ---\n${stderr}`;
     };
 
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
     try {
-      const timeoutMs = args.timeoutMs ?? 20000;
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        timeoutId = setTimeout(
+          () => reject(new Error(withStderrContext(`Connection test timed out after ${timeoutMs}ms`))),
+          timeoutMs,
+        );
+      });
       const text = await Promise.race([
         agent.runMiniCompletion('Say ok'),
-        new Promise<never>((_, reject) =>
-          setTimeout(
-            () => reject(new Error(withStderrContext(`Connection test timed out after ${timeoutMs}ms`))),
-            timeoutMs
-          )
-        ),
+        timeoutPromise,
       ]);
 
       return text
@@ -707,6 +715,7 @@ export async function testBackendConnection(args: {
       const enriched = base.includes('subprocess stderr') ? base : withStderrContext(base);
       return { success: false, error: enriched };
     } finally {
+      if (timeoutId !== undefined) clearTimeout(timeoutId);
       agent.destroy();
     }
   } catch (error) {

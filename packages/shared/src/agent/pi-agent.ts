@@ -2257,8 +2257,9 @@ export class PiAgent extends BaseAgent {
     this.send({ type: 'mini_completion', id, prompt });
 
     // Keep this aligned with the subprocess-side queryLlm timeout.
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
     const timeout = new Promise<string | null>((resolve) => {
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         if (this.pendingMiniCompletions.has(id)) {
           this.pendingMiniCompletions.delete(id);
           this.debug(`[runMiniCompletion] Timed out after ${LLM_QUERY_TIMEOUT_MS / 1000}s`);
@@ -2267,9 +2268,13 @@ export class PiAgent extends BaseAgent {
       }, LLM_QUERY_TIMEOUT_MS);
     });
 
-    const text = await Promise.race([resultPromise, timeout]);
-    this.debug(`[runMiniCompletion] Result: ${text ? `"${text.slice(0, 200)}"` : 'null'}`);
-    return text;
+    try {
+      const text = await Promise.race([resultPromise, timeout]);
+      this.debug(`[runMiniCompletion] Result: ${text ? `"${text.slice(0, 200)}"` : 'null'}`);
+      return text;
+    } finally {
+      if (timeoutId !== undefined) clearTimeout(timeoutId);
+    }
   }
 
   /**
@@ -2296,8 +2301,9 @@ export class PiAgent extends BaseAgent {
     this.send({ type: 'llm_query', id, request });
 
     // Keep this aligned with the subprocess-side queryLlm timeout.
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
     const timeout = new Promise<LLMQueryResult>((_, reject) => {
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         if (this.pendingLlmQueries.has(id)) {
           this.pendingLlmQueries.delete(id);
           reject(new Error(`queryLlm timed out after ${LLM_QUERY_TIMEOUT_MS / 1000}s`));
@@ -2305,7 +2311,11 @@ export class PiAgent extends BaseAgent {
       }, LLM_QUERY_TIMEOUT_MS);
     });
 
-    return Promise.race([resultPromise, timeout]);
+    try {
+      return await Promise.race([resultPromise, timeout]);
+    } finally {
+      if (timeoutId !== undefined) clearTimeout(timeoutId);
+    }
   }
 
   // ============================================================

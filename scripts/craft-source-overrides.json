@@ -923,8 +923,8 @@
       "reason": "Craft Pi subprocess adapted to the retained provider and session-tool contract"
     },
     "packages/pi-agent-server/src/index.ts": {
-      "sha256": "ace7c4c30619425d014f2eca2bdfb865d61c0f5159b1c9f12c87b06b2a7a4624",
-      "reason": "Craft Pi subprocess adapted to accept full OAuth credentials and return Pi-refreshed credentials without adding another agent SDK"
+      "sha256": "5caf9732dba8d37d06f9010056f0ff1b76baf3861fce54d2886de09e088e7fcc",
+      "reason": "Craft Pi subprocess preserves Pi request identity for custom Anthropic-compatible endpoints while retaining MkAgent instructions"
     },
     "packages/pi-agent-server/src/model-resolution.test.ts": {
       "sha256": "5c48a4a535eca639d9bcd7d1823d4abf1643c5830a034331c199f342cc1dc805",
@@ -947,8 +947,12 @@
       "reason": "Craft test adapted to the retained Lite feature set or strengthened for retained behavior"
     },
     "packages/pi-agent-server/src/system-prompt-override.test.ts": {
-      "sha256": "14bcfd5f9b72bfdd70fed03e8ac8fbfde57d3e315b0e8d2017b22d925119a0a2",
-      "reason": "Craft test adapted to the retained Lite feature set or strengthened for retained behavior"
+      "sha256": "2501a9fe43664dbfa5028fc09065eed37b54b75ca55c39ea1720c59ffe5866e4",
+      "reason": "Craft test guards Pi identity preservation, prompt rebuilds, and custom Anthropic endpoint scoping"
+    },
+    "packages/pi-agent-server/src/system-prompt-override.ts": {
+      "sha256": "a3cc5546fdb8a2cfb75f723ff6ee1584fecd53b674ec741160b4442ce44a04a2",
+      "reason": "Craft Pi prompt helper extended to append MkAgent instructions without replacing the Pi default identity"
     },
     "packages/pi-agent-server/src/tools/search/create-search-tool.test.ts": {
       "sha256": "dbc05b2d5151c97a6307617f9acef63044e22fd15d06f9a2ec1730e32f358b9d",
@@ -1447,8 +1451,8 @@
       "reason": "Craft shared module reduced to retained Pi, session, configuration, Skill, and UI behavior"
     },
     "packages/shared/src/agent/backend/factory.ts": {
-      "sha256": "ccf2bb6eb10b920f3330e85069b5da3dca20927c673c5e940e80a7ec2ce549f0",
-      "reason": "Craft shared module reduced to retained Pi, session, configuration, Skill, and UI behavior"
+      "sha256": "5cbf815b6c397f8b740535b117c206aa104aa7043b9426473f3ffcc87183d174",
+      "reason": "Craft connection testing uses the full Pi path and compatible timeout for custom Anthropic endpoints"
     },
     "packages/shared/src/agent/backend/index.ts": {
       "sha256": "0dec544ca1a8c403b08a6ff20e77bb9ef19e6bbd727f41ba415f1fc0c58d9485",
@@ -1583,8 +1587,8 @@
       "reason": "Craft Sources agent runtime restored with minimal MkAgent Pi, Browser, branch-session, permission, and background-task compatibility adaptations."
     },
     "packages/shared/src/agent/pi-agent.ts": {
-      "sha256": "cc3620124bc0b4e05a88d12d2b1f51cf956fcdcd394967bdbdded6276a1d056e",
-      "reason": "Craft Sources agent runtime restored with minimal MkAgent Pi, Browser, branch-session, permission, and background-task compatibility adaptations."
+      "sha256": "70b9ecf6e7ea3d1c44e69ac73e665f44bfde8379c1a52be64942a48ad6755b21",
+      "reason": "Craft Sources agent runtime clears completed Pi RPC timeout handles while retaining existing session behavior."
     },
     "packages/shared/src/agent/powershell-parser.ps1": {
       "sha256": "e383d6a143061c58caa1cde9e0fa5f70af10b98735038391b6c36294374b5873",

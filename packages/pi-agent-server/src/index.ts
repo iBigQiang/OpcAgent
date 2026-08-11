@@ -79,7 +79,11 @@ import { createWebFetchTool } from './tools/web-fetch.ts';
 import { resolveSearchProvider } from './tools/search/resolve-provider.ts';
 import { createSearchTool } from './tools/search/create-search-tool.ts';
 import { allowMkAgentMetadataProperties, stripMkAgentMetadata } from './mkagent-metadata-schema.ts';
-import { applySystemPromptOverride } from './system-prompt-override.ts';
+import {
+  applySystemPromptAppend,
+  applySystemPromptOverride,
+  shouldPreservePiSystemPrompt,
+} from './system-prompt-override.ts';
 
 // ============================================================
 // Types — JSONL Protocol
@@ -420,6 +424,20 @@ function resolvedCwd(): string {
 // Helper: derive preferCustomEndpoint flag from init config
 function shouldPreferCustomEndpoint(): boolean {
   return Boolean(initConfig?.customEndpoint && initConfig?.baseUrl?.trim());
+}
+
+function applyMkAgentSystemPrompt(session: AgentSession, prompt: string): void {
+  const preservePiIdentity = shouldPreservePiSystemPrompt(
+    initConfig?.baseUrl,
+    initConfig?.customEndpoint,
+  );
+
+  if (preservePiIdentity) {
+    applySystemPromptAppend(session, prompt);
+    return;
+  }
+
+  applySystemPromptOverride(session, prompt);
 }
 
 /**
@@ -1010,11 +1028,11 @@ async function queryLlm(request: LLMQueryRequest): Promise<LLMQueryResult> {
 
     debugLog(`[queryLlm] Created ephemeral session: ${ephemeralSession.sessionId}`);
 
-    // Force the system prompt — see system-prompt-override.ts for why direct
+    // Apply the system prompt — see system-prompt-override.ts for why direct
     // assignment to `state.systemPrompt` doesn't survive `session.prompt()`.
     const promptForSession =
       request.systemPrompt ?? 'Reply with ONLY the requested text. No explanation.';
-    applySystemPromptOverride(ephemeralSession, promptForSession);
+    applyMkAgentSystemPrompt(ephemeralSession, promptForSession);
 
     // Collect response text and errors from events
     let result = '';
@@ -1365,11 +1383,11 @@ async function handlePrompt(msg: Extract<InboundMessage, { type: 'prompt' }>): P
 
     const session = await ensureSession();
 
-    // Force the MkAgent-built system prompt onto the Pi session. Direct assignment
+    // Apply the MkAgent-built instructions to the Pi session. Direct assignment
     // to `state.systemPrompt` is wiped on every `session.prompt()` call by the Pi
     // SDK (see system-prompt-override.ts).
     if (msg.systemPrompt) {
-      applySystemPromptOverride(session, msg.systemPrompt);
+      applyMkAgentSystemPrompt(session, msg.systemPrompt);
     }
 
     // Wire up event handler
