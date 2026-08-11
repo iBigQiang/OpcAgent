@@ -5,7 +5,7 @@
  * model resolution used for title generation, summarization, and call_llm.
  */
 import { describe, it, expect } from 'bun:test';
-import { getMiniModel, getSummarizationModel, isDeniedMiniModelId } from '../src/config/llm-connections.ts';
+import { getMiniModel, getSummarizationModel, isDeniedMiniModelId, normalizePlatformProfileBaseUrl } from '../src/config/llm-connections.ts';
 import type { LlmProviderType } from '../src/config/llm-connections.ts';
 
 // ============================================================
@@ -201,5 +201,17 @@ describe('isDeniedMiniModelId()', () => {
     expect(isDeniedMiniModelId('gpt-5-mini', 'openai-codex')).toBe(false);
     expect(isDeniedMiniModelId('claude-haiku-4-5', 'openai-codex')).toBe(false);
     expect(isDeniedMiniModelId('gpt-5.1-codex', 'openai-codex')).toBe(false);
+  });
+});
+
+describe('AnyRouter platform profiles', () => {
+  it('pins both AnyRouter profiles to the shared endpoint', () => {
+    expect(normalizePlatformProfileBaseUrl('anyrouter', 'https://anyrouter.top/')).toBe('https://anyrouter.top');
+    expect(normalizePlatformProfileBaseUrl('anyrouter_pi', 'https://anyrouter.top/')).toBe('https://anyrouter.top');
+  });
+
+  it('rejects an AnyRouter-Pi endpoint override', () => {
+    expect(() => normalizePlatformProfileBaseUrl('anyrouter_pi', 'https://example.test'))
+      .toThrow('requires https://anyrouter.top');
   });
 });

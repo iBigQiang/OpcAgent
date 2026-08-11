@@ -15,6 +15,7 @@ export interface BackendRuntimePaths {
   interceptor?: string;
   node?: string;
   piServer?: string;
+  claudeExecutable?: string;
 }
 
 export interface BackendRuntimePayload extends Record<string, unknown> {
@@ -24,6 +25,8 @@ export interface BackendRuntimePayload extends Record<string, unknown> {
   baseUrl?: string;
   /** Custom endpoint protocol config (api type for routing). */
   customEndpoint?: { api: string; supportsImages?: boolean };
+  /** Explicit provider profile. Never inferred from an endpoint hostname. */
+  platformProfile?: LlmConnection['platformProfile'];
   /** Models registered for a custom endpoint. Strings default to 128K context; objects allow overrides. */
   customModels?: Array<string | { id: string; contextWindow?: number; supportsImages?: boolean }>;
 }
@@ -82,7 +85,7 @@ export interface DriverTestConnectionArgs extends DriverHostRuntimeArgs {
   apiKey: string;
   model: string;
   baseUrl?: string;
-  connection?: Pick<LlmConnection, 'providerType' | 'piAuthProvider' | 'customEndpoint'>;
+  connection?: Pick<LlmConnection, 'providerType' | 'piAuthProvider' | 'customEndpoint' | 'platformProfile'>;
   timeoutMs: number;
 }
 
@@ -108,5 +111,6 @@ export function getBackendRuntime(config: BackendConfig): BackendRuntimePayload 
 }
 
 export function getDefaultProviderType(provider: AgentProvider): LlmProviderType {
-  return provider;
+  void provider;
+  return 'pi';
 }

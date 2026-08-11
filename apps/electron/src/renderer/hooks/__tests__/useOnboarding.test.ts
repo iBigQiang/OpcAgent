@@ -48,6 +48,50 @@ describe('Pi-only connection setup', () => {
     })
   })
 
+  it('preserves a branded platform profile in API-key connection setup', () => {
+    const setup = apiSetupMethodToConnectionSetup(
+      'pi_api_key',
+      {
+        baseUrl: 'https://agentrouter.org',
+        connectionDefaultModel: 'claude-opus-5',
+        models: ['claude-opus-5', 'claude-opus-4-8'],
+        piAuthProvider: 'anthropic',
+        customEndpoint: { api: 'anthropic-messages' },
+        platformProfile: 'agentrouter',
+      },
+      null,
+      new Set(),
+    )
+
+    expect(setup).toMatchObject({
+      customEndpoint: { api: 'anthropic-messages' },
+      platformProfile: 'agentrouter',
+    })
+  })
+
+  it('preserves the AnyRouter-Pi profile when saving its experimental endpoint', () => {
+    const setup = apiSetupMethodToConnectionSetup(
+      'pi_api_key',
+      {
+        baseUrl: 'https://anyrouter.top',
+        connectionDefaultModel: 'claude-opus-5[1m]',
+        models: ['claude-opus-5[1m]', 'claude-fable-5[1m]', 'claude-opus-4-8[1m]'],
+        piAuthProvider: 'anthropic',
+        customEndpoint: { api: 'anthropic-messages' },
+        platformProfile: 'anyrouter_pi',
+      },
+      'existing-anyrouter-pi',
+      new Set(),
+    )
+
+    expect(setup).toMatchObject({
+      slug: 'existing-anyrouter-pi',
+      baseUrl: 'https://anyrouter.top',
+      customEndpoint: { api: 'anthropic-messages' },
+      platformProfile: 'anyrouter_pi',
+    })
+  })
+
   it('maps Claude OAuth identity to the Claude Max subscription connection', () => {
     const setup = apiSetupMethodToConnectionSetup(
       'claude_oauth',

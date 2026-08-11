@@ -55,6 +55,7 @@ export function buildRestartRequiredSignature(input: BackendRuntimeSignatureInpu
     slug: connection?.slug,
     providerType: connection?.providerType,
     piAuthProvider: connection?.piAuthProvider,
+    platformProfile: connection?.platformProfile,
   }))
 }
 
@@ -75,6 +76,7 @@ export function buildBackendRuntimeSignature(input: BackendRuntimeSignatureInput
           ? {
               baseUrl: connection.baseUrl,
               piAuthProvider: connection.piAuthProvider,
+              platformProfile: connection.platformProfile,
               customEndpoint: connection.customEndpoint
                 ? definedObject({
                     api: connection.customEndpoint.api,

@@ -22,16 +22,24 @@ import {
   StyledDropdownMenuItem,
 } from "@/components/ui/styled-dropdown"
 import { cn } from "@/lib/utils"
-import { Check, ChevronDown, Eye, EyeOff, Loader2 } from "lucide-react"
+import { Check, ChevronDown, Eye, EyeOff, FolderOpen, Loader2, RefreshCw, RotateCcw } from "lucide-react"
 import { pickTierDefaults, resolveTierModels, type PiModelInfo } from "./tier-models"
 import {
+  getClaudeCliStatusMessage,
+  hasSavedClaudeCliPath,
+  shouldShowClaudeCliControls,
+} from "./claude-cli-status"
+import {
   resolveCustomEndpointPayload,
+  resolveEditableApiKey,
   resolvePiAuthProviderForSubmit,
   resolvePresetStateForBaseUrlChange,
+  PLATFORM_PROFILE_BY_PRESET,
   type PresetKey,
 } from "./submit-helpers"
 
-import type { CustomEndpointApi, CustomEndpointConfig } from '@config/llm-connections'
+import type { CustomEndpointApi, CustomEndpointConfig, LlmPlatformProfile } from '@config/llm-connections'
+import type { ClaudeCliStatus } from '../../../shared/types'
 
 export type ApiKeyStatus = 'idle' | 'validating' | 'success' | 'error'
 
@@ -46,6 +54,8 @@ export interface ApiKeySubmitData {
   modelSelectionMode?: 'automaticallySyncedFromProvider' | 'userDefined3Tier'
   /** Custom endpoint protocol — set when user configures an arbitrary API endpoint */
   customEndpoint?: CustomEndpointConfig
+  /** Platform routing profile for a branded compatible endpoint. */
+  platformProfile?: LlmPlatformProfile
 }
 
 export interface ApiKeyInputProps {
@@ -68,6 +78,8 @@ export interface ApiKeyInputProps {
     models?: string[]
     /** Pre-fill the protocol toggle for custom endpoints */
     customApi?: CustomEndpointApi
+    /** Pre-fill a branded platform endpoint. */
+    platformProfile?: LlmPlatformProfile
   }
 }
 
@@ -76,6 +88,7 @@ interface Preset {
   label: string
   url: string
   placeholder?: string
+  description?: string
 }
 
 // Provider presets routed through the Pi SDK.
@@ -99,6 +112,9 @@ const PI_PROVIDER_PRESETS: Preset[] = [
   { key: 'kimi-coding', label: 'Kimi (Coding)', url: 'https://api.kimi.com/coding', placeholder: 'sk-kimi-...' },
   { key: 'vercel-ai-gateway', label: 'Vercel AI Gateway', url: 'https://ai-gateway.vercel.sh', placeholder: 'Paste your key here...' },
   { key: 'manifest', label: 'Manifest', url: 'https://app.manifest.build/v1', placeholder: 'mnfst_...' },
+  { key: 'agentrouter', label: 'AgentRouter', url: 'https://agentrouter.org', placeholder: 'Paste your key here...' },
+  { key: 'anyrouter', label: 'AnyRouter-CC', url: 'https://anyrouter.top', placeholder: 'Paste your key here...' },
+  { key: 'anyrouter_pi', label: 'AnyRouter-Pi', url: 'https://anyrouter.top', placeholder: 'Paste your key here...', description: 'Experimental Pi backend profile.' },
   { key: 'custom', label: 'Custom', url: '', placeholder: 'Paste your key here...' },
 ]
 
@@ -112,6 +128,8 @@ const OPENAI_COMPAT_CUSTOM_URL_PRESETS: ReadonlySet<string> = new Set(['manifest
 const COMPAT_CUSTOM_DEFAULTS = 'claude-opus-4-8, claude-opus-4-7, claude-sonnet-4-6, claude-haiku-4-5'
 const COMPAT_MINIMAX_DEFAULTS = 'MiniMax-M2.5, MiniMax-M2.5-highspeed'
 const COMPAT_KIMI_DEFAULTS = 'k2p5, kimi-k2-thinking'
+const AGENTROUTER_DEFAULTS = 'claude-opus-5, claude-opus-4-8'
+const ANYROUTER_DEFAULTS = 'claude-opus-5[1m], claude-fable-5[1m], claude-opus-4-8[1m]'
 
 function getPresetForUrl(url: string, presets: Preset[]): PresetKey {
   const match = presets.find(p => p.key !== 'custom' && p.url === url)
@@ -142,10 +160,11 @@ export function ApiKeyInput({
 
   // Compute initial preset: explicit (Pi piAuthProvider), derived from URL, or default
   const initialPreset = initialValues?.activePreset
+    ?? initialValues?.platformProfile
     ?? (initialValues?.baseUrl ? getPresetForUrl(initialValues.baseUrl, presets) : defaultPreset.key)
 
   const { t } = useTranslation()
-  const [apiKey, setApiKey] = useState(initialValues?.apiKey ?? '')
+  const [apiKey, setApiKey] = useState(resolveEditableApiKey(initialValues?.apiKey))
   const [showValue, setShowValue] = useState(false)
   const [baseUrl, setBaseUrl] = useState(initialValues?.baseUrl ?? defaultPreset.url)
   const [activePreset, setActivePreset] = useState<PresetKey>(initialPreset)
@@ -155,6 +174,10 @@ export function ApiKeyInput({
   const [connectionDefaultModel, setConnectionDefaultModel] = useState(initialValues?.connectionDefaultModel ?? '')
   const [customApi, setCustomApi] = useState<CustomEndpointApi>(initialValues?.customApi ?? 'openai-completions')
   const [modelError, setModelError] = useState<string | null>(null)
+  const [claudeCliStatus, setClaudeCliStatus] = useState<ClaudeCliStatus | null>(null)
+  const [claudeCliError, setClaudeCliError] = useState<string | undefined>(undefined)
+  const [isCheckingClaudeCli, setIsCheckingClaudeCli] = useState(false)
+  const [isUpdatingClaudeCliPath, setIsUpdatingClaudeCliPath] = useState(false)
 
 
   // Pi model tier state (for providers with many models like OpenRouter, Vercel)
@@ -174,6 +197,8 @@ export function ApiKeyInput({
   // Hide endpoint/model fields for providers with well-known endpoints handled by the SDK
   const DEFAULT_ENDPOINT_PROVIDERS = new Set(['anthropic', 'openai', 'pi', 'google'])
   const isDefaultProviderPreset = DEFAULT_ENDPOINT_PROVIDERS.has(activePreset)
+  const isPlatformProfilePreset = Boolean(PLATFORM_PROFILE_BY_PRESET[activePreset])
+  const shouldShowClaudeCli = shouldShowClaudeCliControls(activePreset)
 
   // Provider-specific placeholders from the active preset
   const activePresetObj = presets.find(p => p.key === activePreset)
@@ -182,7 +207,7 @@ export function ApiKeyInput({
   // Fetch Pi SDK models when a provider is selected in pi_api_key flow.
   // Returns all models sorted by cost (expensive-first) for the searchable tier dropdowns.
   const loadPiModels = useCallback(async (provider: string) => {
-    if (!provider || provider === 'custom' || DEFAULT_ENDPOINT_PROVIDERS.has(provider) || OPENAI_COMPAT_CUSTOM_URL_PRESETS.has(provider)) {
+    if (!provider || provider === 'custom' || DEFAULT_ENDPOINT_PROVIDERS.has(provider) || OPENAI_COMPAT_CUSTOM_URL_PRESETS.has(provider) || PLATFORM_PROFILE_BY_PRESET[provider]) {
       setPiModels([])
       return
     }
@@ -210,6 +235,65 @@ export function ApiKeyInput({
     loadPiModels(activePreset)
   }, [activePreset, loadPiModels])
 
+  const checkClaudeCli = useCallback(async () => {
+    setIsCheckingClaudeCli(true)
+    setClaudeCliError(undefined)
+    try {
+      setClaudeCliStatus(await window.electronAPI.checkClaudeCli())
+    } catch (error) {
+      setClaudeCliStatus(null)
+      setClaudeCliError(error instanceof Error ? error.message : 'Failed to check Claude Code CLI.')
+    } finally {
+      setIsCheckingClaudeCli(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (shouldShowClaudeCli) {
+      void checkClaudeCli()
+      return
+    }
+    setClaudeCliStatus(null)
+    setClaudeCliError(undefined)
+  }, [shouldShowClaudeCli, checkClaudeCli])
+
+  const handleBrowseClaudeCli = async () => {
+    setIsUpdatingClaudeCliPath(true)
+    setClaudeCliError(undefined)
+    try {
+      const path = await window.electronAPI.browseForClaudeCli()
+      if (!path) return
+
+      const result = await window.electronAPI.setClaudeCliPath(path)
+      if (!result.success) {
+        setClaudeCliError(result.error || 'Failed to save the Claude Code CLI path.')
+        return
+      }
+      await checkClaudeCli()
+    } catch (error) {
+      setClaudeCliError(error instanceof Error ? error.message : 'Failed to select Claude Code CLI.')
+    } finally {
+      setIsUpdatingClaudeCliPath(false)
+    }
+  }
+
+  const handleClearClaudeCliPath = async () => {
+    setIsUpdatingClaudeCliPath(true)
+    setClaudeCliError(undefined)
+    try {
+      const result = await window.electronAPI.clearClaudeCliPath()
+      if (!result.success) {
+        setClaudeCliError(result.error || 'Failed to restore automatic Claude Code CLI detection.')
+        return
+      }
+      setClaudeCliStatus(result)
+    } catch (error) {
+      setClaudeCliError(error instanceof Error ? error.message : 'Failed to restore automatic Claude Code CLI detection.')
+    } finally {
+      setIsUpdatingClaudeCliPath(false)
+    }
+  }
+
   // Whether to show 3 tier dropdowns instead of text input
   const hasPiModels = piModels.length > 0 && !isDefaultProviderPreset && activePreset !== 'custom'
 
@@ -236,6 +320,10 @@ export function ApiKeyInput({
       setConnectionDefaultModel(COMPAT_KIMI_DEFAULTS)
     } else if (preset.key === 'manifest') {
       setConnectionDefaultModel('auto')
+    } else if (preset.key === 'agentrouter') {
+      setConnectionDefaultModel(AGENTROUTER_DEFAULTS)
+    } else if (preset.key === 'anyrouter' || preset.key === 'anyrouter_pi') {
+      setConnectionDefaultModel(ANYROUTER_DEFAULTS)
     } else if (preset.key === 'custom' || OPENAI_COMPAT_CUSTOM_URL_PRESETS.has(preset.key)) {
       setConnectionDefaultModel(COMPAT_CUSTOM_DEFAULTS)
     } else {
@@ -265,6 +353,10 @@ export function ApiKeyInput({
         setConnectionDefaultModel(COMPAT_MINIMAX_DEFAULTS)
       } else if (presetKey === 'kimi-coding') {
         setConnectionDefaultModel(COMPAT_KIMI_DEFAULTS)
+      } else if (presetKey === 'agentrouter') {
+        setConnectionDefaultModel(AGENTROUTER_DEFAULTS)
+      } else if (presetKey === 'anyrouter' || presetKey === 'anyrouter_pi') {
+        setConnectionDefaultModel(ANYROUTER_DEFAULTS)
       } else if (presetKey === 'openrouter' || presetKey === 'vercel-ai-gateway' || presetKey === 'custom') {
         setConnectionDefaultModel(COMPAT_CUSTOM_DEFAULTS)
       }
@@ -308,7 +400,7 @@ export function ApiKeyInput({
     // Include custom endpoint protocol when user configured a custom base URL.
     // Branded openai-compat presets (e.g. Manifest) are pinned to openai-completions
     // and routed via the Pi SDK's openai adapter.
-    const { customEndpoint, piAuthProvider: resolvedPiAuthProvider } = resolveCustomEndpointPayload({
+    const { customEndpoint, piAuthProvider: resolvedPiAuthProvider, platformProfile } = resolveCustomEndpointPayload({
       activePreset,
       baseUrl: effectiveBaseUrl,
       customApi,
@@ -324,6 +416,7 @@ export function ApiKeyInput({
       piAuthProvider: resolvedPiAuthProvider,
       modelSelectionMode: parsedModels.length > 0 ? 'userDefined3Tier' : 'automaticallySyncedFromProvider',
       customEndpoint,
+      ...(platformProfile ? { platformProfile } : {}),
     })
   }
 
@@ -391,7 +484,12 @@ export function ApiKeyInput({
                   onClick={() => handlePresetSelect(preset)}
                   className="justify-between"
                 >
-                  {preset.label}
+                  <span className="flex min-w-0 flex-col">
+                    <span>{preset.label}</span>
+                    {preset.description && (
+                      <span className="text-[10px] font-normal text-foreground/40">{preset.description}</span>
+                    )}
+                  </span>
                   <Check className={cn("size-3", activePreset === preset.key ? "opacity-100" : "opacity-0")} />
                 </StyledDropdownMenuItem>
               ))}
@@ -411,11 +509,66 @@ export function ApiKeyInput({
               onChange={(e) => handleBaseUrlChange(e.target.value)}
               placeholder="https://your-api-endpoint.com"
               className="border-0 bg-transparent shadow-none"
-              disabled={isDisabled}
+              disabled={isDisabled || isPlatformProfilePreset}
             />
           </div>
         )}
       </div>
+      )}
+
+      {shouldShowClaudeCli && (
+        <div className="space-y-2 rounded-md border border-border bg-foreground-2 p-3">
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <Label className="text-sm">Claude Code CLI</Label>
+              <p className={cn(
+                'mt-1 text-xs',
+                claudeCliError || (claudeCliStatus && !claudeCliStatus.found) ? 'text-destructive' : 'text-foreground/50',
+              )}>
+                {getClaudeCliStatusMessage(claudeCliStatus, claudeCliError)}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => void checkClaudeCli()}
+              disabled={isCheckingClaudeCli || isUpdatingClaudeCliPath}
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-[6px] bg-background px-2.5 py-1.5 text-xs font-medium text-foreground shadow-minimal hover:bg-foreground/5 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <RefreshCw className={cn('size-3', isCheckingClaudeCli && 'animate-spin')} />
+              Recheck
+            </button>
+          </div>
+
+          {claudeCliStatus?.path && (
+            <p className="break-all text-xs text-foreground/50">
+              {hasSavedClaudeCliPath(claudeCliStatus) ? 'Saved path: ' : 'Detected path: '}
+              {claudeCliStatus.path}
+            </p>
+          )}
+
+          <div className="flex flex-wrap gap-2 pt-1">
+            <button
+              type="button"
+              onClick={() => void handleBrowseClaudeCli()}
+              disabled={isCheckingClaudeCli || isUpdatingClaudeCliPath}
+              className="inline-flex items-center gap-1.5 rounded-[6px] bg-background px-2.5 py-1.5 text-xs font-medium text-foreground shadow-minimal hover:bg-foreground/5 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <FolderOpen className="size-3" />
+              Browse...
+            </button>
+            {hasSavedClaudeCliPath(claudeCliStatus) && (
+              <button
+                type="button"
+                onClick={() => void handleClearClaudeCliPath()}
+                disabled={isCheckingClaudeCli || isUpdatingClaudeCliPath}
+                className="inline-flex items-center gap-1.5 rounded-[6px] bg-background px-2.5 py-1.5 text-xs font-medium text-foreground shadow-minimal hover:bg-foreground/5 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <RotateCcw className="size-3" />
+                Restore automatic detection
+              </button>
+            )}
+          </div>
+        </div>
       )}
 
       {/* Protocol Toggle — visible as soon as Custom preset is selected */}

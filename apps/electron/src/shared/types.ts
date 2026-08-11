@@ -215,6 +215,7 @@ import type {
   SkillFile,
   SessionFile,
   GitBashStatus,
+  ClaudeCliStatus,
   UpdateInfo,
   WorkspaceSettings,
   PermissionModeState,
@@ -387,6 +388,11 @@ export interface ElectronAPI {
   getPiApiKeyProviders(): Promise<Array<{ key: string; label: string; placeholder: string }>>
   getPiProviderBaseUrl(provider: string): Promise<string | undefined>
   getPiProviderModels(provider: string): Promise<{ models: Array<{ id: string; name: string; costInput: number; costOutput: number; contextWindow: number; reasoning: boolean }>; totalCount: number }>
+  /** Claude Code CLI discovery and executable-path controls for AnyRouter-CC. */
+  checkClaudeCli(): Promise<ClaudeCliStatus>
+  browseForClaudeCli(): Promise<string | null>
+  setClaudeCliPath(path: string): Promise<{ success: boolean; path?: string; version?: string; error?: string }>
+  clearClaudeCliPath(): Promise<{ success: boolean } & ClaudeCliStatus>
 
   // Session-specific model (overrides global)
   getSessionModel(sessionId: string, workspaceId: string): Promise<string | null>

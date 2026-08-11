@@ -1,0 +1,33 @@
+export type InterceptorHintModel = {
+  api?: string;
+  provider?: string;
+  baseUrl?: string;
+};
+
+/**
+ * Keep interceptor routing hints in sync with the active Pi runtime.
+ *
+ * The platform profile must be cleared whenever the runtime switches away
+ * from AnyRouter-Pi so the shared interceptor cannot retain a stale adapter.
+ */
+export function setInterceptorApiHints(
+  model: InterceptorHintModel | undefined,
+  platformProfile?: string,
+): void {
+  if (!model) {
+    delete process.env.MKAGENT_PI_MODEL_API;
+    delete process.env.MKAGENT_PI_MODEL_PROVIDER;
+    delete process.env.MKAGENT_PI_MODEL_BASE_URL;
+    delete process.env.MKAGENT_PLATFORM_PROFILE;
+    return;
+  }
+
+  process.env.MKAGENT_PI_MODEL_API = model.api || '';
+  process.env.MKAGENT_PI_MODEL_PROVIDER = model.provider || '';
+  process.env.MKAGENT_PI_MODEL_BASE_URL = model.baseUrl || '';
+  if (platformProfile) {
+    process.env.MKAGENT_PLATFORM_PROFILE = platformProfile;
+  } else {
+    delete process.env.MKAGENT_PLATFORM_PROFILE;
+  }
+}

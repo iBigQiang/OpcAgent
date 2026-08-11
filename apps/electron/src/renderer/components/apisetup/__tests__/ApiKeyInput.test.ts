@@ -1,9 +1,17 @@
 import { describe, expect, it } from 'bun:test'
 import {
   resolveCustomEndpointPayload,
+  resolveEditableApiKey,
   resolvePiAuthProviderForSubmit,
   resolvePresetStateForBaseUrlChange,
 } from '../submit-helpers'
+
+describe('resolveEditableApiKey', () => {
+  it('never hydrates a masked credential hint into the editable key field', () => {
+    expect(resolveEditableApiKey('sk-test••••tail')).toBe('')
+    expect(resolveEditableApiKey('sk-test-raw')).toBe('sk-test-raw')
+  })
+})
 import { pickTierDefaults, resolveTierModels } from '../tier-models'
 
 const MODELS = [
@@ -116,16 +124,19 @@ describe('resolveCustomEndpointPayload', () => {
   })
 
   it('honors the protocol toggle for the generic custom preset', () => {
-    expect(resolveCustomEndpointPayload({
+    const payload = resolveCustomEndpointPayload({
       activePreset: 'custom',
       baseUrl: 'https://my-endpoint.example.com',
       customApi: 'anthropic-messages',
       brandedOpenAiCompatPresets: BRANDED,
       fallbackPiAuthProvider: undefined,
-    })).toEqual({
+    })
+
+    expect(payload).toEqual({
       customEndpoint: { api: 'anthropic-messages' },
       piAuthProvider: 'anthropic',
     })
+    expect(payload).not.toHaveProperty('platformProfile')
   })
 
   it('returns no customEndpoint for a standard preset, passing through the fallback piAuth', () => {
@@ -151,6 +162,48 @@ describe('resolveCustomEndpointPayload', () => {
     })).toEqual({
       customEndpoint: undefined,
       piAuthProvider: undefined,
+    })
+  })
+
+  it('pins AgentRouter to Anthropic Messages and persists its platform profile', () => {
+    expect(resolveCustomEndpointPayload({
+      activePreset: 'agentrouter',
+      baseUrl: 'https://agentrouter.org',
+      customApi: 'openai-completions',
+      brandedOpenAiCompatPresets: BRANDED,
+      fallbackPiAuthProvider: undefined,
+    })).toEqual({
+      customEndpoint: { api: 'anthropic-messages' },
+      piAuthProvider: 'anthropic',
+      platformProfile: 'agentrouter',
+    })
+  })
+
+  it('pins AnyRouter to Anthropic Messages and persists its platform profile', () => {
+    expect(resolveCustomEndpointPayload({
+      activePreset: 'anyrouter',
+      baseUrl: 'https://anyrouter.top',
+      customApi: 'openai-completions',
+      brandedOpenAiCompatPresets: BRANDED,
+      fallbackPiAuthProvider: undefined,
+    })).toEqual({
+      customEndpoint: { api: 'anthropic-messages' },
+      piAuthProvider: 'anthropic',
+      platformProfile: 'anyrouter',
+    })
+  })
+
+  it('pins the experimental AnyRouter-Pi preset to Anthropic Messages', () => {
+    expect(resolveCustomEndpointPayload({
+      activePreset: 'anyrouter_pi',
+      baseUrl: 'https://anyrouter.top',
+      customApi: 'openai-completions',
+      brandedOpenAiCompatPresets: BRANDED,
+      fallbackPiAuthProvider: undefined,
+    })).toEqual({
+      customEndpoint: { api: 'anthropic-messages' },
+      piAuthProvider: 'anthropic',
+      platformProfile: 'anyrouter_pi',
     })
   })
 })

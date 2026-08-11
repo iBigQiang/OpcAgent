@@ -10,6 +10,7 @@ import {
   getPiApiKeyProviders,
   getPiProviderBaseUrl,
   isCompatProvider,
+  normalizeApiKeyInput,
   parseValidationError,
   setDefaultLlmConnection,
   setSetupDeferred,
@@ -32,7 +33,9 @@ import {
 import {
   parseTestConnectionError,
   createBuiltInConnection,
+  getDefaultConnectionName,
   piAuthProviderDisplayName,
+  preserveExistingConnectionName,
   resolveCustomEndpointSetup,
   setupTestRequiresApiKey,
   validateModelList,
@@ -100,11 +103,12 @@ function createConnection(setup: LlmConnectionSetup): LlmConnection {
   return {
     slug: setup.slug,
     name: custom?.name
-      ?? (providerName ? `MkAgent Backend (${providerName})` : 'MkAgent Backend'),
+      ?? getDefaultConnectionName(setup.platformProfile, providerName),
     providerType,
     authType: custom?.authType ?? 'api_key',
     ...(baseUrl ? { baseUrl } : {}),
     ...(customEndpoint ? { customEndpoint } : {}),
+    ...(setup.platformProfile ? { platformProfile: setup.platformProfile } : {}),
     ...(piAuthProvider ? { piAuthProvider } : {}),
     models,
     ...(defaultModel ? { defaultModel } : {}),
@@ -139,7 +143,11 @@ export function registerLlmConnectionsHandlers(server: RpcServer, deps: HandlerD
       }
 
       const persisted = existing
-        ? updateLlmConnection(setup.slug, { ...connection, slug: undefined } as Partial<Omit<LlmConnection, 'slug'>>)
+        ? updateLlmConnection(setup.slug, {
+            ...preserveExistingConnectionName(existing, connection),
+            slug: undefined,
+            platformProfile: connection.platformProfile,
+          } as Partial<Omit<LlmConnection, 'slug'>>)
         : addLlmConnection(connection)
       if (!persisted) return { success: false, error: 'Failed to save connection.' }
 
@@ -163,17 +171,24 @@ export function registerLlmConnectionsHandlers(server: RpcServer, deps: HandlerD
     model?: string
     piAuthProvider?: string
     customEndpoint?: LlmConnection['customEndpoint']
+    platformProfile?: LlmConnection['platformProfile']
   }) => {
     const validation = validateSetupTestInput(params)
     if (!validation.valid) return { success: false, error: validation.error }
-    if (setupTestRequiresApiKey(params.baseUrl) && !params.apiKey.trim()) {
+    let apiKey: string
+    try {
+      apiKey = normalizeApiKeyInput(params.apiKey)
+    } catch (error) {
+      return { success: false, error: error instanceof Error ? error.message : 'Invalid API key format' }
+    }
+    if (setupTestRequiresApiKey(params.baseUrl) && !apiKey) {
       return { success: false, error: 'API key is required' }
     }
     try {
       const connection = resolveSetupTestConnectionHint(params)
       const result = await testBackendConnection({
         provider: 'pi',
-        apiKey: params.apiKey,
+        apiKey,
         model: params.model ?? '',
         baseUrl: params.baseUrl,
         connection,

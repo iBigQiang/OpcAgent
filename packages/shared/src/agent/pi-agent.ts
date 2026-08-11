@@ -488,6 +488,7 @@ export class PiAgent extends BaseAgent {
       workspaceId: this.config.workspace.id,
       piAuth,
       baseUrl: runtime.baseUrl,
+      platformProfile: runtime.platformProfile,
       customEndpoint: runtime.customEndpoint,
       customModels: runtime.customModels,
       // Branch params for Pi SDK session fork
@@ -1695,6 +1696,7 @@ export class PiAgent extends BaseAgent {
         providerType: update.providerType,
         authType: update.authType,
         baseUrl: runtime.baseUrl,
+        platformProfile: runtime.platformProfile ?? null,
         customEndpoint: runtime.customEndpoint,
         customModels: runtime.customModels,
       });

@@ -54,6 +54,7 @@ import { RenameDialog } from '@/components/ui/rename-dialog'
 import { useAppShellContext } from '@/context/AppShellContext'
 import { getModelShortName, type ModelDefinition } from '@config/models'
 import { getModelsForProviderType, resolveMidStreamBehavior, type CustomEndpointApi, type MidStreamBehavior } from '@config/llm-connections'
+import { getPlatformConnectionDescription } from './connection-display'
 import { toast } from 'sonner'
 
 /**
@@ -224,6 +225,9 @@ function ConnectionRow({ connection, isLastConnection, onRenameClick, onDelete, 
     if (validationState === 'validating') return t("settings.ai.validating")
     if (validationState === 'success') return t("settings.ai.connectionValid")
     if (validationState === 'error') return validationError || t("settings.ai.validationFailed")
+
+    const platformDescription = getPlatformConnectionDescription(connection.platformProfile)
+    if (platformDescription) return platformDescription
 
     const parts: string[] = []
 
@@ -597,6 +601,7 @@ export default function AiSettingsPage() {
     activePreset?: string
     models?: string[]
     customApi?: CustomEndpointApi
+    platformProfile?: import('@config/llm-connections').LlmPlatformProfile
   } | undefined>(undefined)
   const setFullscreenOverlayOpen = useSetAtom(fullscreenOverlayOpenAtom)
 
@@ -763,14 +768,6 @@ export default function AiSettingsPage() {
   }, [renamingConnection, renameValue, refreshLlmConnections])
 
   const handleEditConnection = useCallback(async (connection: LlmConnectionWithStatus) => {
-    // Fetch stored API key (best-effort — if IPC not available yet, skip pre-fill)
-    let apiKey: string | undefined
-    try {
-      apiKey = (await window.electronAPI.getLlmConnectionApiKey(connection.slug)) ?? undefined
-    } catch {
-      // IPC method may not exist if app wasn't restarted after code change
-    }
-
     // Build model string from connection's models array
     const modelStr = connection.models
       ?.map((m: string | ModelDefinition) => typeof m === 'string' ? m : m.id)
@@ -784,12 +781,15 @@ export default function AiSettingsPage() {
     const isCustomEndpointConnection = !!connection.customEndpoint && !!connection.baseUrl?.trim()
 
     setEditInitialValues({
-      apiKey,
+      // Credentials stay in the encrypted backend store. Never copy the
+      // renderer-facing masked placeholder into an editable API-key field.
+      apiKey: undefined,
       baseUrl: connection.baseUrl,
       connectionDefaultModel: modelStr,
-      activePreset: isCustomEndpointConnection ? 'custom' : (connection.piAuthProvider || undefined),
+      activePreset: connection.platformProfile ?? (isCustomEndpointConnection ? 'custom' : (connection.piAuthProvider || undefined)),
       models: modelIds,
       customApi: connection.customEndpoint?.api,
+      platformProfile: connection.platformProfile,
     })
 
     // Open overlay and jump directly to credentials step (no reset — jumpToCredentials sets state)
@@ -997,9 +997,10 @@ export default function AiSettingsPage() {
                     options={llmConnections.map((conn) => ({
                       value: conn.slug,
                       label: conn.name,
-                      description: conn.providerType === 'pi' ? 'Pi Backend' :
+                      description: getPlatformConnectionDescription(conn.platformProfile)
+                                   ?? (conn.providerType === 'pi' ? 'Pi Backend' :
                                    conn.providerType === 'pi_compat' ? (conn.baseUrl?.toLowerCase().includes('manifest.build') ? 'Manifest' : 'Pi Backend Compatible') :
-                                   conn.providerType || 'Unknown',
+                                   conn.providerType || 'Unknown'),
                     }))}
                   />
                   <SettingsMenuSelectRow

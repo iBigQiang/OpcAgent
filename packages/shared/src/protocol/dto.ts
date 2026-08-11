@@ -9,7 +9,7 @@ import type {
 } from '@mkagent/core/types';
 import type { PermissionMode } from '../agent/mode-types.ts';
 import type { ThinkingLevel } from '../agent/thinking-levels.ts';
-import type { CustomEndpointConfig } from '../config/llm-connections.ts';
+import type { CustomEndpointConfig, LlmPlatformProfile } from '../config/llm-connections.ts';
 import type {
   AuthRequest as SharedAuthRequest,
   CredentialAuthRequest as SharedCredentialAuthRequest,
@@ -248,6 +248,7 @@ export interface LlmConnectionSetup {
   modelSelectionMode?: 'automaticallySyncedFromProvider' | 'userDefined3Tier';
   updateOnly?: boolean;
   customEndpoint?: CustomEndpointConfig;
+  platformProfile?: LlmPlatformProfile;
   oauthIdentity?: ClaudeOAuthIdentityDto;
 }
 export interface TestLlmConnectionParams {
@@ -257,6 +258,7 @@ export interface TestLlmConnectionParams {
   model?: string;
   piAuthProvider?: string;
   customEndpoint?: CustomEndpointConfig;
+  platformProfile?: LlmPlatformProfile;
 }
 export interface TestLlmConnectionResult { success: boolean; error?: string }
 export interface ClaudeOAuthResult {
@@ -274,6 +276,14 @@ export interface RefreshTitleResult { success: boolean; title?: string; error?: 
 export interface PlanStep { id: string; description: string; tools?: string[]; status?: 'pending' | 'in_progress' | 'completed' | 'failed' | 'skipped' }
 export interface Plan { id: string; title: string; summary?: string; steps: PlanStep[]; questions?: string[]; state?: 'creating' | 'refining' | 'ready' | 'executing' | 'completed' | 'cancelled'; createdAt?: number; updatedAt?: number }
 export interface GitBashStatus { found: boolean; path: string | null; platform: 'win32' | 'darwin' | 'linux' }
+export interface ClaudeCliStatus {
+  found: boolean;
+  path: string | null;
+  version?: string;
+  source?: 'persisted' | 'host-override' | 'common-install' | 'path' | 'project-local';
+  error?: string;
+  platform: 'win32' | 'darwin' | 'linux';
+}
 export interface UpdateInfo { available: boolean; currentVersion: string; latestVersion: string | null; downloadState: 'idle' | 'downloading' | 'ready' | 'installing' | 'error'; downloadProgress: number; error?: string }
 export interface WorkspaceSettings { name?: string; model?: string; permissionMode?: PermissionMode; cyclablePermissionModes?: PermissionMode[]; thinkingLevel?: ThinkingLevel; workingDirectory?: string; localMcpEnabled?: boolean; defaultLlmConnection?: string; enabledSourceSlugs?: string[] }
 export type WindowCloseRequestSource = 'keyboard-shortcut' | 'window-button' | 'unknown';

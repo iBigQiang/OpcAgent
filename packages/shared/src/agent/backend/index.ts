@@ -46,3 +46,10 @@ export {
 export { BaseEventAdapter } from './base-event-adapter.ts';
 export { EventQueue } from './event-queue.ts';
 export { PiEventAdapter } from './pi/event-adapter.ts';
+export {
+  isClaudeExecutablePath,
+  resolveClaudeExecutable,
+  validateClaudeExecutablePath,
+  type ClaudeExecutableSource,
+  type ClaudeExecutableValidation,
+} from './internal/runtime-resolver.ts';

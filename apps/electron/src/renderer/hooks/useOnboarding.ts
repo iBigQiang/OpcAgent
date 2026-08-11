@@ -18,7 +18,11 @@ import type {
 import type { ProviderChoice } from '@/components/onboarding/ProviderSelectStep'
 import type { LocalModelSubmitData } from '@/components/onboarding/LocalModelStep'
 import type { ApiKeySubmitData } from '@/components/apisetup'
-import type { CustomEndpointConfig } from '@config/llm-connections'
+import {
+  normalizeApiKeyInput,
+  type CustomEndpointConfig,
+  type LlmPlatformProfile,
+} from '@config/llm-connections'
 import type { SetupNeeds, LlmConnectionSetup, ClaudeOAuthIdentityDto } from '../../shared/types'
 
 interface UseOnboardingOptions {
@@ -136,6 +140,7 @@ export function apiSetupMethodToConnectionSetup(
     piAuthProvider?: string
     modelSelectionMode?: 'automaticallySyncedFromProvider' | 'userDefined3Tier'
     customEndpoint?: CustomEndpointConfig
+    platformProfile?: LlmPlatformProfile
     oauthIdentity?: ClaudeOAuthIdentityDto
   },
   editingSlug: string | null,
@@ -145,7 +150,17 @@ export function apiSetupMethodToConnectionSetup(
 
   if (method === 'claude_oauth') return { slug, credential: options.credential, oauthIdentity: options.oauthIdentity }
   if (method === 'pi_chatgpt_oauth') return { slug, credential: options.credential }
-  return { slug, credential: options.credential, baseUrl: options.baseUrl, defaultModel: options.connectionDefaultModel, models: options.models, piAuthProvider: options.piAuthProvider, modelSelectionMode: options.modelSelectionMode, customEndpoint: options.customEndpoint }
+  return {
+    slug,
+    credential: options.credential,
+    baseUrl: options.baseUrl,
+    defaultModel: options.connectionDefaultModel,
+    models: options.models,
+    piAuthProvider: options.piAuthProvider,
+    modelSelectionMode: options.modelSelectionMode,
+    customEndpoint: options.customEndpoint,
+    ...(options.platformProfile ? { platformProfile: options.platformProfile } : {}),
+  }
 }
 
 export function useOnboarding({
@@ -206,6 +221,7 @@ export function useOnboarding({
       piAuthProvider?: string
       modelSelectionMode?: 'automaticallySyncedFromProvider' | 'userDefined3Tier'
       customEndpoint?: CustomEndpointConfig
+      platformProfile?: LlmPlatformProfile
       oauthIdentity?: ClaudeOAuthIdentityDto
     },
     methodOverride?: ApiSetupMethod,
@@ -222,14 +238,8 @@ export function useOnboarding({
     try {
       // Build connection setup from UI state
       const setup = apiSetupMethodToConnectionSetup(method, {
+        ...options,
         credential,
-        baseUrl: options?.baseUrl,
-        connectionDefaultModel: options?.connectionDefaultModel,
-        models: options?.models,
-        piAuthProvider: options?.piAuthProvider,
-        modelSelectionMode: options?.modelSelectionMode,
-        customEndpoint: options?.customEndpoint,
-        oauthIdentity: options?.oauthIdentity,
       }, connectionSlugOverride ?? editingSlug, existingSlugs)
       // Use new unified API
       const result = await window.electronAPI.setupLlmConnection(
@@ -343,6 +353,7 @@ export function useOnboarding({
           piAuthProvider: data.piAuthProvider,
           modelSelectionMode: data.modelSelectionMode,
           customEndpoint: data.customEndpoint,
+          platformProfile: data.platformProfile,
         })
         if (saved) {
           setState(s => ({ ...s, credentialStatus: 'success', step: 'complete' }))
@@ -352,11 +363,23 @@ export function useOnboarding({
         return
       }
 
+      let normalizedApiKey: string
+      try {
+        normalizedApiKey = normalizeApiKeyInput(data.apiKey)
+      } catch (error) {
+        setState(s => ({
+          ...s,
+          credentialStatus: 'error',
+          errorMessage: error instanceof Error ? error.message : 'Invalid API key format',
+        }))
+        return
+      }
+
       // API key validation differs by endpoint locality:
       // - Local/loopback custom endpoints may be keyless (e.g. Ollama)
       // - Non-local endpoints require an API key
       const isLoopbackCustomEndpoint = isLoopbackEndpoint(data.baseUrl)
-      if (!data.apiKey.trim() && !isLoopbackCustomEndpoint) {
+      if (!normalizedApiKey && !isLoopbackCustomEndpoint) {
         setState(s => ({
           ...s,
           credentialStatus: 'error',
@@ -370,11 +393,12 @@ export function useOnboarding({
       const setupTestProvider = 'pi'
       const testResult = await window.electronAPI.testLlmConnectionSetup({
         provider: setupTestProvider,
-        apiKey: data.apiKey,
+        apiKey: normalizedApiKey,
         baseUrl: data.baseUrl,
         model: data.models?.[0],
         piAuthProvider: data.piAuthProvider,
         customEndpoint: data.customEndpoint,
+        ...(data.platformProfile ? { platformProfile: data.platformProfile } : {}),
       })
 
       if (!testResult.success) {
@@ -386,13 +410,14 @@ export function useOnboarding({
         return
       }
 
-      const saved = await handleSaveConfig(data.apiKey, {
+      const saved = await handleSaveConfig(normalizedApiKey, {
         baseUrl: data.baseUrl,
         connectionDefaultModel: data.connectionDefaultModel,
         models: data.models,
         piAuthProvider: data.piAuthProvider,
         modelSelectionMode: data.modelSelectionMode,
         customEndpoint: data.customEndpoint,
+        ...(data.platformProfile ? { platformProfile: data.platformProfile } : {}),
       })
 
       if (saved) {

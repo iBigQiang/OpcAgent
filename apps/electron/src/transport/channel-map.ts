@@ -187,6 +187,10 @@ export const CHANNEL_MAP = {
   checkGitBash: invoke(RPC_CHANNELS.gitbash.CHECK),
   browseForGitBash: invoke(RPC_CHANNELS.gitbash.BROWSE),
   setGitBashPath: invoke(RPC_CHANNELS.gitbash.SET_PATH),
+  checkClaudeCli: invoke(RPC_CHANNELS.claude.CHECK),
+  browseForClaudeCli: invoke(RPC_CHANNELS.claude.BROWSE),
+  setClaudeCliPath: invoke(RPC_CHANNELS.claude.SET_PATH),
+  clearClaudeCliPath: invoke(RPC_CHANNELS.claude.CLEAR_PATH),
 
   showNotification: invoke(RPC_CHANNELS.notification.SHOW),
   onNotificationNavigate: listener(RPC_CHANNELS.notification.NAVIGATE),

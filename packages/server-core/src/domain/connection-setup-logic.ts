@@ -9,6 +9,7 @@ import type { ModelDefinition } from '@mkagent/shared/config/models'
 import {
   type LlmConnection,
   type CustomEndpointApi,
+  type LlmPlatformProfile,
   getDefaultModelsForConnection,
   getDefaultModelForConnection,
   defaultMidStreamBehavior,
@@ -121,6 +122,25 @@ export function resolveCustomEndpointSetup(input: {
     authType: 'api_key_with_endpoint',
     piAuthProvider: input.customEndpointApi === 'anthropic-messages' ? 'anthropic' : 'openai',
   }
+}
+
+/** Use platform names for newly created branded endpoint connections. */
+export function getDefaultConnectionName(
+  platformProfile: LlmPlatformProfile | undefined,
+  providerName: string | null,
+): string {
+  if (platformProfile === 'anyrouter') return 'AnyRouter-CC'
+  if (platformProfile === 'anyrouter_pi') return 'AnyRouter-Pi'
+  if (platformProfile === 'agentrouter') return 'AgentRouter'
+  return providerName ? `MkAgent Backend (${providerName})` : 'MkAgent Backend'
+}
+
+/** Keep a user's connection name when re-saving an existing profile. */
+export function preserveExistingConnectionName(
+  existing: Pick<LlmConnection, 'name'>,
+  connection: LlmConnection,
+): LlmConnection {
+  return { ...connection, name: existing.name }
 }
 
 // ============================================================

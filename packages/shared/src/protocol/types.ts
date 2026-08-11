@@ -157,6 +157,18 @@ export const HEARTBEAT_MAX_MISSED = 2
 /** Default request timeout in ms. */
 export const REQUEST_TIMEOUT_MS = 30_000
 
+/** Connection setup can launch a real provider CLI and needs a longer first-response window. */
+export const CONNECTION_SETUP_REQUEST_TIMEOUT_MS = 180_000
+
+export function getRpcRequestTimeoutMs(
+  channel: string,
+  fallbackTimeoutMs = REQUEST_TIMEOUT_MS,
+): number {
+  return channel === 'settings:testLlmConnectionSetup'
+    ? CONNECTION_SETUP_REQUEST_TIMEOUT_MS
+    : fallbackTimeoutMs
+}
+
 // -- Reliable delivery constants --
 
 /** Max events to retain per client in the ring buffer. */

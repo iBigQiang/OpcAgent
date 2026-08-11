@@ -18,6 +18,7 @@ import {
   EVENT_BUFFER_MAX_SIZE,
   EVENT_BUFFER_TTL_MS,
   DISCONNECTED_CLIENT_TTL_MS,
+  getRpcRequestTimeoutMs,
   isErrorCode,
   type MessageEnvelope,
   type PushTarget,
@@ -660,11 +661,12 @@ export class WsRpcServer implements RpcServer {
     }
 
     try {
+      const handlerTimeoutMs = getRpcRequestTimeoutMs(channel, WsRpcServer.HANDLER_TIMEOUT_MS)
       const result = await Promise.race([
         handler(ctx, ...(args ?? [])),
         new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error(`Handler timeout: ${channel} (${WsRpcServer.HANDLER_TIMEOUT_MS}ms)`)),
-            WsRpcServer.HANDLER_TIMEOUT_MS),
+          setTimeout(() => reject(new Error(`Handler timeout: ${channel} (${handlerTimeoutMs}ms)`)),
+            handlerTimeoutMs),
         ),
       ])
       const response: MessageEnvelope = {

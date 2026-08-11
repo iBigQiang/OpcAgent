@@ -1,9 +1,17 @@
-import { describe, expect, it } from 'bun:test'
+import { afterEach, describe, expect, it, mock, spyOn } from 'bun:test'
+import { copyFileSync, mkdirSync, rmSync, rmdirSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { RPC_CHANNELS } from '@mkagent/shared/protocol'
 import { CLIENT_OPEN_EXTERNAL } from '@mkagent/server-core/transport'
 import type { RpcServer, HandlerFn, RequestContext } from '@mkagent/server-core/transport'
 import type { HandlerDeps } from '../handler-deps'
+import * as backend from '@mkagent/shared/agent/backend'
+import * as config from '@mkagent/shared/config'
+import * as handlerUtils from '@mkagent/server-core/handlers'
 import { registerSystemCoreHandlers } from './system'
+
+afterEach(() => mock.restore())
 
 function createTestHarness(overrides?: { workspaceId?: string | null }) {
   const handlers = new Map<string, HandlerFn>()
@@ -60,8 +68,67 @@ function createTestHarness(overrides?: { workspaceId?: string | null }) {
     webContentsId: 101,
   }
 
-  return { openUrl, ctx, invokeClientCalls, pushCalls }
+  return { openUrl, ctx, handlers, invokeClientCalls, pushCalls }
 }
+
+describe('registerSystemCoreHandlers Claude Code CLI', () => {
+  it('registers CLI discovery controls and rejects an invalid manual executable without persisting it', async () => {
+    const { handlers, ctx } = createTestHarness()
+    const check = handlers.get(RPC_CHANNELS.claude.CHECK)
+    const setPath = handlers.get(RPC_CHANNELS.claude.SET_PATH)
+    const clearPath = handlers.get(RPC_CHANNELS.claude.CLEAR_PATH)
+
+    expect(check).toBeDefined()
+    expect(setPath).toBeDefined()
+    expect(clearPath).toBeDefined()
+    await expect(setPath!(ctx, 'C:\\not-a-claude-executable.exe')).resolves.toMatchObject({
+      success: false,
+      error: expect.stringContaining('claude'),
+    })
+  })
+
+  it('persists a selected executable for CHECK and clears it again', async () => {
+    const base = join(tmpdir(), `system-claude-cli-test-${Date.now()}`)
+    const executable = join(base, process.platform === 'win32' ? 'claude.exe' : 'claude')
+    mkdirSync(base, { recursive: true })
+    copyFileSync(process.execPath, executable)
+
+    let persistedPath: string | undefined
+    const setPathSpy = spyOn(config, 'setClaudeExecutablePath').mockImplementation((path) => {
+      persistedPath = path
+      return true
+    })
+    const clearPathSpy = spyOn(config, 'clearClaudeExecutablePath').mockImplementation(() => {
+      persistedPath = undefined
+    })
+    spyOn(handlerUtils, 'buildBackendHostRuntimeContext').mockImplementation((platform) => ({
+      appRootPath: platform.appRootPath,
+      resourcesPath: platform.resourcesPath,
+      isPackaged: platform.isPackaged,
+      persistedClaudeExecutablePath: persistedPath,
+    }))
+    spyOn(backend, 'resolveClaudeExecutable').mockImplementation((runtime) => runtime.persistedClaudeExecutablePath
+      ? { valid: true, path: runtime.persistedClaudeExecutablePath, version: 'test-version', source: 'persisted' }
+      : { valid: false, error: 'not found' })
+
+    try {
+      const { handlers, ctx } = createTestHarness()
+      const check = handlers.get(RPC_CHANNELS.claude.CHECK)!
+      const setPath = handlers.get(RPC_CHANNELS.claude.SET_PATH)!
+      const clearPath = handlers.get(RPC_CHANNELS.claude.CLEAR_PATH)!
+
+      await expect(setPath(ctx, executable)).resolves.toMatchObject({ success: true, path: executable })
+      expect(setPathSpy).toHaveBeenCalledWith(executable)
+      await expect(check(ctx)).resolves.toMatchObject({ found: true, path: executable, source: 'persisted' })
+
+      await expect(clearPath(ctx)).resolves.toMatchObject({ success: true, found: false, path: null })
+      expect(clearPathSpy).toHaveBeenCalledTimes(1)
+    } finally {
+      rmSync(executable, { force: true })
+      rmdirSync(base)
+    }
+  })
+})
 
 describe('registerSystemCoreHandlers OPEN_URL', () => {
   it('routes mkagent action links internally via deeplink:navigate', async () => {

@@ -1,7 +1,7 @@
 import { normalize, isAbsolute, sep } from 'path'
 import { homedir, tmpdir } from 'os'
 import { realpath } from 'fs/promises'
-import { getWorkspaceByNameOrId, type Workspace } from '@mkagent/shared/config'
+import { getClaudeExecutablePath, getWorkspaceByNameOrId, type Workspace } from '@mkagent/shared/config'
 import { loadWorkspaceConfig } from '@mkagent/shared/workspaces'
 import type { PlatformServices } from '../runtime/platform'
 
@@ -22,6 +22,7 @@ export function buildBackendHostRuntimeContext(platform: PlatformServices) {
     appRootPath: platform.appRootPath,
     resourcesPath: platform.resourcesPath,
     isPackaged: platform.isPackaged,
+    persistedClaudeExecutablePath: getClaudeExecutablePath(),
   }
 }
 

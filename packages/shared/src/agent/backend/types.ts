@@ -46,7 +46,7 @@ export interface BackendRuntimeUpdate {
 /**
  * Provider identifier for AI backends.
  */
-export type AgentProvider = 'pi';
+export type AgentProvider = 'anthropic' | 'pi';
 
 
 // ============================================================
@@ -125,6 +125,10 @@ export interface BackendHostRuntimeContext {
   nodeRuntimePath?: string;
   /** Optional interceptor bundle override (CJS bundle loaded via --require) */
   interceptorBundlePath?: string;
+  /** Optional Claude Code executable override for the AnyRouter CLI backend. */
+  claudeExecutablePath?: string;
+  /** Persisted MkAgent Claude Code executable path. Takes precedence over host overrides. */
+  persistedClaudeExecutablePath?: string;
 }
 
 /**

@@ -1,6 +1,8 @@
 import type { ProviderDriver, DriverTestConnectionArgs } from '../driver-types.ts';
 import { getAllPiModels, getPiModelsForAuthProvider } from '../../../../config/models-pi.ts';
 import { getPiProviderBaseUrl } from '../../../../config/models-pi.ts';
+import { normalizePlatformProfileBaseUrl } from '../../../../config/llm-connections.ts';
+import { adaptAnyRouterPiRequest, ANYROUTER_PI_PROFILE } from '../anyrouter-pi-wire.ts';
 
 /**
  * Lightweight direct HTTP test for Pi providers that expose an Anthropic-compatible
@@ -49,32 +51,98 @@ async function testAnthropicCompatible(
   }
 }
 
+async function testAnyRouterPiCompatible(
+  apiKey: string,
+  model: string,
+  timeoutMs: number,
+): Promise<{ success: boolean; error?: string }> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const request = adaptAnyRouterPiRequest({
+      url: 'https://anyrouter.top/v1/messages',
+      headers: { 'content-type': 'application/json', 'x-api-key': apiKey },
+      body: {
+        model: model.startsWith('pi/') ? model.slice(3) : model,
+        max_tokens: 16,
+        messages: [{ role: 'user', content: 'Say ok' }],
+      },
+      sessionId: crypto.randomUUID(),
+      deviceId: crypto.randomUUID().replaceAll('-', ''),
+    });
+    const res = await fetch(request.url, {
+      method: 'POST',
+      signal: controller.signal,
+      headers: request.headers,
+      body: JSON.stringify(request.body),
+    });
+    const text = await res.text().catch(() => '');
+    if (!res.ok) return { success: false, error: `${res.status} ${text}`.slice(0, 500) };
+
+    let sawMessageStop = false;
+    for (const line of text.split(/\r?\n/)) {
+      if (!line.startsWith('data:')) continue;
+      try {
+        const event = JSON.parse(line.slice(5).trim()) as {
+          type?: string;
+          error?: { type?: string; message?: string };
+        };
+        if (event.type === 'message_stop') sawMessageStop = true;
+        if (event.type === 'error' || event.type === 'rate_limit') {
+          const detail = event.error?.message || event.error?.type || event.type;
+          return { success: false, error: detail.slice(0, 500) };
+        }
+      } catch {
+        // Ignore non-JSON SSE lines such as keep-alive comments.
+      }
+    }
+    return sawMessageStop
+      ? { success: true }
+      : { success: false, error: 'AnyRouter response ended without message_stop' };
+  } catch (err) {
+    if ((err as Error).name === 'AbortError') return { success: false, error: 'Connection test timed out' };
+    return { success: false, error: (err as Error).message };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 export const piDriver: ProviderDriver = {
   provider: 'pi',
-  buildRuntime: ({ context, providerOptions, resolvedPaths }) => ({
-    paths: {
-      piServer: resolvedPaths.piServerPath,
-      interceptor: resolvedPaths.interceptorBundlePath,
-      node: resolvedPaths.nodeRuntimePath,
-    },
-    piAuthProvider: providerOptions?.piAuthProvider || context.connection?.piAuthProvider,
-    baseUrl: context.connection?.baseUrl,
-    customEndpoint: context.connection?.customEndpoint,
-    customModels: context.connection?.models?.map(m => {
-      if (typeof m === 'string') return m;
-      const supportsImages = typeof m.supportsImages === 'boolean'
-        ? m.supportsImages
-        : undefined;
-      if (m.contextWindow || supportsImages !== undefined) {
-        return {
-          id: m.id,
-          ...(m.contextWindow ? { contextWindow: m.contextWindow } : {}),
-          ...(supportsImages !== undefined ? { supportsImages } : {}),
-        };
-      }
-      return m.id;
-    }),
-  }),
+  buildRuntime: ({ context, providerOptions, resolvedPaths }) => {
+    const platformProfile = context.connection?.platformProfile;
+    return {
+      paths: {
+        piServer: resolvedPaths.piServerPath,
+        interceptor: resolvedPaths.interceptorBundlePath,
+        node: resolvedPaths.nodeRuntimePath,
+      },
+      piAuthProvider: platformProfile === ANYROUTER_PI_PROFILE
+        ? 'anthropic'
+        : providerOptions?.piAuthProvider || context.connection?.piAuthProvider,
+      baseUrl: platformProfile === 'agentrouter' || platformProfile === ANYROUTER_PI_PROFILE
+        ? normalizePlatformProfileBaseUrl(platformProfile, context.connection?.baseUrl)
+        : context.connection?.baseUrl,
+      platformProfile,
+      customEndpoint: platformProfile === ANYROUTER_PI_PROFILE
+        ? { api: 'anthropic-messages' }
+        : context.connection?.customEndpoint,
+      customModels: context.connection?.models?.map(m => {
+        if (typeof m === 'string') return m;
+        const supportsImages = typeof m.supportsImages === 'boolean'
+          ? m.supportsImages
+          : undefined;
+        if (m.contextWindow || supportsImages !== undefined) {
+          return {
+            id: m.id,
+            ...(m.contextWindow ? { contextWindow: m.contextWindow } : {}),
+            ...(supportsImages !== undefined ? { supportsImages } : {}),
+          };
+        }
+        return m.id;
+      }),
+    };
+  },
   fetchModels: async ({ connection, credentials, timeoutMs }) => {
     // Pi providers use the SDK model registry; custom endpoints supply models directly.
     const models = connection.piAuthProvider
@@ -90,6 +158,10 @@ export const piDriver: ProviderDriver = {
     return { models };
   },
   testConnection: async (args: DriverTestConnectionArgs): Promise<{ success: boolean; error?: string } | null> => {
+    if (args.connection?.platformProfile === ANYROUTER_PI_PROFILE) {
+      normalizePlatformProfileBaseUrl(ANYROUTER_PI_PROFILE, args.baseUrl);
+      return testAnyRouterPiCompatible(args.apiKey, args.model, args.timeoutMs);
+    }
     const piAuthProvider = args.connection?.piAuthProvider;
     if (!piAuthProvider) {
       // No provider hint — fall back to generic subprocess path
@@ -138,5 +210,10 @@ export const piDriver: ProviderDriver = {
       isCustomAnthropicEndpoint,
     );
   },
-  validateStoredConnection: async () => ({ success: true }),
+  validateStoredConnection: async ({ connection }) => {
+    if (connection.platformProfile === 'agentrouter' || connection.platformProfile === ANYROUTER_PI_PROFILE) {
+      normalizePlatformProfileBaseUrl(connection.platformProfile, connection.baseUrl);
+    }
+    return { success: true };
+  },
 };

@@ -13,7 +13,46 @@ export type LlmProviderType = 'pi' | 'pi_compat';
 export type LlmAuthType = 'api_key' | 'api_key_with_endpoint' | 'oauth' | 'none';
 export type ModelSelectionMode = 'automaticallySyncedFromProvider' | 'userDefined3Tier';
 export type CustomEndpointApi = 'openai-completions' | 'anthropic-messages';
+export type LlmPlatformProfile = 'agentrouter' | 'anyrouter' | 'anyrouter_pi';
 export type MidStreamBehavior = 'steer' | 'queue';
+
+const PLATFORM_PROFILE_ORIGINS: Readonly<Record<LlmPlatformProfile, string>> = {
+  agentrouter: 'https://agentrouter.org',
+  anyrouter: 'https://anyrouter.top',
+  anyrouter_pi: 'https://anyrouter.top',
+};
+
+export function normalizePlatformProfileBaseUrl(
+  platformProfile: LlmPlatformProfile,
+  value: string | undefined,
+): string {
+  const expectedOrigin = PLATFORM_PROFILE_ORIGINS[platformProfile];
+  const errorMessage = `${platformProfile} profile requires ${expectedOrigin}`;
+  if (!value?.trim()) throw new Error(errorMessage);
+
+  let parsed: URL;
+  try {
+    parsed = new URL(value.trim());
+  } catch {
+    throw new Error(errorMessage);
+  }
+
+  const hasUnexpectedParts = parsed.origin.toLowerCase() !== expectedOrigin
+    || (parsed.pathname !== '/' && parsed.pathname !== '')
+    || Boolean(parsed.username || parsed.password || parsed.search || parsed.hash);
+  if (hasUnexpectedParts) throw new Error(errorMessage);
+  return expectedOrigin;
+}
+
+export function normalizeApiKeyInput(value: string): string {
+  const normalized = value.trim();
+  if (normalized && !/^[\x21-\x7E]+$/.test(normalized)) {
+    throw new Error(
+      'API key contains invalid characters. Paste the raw key without labels, quotes, line breaks, or masked dots.',
+    );
+  }
+  return normalized;
+}
 
 export interface CustomEndpointConfig {
   api: CustomEndpointApi;
@@ -31,6 +70,7 @@ export interface LlmConnection {
   modelSelectionMode?: ModelSelectionMode;
   piAuthProvider?: string;
   customEndpoint?: CustomEndpointConfig;
+  platformProfile?: LlmPlatformProfile;
   midStreamBehavior?: MidStreamBehavior;
   oauthAccountUuid?: string;
   oauthAccountEmail?: string;

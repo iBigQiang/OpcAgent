@@ -4,6 +4,8 @@ import {
   isLoopbackBaseUrl,
   setupTestRequiresApiKey,
   resolveCustomEndpointSetup,
+  getDefaultConnectionName,
+  preserveExistingConnectionName,
   createBuiltInConnection,
   BUILT_IN_CONNECTION_TEMPLATES,
 } from './connection-setup-logic'
@@ -46,6 +48,32 @@ describe('setup test API key requirements', () => {
   it('allows keyless setup tests for loopback endpoints', () => {
     expect(setupTestRequiresApiKey('http://localhost:11434/v1')).toBe(false)
     expect(setupTestRequiresApiKey('http://127.0.0.1:11434/v1')).toBe(false)
+  })
+})
+
+describe('branded connection names', () => {
+  it('uses a platform name only for newly created branded profiles', () => {
+    expect(getDefaultConnectionName('anyrouter', 'Anthropic')).toBe('AnyRouter-CC')
+    expect(getDefaultConnectionName('anyrouter_pi', 'Anthropic')).toBe('AnyRouter-Pi')
+    expect(getDefaultConnectionName('agentrouter', 'Anthropic')).toBe('AgentRouter')
+    expect(getDefaultConnectionName(undefined, 'Anthropic')).toBe('MkAgent Backend (Anthropic)')
+  })
+
+  it('preserves a custom name when an existing connection is re-saved', () => {
+    const saved = preserveExistingConnectionName(
+      { name: 'My Claude Gateway' },
+      {
+        slug: 'anyrouter',
+        name: 'AnyRouter-CC',
+        providerType: 'pi_compat',
+        authType: 'api_key_with_endpoint',
+        platformProfile: 'anyrouter',
+        createdAt: 1,
+      },
+    )
+
+    expect(saved.name).toBe('My Claude Gateway')
+    expect(saved.platformProfile).toBe('anyrouter')
   })
 })
 

@@ -12,10 +12,13 @@ import {
   resolveSetupTestConnectionHint,
 } from '../factory.ts';
 import { createMockBackendConfig } from '../../__tests__/test-utils.ts';
+import { normalizeAnyRouterBaseUrl } from '../internal/drivers/anthropic.ts';
+import { normalizePlatformProfileBaseUrl } from '../../../config/llm-connections.ts';
 
-describe('Pi-only backend registry', () => {
-  it('registers only Pi', () => {
-    expect(getAvailableProviders()).toEqual(['pi']);
+describe('backend registry', () => {
+  it('registers Claude CLI and Pi', () => {
+    expect(getAvailableProviders()).toEqual(['anthropic', 'pi']);
+    expect(isProviderAvailable('anthropic')).toBe(true);
     expect(isProviderAvailable('pi')).toBe(true);
   });
 
@@ -41,6 +44,27 @@ describe('Pi-only backend registry', () => {
   it('maps retained provider types to Pi', () => {
     expect(providerTypeToAgentProvider('pi')).toBe('pi');
     expect(providerTypeToAgentProvider('pi_compat')).toBe('pi');
+  });
+
+  it('routes only the AnyRouter profile through the Claude CLI backend', () => {
+    expect(providerTypeToAgentProvider('pi_compat', 'anyrouter')).toBe('anthropic');
+    expect(providerTypeToAgentProvider('pi_compat', 'anyrouter_pi')).toBe('pi');
+    expect(providerTypeToAgentProvider('pi_compat', 'agentrouter')).toBe('pi');
+  });
+
+  it('pins the AnyRouter profile to its HTTPS origin', () => {
+    expect(normalizeAnyRouterBaseUrl('https://anyrouter.top/')).toBe('https://anyrouter.top');
+    expect(() => normalizeAnyRouterBaseUrl('https://example.test')).toThrow('requires https://anyrouter.top');
+    expect(() => normalizeAnyRouterBaseUrl('http://anyrouter.top')).toThrow('requires https://anyrouter.top');
+    expect(() => normalizeAnyRouterBaseUrl('https://anyrouter.top/v1')).toThrow('requires https://anyrouter.top');
+    expect(() => normalizeAnyRouterBaseUrl('https://anyrouter.top:444')).toThrow('requires https://anyrouter.top');
+  });
+
+  it('pins the AgentRouter profile to its HTTPS origin', () => {
+    expect(normalizePlatformProfileBaseUrl('agentrouter', 'https://agentrouter.org/'))
+      .toBe('https://agentrouter.org');
+    expect(() => normalizePlatformProfileBaseUrl('agentrouter', 'https://example.test'))
+      .toThrow('requires https://agentrouter.org');
   });
 
   it('passes through retained API key auth types', () => {
@@ -74,6 +98,20 @@ describe('Pi-only backend registry', () => {
       providerType: 'pi_compat',
       piAuthProvider: 'openai',
       customEndpoint: { api: 'openai-completions' },
+    });
+  });
+
+  it('preserves a platform profile for custom endpoint setup tests', () => {
+    expect(resolveSetupTestConnectionHint({
+      provider: 'pi',
+      baseUrl: 'https://anyrouter.top',
+      customEndpoint: { api: 'anthropic-messages' },
+      platformProfile: 'anyrouter',
+    })).toEqual({
+      providerType: 'pi_compat',
+      piAuthProvider: 'anthropic',
+      customEndpoint: { api: 'anthropic-messages' },
+      platformProfile: 'anyrouter',
     });
   });
 

@@ -1,6 +1,21 @@
-import type { CustomEndpointApi, CustomEndpointConfig } from '@config/llm-connections'
+import type { CustomEndpointApi, CustomEndpointConfig, LlmPlatformProfile } from '@config/llm-connections'
 
 export type PresetKey = string
+
+/**
+ * The backend exposes only a masked credential hint to the renderer. Treat any
+ * non-ASCII display value as empty so it can never be submitted as a real key.
+ */
+export function resolveEditableApiKey(value: string | undefined): string {
+  if (!value) return ''
+  return /^[\x21-\x7E]+$/.test(value) ? value : ''
+}
+
+export const PLATFORM_PROFILE_BY_PRESET: Readonly<Record<string, LlmPlatformProfile | undefined>> = {
+  agentrouter: 'agentrouter',
+  anyrouter: 'anyrouter',
+  anyrouter_pi: 'anyrouter_pi',
+}
 
 /**
  * Preset keys that are regional variants of a canonical Pi auth provider.
@@ -59,7 +74,8 @@ export function resolvePresetStateForBaseUrlChange(params: {
 /**
  * Resolve the customEndpoint + piAuthProvider payload at submit time.
  *
- * Three submit branches:
+ * Four submit branches:
+ *  - platform profile preset                    → pinned to anthropic-messages with its profile
  *  - branded openai-compat preset (e.g. Manifest)  → pinned to openai-completions
  *  - generic custom preset with a base URL         → honors the protocol toggle
  *  - everything else                               → no customEndpoint, passthrough piAuth
@@ -73,17 +89,25 @@ export function resolveCustomEndpointPayload(params: {
 }): {
   customEndpoint: CustomEndpointConfig | undefined
   piAuthProvider: string | undefined
+  platformProfile?: LlmPlatformProfile
 } {
   const { activePreset, baseUrl, customApi, brandedOpenAiCompatPresets, fallbackPiAuthProvider } = params
 
+  const platformProfile = PLATFORM_PROFILE_BY_PRESET[activePreset]
   const isBrandedOpenAiCompat = brandedOpenAiCompatPresets.has(activePreset) && !!baseUrl
-  const isCustomEndpoint = (activePreset === 'custom' && !!baseUrl) || isBrandedOpenAiCompat
-  const effectiveApi: CustomEndpointApi = isBrandedOpenAiCompat ? 'openai-completions' : customApi
+  const isPlatformProfileEndpoint = !!platformProfile && !!baseUrl
+  const isCustomEndpoint = (activePreset === 'custom' && !!baseUrl) || isBrandedOpenAiCompat || isPlatformProfileEndpoint
+  const effectiveApi: CustomEndpointApi = isPlatformProfileEndpoint
+    ? 'anthropic-messages'
+    : isBrandedOpenAiCompat
+      ? 'openai-completions'
+      : customApi
 
   return {
     customEndpoint: isCustomEndpoint ? { api: effectiveApi } : undefined,
     piAuthProvider: isCustomEndpoint
       ? (effectiveApi === 'anthropic-messages' ? 'anthropic' : 'openai')
       : fallbackPiAuthProvider,
+    ...(platformProfile ? { platformProfile } : {}),
   }
 }

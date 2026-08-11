@@ -40,12 +40,13 @@ function setup(llmConnections: any[]) {
     'utf-8',
   )
 
-  function runUpdate(slug: string, updates: Record<string, unknown>): boolean {
+  function runUpdate(slug: string, updates: Record<string, unknown>, undefinedKeys: string[] = []): boolean {
     const updatesJson = JSON.stringify(updates)
+    const undefinedKeysJson = JSON.stringify(undefinedKeys)
     const run = Bun.spawnSync([
       process.execPath,
       '--eval',
-      `import { updateLlmConnection } from '${STORAGE_MODULE_PATH}'; const ok = updateLlmConnection(${JSON.stringify(slug)}, ${updatesJson}); process.exit(ok ? 0 : 1);`,
+      `import { updateLlmConnection } from '${STORAGE_MODULE_PATH}'; const updates = ${updatesJson}; for (const key of ${undefinedKeysJson}) updates[key] = undefined; const ok = updateLlmConnection(${JSON.stringify(slug)}, updates); process.exit(ok ? 0 : 1);`,
     ], {
       env: { ...process.env, CONFIG_DIR: configDir },
       stdout: 'pipe',
@@ -113,6 +114,22 @@ describe('updateLlmConnection – customEndpoint', () => {
 
     const conn = readConnection('custom-compat')
     expect(conn.customEndpoint).toEqual({ api: 'anthropic-messages' })
+  })
+})
+
+describe('updateLlmConnection – platformProfile', () => {
+  it('preserves a profile when unrelated updates omit it', () => {
+    const { runUpdate, readConnection } = setup([makeConnection({ platformProfile: 'agentrouter' })])
+
+    expect(runUpdate('custom-compat', { name: 'Renamed Endpoint' })).toBe(true)
+    expect(readConnection('custom-compat').platformProfile).toBe('agentrouter')
+  })
+
+  it('clears a profile when an update explicitly sets it to undefined', () => {
+    const { runUpdate, readConnection } = setup([makeConnection({ platformProfile: 'anyrouter' })])
+
+    expect(runUpdate('custom-compat', {}, ['platformProfile'])).toBe(true)
+    expect(readConnection('custom-compat')).not.toHaveProperty('platformProfile')
   })
 })
 

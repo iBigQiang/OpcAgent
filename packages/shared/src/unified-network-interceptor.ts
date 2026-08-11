@@ -32,6 +32,12 @@ import {
 } from './interceptor-common.ts';
 import { FEATURE_FLAGS } from './feature-flags.ts';
 import { resolveRequestContext } from './interceptor-request-utils.ts';
+import {
+  adaptAnyRouterPiRequest,
+  adaptAnyRouterPiToolInput,
+  adaptAnyRouterPiToolName,
+  ANYROUTER_PI_PROFILE,
+} from './agent/backend/internal/anyrouter-pi-wire.ts';
 
 // Type alias for fetch's HeadersInit
 type HeadersInitType = Headers | Record<string, string> | string[][];
@@ -114,7 +120,11 @@ interface ApiAdapter {
   /** Whether SSE processing strips metadata (Anthropic) or passes through (OpenAI) */
   stripsSseMetadata: boolean;
   /** Optional request modifications (e.g., fast mode headers) */
-  modifyRequest?(url: string, init: RequestInit, body: Record<string, unknown>): { init: RequestInit; body: Record<string, unknown> };
+  modifyRequest?(url: string, init: RequestInit, body: Record<string, unknown>): {
+    init: RequestInit;
+    body: Record<string, unknown>;
+    url?: string;
+  };
   /**
    * Optional pre-flight validation of the outgoing body. Adapters that opt in
    * throw {@link MalformedBodyError} when the body would cause a deterministic
@@ -485,6 +495,11 @@ interface TrackedToolBlock {
   bufferedJson: string;
 }
 
+interface AnthropicSseTransformOptions {
+  transformToolName?: (name: string) => string;
+  transformToolInput?: (toolName: string, input: Record<string, unknown>) => Record<string, unknown>;
+}
+
 const SSE_EVENT_RE = /^event:\s*(.+)$/;
 const SSE_DATA_RE = /^data:\s*(.+)$/;
 
@@ -493,7 +508,9 @@ const SSE_DATA_RE = /^data:\s*(.+)$/;
  * buffers tool_use input deltas, extracts _intent/_displayName into the metadata
  * store, and re-emits clean events without those fields.
  */
-export function createAnthropicSseStrippingStream(): TransformStream<Uint8Array, Uint8Array> {
+export function createAnthropicSseStrippingStream(
+  options: AnthropicSseTransformOptions = {},
+): TransformStream<Uint8Array, Uint8Array> {
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
 
@@ -517,12 +534,17 @@ export function createAnthropicSseStrippingStream(): TransformStream<Uint8Array,
       const contentBlock = data.content_block as { type?: string; id?: string; name?: string } | undefined;
       if (contentBlock?.type === 'tool_use' && contentBlock.id && contentBlock.name != null) {
         const index = data.index as number;
+        const name = options.transformToolName?.(contentBlock.name) ?? contentBlock.name;
         trackedBlocks.set(index, {
           id: contentBlock.id,
-          name: contentBlock.name,
+          name,
           index,
           bufferedJson: '',
         });
+        if (name !== contentBlock.name) {
+          data.content_block = { ...contentBlock, name };
+          dataStr = JSON.stringify(data);
+        }
       }
       emitSseEvent(eventType, dataStr, controller);
       return;
@@ -569,12 +591,13 @@ export function createAnthropicSseStrippingStream(): TransformStream<Uint8Array,
 
     try {
       const parsed = JSON.parse(block.bufferedJson);
+      const normalizedInput = options.transformToolInput?.(block.name, parsed) ?? parsed;
 
-      captureMetadataFromInput(block.id, block.name, parsed);
-      delete parsed._intent;
-      delete parsed._displayName;
+      captureMetadataFromInput(block.id, block.name, normalizedInput);
+      delete normalizedInput._intent;
+      delete normalizedInput._displayName;
 
-      const cleanJson = JSON.stringify(parsed);
+      const cleanJson = JSON.stringify(normalizedInput);
 
       const deltaEvent = {
         type: 'content_block_delta',
@@ -814,6 +837,43 @@ const anthropicAdapter: ApiAdapter = {
       };
     }
     return { init, body };
+  },
+};
+
+// The IDs are generated once per Pi subprocess, matching a single Claude Code
+// session across request turns. The adapter is selected only by explicit
+// profile, never by AnyRouter's hostname.
+const anyRouterPiSessionId = crypto.randomUUID();
+const anyRouterPiDeviceId = `${crypto.randomUUID().replaceAll('-', '')}${crypto.randomUUID().replaceAll('-', '')}`;
+
+/** AnyRouter returns native Anthropic SSE; Pi consumes this unchanged. */
+export function createAnyRouterPiSseProcessor(): TransformStream<Uint8Array, Uint8Array> {
+  return createAnthropicSseStrippingStream({
+    transformToolName: adaptAnyRouterPiToolName,
+    transformToolInput: adaptAnyRouterPiToolInput,
+  });
+}
+
+const anyRouterPiAdapter: ApiAdapter = {
+  name: 'anyrouter-pi',
+  shouldIntercept: () => false,
+  addMetadataToTools: body => anthropicAdapter.addMetadataToTools(body),
+  injectMetadataIntoHistory: body => anthropicAdapter.injectMetadataIntoHistory(body),
+  createSseProcessor: () => createAnyRouterPiSseProcessor(),
+  stripsSseMetadata: true,
+  modifyRequest: (url, init, body) => {
+    const wire = adaptAnyRouterPiRequest({
+      url,
+      headers: init.headers,
+      body,
+      sessionId: anyRouterPiSessionId,
+      deviceId: anyRouterPiDeviceId,
+    });
+    return {
+      url: wire.url,
+      init: { ...init, headers: wire.headers },
+      body: wire.body,
+    };
   },
 };
 
@@ -1795,6 +1855,15 @@ export function resolveAdapterNameFromPiApiHint(piApiHint?: string): 'anthropic'
   return undefined;
 }
 
+export function isAnyRouterPiMessagesUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return parsed.origin === 'https://anyrouter.top' && parsed.pathname === '/v1/messages';
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Find the matching adapter for a request.
  * Priority:
@@ -1802,6 +1871,12 @@ export function resolveAdapterNameFromPiApiHint(piApiHint?: string): 'anthropic'
  * 2) URL pattern fallback (legacy/non-Pi requests)
  */
 function findAdapter(url: string): ApiAdapter | undefined {
+  if (
+    process.env.MKAGENT_PLATFORM_PROFILE === ANYROUTER_PI_PROFILE
+    && isAnyRouterPiMessagesUrl(url)
+  ) {
+    return anyRouterPiAdapter;
+  }
   const piApiHint = getPiApiHint();
   const hintedAdapter = resolveAdapterNameFromPiApiHint(piApiHint);
   if (hintedAdapter === 'anthropic') return anthropicAdapter;
@@ -2183,13 +2258,15 @@ async function interceptedFetch(
 
         // Adapter-specific request modifications (e.g., fast mode)
         let modifiedInit = normalizedInit;
+        let requestUrl = url;
         if (adapter.modifyRequest) {
           const result = adapter.modifyRequest(url, normalizedInit, parsed);
           modifiedInit = result.init;
           parsed = result.body;
+          requestUrl = result.url ?? requestUrl;
         }
 
-        const proxy = getProxyForUrl(url);
+        const proxy = getProxyForUrl(requestUrl);
         const finalBody = JSON.stringify(parsed);
         const finalInit = {
           ...modifiedInit,
@@ -2200,10 +2277,10 @@ async function interceptedFetch(
         // Cache a sanitized request summary for the 400-empty-body diagnostic
         // pathway in captureApiError. Plain-text bodies (sensitive arguments)
         // never leave this process.
-        rememberLastOutgoingRequest(url, parsed, adapter);
+        rememberLastOutgoingRequest(requestUrl, parsed, adapter);
 
-        debugLog(`[${adapter.name}] Intercepted request to ${url}`);
-        const response = await originalFetch(url, finalInit);
+        debugLog(`[${adapter.name}] Intercepted request to ${requestUrl}`);
+        const response = await originalFetch(requestUrl, finalInit);
 
         // Process SSE response through adapter's stream processor
         const contentType = response.headers.get('content-type') ?? '';
@@ -2216,7 +2293,7 @@ async function interceptedFetch(
             statusText: response.statusText,
             headers: response.headers,
           });
-          return logResponse(processedResponse, url, startTime, adapter);
+          return logResponse(processedResponse, requestUrl, startTime, adapter);
         }
 
         // Non-SSE response — strip metadata from JSON body if present
@@ -2227,10 +2304,10 @@ async function interceptedFetch(
             status: response.status,
             statusText: response.statusText,
             headers: response.headers,
-          }), url, startTime, adapter);
+          }), requestUrl, startTime, adapter);
         }
 
-        return logResponse(response, url, startTime, adapter);
+        return logResponse(response, requestUrl, startTime, adapter);
       }
     } catch (e) {
       debugLog(`[${adapter?.name}] FETCH modification failed:`, e);

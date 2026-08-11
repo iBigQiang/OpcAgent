@@ -57,6 +57,11 @@ describe('buildBackendRuntimeSignature', () => {
   it('ignores non-runtime metadata such as lastUsedAt', () => {
     expect(sig({ ...baseCompat, lastUsedAt: 1 })).toBe(sig({ ...baseCompat, lastUsedAt: 2 }))
   })
+
+  it('changes when a platform routing profile changes', () => {
+    expect(sig({ ...baseCompat, platformProfile: 'agentrouter' }))
+      .not.toBe(sig({ ...baseCompat, platformProfile: 'anyrouter' }))
+  })
 })
 
 describe('filterAttachmentsForModelInput', () => {

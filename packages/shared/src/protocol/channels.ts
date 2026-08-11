@@ -305,6 +305,12 @@ export const RPC_CHANNELS = {
     BROWSE: 'gitbash:browse',
     SET_PATH: 'gitbash:setPath',
   },
+  claude: {
+    CHECK: 'claude:check',
+    BROWSE: 'claude:browse',
+    SET_PATH: 'claude:setPath',
+    CLEAR_PATH: 'claude:clearPath',
+  },
   browserPane: {
     CREATE: 'browser-pane:create',
     DESTROY: 'browser-pane:destroy',

@@ -20,8 +20,10 @@ function joinPrompts(base: string, appended: string): string {
 export function shouldPreservePiSystemPrompt(
   baseUrl?: string,
   customEndpoint?: { api?: string },
+  platformProfile?: string,
 ): boolean {
-  return Boolean(baseUrl?.trim() && customEndpoint?.api === 'anthropic-messages');
+  return platformProfile !== 'anyrouter_pi'
+    && Boolean(baseUrl?.trim() && customEndpoint?.api === 'anthropic-messages');
 }
 
 /**

@@ -44,6 +44,7 @@ import {
 import {
   ConfigWatcher,
   getMiniModel,
+  getClaudeExecutablePath,
   getWorkspaces,
   resolveTitleLanguageName,
   type ConfigWatcherCallbacks,
@@ -1289,6 +1290,7 @@ export class SessionManager implements ISessionManager {
         appRootPath: platform.appRootPath,
         resourcesPath: platform.resourcesPath,
         isPackaged: platform.isPackaged,
+        persistedClaudeExecutablePath: getClaudeExecutablePath(),
       },
       coreConfig: {
         workspace: managed.workspace,

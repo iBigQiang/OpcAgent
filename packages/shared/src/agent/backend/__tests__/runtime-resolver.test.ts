@@ -6,10 +6,10 @@
  * - Ripgrep path resolution with system rg fallback
  */
 import { describe, it, expect, afterEach } from 'bun:test';
-import { mkdirSync, writeFileSync, rmSync, chmodSync } from 'node:fs';
+import { mkdirSync, writeFileSync, rmSync, chmodSync, copyFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { resolveBackendRuntimePaths } from '../internal/runtime-resolver.ts';
+import { resolveBackendRuntimePaths, resolveClaudeExecutable, validateClaudeExecutablePath } from '../internal/runtime-resolver.ts';
 import { resolveBackendHostTooling } from '../factory.ts';
 import type { BackendHostRuntimeContext } from '../types.ts';
 
@@ -56,6 +56,148 @@ describe('resolveServerPath fallback', () => {
 
     const paths = resolveBackendRuntimePaths(hostRuntime);
     expect(paths.piServerPath).toBe(join(primaryDir, 'index.js'));
+  });
+});
+
+describe('resolveClaudeExecutablePath', () => {
+  const tmpBase = join(tmpdir(), `claude-resolver-test-${Date.now()}`);
+
+  afterEach(() => {
+    try { rmSync(tmpBase, { recursive: true, force: true }); } catch {}
+  });
+
+  function createClaudeExecutable(directory: string): string {
+    mkdirSync(directory, { recursive: true });
+    const executable = join(directory, process.platform === 'win32' ? 'claude.exe' : 'claude');
+    if (process.platform === 'win32') copyFileSync(process.execPath, executable);
+    else writeFileSync(executable, '#!/bin/sh\necho 1.2.3\n');
+    if (process.platform !== 'win32') chmodSync(executable, 0o755);
+    return executable;
+  }
+
+  function withClaudeDiscoveryEnvironment(overrides: Record<string, string | undefined>, run: () => void): void {
+    const previous = new Map<string, string | undefined>();
+    for (const [key, value] of Object.entries(overrides)) {
+      previous.set(key, process.env[key]);
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
+    try {
+      run();
+    } finally {
+      for (const [key, value] of previous) {
+        if (value === undefined) delete process.env[key];
+        else process.env[key] = value;
+      }
+    }
+  }
+
+  it('honors an explicit Claude Code executable supplied by the host runtime', () => {
+    const executable = createClaudeExecutable(tmpBase);
+    expect(validateClaudeExecutablePath(executable)).toMatchObject({ valid: true, path: executable });
+
+    const paths = resolveBackendRuntimePaths({
+      appRootPath: join(tmpBase, 'app'),
+      isPackaged: false,
+      claudeExecutablePath: executable,
+    });
+
+    expect(paths.claudeExecutablePath).toBe(executable);
+  });
+
+  it('does not use the deprecated Agent SDK executable in packaged builds', () => {
+    const appRoot = join(tmpBase, 'packaged-app');
+    const legacyExecutable = join(appRoot, 'resources', 'claude-agent-sdk', process.platform === 'win32' ? 'claude.exe' : 'claude');
+    mkdirSync(join(appRoot, 'resources', 'claude-agent-sdk'), { recursive: true });
+    if (process.platform === 'win32') copyFileSync(process.execPath, legacyExecutable);
+    else writeFileSync(legacyExecutable, '#!/bin/sh\necho 1.2.3\n');
+    if (process.platform !== 'win32') chmodSync(legacyExecutable, 0o755);
+
+    const paths = resolveBackendRuntimePaths({
+      appRootPath: appRoot,
+      isPackaged: true,
+    });
+
+    expect(paths.claudeExecutablePath).not.toBe(legacyExecutable);
+  });
+
+  it('prefers persisted paths over host overrides and validates --version', () => {
+    const persisted = createClaudeExecutable(join(tmpBase, 'persisted'));
+    const override = createClaudeExecutable(join(tmpBase, 'override'));
+
+    const result = resolveClaudeExecutable({
+      appRootPath: join(tmpBase, 'app'),
+      isPackaged: true,
+      persistedClaudeExecutablePath: persisted,
+      claudeExecutablePath: override,
+    });
+
+    expect(result).toMatchObject({ valid: true, path: persisted, source: 'persisted' });
+  });
+
+  it('prefers a common npm installation over PATH and project-local candidates', () => {
+    const prefix = join(tmpBase, 'npm-prefix');
+    const common = createClaudeExecutable(join(prefix, 'node_modules', '@anthropic-ai', 'claude-code', 'bin'));
+    const pathDirectory = join(tmpBase, 'path');
+    const pathCandidate = createClaudeExecutable(pathDirectory);
+    const appRoot = join(tmpBase, 'project', 'app');
+    const projectLocal = createClaudeExecutable(join(appRoot, 'node_modules', '.bin'));
+
+    withClaudeDiscoveryEnvironment({
+      NPM_CONFIG_PREFIX: undefined,
+      PREFIX: undefined,
+      APPDATA: join(tmpBase, 'appdata'),
+      LOCALAPPDATA: join(tmpBase, 'localappdata'),
+      USERPROFILE: join(tmpBase, 'home'),
+      HOME: join(tmpBase, 'home'),
+      PATH: pathDirectory,
+      npm_config_prefix: prefix,
+    }, () => {
+      const result = resolveClaudeExecutable({ appRootPath: appRoot, isPackaged: false });
+      expect(result).toMatchObject({ valid: true, path: common, source: 'common-install' });
+      expect(result.path).not.toBe(pathCandidate);
+      expect(result.path).not.toBe(projectLocal);
+    });
+  });
+
+  it('uses a project-local executable when no configured common install is available', () => {
+    const appRoot = join(tmpBase, 'project-local', 'app');
+    const projectLocal = createClaudeExecutable(join(appRoot, 'node_modules', '.bin'));
+
+    withClaudeDiscoveryEnvironment({
+      NPM_CONFIG_PREFIX: undefined,
+      PREFIX: undefined,
+      APPDATA: join(tmpBase, 'appdata'),
+      LOCALAPPDATA: join(tmpBase, 'localappdata'),
+      USERPROFILE: join(tmpBase, 'home'),
+      HOME: join(tmpBase, 'home'),
+      PATH: '',
+      npm_config_prefix: join(tmpBase, 'empty-prefix'),
+    }, () => {
+      const result = resolveClaudeExecutable({ appRootPath: appRoot, isPackaged: false });
+      expect(result).toMatchObject({ valid: true, path: projectLocal, source: 'project-local' });
+    });
+  });
+
+  it('rejects Windows command shims before executing them', () => {
+    if (process.platform !== 'win32') return;
+    const shim = join(tmpBase, 'claude.cmd');
+    mkdirSync(tmpBase, { recursive: true });
+    writeFileSync(shim, '@echo off\r\necho unsafe\r\n');
+
+    expect(validateClaudeExecutablePath(shim)).toMatchObject({
+      valid: false,
+      error: expect.stringContaining('claude.exe'),
+    });
+  });
+
+  it('rejects a matching filename when --version cannot run', () => {
+    const invalid = join(tmpBase, process.platform === 'win32' ? 'claude.exe' : 'claude');
+    mkdirSync(tmpBase, { recursive: true });
+    writeFileSync(invalid, process.platform === 'win32' ? 'not an executable' : '#!/bin/sh\nexit 7\n');
+    if (process.platform !== 'win32') chmodSync(invalid, 0o755);
+
+    expect(validateClaudeExecutablePath(invalid).valid).toBe(false);
   });
 });
 

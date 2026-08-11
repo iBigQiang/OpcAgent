@@ -83,6 +83,8 @@ export interface StoredConfig {
   networkProxy?: import('./types.ts').NetworkProxySettings;
   // Windows: path to Git Bash (bash.exe) for the SDK subprocess
   gitBashPath?: string;
+  // Optional user-selected Claude Code CLI executable. Used by AnyRouter connections.
+  claudeExecutablePath?: string;
   // User chose "Setup later" during onboarding — skip showing onboarding on next launch
   setupDeferred?: boolean;
   // Server mode — embedded remote server settings
@@ -582,6 +584,31 @@ export function clearGitBashPath(): void {
   const config = loadStoredConfig();
   if (!config || !config.gitBashPath) return;
   delete config.gitBashPath;
+  saveConfig(config);
+}
+
+/** Get the user-selected Claude Code executable path, if one is persisted. */
+export function getClaudeExecutablePath(): string | undefined {
+  return loadStoredConfig()?.claudeExecutablePath;
+}
+
+/** Persist a user-selected Claude Code executable path. */
+export function setClaudeExecutablePath(path: string): boolean {
+  const config = loadStoredConfig();
+  if (!config) {
+    console.warn('[storage] Failed to persist Claude Code path: config could not be loaded');
+    return false;
+  }
+  config.claudeExecutablePath = path;
+  saveConfig(config);
+  return true;
+}
+
+/** Clear the persisted Claude Code executable path. */
+export function clearClaudeExecutablePath(): void {
+  const config = loadStoredConfig();
+  if (!config || !config.claudeExecutablePath) return;
+  delete config.claudeExecutablePath;
   saveConfig(config);
 }
 
@@ -1701,6 +1728,10 @@ export function updateLlmConnection(slug: string, updates: Partial<Omit<LlmConne
     piAuthProvider: updates.piAuthProvider !== undefined ? updates.piAuthProvider : existing.piAuthProvider,
     // Custom endpoint protocol (Anthropic/OpenAI compatible)
     customEndpoint: updates.customEndpoint !== undefined ? updates.customEndpoint : existing.customEndpoint,
+    // Platform routing profile; explicit undefined clears it when switching to a generic endpoint.
+    platformProfile: Object.prototype.hasOwnProperty.call(updates, 'platformProfile')
+      ? updates.platformProfile
+      : existing.platformProfile,
     // Mid-stream send behavior (steer vs queue) — read via resolveMidStreamBehavior()
     midStreamBehavior: updates.midStreamBehavior !== undefined ? updates.midStreamBehavior : existing.midStreamBehavior,
     oauthAccountUuid: updates.oauthAccountUuid !== undefined ? updates.oauthAccountUuid : existing.oauthAccountUuid,

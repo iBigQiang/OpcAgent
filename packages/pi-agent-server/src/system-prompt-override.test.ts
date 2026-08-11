@@ -121,4 +121,12 @@ describe('shouldPreservePiSystemPrompt', () => {
     expect(shouldPreservePiSystemPrompt('https://gateway.example.test', undefined))
       .toBe(false);
   });
+
+  it('does not duplicate Pi identity inside the AnyRouter-Pi Claude Code wire', () => {
+    expect(shouldPreservePiSystemPrompt(
+      'https://anyrouter.top',
+      { api: 'anthropic-messages' },
+      'anyrouter_pi',
+    )).toBe(false);
+  });
 });

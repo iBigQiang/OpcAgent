@@ -23,6 +23,7 @@ const LOCAL_NAMESPACES = [
   RPC_CHANNELS.releaseNotes,
   RPC_CHANNELS.git,
   RPC_CHANNELS.gitbash,
+  RPC_CHANNELS.claude,
   RPC_CHANNELS.browserPane,
 ] as const;
 

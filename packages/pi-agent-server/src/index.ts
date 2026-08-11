@@ -67,6 +67,7 @@ import {
   type CustomEndpointModelEntry,
   type CustomEndpointModelOverrides,
 } from './custom-endpoint-models.ts';
+import { setInterceptorApiHints as applyInterceptorApiHints } from './interceptor-api-hints.ts';
 
 // Direct source imports from shared (bundled by bun build)
 import { handleLargeResponse, estimateTokens, tokenLimitFor } from '../../shared/src/utils/large-response.ts';
@@ -115,6 +116,7 @@ interface InitMessage {
   authType?: string;
   workspaceId?: string;
   baseUrl?: string;
+  platformProfile?: string;
   branchFromSdkSessionId?: string;
   branchFromSessionPath?: string;
   branchFromSdkTurnId?: string;
@@ -130,6 +132,7 @@ interface RuntimeConfigUpdateMessage {
   providerType?: string;
   authType?: string;
   baseUrl?: string;
+  platformProfile?: string | null;
   customEndpoint?: { api: CustomEndpointApi; supportsImages?: boolean };
   customModels?: Array<string | { id: string; contextWindow?: number; supportsImages?: boolean }>;
 }
@@ -430,6 +433,7 @@ function applyMkAgentSystemPrompt(session: AgentSession, prompt: string): void {
   const preservePiIdentity = shouldPreservePiSystemPrompt(
     initConfig?.baseUrl,
     initConfig?.customEndpoint,
+    initConfig?.platformProfile,
   );
 
   if (preservePiIdentity) {
@@ -445,16 +449,8 @@ function applyMkAgentSystemPrompt(session: AgentSession, prompt: string): void {
  * This gives the interceptor a robust routing hint (instead of brittle URL-only matching).
  */
 function setInterceptorApiHints(model: { api?: string; provider?: string; baseUrl?: string } | undefined): void {
-  if (!model) {
-    delete process.env.MKAGENT_PI_MODEL_API;
-    delete process.env.MKAGENT_PI_MODEL_PROVIDER;
-    delete process.env.MKAGENT_PI_MODEL_BASE_URL;
-    return;
-  }
-
-  process.env.MKAGENT_PI_MODEL_API = model.api || '';
-  process.env.MKAGENT_PI_MODEL_PROVIDER = model.provider || '';
-  process.env.MKAGENT_PI_MODEL_BASE_URL = model.baseUrl || '';
+  applyInterceptorApiHints(model, initConfig?.platformProfile);
+  if (!model) return;
 
   debugLog(
     `[interceptor-hint] api=${process.env.MKAGENT_PI_MODEL_API || '-'} provider=${process.env.MKAGENT_PI_MODEL_PROVIDER || '-'} baseUrl=${process.env.MKAGENT_PI_MODEL_BASE_URL || '-'}`,
@@ -1590,6 +1586,7 @@ async function handleUpdateRuntimeConfig(msg: RuntimeConfigUpdateMessage): Promi
       providerType: msg.providerType ?? initConfig.providerType,
       authType: msg.authType ?? initConfig.authType,
       baseUrl: msg.baseUrl,
+      platformProfile: msg.platformProfile ?? undefined,
       customEndpoint: msg.customEndpoint,
       customModels: msg.customModels,
     };

@@ -3,10 +3,11 @@ import { join } from 'path'
 import { homedir } from 'os'
 import { execSync } from 'child_process'
 import { RPC_CHANNELS } from '@mkagent/shared/protocol'
-import { getWorkspaceByNameOrId, getGitBashPath, setGitBashPath, clearGitBashPath } from '@mkagent/shared/config'
+import { getWorkspaceByNameOrId, getGitBashPath, setGitBashPath, clearGitBashPath, clearClaudeExecutablePath, setClaudeExecutablePath } from '@mkagent/shared/config'
+import { resolveClaudeExecutable, validateClaudeExecutablePath } from '@mkagent/shared/agent/backend'
 import { classifyExternalUrl, formatBlockedUrlError } from '@mkagent/shared/utils/url-safety'
 import { deriveGitBashPathsFromGitPaths, isUsableGitBashPath, validateGitBashPath } from '@mkagent/server-core/services'
-import { validateFilePath, getWorkspaceAllowedDirs } from '@mkagent/server-core/handlers'
+import { buildBackendHostRuntimeContext, validateFilePath, getWorkspaceAllowedDirs } from '@mkagent/server-core/handlers'
 import type { RpcServer } from '@mkagent/server-core/transport'
 import type { HandlerDeps } from '../handler-deps'
 import {
@@ -31,6 +32,10 @@ export const CORE_HANDLED_CHANNELS = [
   RPC_CHANNELS.gitbash.CHECK,
   RPC_CHANNELS.gitbash.BROWSE,
   RPC_CHANNELS.gitbash.SET_PATH,
+  RPC_CHANNELS.claude.CHECK,
+  RPC_CHANNELS.claude.BROWSE,
+  RPC_CHANNELS.claude.SET_PATH,
+  RPC_CHANNELS.claude.CLEAR_PATH,
 ] as const
 
 interface ParsedInternalDeepLink {
@@ -271,6 +276,45 @@ export function registerSystemCoreHandlers(server: RpcServer, deps: HandlerDeps)
     setGitBashPath(validation.path)
     process.env.MKAGENT_GIT_BASH_PATH = validation.path
     return { success: true }
+  })
+
+  const checkClaudeCode = () => {
+    const result = resolveClaudeExecutable(buildBackendHostRuntimeContext(deps.platform))
+    return {
+      found: result.valid,
+      path: result.path ?? null,
+      version: result.version,
+      source: result.source,
+      error: result.valid ? undefined : result.error,
+      platform: process.platform as 'win32' | 'darwin' | 'linux',
+    }
+  }
+
+  // Claude Code CLI discovery and explicit path persistence. The resolver itself
+  // also performs the short --version check, so UI status and backend runtime
+  // cannot disagree about whether a path is usable.
+  server.handle(RPC_CHANNELS.claude.CHECK, async () => checkClaudeCode())
+
+  server.handle(RPC_CHANNELS.claude.BROWSE, async (ctx) => {
+    const windows = process.platform === 'win32'
+    const result = await requestClientOpenFileDialog(server, ctx.clientId, {
+      title: 'Select Claude Code executable',
+      filters: [{ name: 'Claude Code', extensions: windows ? ['exe'] : ['*'] }],
+      properties: ['openFile'],
+    })
+    return result.canceled || result.filePaths.length === 0 ? null : result.filePaths[0]
+  })
+
+  server.handle(RPC_CHANNELS.claude.SET_PATH, async (_ctx, claudePath: string) => {
+    const validation = validateClaudeExecutablePath(claudePath)
+    if (!validation.valid || !validation.path) return { success: false, error: validation.error }
+    if (!setClaudeExecutablePath(validation.path)) return { success: false, error: 'Failed to persist Claude Code path' }
+    return { success: true, path: validation.path, version: validation.version }
+  })
+
+  server.handle(RPC_CHANNELS.claude.CLEAR_PATH, async () => {
+    clearClaudeExecutablePath()
+    return { success: true, ...checkClaudeCode() }
   })
 
   // Debug logging from renderer -> main log file (fire-and-forget, no response)
