@@ -5,12 +5,11 @@
 <h1 align="center">MkAgent</h1>
 
 <p align="center">
-  A local-first AI agent workspace for Desktop, WebUI, and CLI.
+  A local-first, Pi-powered AI agent workspace for Desktop, WebUI, and CLI.
 </p>
 
 <p align="center">
-  <a href="https://github.com/MkThingsHQ/mkagent/blob/main/LICENSE"><img src="https://img.shields.io/github/license/MkThingsHQ/mkagent" alt="License" /></a>
-  <a href="https://github.com/MkThingsHQ/mkagent/stargazers"><img src="https://img.shields.io/github/stars/MkThingsHQ/mkagent" alt="GitHub stars" /></a>
+  <a href="./LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue.svg" alt="Apache License 2.0" /></a>
   <a href="https://bun.sh"><img src="https://img.shields.io/badge/Bun-1.3.14%2B-f9f1e1?logo=bun&amp;logoColor=000" alt="Bun 1.3.14 or later" /></a>
   <a href="https://www.electronjs.org"><img src="https://img.shields.io/badge/Electron-39-47848F?logo=electron&amp;logoColor=white" alt="Electron 39" /></a>
 </p>
@@ -21,17 +20,17 @@
   <a href="./docs/zh/README.md">中文文档</a> ·
   <a href="#getting-started">Quick Start</a> ·
   <a href="https://mksaas.link/discord">Community</a> ·
-  <a href="https://github.com/MkThingsHQ/mkagent/issues">Report a bug</a>
 </p>
 
-MkAgent helps developers run long-lived AI coding sessions from Desktop, WebUI, or CLI while
-keeping every workspace under their control. It is powered by the
-[Pi](https://github.com/badlogic/pi-mono) agent runtime and combines persistent local workspaces,
+MkAgent is an open-source, local-first AI agent workspace for anyone who wants more control over
+their AI work. Download and use it through Desktop, WebUI, or CLI, or extend its open-source
+foundation to build your own desktop agent product. Powered by the
+[Pi](https://github.com/badlogic/pi-mono) agent runtime, it combines persistent local workspaces,
 model flexibility, browser tools, and document tools in one application.
 Application state stays under your local data directory, and credentials are stored through the
 operating system credential manager.
 
-[![MkAgent local-first AI agent workspace](https://mkagent.app/og.png)](https://mkagent.app)
+[![MkAgent local-first, Pi-powered AI agent workspace](./docs/assets/mkagent-homepage.png)](https://mkagent.app)
 
 ## Features
 
@@ -47,8 +46,6 @@ operating system credential manager.
 - **Explicit control** — choose Explore, Ask, or Execute permission modes, configure a network
   proxy, and switch between English and Simplified Chinese.
 
-See the [feature matrix](./docs/feature-matrix.md) for the exact supported product boundary.
-
 ## Tech Stack
 
 - [Bun](https://bun.sh) — Workspace runtime, package manager, scripts, and tests.
@@ -63,7 +60,7 @@ See the [feature matrix](./docs/feature-matrix.md) for the exact supported produ
 | Interface | Best for | Command |
 | --- | --- | --- |
 | Desktop | Full local experience and browser pane | `bun run electron:dev` |
-| WebUI | Browser access to the headless MkAgent server | `bun run server:prod` |
+| WebUI | Browser access to the headless server | `bun run server:prod` |
 | CLI | Scripting, remote control, and terminal workflows | `bun run apps/cli/src/index.ts --help` |
 
 ## Getting started
@@ -135,7 +132,7 @@ The complete documentation is available in [English](./docs/README.md) and
 | Work | [Workspaces](./docs/workspaces.md), [sessions](./docs/sessions.md), [Skills](./docs/skills.md) |
 | Tools | [Browser](./docs/browser.md), [attachments](./docs/attachments.md), [document tools](./docs/document-tools.md) |
 | Runtime | [CLI](./docs/cli.md), [permissions](./docs/permissions.md), [network proxy](./docs/network-proxy.md) |
-| Project | [Feature matrix](./docs/feature-matrix.md), [releases](./docs/releases.md), [upstream synchronization](./docs/upstream-sync.md) |
+| Project | [features](./docs/featues.md), [releases](./docs/releases.md), [upstream synchronization](./docs/upstream-sync.md) |
 
 ## Contributing
 
@@ -169,9 +166,15 @@ affiliated with or endorsed by the upstream project. See [NOTICE](./NOTICE) for 
 ## Author
 
 [OpenFox](https://mksaas.link/fox-x) is an independent developer building products and developer
-tools under [MkThingsHQ](https://github.com/MkThingsHQ). Other projects include
-[TanStarter](https://tanstarter.dev/), [Mkdirs](https://github.com/MkThingsHQ/mkdirs), and
-[MkDocs](https://github.com/open-fox/mkdocs).
+tools. His products include:
+
+- [MkAgent](https://mkagent.app) — A local-first, Pi-powered AI agent workspace for Desktop, WebUI,
+  and CLI.
+- [TanStarter](https://tanstarter.dev) — Ship Faster with TanStack, Cost Less with Cloudflare.
+- [MkSaaS](https://mksaas.com) — Make Your AI SaaS Product in a Weekend.
+- [MkImage](https://mkimage.ai) — Make Any Images Possible.
+- [Mkdirs](https://mkdirs.com) — Launch AI-powered directory in 30 minutes.
+- [MkDollar](https://mkdollar.com) — The all-in-one platform to help you make first dollar online.
 
 ## License
 

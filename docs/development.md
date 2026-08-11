@@ -17,7 +17,7 @@ This page summarizes how to set up an MkAgent development environment and which 
 ## First-time setup
 
 ```bash
-git clone --recurse-submodules https://github.com/MkThingsHQ/mkagent.git
+git clone https://github.com/MkThingsHQ/mkagent.git
 cd mkagent
 bun install --frozen-lockfile
 bun run validate:dev
@@ -63,7 +63,7 @@ migration/             # Migration plan, audit, UI history
 | Build a dev-signed macOS arm64 .app | `bun run electron:dist:dev:mac` |
 | Run all unit + isolated tests | `bun run test` |
 | Validate (typecheck + tests + shared suite + doc tool smoke + lint) | `bun run validate:ci` |
-| Audit MkAgent ↔ Craft reuse | `bun run audit:craft-reuse` |
+| Audit MkAgent <-> Craft reuse | `bun run audit:craft-reuse` |
 | Audit Craft test coverage | `bun run lint:craft-test-coverage` |
 | Lint English/Chinese locale parity | `bun run lint:i18n:parity` |
 | Sort locales | `bun run sort-locales` (check-only: `bun run lint:i18n:sorted`) |

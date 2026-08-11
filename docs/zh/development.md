@@ -17,7 +17,7 @@
 ## 首次配置
 
 ```bash
-git clone --recurse-submodules https://github.com/MkThingsHQ/mkagent.git
+git clone https://github.com/MkThingsHQ/mkagent.git
 cd mkagent
 bun install --frozen-lockfile
 bun run validate:dev
@@ -63,7 +63,7 @@ migration/             # 迁移计划、audit、UI 历史
 | 构建 macOS arm64 dev 签名的 .app | `bun run electron:dist:dev:mac` |
 | 跑全部 unit + isolated 测试 | `bun run test` |
 | 校验(typecheck + 测试 + shared 套件 + 文档工具 smoke + lint) | `bun run validate:ci` |
-| 审计 MkAgent ↔ Craft 复用关系 | `bun run audit:craft-reuse` |
+| 审计 MkAgent <-> Craft 复用关系 | `bun run audit:craft-reuse` |
 | 审计 Craft 测试覆盖率 | `bun run lint:craft-test-coverage` |
 | 校验中/英文 locale parity | `bun run lint:i18n:parity` |
 | 排序 locales | `bun run sort-locales`(只检查:`bun run lint:i18n:sorted`) |

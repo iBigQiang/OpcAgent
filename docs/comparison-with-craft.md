@@ -1,6 +1,6 @@
 # MkAgent vs. Craft Agents — current comparison
 
-> Snapshot taken on **2026-07-30** against the MkAgent `main` branch working tree (HEAD `47d09e5 feat: Add Chinese documentation`) and the upstream tag [`craft-ai-agents/craft-agents-oss` `v0.11.2` / `a60ebc1a5a7c`](https://github.com/craft-ai-agents/craft-agents-oss). MkAgent ships a single `main` branch; there is no `dev/agent-memory` line. Numbers come from the on-disk working trees and prior validated builds, not from new network measurements; rebuild both repositories from the recorded commits before re-running this audit.
+> Snapshot taken on **2026-08-10** against MkAgent `main` at `00c0df4` and the upstream tag [`craft-ai-agents/craft-agents-oss` `v0.11.2` / `a60ebc1a5a7c`](https://github.com/craft-ai-agents/craft-agents-oss). Numbers are repository snapshots, not live release metrics. Re-run the commands in the final section after changing either baseline; the current checkout has a pre-existing `README.md` lineage-manifest warning if that file is modified without refreshing the manifest.
 
 This document explains, with evidence, what MkAgent keeps from Craft Agents, what it physically removes, and how those choices change the artifact you ship. MkAgent is the "Lite" derivative built on the same architecture and renderer; the table below is the canonical answer to "what's actually different?".
 
@@ -12,10 +12,10 @@ Both repositories are Bun monorepos with the same workspace layout (`apps/{elect
 |---|---:|---:|---|
 | Tracked TypeScript / TSX LOC (`*.ts`,`*.tsx`, excludes `node_modules`,`dist`,`release`,`.git`) | **190,558** | 344,964 | MkAgent source ≈ **55 %** of Craft's |
 | Tracked source files (current `git ls-files`) | 1,163 | ~1,719 | 96 % same-path rate against Craft (`bun run audit:craft-reuse`) |
-| Same-path files normalized to byte-identical | 686 (59 %) | — | Mechanical replacements only: scope (`@mkagent/*` ↔ `@craft-agent/*`), URL scheme (`mkagent://`), config root (`~/.mkagent`), brand strings |
+| Same-path files normalized to byte-identical | 686 (59 %) | — | Mechanical replacements only: scope (`@mkagent/*` <-> `@craft-agent/*`), URL scheme (`mkagent://`), config root (`~/.mkagent`), brand strings |
 | Same-path Lite-customized | 430 | — | Lite boundary (e.g. deleted Sources/MCP branch) plus brand |
 | MkAgent-only source files | 47 | — | MkAgent brand assets, `audit:craft-reuse`, lint/CLI scripts, `apps/online-docs`-equivalent leftovers removed |
-| Source files Craft has that MkAgent does not | — | 606 | Removed by the Lite boundary (Claude backend, OAuth, Sources, MCP, Messaging, Viewer, automations, …) |
+| Source files Craft has that MkAgent does not | — | 606 | Removed by the Lite boundary (Claude backend, OAuth, Sources, MCP, Messaging, Viewer, automations, ...) |
 | Top-level `dependencies` | 55 | 61 | MkAgent drops `@anthropic-ai/claude-agent-sdk`, `@anthropic-ai/sdk`, `@dnd-kit/{dom,helpers}`, `@github/copilot-sdk`, `@modelcontextprotocol/sdk`, plus the messaging OAuth flow packages (the lowered number reflects the Lite backend registry, not a runtime regression) |
 | Top-level `devDependencies` | 33 | 34 | Only meaningful drop is `@aws-sdk/client-s3` (used only for the upstream release upload to S3; MkAgent's `electron-updater` GitHub provider does not need it) |
 | `node_modules/` size on a clean `bun install --frozen-lockfile` | **2.0 GB** | 2.5 GB | The 0.5 GB delta matches the dropped native + SDK bundles below |
@@ -24,22 +24,22 @@ Both repositories are Bun monorepos with the same workspace layout (`apps/{elect
 
 | Path | MkAgent | Craft Agents |
 |---|---|---|
-| `apps/electron` | ✅ (shared renderer + preload + Browser pane + Sentry + auto-update) | ✅ (same) |
-| `apps/webui` | ✅ (loads the same renderer through a browser adapter) | ✅ (same) |
-| `apps/cli` | ✅ (`run`, `session`, `workspace`, `send`, …) | ✅ (same surface plus extra Sources/Automations sub-commands, which MkAgent does **not** expose) |
-| `apps/viewer` | ❌ (deleted) | ✅ (Electron Viewer app for sharing sessions publicly) |
-| `packages/core` | ✅ | ✅ |
-| `packages/shared` | ✅ (with `messaging-gateway`, `interceptor-common`, `feature-flags`, `interceptor-request-utils` removed) | ✅ (full size) |
-| `packages/ui` | ✅ | ✅ |
-| `packages/server-core` | ✅ | ✅ |
-| `packages/server` | ✅ (headless `MKAGENT_SERVER_TOKEN` server) | ✅ |
-| `packages/pi-agent-server` | ✅ (only registered backend) | ✅ (alongside Craft's `claude-agent-sdk` backend) |
-| `packages/session-tools-core` | ✅ (Labels/Statuses/MCP/Sources OAuth branches trimmed) | ✅ (full size) |
-| `packages/messaging-gateway` | ❌ (deleted) | ✅ |
-| `packages/messaging-whatsapp-worker` | ❌ (deleted) | ✅ (Baileys-backed WhatsApp worker) |
-| `packages/session-mcp-server` | ❌ (deleted) | ✅ (TypeScript MCP server bundled as `resources/session-mcp-server/`) |
-| `resources/bridge-mcp-server/` | ❌ (deleted) | ✅ (bundled, ~13 MB TypeScript MCP server) |
-| `resources/scripts/` + `resources/bin/` | ✅ (`markitdown`, PDF, XLSX, DOCX, PPTX, image, iCal, doc-diff wrappers + Python scripts + bundled **per-platform `uv`**) | ✅ (same wrappers and per-platform `uv` layout) |
+| `apps/electron` | Yes (shared renderer + preload + Browser pane + Sentry + auto-update) | Yes (same) |
+| `apps/webui` | Yes (loads the same renderer through a browser adapter) | Yes (same) |
+| `apps/cli` | Yes (`run`, `session`, `workspace`, `send`, ...) | Yes (same surface plus extra Sources/Automations sub-commands, which MkAgent does **not** expose) |
+| `apps/viewer` | No (deleted) | Yes (Electron Viewer app for sharing sessions publicly) |
+| `packages/core` | Yes | Yes |
+| `packages/shared` | Yes (with `messaging-gateway`, `interceptor-common`, `feature-flags`, `interceptor-request-utils` removed) | Yes (full size) |
+| `packages/ui` | Yes | Yes |
+| `packages/server-core` | Yes | Yes |
+| `packages/server` | Yes (headless `MKAGENT_SERVER_TOKEN` server) | Yes |
+| `packages/pi-agent-server` | Yes (only registered backend) | Yes (alongside Craft's `claude-agent-sdk` backend) |
+| `packages/session-tools-core` | Yes (Labels/Statuses/MCP/Sources OAuth branches trimmed) | Yes (full size) |
+| `packages/messaging-gateway` | No (deleted) | Yes |
+| `packages/messaging-whatsapp-worker` | No (deleted) | Yes (Baileys-backed WhatsApp worker) |
+| `packages/session-mcp-server` | No (deleted) | Yes (TypeScript MCP server bundled as `resources/session-mcp-server/`) |
+| `resources/bridge-mcp-server/` | No (deleted) | Yes (bundled, ~13 MB TypeScript MCP server) |
+| `resources/scripts/` + `resources/bin/` | Yes (`markitdown`, PDF, XLSX, DOCX, PPTX, image, iCal, doc-diff wrappers + Python scripts + bundled **per-platform `uv`**) | Yes (same wrappers and per-platform `uv` layout) |
 
 ## 3. Backend / runtime boundary
 
@@ -49,7 +49,7 @@ Both repositories are Bun monorepos with the same workspace layout (`apps/{elect
 | Auth model | API key + custom endpoints + Ollama + **ChatGPT/Claude subscription OAuth**, all through Pi | API-key + custom + **OAuth (Anthropic, OpenAI, GitHub Copilot, Google Workspace, Slack, Microsoft)** + subscription flows + gateway |
 | Subprocess model | `packages/pi-agent-server` runs as a Bun subprocess; communicates over JSONL on stdio | Pi subprocess (same) **plus** SDK subprocess (`@anthropic-ai/claude-agent-sdk-binary`, ~217 MB native `claude` binary per platform arch) **plus** bridge/session MCP servers **plus** WhatsApp worker subprocess |
 | Built-in transports | OpenAI-compatible, Anthropic-compatible, Ollama (Pi `0.80.6`) | Same, plus Anthropic SDK direct mode and Copilot SDK mode |
-| Image generation | ❌ (deleted; image attachments still supported) | ✅ (`gen_image` model + tool) |
+| Image generation | No (deleted; image attachments still supported) | Yes (`gen_image` model + tool) |
 
 ## 4. Agent tools (what the model can actually call)
 
@@ -84,33 +84,33 @@ Both repositories import the same helpers from `@earendil-works/pi-coding-agent`
 
 | Tool (model-visible name) | MkAgent | Craft | What it does / why MkAgent dropped it |
 |---|:---:|:---:|---|
-| `mcp__session__SubmitPlan` | ✅ | ✅ | Plan review; submits a plan file and pauses the turn |
-| `mcp__session__browser_tool` | ✅ | ✅ | Browser pane control |
-| `mcp__session__call_llm` | ✅ | ✅ | Internal mini-LLM call (titles, summaries, scripts) |
-| `mcp__session__config_validate` | ✅ | ✅ | Validate a workspace `config.json` patch before save |
-| `mcp__session__get_session_info` | ✅ | ✅ | Read session metadata |
-| `mcp__session__list_background_tasks` | ✅ | ✅ | List in-flight background tasks |
-| `mcp__session__list_sessions` | ✅ | ✅ | List sibling sessions in the workspace |
-| `mcp__session__mermaid_validate` | ✅ | ✅ | Validate Mermaid source |
-| `mcp__session__script_sandbox` | ✅ | ✅ | Run a Python script in a sandboxed `uv` environment |
-| `mcp__session__send_agent_message` | ✅ | ✅ | Forward a message into a sibling or spawned session |
-| `mcp__session__send_developer_feedback` | ✅ | ✅ | Send feedback channel |
-| `mcp__session__skill_validate` | ✅ | ✅ | Validate Skill frontmatter and body |
-| `mcp__session__spawn_session` | ✅ | ✅ | Spawn a child session (Lite version, no full conductor) |
-| `mcp__session__transform_data` | ✅ | ✅ | Apply a transform expression to a payload |
-| `mcp__session__update_user_preferences` | ✅ | ✅ | Persist user preference overrides |
-| `mcp__session__create_task` | ❌ | ✅ | Tasks conductor entry point. The product-level Automations surface is removed; the underlying task registry is preserved for background work, but no model-facing entry. |
-| `mcp__session__list_messaging_channels` | ❌ | ✅ | Lists bound external messaging channels. Removed with the messaging gateway. |
-| `mcp__session__unbind_messaging_channel` | ❌ | ✅ | Counterpart of `list_messaging_channels`; same reason. |
-| `mcp__session__render_template` | ❌ | ✅ | Template-rendering helper. Removed as part of the session-tool rendering disablement; see `migration/migration-features.md`. |
-| `mcp__session__set_session_labels` | ❌ | ✅ | User-configurable labels on a session. MkAgent has no labels product area. |
-| `mcp__session__set_session_status` | ❌ | ✅ | User-configurable status on a session. MkAgent has no user statuses. |
-| `mcp__session__source_credential_prompt` | ❌ | ✅ | OAuth credential prompt for a Source. Removed with Sources. |
-| `mcp__session__source_oauth_trigger` | ❌ | ✅ | Generic Source OAuth trigger. |
-| `mcp__session__source_google_oauth_trigger` | ❌ | ✅ | Google OAuth Source trigger. |
-| `mcp__session__source_microsoft_oauth_trigger` | ❌ | ✅ | Microsoft OAuth Source trigger. |
-| `mcp__session__source_slack_oauth_trigger` | ❌ | ✅ | Slack OAuth Source trigger. |
-| `mcp__session__source_test` | ❌ | ✅ | Probe a Source from within a turn. |
+| `mcp__session__SubmitPlan` | Yes | Yes | Plan review; submits a plan file and pauses the turn |
+| `mcp__session__browser_tool` | Yes | Yes | Browser pane control |
+| `mcp__session__call_llm` | Yes | Yes | Internal mini-LLM call (titles, summaries, scripts) |
+| `mcp__session__config_validate` | Yes | Yes | Validate a workspace `config.json` patch before save |
+| `mcp__session__get_session_info` | Yes | Yes | Read session metadata |
+| `mcp__session__list_background_tasks` | Yes | Yes | List in-flight background tasks |
+| `mcp__session__list_sessions` | Yes | Yes | List sibling sessions in the workspace |
+| `mcp__session__mermaid_validate` | Yes | Yes | Validate Mermaid source |
+| `mcp__session__script_sandbox` | Yes | Yes | Run a Python script in a sandboxed `uv` environment |
+| `mcp__session__send_agent_message` | Yes | Yes | Forward a message into a sibling or spawned session |
+| `mcp__session__send_developer_feedback` | Yes | Yes | Send feedback channel |
+| `mcp__session__skill_validate` | Yes | Yes | Validate Skill frontmatter and body |
+| `mcp__session__spawn_session` | Yes | Yes | Spawn a child session (Lite version, no full conductor) |
+| `mcp__session__transform_data` | Yes | Yes | Apply a transform expression to a payload |
+| `mcp__session__update_user_preferences` | Yes | Yes | Persist user preference overrides |
+| `mcp__session__create_task` | No | Yes | Tasks conductor entry point. The product-level Automations surface is removed; the underlying task registry is preserved for background work, but no model-facing entry. |
+| `mcp__session__list_messaging_channels` | No | Yes | Lists bound external messaging channels. Removed with the messaging gateway. |
+| `mcp__session__unbind_messaging_channel` | No | Yes | Counterpart of `list_messaging_channels`; same reason. |
+| `mcp__session__render_template` | No | Yes | Template-rendering helper. Removed as part of the session-tool rendering disablement; see `migration/migration-features.md`. |
+| `mcp__session__set_session_labels` | No | Yes | User-configurable labels on a session. MkAgent has no labels product area. |
+| `mcp__session__set_session_status` | No | Yes | User-configurable status on a session. MkAgent has no user statuses. |
+| `mcp__session__source_credential_prompt` | No | Yes | OAuth credential prompt for a Source. Removed with Sources. |
+| `mcp__session__source_oauth_trigger` | No | Yes | Generic Source OAuth trigger. |
+| `mcp__session__source_google_oauth_trigger` | No | Yes | Google OAuth Source trigger. |
+| `mcp__session__source_microsoft_oauth_trigger` | No | Yes | Microsoft OAuth Source trigger. |
+| `mcp__session__source_slack_oauth_trigger` | No | Yes | Slack OAuth Source trigger. |
+| `mcp__session__source_test` | No | Yes | Probe a Source from within a turn. |
 
 ### 4.4 Source pool / MCP tools
 
@@ -118,11 +118,11 @@ Craft Agents registers an `mcpPool` and forwards its proxy tool definitions thro
 
 | Source / MCP channel | MkAgent | Craft | Notes |
 |---|:---:|:---:|---|
-| API Source proxies (HTTP / GraphQL / etc.) | ❌ | ✅ | Live API endpoints, configured through the Sources UI |
-| MCP Source proxies (stdio MCP servers) | ❌ | ✅ | Per-source MCP process with its own permissions |
-| `bridge-mcp-server` (Craft-bundled MCP bridge, ~13 MB) | ❌ | ✅ | TypeScript MCP server under `resources/bridge-mcp-server/` |
-| `session-mcp-server` (Craft-bundled session MCP) | ❌ | ✅ | TypeScript MCP server under `resources/session-mcp-server/` |
-| Per-source credential prompts and OAuth flows | ❌ | ✅ | Backed by `source_credential_prompt` and the four `source_*_oauth_trigger` tools listed above |
+| API Source proxies (HTTP / GraphQL / etc.) | No | Yes | Live API endpoints, configured through the Sources UI |
+| MCP Source proxies (stdio MCP servers) | No | Yes | Per-source MCP process with its own permissions |
+| `bridge-mcp-server` (Craft-bundled MCP bridge, ~13 MB) | No | Yes | TypeScript MCP server under `resources/bridge-mcp-server/` |
+| `session-mcp-server` (Craft-bundled session MCP) | No | Yes | TypeScript MCP server under `resources/session-mcp-server/` |
+| Per-source credential prompts and OAuth flows | No | Yes | Backed by `source_credential_prompt` and the four `source_*_oauth_trigger` tools listed above |
 
 ### 4.5 Claude backend tools (exist only in Craft)
 
@@ -130,10 +130,10 @@ Craft Agents' second registered backend, `claude-agent-sdk`, brings Claude-Code-
 
 | Tool | Backend | MkAgent | Craft |
 |---|---|:---:|:---:|
-| `TodoWrite` | claude-agent-sdk | ❌ | ✅ |
-| `NotebookEdit` | claude-agent-sdk | ❌ | ✅ |
-| `MultiEdit` | claude-agent-sdk | ❌ | ✅ |
-| Claude SDK-native `Read` / `Write` / `Edit` / `Bash` / `Grep` / `Glob` / `WebFetch` / `WebSearch` | claude-agent-sdk | ❌ | ✅ |
+| `TodoWrite` | claude-agent-sdk | No | Yes |
+| `NotebookEdit` | claude-agent-sdk | No | Yes |
+| `MultiEdit` | claude-agent-sdk | No | Yes |
+| Claude SDK-native `Read` / `Write` / `Edit` / `Bash` / `Grep` / `Glob` / `WebFetch` / `WebSearch` | claude-agent-sdk | No | Yes |
 
 ### 4.6 Effective tool count per agent turn
 
@@ -175,18 +175,18 @@ These are the sizes you actually ship to users, taken from the on-disk dev build
 
 | Bundled to installer | MkAgent | Craft Agents | Approx. size carried in installer |
 |---|---|---|---:|
-| Per-platform **`claude` native binary** (Anthropic SDK) | ❌ | ✅ | **~217 MB per platform arch** |
-| Bundled **`uv`** Python launcher (target-platform binary under `resources/bin/<platform-arch>/`) | ✅ (`uv 0.10.6`; injected through `MKAGENT_UV`) | ✅ | ~30–55 MB for the target arch in each package |
-| `@anthropic-ai/claude-agent-sdk` thin core + per-platform binary shim | ❌ | ✅ | ~3.5 MB core + ~217 MB binary per arch |
-| `bridge-mcp-server/` (Craft's MCP bridge) | ❌ | ✅ | ~13 MB |
-| `session-mcp-server/` (Craft's session MCP) | ❌ | ✅ | ~50 KB TypeScript |
-| WhatsApp worker (`packages/messaging-whatsapp-worker/dist/worker.cjs`) with bundled Baileys | ❌ | ✅ | ~8 MB worker + transitive Baileys deps |
-| `resources/scripts/*.py` (PDF, DOCX, XLSX, PPTX, image, iCal, doc-diff, MarkItDown wrappers) | ✅ (same files) | ✅ | ~110 KB Python; both versions keep them |
-| `resources/bin/*-tool` shell wrappers | ✅ (same) | ✅ | trivial |
-| `@vscode/ripgrep` (bundled `rg` for `server-core` search) | ✅ (4.3 MB on mac-arm64) | ✅ | 4.3 MB |
-| `vendor/bun` (Bun runtime for Pi subprocess) | ✅ (60 MB on mac-arm64) | ✅ | 60 MB |
-| `dist/resources/{themes,tool-icons,permissions,docs,release-notes}` | ✅ | ✅ | couple of MB |
-| `dist/renderer/assets/` (KaTeX fonts, Shiki languages, language modes) | ✅ (~51 MB) | ✅ | identical |
+| Per-platform **`claude` native binary** (Anthropic SDK) | No | Yes | **~217 MB per platform arch** |
+| Bundled **`uv`** Python launcher (target-platform binary under `resources/bin/<platform-arch>/`) | Yes (`uv 0.10.6`; injected through `MKAGENT_UV`) | Yes | ~30–55 MB for the target arch in each package |
+| `@anthropic-ai/claude-agent-sdk` thin core + per-platform binary shim | No | Yes | ~3.5 MB core + ~217 MB binary per arch |
+| `bridge-mcp-server/` (Craft's MCP bridge) | No | Yes | ~13 MB |
+| `session-mcp-server/` (Craft's session MCP) | No | Yes | ~50 KB TypeScript |
+| WhatsApp worker (`packages/messaging-whatsapp-worker/dist/worker.cjs`) with bundled Baileys | No | Yes | ~8 MB worker + transitive Baileys deps |
+| `resources/scripts/*.py` (PDF, DOCX, XLSX, PPTX, image, iCal, doc-diff, MarkItDown wrappers) | Yes (same files) | Yes | ~110 KB Python; both versions keep them |
+| `resources/bin/*-tool` shell wrappers | Yes (same) | Yes | trivial |
+| `@vscode/ripgrep` (bundled `rg` for `server-core` search) | Yes (4.3 MB on mac-arm64) | Yes | 4.3 MB |
+| `vendor/bun` (Bun runtime for Pi subprocess) | Yes (60 MB on mac-arm64) | Yes | 60 MB |
+| `dist/resources/{themes,tool-icons,permissions,docs,release-notes}` | Yes | Yes | couple of MB |
+| `dist/renderer/assets/` (KaTeX fonts, Shiki languages, language modes) | Yes (~51 MB) | Yes | identical |
 
 ### 4.3 Net effect for end users
 
@@ -203,40 +203,40 @@ These are the sizes you actually ship to users, taken from the on-disk dev build
 
 ## 6. Feature surface
 
-The matrix below extends [`docs/feature-matrix.md`](./feature-matrix.md) with explicit numbers from the audit and pointing at concrete file evidence.
+The matrix below extends [`docs/featues.md`](./featues.md) with explicit numbers from the audit and pointing at concrete file evidence.
 
 | Area | MkAgent | Craft Agents |
 |---|---|---|
-| Electron Desktop + WebUI + headless server + CLI + shared renderer | ✅ | ✅ |
-| Pi agent + Pi provider preset + API-key connections | ✅ | ✅ |
-| Custom OpenAI-completions / Anthropic-messages endpoints + Ollama | ✅ | ✅ |
-| Local multi-workspace, `default` slug, per-window binding | ✅ | ✅ |
-| Sessions: create / continue / cancel / resume / flag / archive / unread / search / import / export / branch / multi-window | ✅ | ✅ |
-| Skills (global / workspace / project), mini chat, plan, annotations, follow-up | ✅ | ✅ |
-| Browser pane + `web_search` + `web_fetch` | ✅ | ✅ |
-| Permissions (safe / allow-all) + permission prompts | ✅ | ✅ |
-| Network proxy | ✅ | ✅ |
-| Auto-update via `electron-updater` against GitHub Releases | ✅ (against `MkThingsHQ/mkagent`) | ✅ (against `https://agents.craft.do/electron/latest`) |
-| Sentry (`@sentry/electron` + `@sentry/react`); gated by `SENTRY_ELECTRON_INGEST_URL` | ✅ | ✅ |
-| Document tools (PDF / DOCX / XLSX / PPTX / image / iCal / doc-diff / MarkItDown) with `uv`-based Python wrappers | ✅ (bundled per-platform `uv`; PATH fallback in development) | ✅ (bundled per-platform `uv`) |
-| Mini chat, `EditPopover`, mini model, titles, summaries | ✅ | ✅ |
-| Theme presets, light/dark/system, i18n (`en`, `zh-Hans`) | ✅ (15 themes inherited from Craft) | ✅ (same) |
-| Tool icons, default permissions, "What's New" notes | ✅ | ✅ |
-| Claude Agent SDK backend | ❌ | ✅ |
-| Claude Pro/Max OAuth subscription | ✅ (Pi) | ✅ (Claude SDK by default) |
-| ChatGPT Plus OAuth subscription | ✅ (Pi) | ✅ (Pi) |
-| GitHub Copilot SDK + OAuth subscription | ❌ | ✅ |
-| External messaging gateway + WhatsApp / Slack / Lark workers | ❌ | ✅ |
-| Sources (API Source, MCP Source, MCP pool), Source OAuth flows | ❌ | ✅ |
-| Session MCP server, bridge MCP server | ❌ | ✅ |
-| Viewer (separate Electron app for shared sessions) | ❌ | ✅ |
-| Public sharing, remote workspace federation/transfer | ❌ | ✅ |
-| Product automations / scheduler / recurring tasks | ❌ | ✅ |
-| Session labels + user-defined statuses (settings UI) | ❌ | ✅ |
-| Projects / Kanban | ❌ | ✅ |
-| LLM subscription OAuth callback | ✅ (ChatGPT Desktop callback; Claude code flow) | ✅ |
-| Generic / Sources / gateway OAuth | ❌ | ✅ |
-| Image generation (`gen_image` tool + provider routing) | ❌ | ✅ |
+| Electron Desktop + WebUI + headless server + CLI + shared renderer | Yes | Yes |
+| Pi agent + Pi provider preset + API-key connections | Yes | Yes |
+| Custom OpenAI-completions / Anthropic-messages endpoints + Ollama | Yes | Yes |
+| Local multi-workspace, `default` slug, per-window binding | Yes | Yes |
+| Sessions: create / continue / cancel / resume / flag / archive / unread / search / import / export / branch / multi-window | Yes | Yes |
+| Skills (global / workspace / project), mini chat, plan, annotations, follow-up | Yes | Yes |
+| Browser pane + `web_search` + `web_fetch` | Yes | Yes |
+| Permissions (safe / allow-all) + permission prompts | Yes | Yes |
+| Network proxy | Yes | Yes |
+| Auto-update via `electron-updater` against GitHub Releases | Yes (against `MkThingsHQ/mkagent`) | Yes (against `https://agents.craft.do/electron/latest`) |
+| Sentry (`@sentry/electron` + `@sentry/react`); gated by `SENTRY_ELECTRON_INGEST_URL` | Yes | Yes |
+| Document tools (PDF / DOCX / XLSX / PPTX / image / iCal / doc-diff / MarkItDown) with `uv`-based Python wrappers | Yes (bundled per-platform `uv`; PATH fallback in development) | Yes (bundled per-platform `uv`) |
+| Mini chat, `EditPopover`, mini model, titles, summaries | Yes | Yes |
+| Theme presets, light/dark/system, i18n (`en`, `zh-Hans`) | Yes (15 themes inherited from Craft) | Yes (same) |
+| Tool icons, default permissions, "What's New" notes | Yes | Yes |
+| Claude Agent SDK backend | No | Yes |
+| Claude Pro/Max OAuth subscription | Yes (Pi) | Yes (Claude SDK by default) |
+| ChatGPT Plus OAuth subscription | Yes (Pi) | Yes (Pi) |
+| GitHub Copilot SDK + OAuth subscription | No | Yes |
+| External messaging gateway + WhatsApp / Slack / Lark workers | No | Yes |
+| Sources (API Source, MCP Source, MCP pool), Source OAuth flows | No | Yes |
+| Session MCP server, bridge MCP server | No | Yes |
+| Viewer (separate Electron app for shared sessions) | No | Yes |
+| Public sharing, remote workspace federation/transfer | No | Yes |
+| Product automations / scheduler / recurring tasks | No | Yes |
+| Session labels + user-defined statuses (settings UI) | No | Yes |
+| Projects / Kanban | No | Yes |
+| LLM subscription OAuth callback | Yes (ChatGPT Desktop callback; Claude code flow) | Yes |
+| Generic / Sources / gateway OAuth | No | Yes |
+| Image generation (`gen_image` tool + provider routing) | No | Yes |
 
 ## 7. Test, typecheck and lint coverage delta
 
@@ -247,13 +247,13 @@ The matrix below extends [`docs/feature-matrix.md`](./feature-matrix.md) with ex
 | `bun run typecheck:all` | passes; `apps/online-docs` is excluded from the workspace by `workspaces` globs in MkAgent and skipped in Craft | passes | both green |
 | `bun run lint` | `lint:craft-ui-sync`, `lint:craft-test-coverage`, `lint:electron`, `lint:shared`, `lint:ui` pass; **20 React Hook `exhaustive-deps` warnings retained** from upstream | adds `lint:ipc-sends`, `lint:tool-name-checks`, `lint:i18n:coverage`, `lint:i18n:strings`; **45 Craft-origin React Hook warnings** | MkAgent's lint scope is narrower |
 | `bun run audit:craft-reuse` | 96 % same-path, 59 % byte-identical, 0 missing-without-explanation | (not applicable) | green |
-| `bun run lint:craft-test-coverage` | 246 kept / 6 substituted / 121 dropped-for-product-boundary / **0 missing-without-explanation** | (not applicable) | green |
+| `bun run lint:craft-test-coverage` | 246 kept / 5 substituted / 122 dropped-for-product-boundary / **0 missing-without-explanation** | (not applicable) | green |
 
-The MkAgent-side lifts (zero "missing test without explanation") come from [`scripts/check-craft-test-coverage.ts`](../../scripts/check-craft-test-coverage.ts), which enforces that every Craft test is one of: (a) same-path kept, (b) replaced with a Lite equivalent, (c) explicitly tied to a removed product area.
+The MkAgent-side lifts (zero "missing test without explanation") come from [`scripts/check-craft-test-coverage.ts`](../scripts/check-craft-test-coverage.ts), which enforces that every Craft test is one of: (a) same-path kept, (b) replaced with a Lite equivalent, (c) explicitly tied to a removed product area.
 
 ## 8. License & attribution
 
-Both projects are released under **Apache-2.0**. MkAgent ships [`NOTICE`](../NOTICE) on the repo root with the attribution upstream required, and [`docs/feature-matrix.md`](./feature-matrix.md) records the kept/removed capabilities in human-readable form. Source and release artifacts (DMG/ZIP/NSIS/AppImage, manifests, blockmaps, and checksums) now share the `MkThingsHQ/mkagent` repository; no release-only mirror is used.
+Both projects are released under **Apache-2.0**. MkAgent ships [`NOTICE`](../NOTICE) on the repo root with the attribution upstream required, and [`docs/featues.md`](./featues.md) records the kept/removed capabilities in human-readable form. Source and release artifacts (DMG/ZIP/NSIS/AppImage, manifests, blockmaps, and checksums) now share the `MkThingsHQ/mkagent` repository; no release-only mirror is used.
 
 ## 9. Re-running this audit
 
@@ -272,4 +272,4 @@ git checkout a60ebc1a5a7cb0a6af7a77d5eed0512c5fc07658
 ls -lah node_modules/@anthropic-ai/claude-agent-sdk-darwin-arm64/claude   # 217 MB binary
 ```
 
-If you need updated DMG / NSIS / AppImage numbers, build both products from their recorded commits with the same `electron-builder.yml` flags, then reuse [`scripts/build-server.ts`](../../scripts/build-server.ts) and the per-platform `apps/electron/scripts/build-dmg.sh` to write installers.
+If you need updated DMG / NSIS / AppImage numbers, build both products from their recorded commits with the same `electron-builder.yml` flags, then reuse [`scripts/build-server.ts`](../scripts/build-server.ts) and the per-platform `apps/electron/scripts/build-dmg.sh` to write installers.
