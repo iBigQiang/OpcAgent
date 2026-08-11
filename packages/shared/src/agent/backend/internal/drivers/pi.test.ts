@@ -40,3 +40,49 @@ describe('piDriver.buildRuntime custom endpoint models', () => {
     ]);
   });
 });
+
+describe('piDriver.testConnection custom Anthropic endpoint auth', () => {
+  it('mirrors the runtime x-api-key and Bearer headers', async () => {
+    const originalFetch = globalThis.fetch;
+    let requestUrl = '';
+    let requestHeaders: Headers | undefined;
+
+    globalThis.fetch = (async (input: string | URL | Request, init?: RequestInit) => {
+      requestUrl = input.toString();
+      requestHeaders = new Headers(init?.headers);
+      return new Response('', { status: 200 });
+    }) as typeof fetch;
+
+    try {
+      const result = await piDriver.testConnection!({
+        provider: 'pi',
+        apiKey: 'test-token',
+        model: 'pi/claude-opus-test',
+        baseUrl: 'https://gateway.example.test',
+        connection: {
+          providerType: 'pi_compat',
+          piAuthProvider: 'anthropic',
+          customEndpoint: { api: 'anthropic-messages' },
+        },
+        timeoutMs: 1_000,
+        resolvedPaths: {
+          piServerPath: '/tmp/pi-agent-server.js',
+          interceptorBundlePath: '/tmp/interceptor.cjs',
+          nodeRuntimePath: '/usr/bin/node',
+        },
+        hostRuntime: {
+          appRootPath: '/tmp/mkagent',
+          isPackaged: false,
+        },
+      });
+
+      expect(result).toEqual({ success: true });
+      expect(requestUrl).toBe('https://gateway.example.test/v1/messages');
+      expect(requestHeaders?.get('x-api-key')).toBe('test-token');
+      expect(requestHeaders?.get('authorization')).toBe('Bearer test-token');
+      expect(requestHeaders?.get('anthropic-version')).toBe('2023-06-01');
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+});

@@ -1458,8 +1458,12 @@
       "sha256": "7d1380cc8691f536cf41b7d40e85da3f3f6ef1a54a44199571934f26abb1321c",
       "reason": "Craft shared module reduced to retained Pi, session, configuration, Skill, and UI behavior"
     },
+    "packages/shared/src/agent/backend/internal/drivers/pi.test.ts": {
+      "sha256": "f698e1344faafb553b46710715b78a0f230d18246238cae2034766fa06f6e979",
+      "reason": "MkAgent custom Anthropic endpoint authentication regression coverage"
+    },
     "packages/shared/src/agent/backend/internal/drivers/pi.ts": {
-      "sha256": "e923a53cbf0a4f9fd79775ac02ecf54f35c51d4cb995426aefe1e534fbc6efbd",
+      "sha256": "9c97cd4bed9ef65f6febb48e22d01bb5dfe8e7c4ea52285fe75b56107eeceafe",
       "reason": "Craft shared module reduced to retained Pi, session, configuration, Skill, and UI behavior"
     },
     "packages/shared/src/agent/backend/internal/runtime-resolver.ts": {
