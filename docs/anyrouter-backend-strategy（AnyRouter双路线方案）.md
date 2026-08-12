@@ -144,7 +144,7 @@ AnyRouter 公开说明要求安装官方 Claude Code，并配置：
 
 本机最终验收中，未保存手动路径时，resolver 通过 `common-install` 自动发现：
 
-`C:\Users\Qiang\AppData\Roaming\npm\node_modules\@anthropic-ai\claude-code\bin\claude.exe`
+`C:\Users\<用户>\AppData\Roaming\npm\node_modules\@anthropic-ai\claude-code\bin\claude.exe`
 
 并通过 `claude.exe --version` 验证为 Claude Code 2.1.227。因此当前电脑无需手动填写路径。手动浏览仍作为兜底，用于自定义安装目录、便携版目录或未来尚未覆盖的新安装器布局。
 
@@ -219,3 +219,62 @@ Windows 的 `.cmd` shim 不能在 `shell: false` 下假定可直接执行，必�
 - 第一阶段：发布 AnyRouter-CC 的路径检测与手动配置能力。
 - 第二阶段：在开发模式或显式实验开关下提供 AnyRouter-Pi。
 - 第三阶段：完成协议矩阵和稳定性测试，并取得服务方兼容确认后，再决定是否面向普通用户默认显示。
+
+---
+
+## 两种模式怎么选
+
+| 项目                 | AnyRouter-Pi                  | AnyRouter-CC                |
+| -------------------- | ----------------------------- | --------------------------- |
+| 依赖 `claude.exe`    | 不依赖                        | 依赖                        |
+| 本机安装负担         | 更轻                          | 需要安装 Claude Code        |
+| 官方兼容性           | 非官方协议适配                | AnyRouter 官方推荐路径      |
+| 本机 Claude 升级影响 | 不受本机 CLI 升级影响         | 依赖 CLI 参数和输出保持兼容 |
+| 长期稳定性           | 协议变化时需更新 MkAgent 代码 | 当前更稳定                  |
+| 建议                 | 实验、免安装备用              | 默认推荐                    |
+
+结论：`AnyRouter-Pi` 更轻，但 `AnyRouter-CC` 目前更稳定。
+
+MkAgent 不会自动更新用户电脑里的 Claude Code：
+
+- `AnyRouter-CC` 使用本机现有 `claude.exe`。
+- 用户升级 Claude Code 后，只要命令行参数和流式输出格式没变，通常无需修改 MkAgent。
+- `AnyRouter-Pi` 固定模拟 Claude Code 2.1.227 的协议形状，不随本机 Claude Code 升级。AnyRouter 将来修改客户端识别规则时，需要更新 MkAgent 的 wire adapter 并重新发布。
+
+## Claude CLI 自动识别
+
+本机已完成真实自动检测，没有使用手动保存路径：
+
+```
+source: common-install
+path: C:\Users\<用户>\AppData\Roaming\npm\node_modules\@anthropic-ai\claude-code\bin\claude.exe
+version: 2.1.227 (Claude Code)
+```
+
+自动扫描已经覆盖：
+
+- npm 默认目录和自定义 npm prefix
+- pnpm、Bun、Volta、Scoop
+- 常见 standalone 安装目录
+- 系统 PATH
+- 项目本地 `node_modules`
+- macOS/Linux 常见安装目录
+
+每个候选都会实际执行 `claude.exe --version` 验证。只有便携版放在自定义目录、安装器采用未知布局或路径不可访问时，才需要点击“Browse”手动选择。
+
+同时补充了自动候选优先级，以及 `保存路径 → 检查 → 清除 → 恢复自动检测` 的回归测试。
+
+## AnyRouter-Pi 最终能力矩阵
+
+已通过真实连接测试：
+
+- 单轮文本
+- 多轮上下文
+- Read 工具闭环
+- 带签名 thinking replay
+- 流开始后的取消
+- Pi 会话恢复
+- Anthropic 缓存创建与读取
+- AgentRouter、Generic Custom、AnyRouter-CC 路由隔离
+
+图片测试进行了三次，均在流开始前被 AnyRouter 返回 HTTP 429，因此无法证明图片兼容成功或失败。当前继续保持 text-only，不会在界面错误开放图片能力。

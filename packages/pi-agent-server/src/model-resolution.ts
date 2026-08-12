@@ -11,23 +11,24 @@ type PiModel<T = any> = ReturnType<PiModelRegistry['find']>;
  * Resolve a Pi SDK model from the registry, with optional custom-endpoint precedence.
  *
  * Resolution order:
- * 1. If `preferCustomEndpoint` is true, try `'custom-endpoint'` provider first
+ * 1. If `preferCustomEndpoint` is true, try the configured endpoint provider first
  * 2. Exact provider+model lookup via `piAuthProvider`
  * 3. Full `getAll()` scan by id/name
- * 4. Common provider fallback list (includes 'custom-endpoint')
+ * 4. Common provider fallback list (includes the configured endpoint provider)
  */
 export function resolvePiModel(
   modelRegistry: PiModelRegistry,
   modelId: string,
   piAuthProvider?: string,
   preferCustomEndpoint?: boolean,
+  customEndpointProviderId = 'custom-endpoint',
 ): PiModel | undefined {
   // Strip MkAgent's pi/ prefix — Pi SDK uses bare model IDs.
   const bareId = modelId.startsWith('pi/') ? modelId.slice(3) : modelId;
 
   // Custom-endpoint takes precedence when configured
   if (preferCustomEndpoint) {
-    const custom = modelRegistry.find('custom-endpoint', bareId);
+    const custom = modelRegistry.find(customEndpointProviderId, bareId);
     if (custom) return custom;
   }
 
@@ -49,21 +50,21 @@ export function resolvePiModel(
 
   // Fallback: search all available models.
   // When piAuthProvider is set, only return models from the same provider
-  // (or 'custom-endpoint'). Without this guard, a model that exists under
+  // (or the configured custom-endpoint provider). Without this guard, a model that exists under
   // a different provider would be returned, and the Pi SDK
   // would fail with "No API key found for <wrong-provider>".
   const allModels = modelRegistry.getAll();
   const match = allModels.find(m =>
     (m.id === bareId || m.name === bareId) &&
-    (!piAuthProvider || (m as any).provider === piAuthProvider || (m as any).provider === 'custom-endpoint'),
+    (!piAuthProvider || (m as any).provider === piAuthProvider || (m as any).provider === customEndpointProviderId),
   );
   if (match) return match;
 
   // Try common providers with the model ID
-  const providers = ['custom-endpoint', 'anthropic', 'openai', 'google'];
+  const providers = [customEndpointProviderId, 'anthropic', 'openai', 'google'];
   for (const provider of providers) {
     // Skip providers incompatible with the authenticated provider
-    if (piAuthProvider && provider !== piAuthProvider && provider !== 'custom-endpoint') continue;
+    if (piAuthProvider && provider !== piAuthProvider && provider !== customEndpointProviderId) continue;
     const model = modelRegistry.find(provider, bareId);
     if (model) return model;
   }

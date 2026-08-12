@@ -75,6 +75,11 @@ import { CHAT_LAYOUT } from "@/config/layout"
 import { collectFileChangesFromActivities, getFirstFileChangeIdForActivity } from "@/lib/file-changes"
 import { resolveBranchNewPanelOption } from "./branching"
 import { handleErrorMessageAction } from "./error-message-actions"
+import {
+  buildSafeContinuationDraft,
+  buildSafeContinuationSessionOptions,
+  isAgentRouterContextRejection,
+} from "@/lib/safe-session-continuation"
 
 // ============================================================================
 // CSS Custom Highlight API helper
@@ -522,6 +527,33 @@ export const ChatDisplay = React.forwardRef<ChatDisplayHandle, ChatDisplayProps>
 
   // Navigation for session branching
   const { navigate } = useNavigation()
+
+  const isAgentRouterSession = React.useMemo(() => {
+    const connectionSlug = session?.llmConnection ?? appShellContext.workspaceDefaultLlmConnection
+    if (!connectionSlug) return false
+    return appShellContext.llmConnections.some(connection =>
+      connection.slug === connectionSlug
+      && connection.platformProfile === 'agentrouter',
+    )
+  }, [appShellContext.llmConnections, appShellContext.workspaceDefaultLlmConnection, session?.llmConnection])
+
+  const continueInFreshSession = React.useCallback(async () => {
+    if (!session) return
+    try {
+      const draft = buildSafeContinuationDraft(session.messages ?? [])
+      const child = await appShellContext.onCreateSession(
+        session.workspaceId,
+        buildSafeContinuationSessionOptions(session),
+      )
+      appShellContext.onInputChange(child.id, draft)
+      await window.electronAPI.setDraft(child.id, { text: draft })
+      navigate(routes.view.allSessions(child.id))
+    } catch (error) {
+      toast.error(t('toast.couldNotCreateSession'), {
+        description: error instanceof Error ? error.message : 'Unknown error',
+      })
+    }
+  }, [appShellContext, navigate, session, t])
 
   // Get isDark from useTheme hook for overlay theme
   // This accounts for scenic themes (like Haze) that force dark mode
@@ -1635,6 +1667,11 @@ export const ChatDisplay = React.forwardRef<ChatDisplayHandle, ChatDisplayProps>
                             onOpenFile={onOpenFile}
                             onOpenUrl={onOpenUrl}
                             sessionId={session?.id}
+                            onContinueInNewSession={
+                              isAgentRouterSession && isAgentRouterContextRejection(turn.message)
+                                ? continueInFreshSession
+                                : undefined
+                            }
                             onRetry={turn.message.role === 'error' ? () => {
                               const msgs = session?.messages
                               if (!msgs) return
@@ -2117,15 +2154,18 @@ interface MessageBubbleProps {
   compactMode?: boolean
   /** Callback to resend the user message that preceded an error */
   onRetry?: () => void
+  /** Create a clean session with a safe, editable visible-text transcript draft. */
+  onContinueInNewSession?: () => Promise<void> | void
 }
 
 /**
  * ErrorMessage - Separate component for error messages to allow useState hook
  */
-function ErrorMessage({ message, onOpenUrl, sessionId, onRetry }: { message: Message; onOpenUrl?: (url: string) => void; sessionId?: string; onRetry?: () => void }) {
+function ErrorMessage({ message, onOpenUrl, sessionId, onRetry, onContinueInNewSession }: { message: Message; onOpenUrl?: (url: string) => void; sessionId?: string; onRetry?: () => void; onContinueInNewSession?: () => Promise<void> | void }) {
   const { t } = useTranslation()
   const hasDetails = (message.errorDetails && message.errorDetails.length > 0) || message.errorOriginal
   const [detailsOpen, setDetailsOpen] = React.useState(false)
+  const [isContinuing, setIsContinuing] = React.useState(false)
   const actions = message.errorActions?.filter(a => {
     if (a.action === 'open_url') return !!a.url && !!onOpenUrl
     return true
@@ -2161,9 +2201,29 @@ function ErrorMessage({ message, onOpenUrl, sessionId, onRetry }: { message: Mes
                 }}
                 className="text-xs px-2 py-0.5 rounded border border-destructive/20 text-destructive/70 hover:text-destructive hover:border-destructive/40 transition-colors"
               >
-                {action.label}{action.action === 'open_url' ? ' ↗' : ''}
+                {action.label}{action.action === 'open_url' ? ' (external)' : ''}
               </button>
             ))}
+          </div>
+        )}
+
+        {onContinueInNewSession && (
+          <div className="mt-2">
+            <button
+              disabled={isContinuing}
+              onClick={async () => {
+                if (isContinuing) return
+                setIsContinuing(true)
+                try {
+                  await onContinueInNewSession()
+                } finally {
+                  setIsContinuing(false)
+                }
+              }}
+              className="text-xs px-2 py-0.5 rounded border border-destructive/20 text-destructive/70 hover:text-destructive hover:border-destructive/40 transition-colors"
+            >
+              {t('chat.continueInNewSession')}
+            </button>
           </div>
         )}
 
@@ -2204,6 +2264,7 @@ function MessageBubble({
   onPopOut,
   compactMode,
   onRetry,
+  onContinueInNewSession,
 }: MessageBubbleProps) {
   const { t } = useTranslation()
 
@@ -2270,7 +2331,7 @@ function MessageBubble({
 
   // === ERROR MESSAGE: Red bordered bubble with warning icon and collapsible details ===
   if (message.role === 'error') {
-    return <ErrorMessage message={message} onOpenUrl={onOpenUrl} sessionId={sessionId} onRetry={onRetry} />
+    return <ErrorMessage message={message} onOpenUrl={onOpenUrl} sessionId={sessionId} onRetry={onRetry} onContinueInNewSession={onContinueInNewSession} />
   }
 
   // === STATUS MESSAGE: Matches ProcessingIndicator layout for visual consistency ===
@@ -2356,6 +2417,7 @@ const MemoizedMessageBubble = React.memo(MessageBubble, (prev, next) => {
     prev.message.content === next.message.content &&
     prev.message.role === next.message.role &&
     prev.sessionId === next.sessionId &&
-    prev.compactMode === next.compactMode
+    prev.compactMode === next.compactMode &&
+    Boolean(prev.onContinueInNewSession) === Boolean(next.onContinueInNewSession)
   )
 })

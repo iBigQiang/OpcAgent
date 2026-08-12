@@ -58,6 +58,17 @@ describe('resolvePiModel', () => {
       expect(result).toBeDefined();
       expect(result!.provider).toBe('anthropic');
     });
+
+    it('uses the AgentRouter provider for endpoint-preferred model resolution', () => {
+      const registry = createMockRegistry({
+        agentrouter: [{ id: 'claude-opus-5', name: 'claude-opus-5', provider: 'agentrouter' }],
+        anthropic: [{ id: 'claude-opus-5', name: 'claude-opus-5', provider: 'anthropic' }],
+      });
+
+      const result = resolvePiModel(registry, 'claude-opus-5', 'agentrouter', true, 'agentrouter');
+      expect(result).toBeDefined();
+      expect(result!.provider).toBe('agentrouter');
+    });
   });
 
   describe('exact provider lookup', () => {
@@ -171,6 +182,16 @@ describe('resolvePiModel', () => {
       const result = resolvePiModel(registry, 'my-model', 'provider-a');
       expect(result).toBeDefined();
       expect(result!.provider).toBe('custom-endpoint');
+    });
+
+    it('keeps AgentRouter model lookup isolated from the generic custom endpoint', () => {
+      const registry = createMockRegistry({
+        'custom-endpoint': [{ id: 'claude-opus-5', name: 'claude-opus-5', provider: 'custom-endpoint' }],
+        agentrouter: [{ id: 'claude-opus-5', name: 'claude-opus-5', provider: 'agentrouter' }],
+      });
+
+      const result = resolvePiModel(registry, 'claude-opus-5', 'agentrouter', true, 'agentrouter');
+      expect(result!.provider).toBe('agentrouter');
     });
 
     it('does not filter by provider when piAuthProvider is not set', () => {

@@ -46,6 +46,14 @@ describe('MkAgent system prompt', () => {
     expect(prompt).toContain('The subtask needs file/shell tools (for example, Read or Bash)')
     expect(prompt).not.toContain('The subtask needs tools (Read, Bash, Grep)')
   })
+
+  it('avoids repeated tool-based counting for approximate-length writing', () => {
+    const prompt = getSystemPrompt(undefined, undefined, '/tmp/workspace', '/tmp/workspace')
+    expect(prompt).toContain('“about N characters/words/tokens,” write directly without calling tools to count')
+    expect(prompt).toContain('explicitly requires an exact count or strict limit, count at most once after drafting')
+    expect(prompt).toContain('preferably with an available `transform_data` tool')
+    expect(prompt).toContain('do not retry across multiple runtimes')
+  })
 })
 
 describe('includeCoAuthoredBy handling', () => {

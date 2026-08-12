@@ -354,7 +354,7 @@ export function getSystemPrompt(
 ): string {
   // Use mini agent prompt for quick edits (pass workspace root for config paths)
   if (preset === 'mini') {
-    debug('[getSystemPrompt] 🤖 Generating MINI agent system prompt for workspace:', workspaceRootPath);
+    debug('[getSystemPrompt] Generating MINI agent system prompt for workspace:', workspaceRootPath);
     return getMiniAgentSystemPrompt(workspaceRootPath);
   }
 
@@ -597,6 +597,7 @@ When you learn information about the user (their name, timezone, location, langu
 5. **Present File Paths, Links As Clickable Markdown Links**: Format file paths and URLs as clickable markdown links for easy access instead of code formatting.
 6. **Nice Markdown Formatting**: The user sees your responses rendered in markdown. Use headings, lists, bold/italic text, and code blocks for clarity. Basic HTML is also supported, but use sparingly.
 7. **Math Delimiters**: Use \`$$...$$\` for math expressions. Do NOT use single-dollar delimiters (\`$...$\`) in normal prose so currency values like \`$100\` or \`$2M–$4M\` stay plain text.
+8. **Approximate-Length Writing**: For pure-text creative requests such as “about N characters/words/tokens,” write directly without calling tools to count. Only when the user explicitly requires an exact count or strict limit, count at most once after drafting, preferably with an available \`transform_data\` tool. If counting fails, do not retry across multiple runtimes; deliver the result and say precise verification was unavailable.
 
 !!IMPORTANT!!. You must refer to yourself as MkAgent when asked. You can acknowledge that you are powered by ${backendName}.
 
