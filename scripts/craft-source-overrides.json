@@ -1439,7 +1439,7 @@
       "reason": "Craft test adapted to the retained Lite feature set or strengthened for retained behavior"
     },
     "packages/shared/src/agent/backend/__tests__/runtime-resolver.test.ts": {
-      "sha256": "96acf18a81e925af140e8e5f59667d8446efa8d33e42e8696401d569d28a7f09",
+      "sha256": "3356ff674f5bd82581ec0755c1d6939f57369a0a892d6462952916b6608e404d",
       "reason": "Craft test adapted to the retained Lite feature set or strengthened for retained behavior"
     },
     "packages/shared/src/agent/backend/base-event-adapter.ts": {
@@ -1471,7 +1471,7 @@
       "reason": "Craft shared module reduced to retained Pi, session, configuration, Skill, and UI behavior"
     },
     "packages/shared/src/agent/backend/internal/runtime-resolver.ts": {
-      "sha256": "8eaade2bf59a9b0b772a08bdb591c1fe3d888e2e223ab4c59f0a6a46847e10e2",
+      "sha256": "1f6a59ddd33d1327b3c463d198962143a20ed71f5f7845ae7b6864c156921412",
       "reason": "Craft shared module reduced to retained Pi, session, configuration, Skill, and UI behavior"
     },
     "packages/shared/src/agent/backend/pi/constants.ts": {
@@ -3121,7 +3121,7 @@
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "packages/server-core/src/handlers/rpc/messaging.ts": {
-      "sha256": "521228dc0aee660c448c8ee4a9c8d353398f33916e1799fd9fbbe22c1c3d87e7",
+      "sha256": "35b03690f79a0661f9da9814b758ab1215e7ae5a7599bcdbf54e28bc6f2bffd2",
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "packages/server-core/src/handlers/rpc/projects-loaded-unbind.test.ts": {

@@ -19,6 +19,8 @@ const CHANNEL = {
   getRuntime: RPC_CHANNELS.messaging.GET_RUNTIME,
   saveCredential: RPC_CHANNELS.messaging.SAVE_CREDENTIAL,
   forgetCredential: RPC_CHANNELS.messaging.FORGET_CREDENTIAL,
+  saveTelegram: RPC_CHANNELS.messaging.SAVE_TELEGRAM,
+  saveLark: RPC_CHANNELS.messaging.SAVE_LARK,
   forget: RPC_CHANNELS.messaging.FORGET,
   testTelegram: RPC_CHANNELS.messaging.TEST_TELEGRAM,
   testLark: RPC_CHANNELS.messaging.TEST_LARK,
@@ -61,8 +63,8 @@ export function registerMessagingHandlers(server: RpcServer, deps: HandlerDeps &
   server.handle(CHANNEL.getRuntime, async ctx => registry.getRuntime(workspaceId(ctx.workspaceId)))
   server.handle(CHANNEL.saveCredential, async () => { throw new Error('Generic messaging credentials are not supported') })
   server.handle(CHANNEL.forgetCredential, async () => { throw new Error('Generic messaging credentials are not supported') })
-  server.handle(RPC_CHANNELS.messaging.SAVE_TELEGRAM, async (ctx, token: string) => { await registry.saveTelegramToken(workspaceId(ctx.workspaceId), token); return { success: true } })
-  server.handle(RPC_CHANNELS.messaging.SAVE_LARK, async (ctx, credentials: LarkCredentials) => { await registry.saveLarkCredentials(workspaceId(ctx.workspaceId), credentials); return { success: true } })
+  server.handle(CHANNEL.saveTelegram, async (ctx, token: string) => { await registry.saveTelegramToken(workspaceId(ctx.workspaceId), token); return { success: true } })
+  server.handle(CHANNEL.saveLark, async (ctx, credentials: LarkCredentials) => { await registry.saveLarkCredentials(workspaceId(ctx.workspaceId), credentials); return { success: true } })
   server.handle(CHANNEL.forget, async (ctx, platform: PlatformType) => { await registry.forgetPlatform(workspaceId(ctx.workspaceId), platform); return { success: true } })
   server.handle(CHANNEL.testTelegram, async (_ctx, token: string) => registry.testTelegramToken(token))
   server.handle(CHANNEL.testLark, async (_ctx, credentials: LarkCredentials) => registry.testLarkCredentials(credentials))

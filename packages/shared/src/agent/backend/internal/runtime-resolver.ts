@@ -153,6 +153,11 @@ function getPathCandidates(): string[] {
 }
 
 function getConfiguredNpmPrefix(): string | undefined {
+  const configured = process.env.npm_config_prefix
+    || process.env.NPM_CONFIG_PREFIX
+    || process.env.PREFIX;
+  if (configured) return configured;
+
   try {
     const output = process.platform === 'win32'
       ? execFileSync(process.env.ComSpec || 'cmd.exe', ['/d', '/c', 'npm', 'prefix', '-g'], { encoding: 'utf-8', timeout: 2_000, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] })
@@ -169,9 +174,6 @@ function getCommonClaudeCandidates(): string[] {
   const appData = process.env.APPDATA || '';
   const localAppData = process.env.LOCALAPPDATA || '';
   const npmPrefixes = [
-    process.env.npm_config_prefix,
-    process.env.NPM_CONFIG_PREFIX,
-    process.env.PREFIX,
     getConfiguredNpmPrefix(),
     appData ? join(appData, 'npm') : undefined,
     home ? join(home, '.npm-global') : undefined,

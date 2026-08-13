@@ -137,7 +137,10 @@ describe('resolveClaudeExecutablePath', () => {
 
   it('prefers a common npm installation over PATH and project-local candidates', () => {
     const prefix = join(tmpBase, 'npm-prefix');
-    const common = createClaudeExecutable(join(prefix, 'node_modules', '@anthropic-ai', 'claude-code', 'bin'));
+    const commonDirectory = process.platform === 'win32'
+      ? join(prefix, 'node_modules', '@anthropic-ai', 'claude-code', 'bin')
+      : join(prefix, 'lib', 'node_modules', '@anthropic-ai', 'claude-code', 'bin');
+    const common = createClaudeExecutable(commonDirectory);
     const pathDirectory = join(tmpBase, 'path');
     const pathCandidate = createClaudeExecutable(pathDirectory);
     const appRoot = join(tmpBase, 'project', 'app');
@@ -163,16 +166,17 @@ describe('resolveClaudeExecutablePath', () => {
   it('uses a project-local executable when no configured common install is available', () => {
     const appRoot = join(tmpBase, 'project-local', 'app');
     const projectLocal = createClaudeExecutable(join(appRoot, 'node_modules', '.bin'));
+    const emptyPrefix = join(tmpBase, 'empty-prefix');
 
     withClaudeDiscoveryEnvironment({
-      NPM_CONFIG_PREFIX: undefined,
+      NPM_CONFIG_PREFIX: emptyPrefix,
       PREFIX: undefined,
       APPDATA: join(tmpBase, 'appdata'),
       LOCALAPPDATA: join(tmpBase, 'localappdata'),
       USERPROFILE: join(tmpBase, 'home'),
       HOME: join(tmpBase, 'home'),
       PATH: '',
-      npm_config_prefix: join(tmpBase, 'empty-prefix'),
+      npm_config_prefix: emptyPrefix,
     }, () => {
       const result = resolveClaudeExecutable({ appRootPath: appRoot, isPackaged: false });
       expect(result).toMatchObject({ valid: true, path: projectLocal, source: 'project-local' });
