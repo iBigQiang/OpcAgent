@@ -71,6 +71,7 @@ export function OwnersListEditor({ owners, enforced, onRemove, currentUserId }: 
     </div>
   )
 }
+
 function OwnerRow({
   owner,
   enforced,

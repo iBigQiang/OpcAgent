@@ -475,6 +475,16 @@ export class SessionManager implements ISessionManager {
   private initPromise: Promise<void> | null = null
   private activeViewingByWorkspace = new Map<string, string>()
   private completionListeners = new Set<(event: SessionCompletionEvent) => void>()
+  /**
+   * Optional host-installed bridge for automation sessions that declare a
+   * Telegram forum topic. Keeping this as a callback prevents server-core from
+   * importing the messaging package and creating a package cycle.
+   */
+  private automationBinder?: (input: {
+    workspaceId: string
+    sessionId: string
+    topicName: string
+  }) => Promise<void>
   private browserPaneManager: IBrowserPaneManager | null = null
   private rpcServer: RpcServer | null = null
   private browserHostPins = new Map<string, string>()
@@ -501,6 +511,11 @@ export class SessionManager implements ISessionManager {
 
   setEventSink(sink: EventSink): void {
     this.eventSink = sink
+  }
+
+  /** Install the best-effort automation-to-messaging topic binder. */
+  setAutomationBinder(fn: (input: { workspaceId: string; sessionId: string; topicName: string }) => Promise<void>): void {
+    this.automationBinder = fn
   }
 
   setBrowserPaneManager(manager: IBrowserPaneManager): void {
@@ -2391,6 +2406,7 @@ export class SessionManager implements ISessionManager {
       workspaceId, workspaceRootPath, prompt: prompt.prompt, labels: prompt.labels, permissionMode: prompt.permissionMode,
       mentions: prompt.mentions, llmConnection: prompt.llmConnection, model: prompt.model,
       thinkingLevel: prompt.thinkingLevel, automationName: prompt.automationName,
+      telegramTopic: prompt.telegramTopic,
       sourceEvent: prompt.sourceEvent,
     })))
   }
@@ -2405,6 +2421,14 @@ export class SessionManager implements ISessionManager {
     if (managed) {
       managed.triggeredBy = { automationName: input.automationName, event: input.sourceEvent, timestamp: Date.now() }
       await this.flushSession(session.id)
+    }
+    const telegramTopic = input.telegramTopic?.trim()
+    if (this.automationBinder && telegramTopic) {
+      try {
+        await this.automationBinder({ workspaceId: input.workspaceId, sessionId: session.id, topicName: telegramTopic })
+      } catch (error) {
+        log.warn('Automation topic binding failed', error)
+      }
     }
     const send = this.sendMessage(session.id, input.prompt)
     if (input.waitForCompletion === false) void send.catch(error => log.error('Automation prompt dispatch failed', error))

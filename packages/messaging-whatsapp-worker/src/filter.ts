@@ -6,7 +6,8 @@ export function extractText(message: Record<string, unknown>): string {
   const extended = content.extendedTextMessage as Record<string, unknown> | undefined
   return typeof extended?.text === 'string' ? extended.text : ''
 }
-export function shouldAcceptInbound(message: { key?: { fromMe?: boolean; remoteJid?: string; id?: string }; message?: unknown }, selfJid?: string): boolean {
+export function shouldAcceptInbound(message: { key?: { fromMe?: boolean; remoteJid?: string; id?: string }; message?: unknown }, selfJid?: string, allowedGroupJids: readonly string[] = []): boolean {
   const jid = bareJid(message.key?.remoteJid)
-  return Boolean(jid && message.key?.id && !message.key?.fromMe && jid !== bareJid(selfJid))
+  if (!jid || !message.key?.id || message.key?.fromMe || jid === bareJid(selfJid)) return false
+  return !jid.endsWith('@g.us') || allowedGroupJids.map(bareJid).includes(jid)
 }

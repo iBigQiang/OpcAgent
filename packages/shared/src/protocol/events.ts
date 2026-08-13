@@ -12,6 +12,14 @@ import type {
 import type { LoadedProject } from '../projects/types.ts';
 import type { PlatformRuntimeInfo } from '@mkagent/messaging-gateway';
 
+export type WhatsAppUiEvent =
+  | { type: 'qr'; qr: string }
+  | { type: 'pairing_code'; code: string }
+  | { type: 'connected'; jid?: string; name?: string }
+  | { type: 'disconnected'; loggedOut: boolean; reason?: string }
+  | { type: 'unavailable'; reason: string; message: string }
+  | { type: 'error'; message: string };
+
 export interface BroadcastEventMap {
   [RPC_CHANNELS.sessions.EVENT]: [event: SessionEvent];
   [RPC_CHANNELS.sessions.UNREAD_SUMMARY_CHANGED]: [summary: UnreadSummary];
@@ -24,6 +32,7 @@ export interface BroadcastEventMap {
   [RPC_CHANNELS.messaging.BINDING_CHANGED]: [workspaceId: string];
   [RPC_CHANNELS.messaging.PLATFORM_STATUS]: [workspaceId: string, runtime: PlatformRuntimeInfo | PlatformRuntimeInfo[]];
   [RPC_CHANNELS.messaging.PENDING_CHANGED]: [workspaceId: string];
+  [RPC_CHANNELS.messaging.WA_UI_EVENT]: [workspaceId: string, event: WhatsAppUiEvent];
   [RPC_CHANNELS.llmConnections.CHANGED]: [];
   [RPC_CHANNELS.permissions.DEFAULTS_CHANGED]: [value: null];
   [RPC_CHANNELS.theme.APP_CHANGED]: [theme: ThemeOverrides | null];

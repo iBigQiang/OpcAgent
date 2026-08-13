@@ -631,29 +631,38 @@ export interface ElectronAPI {
   onAutomationsChanged(callback: (workspaceId: string) => void): () => void
 
   // Messaging configuration and status. Credentials remain main-process only.
-  getMessagingConfig(): Promise<{ version: 1; enabled: boolean; platforms: Record<string, { enabled?: boolean }> }>
+  getMessagingConfig(): Promise<MessagingConfigInfo | null>
   updateMessagingConfig(config: Record<string, unknown>): Promise<void>
   getMessagingRuntime(): Promise<MessagingPlatformRuntimeInfo[]>
-  saveMessagingCredential(platform: MessagingPlatform, value: string): Promise<{ success: boolean }>
-  forgetMessagingCredential(platform: MessagingPlatform): Promise<{ success: boolean }>
   testTelegramToken(token: string): Promise<{ success: boolean; botName?: string; botUsername?: string; error?: string }>
-  testLarkCredentials(credentials: { appId: string; appSecret: string; domain: 'lark' | 'feishu' }): Promise<{ success: boolean; error?: string }>
-  connectMessagingPlatform(platform: MessagingPlatform): Promise<MessagingPlatformRuntimeInfo[]>
-  disconnectMessagingPlatform(platform: MessagingPlatform): Promise<MessagingPlatformRuntimeInfo[]>
+  saveTelegramToken(token: string): Promise<void>
+  testLarkCredentials(credentials: { appId: string; appSecret: string; domain: 'lark' | 'feishu' }): Promise<{ success: boolean; botName?: string; error?: string }>
+  saveLarkCredentials(credentials: { appId: string; appSecret: string; domain: 'lark' | 'feishu' }): Promise<void>
+  disconnectMessagingPlatform(platform: MessagingPlatform): Promise<void>
+  /** Disconnects the platform then removes its credential/device state. */
+  forgetMessagingPlatform(platform: MessagingPlatform): Promise<{ success: boolean }>
   getMessagingBindings(): Promise<MessagingBinding[]>
   bindMessaging(input: { platform: MessagingPlatform; sessionId: string; channelId: string }): Promise<MessagingBinding>
   unbindMessagingBinding(bindingId: string): Promise<{ success: boolean }>
-  setMessagingBindingAccess(bindingId: string, mode: 'inherit' | 'allow-list' | 'open', allowedSenderIds?: string[]): Promise<void>
-  getMessagingPlatformOwners(platform: MessagingPlatform): Promise<string[]>
-  setMessagingPlatformOwners(platform: MessagingPlatform, ownerIds: string[]): Promise<unknown>
+  generateMessagingPairingCode(sessionId: string, platform: MessagingPlatform): Promise<MessagingPairingCode>
+  unbindMessagingSession(sessionId: string, platform?: MessagingPlatform): Promise<{ success: boolean }>
+  generateMessagingSupergroupCode(platform: 'telegram'): Promise<MessagingPairingCode>
+  getMessagingSupergroup(): Promise<MessagingSupergroupInfo | null>
+  unbindMessagingSupergroup(): Promise<{ success: boolean }>
+  startWhatsAppConnect(): Promise<{ success: boolean }>
+  submitWhatsAppPhone(phoneNumber: string): Promise<{ success: boolean }>
+  setMessagingBindingAccess(bindingId: string, access: MessagingBindingAccess): Promise<{ success: boolean }>
+  getMessagingPlatformOwners(platform: MessagingPlatform): Promise<MessagingPlatformOwnerInfo[]>
+  setMessagingPlatformOwners(platform: MessagingPlatform, owners: MessagingPlatformOwnerInfo[]): Promise<MessagingPlatformOwnerInfo[]>
   getMessagingPlatformAccessMode(platform: MessagingPlatform): Promise<'open' | 'owner-only'>
   setMessagingPlatformAccessMode(platform: MessagingPlatform, mode: 'open' | 'owner-only'): Promise<unknown>
   getMessagingPendingSenders(platform?: MessagingPlatform): Promise<MessagingPendingSender[]>
-  dismissMessagingPendingSender(platform: MessagingPlatform, senderId: string): Promise<{ success: boolean }>
-  allowMessagingPendingSender(platform: MessagingPlatform, senderId: string): Promise<string[]>
+  dismissMessagingPendingSender(platform: MessagingPlatform, senderId: string, entryKey?: MessagingPendingEntryKey): Promise<{ success: boolean }>
+  allowMessagingPendingSender(platform: MessagingPlatform, senderId: string, entryKey?: MessagingPendingEntryKey): Promise<{ owners: MessagingPlatformOwnerInfo[]; bindingId?: string }>
   onMessagingBindingChanged(callback: (workspaceId: string) => void): () => void
   onMessagingPlatformStatus(callback: (workspaceId: string, runtime: MessagingPlatformRuntimeInfo | MessagingPlatformRuntimeInfo[]) => void): () => void
   onMessagingPendingChanged(callback: (workspaceId: string) => void): () => void
+  onWhatsAppEvent(callback: (payload: { workspaceId: string; event: WhatsAppUiEvent }) => void): () => void
 
   // Language
   changeLanguage(lang: string): Promise<void>
@@ -681,14 +690,22 @@ export interface AutomationFilter {
 }
 
 export type MessagingPlatform = 'telegram' | 'whatsapp' | 'lark'
+export interface MessagingConfigInfo {
+  version: 1
+  enabled: boolean
+  platforms: Partial<Record<MessagingPlatform, { enabled?: boolean; botUsername?: string; acceptedSupergroupChatId?: string }>>
+  access?: Partial<Record<MessagingPlatform, { mode: MessagingPlatformAccessMode; ownerIds: string[] }>>
+  runtime: Partial<Record<MessagingPlatform, MessagingPlatformRuntimeInfo>>
+}
 export interface MessagingPlatformRuntimeInfo {
-  platform?: MessagingPlatform
-  configured?: boolean
-  connected?: boolean
-  state?: 'disconnected' | 'connecting' | 'connected' | 'reconnect_required' | 'error'
+  platform: MessagingPlatform
+  configured: boolean
+  connected: boolean
+  state: 'disconnected' | 'connecting' | 'connected' | 'reconnect_required' | 'error'
   identity?: string
   qrCode?: string
   lastError?: string
+  updatedAt: number
 }
 export interface MessagingBinding {
   id: string
@@ -696,17 +713,42 @@ export interface MessagingBinding {
   sessionId: string
   platform: MessagingPlatform
   channelId: string
+  threadId?: number
+  channelName?: string
   enabled: boolean
   createdAt: number
+  accessMode?: MessagingBindingAccessMode
+  allowedSenderIds?: string[]
 }
+export type MessagingPlatformAccessMode = 'open' | 'owner-only'
+export type MessagingBindingAccessMode = 'inherit' | 'allow-list' | 'open'
+export interface MessagingBindingAccess { mode: MessagingBindingAccessMode; allowedSenderIds?: string[] }
+export interface MessagingPlatformOwnerInfo { userId: string; displayName?: string; username?: string; addedAt: number }
+export type MessagingPendingRejectReason = 'not-owner' | 'not-on-binding-allowlist'
+export interface MessagingPendingEntryKey { reason?: MessagingPendingRejectReason; bindingId?: string }
 export interface MessagingPendingSender {
   platform: MessagingPlatform
-  senderId: string
-  senderName?: string
+  userId: string
+  displayName?: string
+  username?: string
   bindingId?: string
-  reason: 'not-owner' | 'not-on-binding-allowlist'
+  sessionId?: string
+  channelId?: string
+  threadId?: number
+  reason?: MessagingPendingRejectReason
   createdAt: number
+  lastAttemptAt?: number
+  attemptCount?: number
 }
+export interface MessagingPairingCode { code: string; expiresAt: number; botUsername?: string }
+export interface MessagingSupergroupInfo { chatId: string; title: string; capturedAt: number }
+export type WhatsAppUiEvent =
+  | { type: 'qr'; qr: string }
+  | { type: 'pairing_code'; code: string }
+  | { type: 'connected'; jid?: string; name?: string }
+  | { type: 'disconnected'; loggedOut: boolean; reason?: string }
+  | { type: 'unavailable'; reason: string; message: string }
+  | { type: 'error'; message: string }
 
 export type { SettingsSubpage } from './settings-registry'
 import { isValidSettingsSubpage, type SettingsSubpage } from './settings-registry'

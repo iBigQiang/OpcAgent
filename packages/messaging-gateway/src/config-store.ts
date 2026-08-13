@@ -10,7 +10,19 @@ export class ConfigStore {
   private config: MessagingConfig
   constructor(storageDir: string, private readonly logger: MessagingLogger = NOOP) { this.filePath = join(storageDir, 'config.json'); this.config = this.load() }
   get(): MessagingConfig { return JSON.parse(JSON.stringify(this.config)) as MessagingConfig }
-  update(patch: Partial<MessagingConfig>): MessagingConfig { this.config = { version: 1, enabled: patch.enabled ?? this.config.enabled, platforms: { ...this.config.platforms, ...patch.platforms }, access: { ...this.config.access, ...patch.access } }; this.save(); return this.get() }
+  update(patch: Partial<MessagingConfig>): MessagingConfig {
+    const platforms = { ...this.config.platforms }
+    for (const [platform, value] of Object.entries(patch.platforms ?? {})) {
+      if (value) platforms[platform as keyof typeof platforms] = { ...platforms[platform as keyof typeof platforms], ...value }
+    }
+    const access = { ...this.config.access }
+    for (const [platform, value] of Object.entries(patch.access ?? {})) {
+      if (value) access[platform as keyof typeof access] = { ...access[platform as keyof typeof access], ...value }
+    }
+    this.config = { version: 1, enabled: patch.enabled ?? this.config.enabled, platforms, access }
+    this.save()
+    return this.get()
+  }
   private load(): MessagingConfig {
     if (!existsSync(this.filePath)) return JSON.parse(JSON.stringify(DEFAULT_MESSAGING_CONFIG))
     try { const parsed = JSON.parse(readFileSync(this.filePath, 'utf8')) as Partial<MessagingConfig>; if (parsed.version !== 1 || typeof parsed.enabled !== 'boolean' || !parsed.platforms || typeof parsed.platforms !== 'object') throw new Error('unsupported messaging config'); return { version: 1, enabled: parsed.enabled, platforms: parsed.platforms, access: parsed.access ?? {} } }

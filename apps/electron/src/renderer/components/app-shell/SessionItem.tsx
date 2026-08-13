@@ -1,6 +1,6 @@
 import { formatDistanceToNowStrict } from 'date-fns'
 import type { Locale } from 'date-fns'
-import { Flag, ShieldAlert } from 'lucide-react'
+import { Flag, ShieldAlert, MessageSquare } from 'lucide-react'
 import { useActionLabel } from '@/actions'
 import { cn } from '@/lib/utils'
 import { rendererPerf } from '@/lib/perf'
@@ -20,6 +20,8 @@ import { useSessionListContext } from '@/context/SessionListContext'
 import { useAppShellContext } from '@/context/AppShellContext'
 import { navigate, routes } from '@/lib/navigate'
 import type { SessionMeta } from '@/atoms/sessions'
+import { messagingBindingsBySessionAtom } from '@/atoms/messaging'
+import { useAtomValue } from 'jotai'
 
 export interface SessionItemProps {
   item: SessionMeta
@@ -54,6 +56,7 @@ export function SessionItem({
   const hasMatch = chatMatchCount != null && chatMatchCount > 0
   const hasPendingPrompt = ctx.hasPendingPrompt?.(item.id) ?? false
   const previewText = isCompactMode ? getSessionPreviewText(item) : null
+  const messagingBindings = useAtomValue(messagingBindingsBySessionAtom).get(item.id) ?? []
 
   const handleClick = (event: React.MouseEvent) => {
     ctx.onFocusZone()
@@ -147,6 +150,11 @@ export function SessionItem({
       title={ctx.searchQuery ? highlightMatch(title, ctx.searchQuery) : title}
       titleClassName={cn('text-[13px]', item.isAsyncOperationOngoing && 'animate-shimmer-text')}
       subtitle={previewText}
+      titleSuffix={messagingBindings.length > 0 ? (
+        <span className="inline-flex items-center gap-1 text-[11px] text-foreground/45" title={messagingBindings.map(binding => `Connected to ${binding.platform}`).join(', ')}>
+          {messagingBindings.map(binding => <MessageSquare key={binding.id} className="h-3 w-3" />)}
+        </span>
+      ) : undefined}
       titleTrailing={hasMatch ? (
         <span
           className={cn(

@@ -1,97 +1,164 @@
-import * as React from 'react'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { useTranslation } from 'react-i18next'
+/**
+ * TelegramConnectDialog — token-input pairing flow in a modal.
+ *
+ * Sibling to WhatsAppConnectDialog: same Dialog shape, different auth flow
+ * (Telegram Bot API doesn't support QR login — only bot tokens issued by
+ * @BotFather). User pastes a token → Test → Save → dialog closes.
+ *
+ * Used by MessagingSettingsPage as the only flow for saving Telegram tokens.
+ * The `reconfigure` prop is set when the user picks "Reconfigure" from the
+ * three-dot menu, so the UI treats it as replacing an existing token.
+ */
 
-type MessagingTestAPI = {
-  testTelegramToken(token: string): Promise<{ success: boolean; error?: string }>
-}
+import * as React from 'react'
+import { Check, X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Spinner } from '@mkagent/ui'
+import { SettingsSecretInput } from '@/components/settings'
 
 interface TelegramConnectDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onConnected: () => void
+  /** When true, treat the flow as "replace existing token" (used from Reconfigure menu item). */
+  reconfigure?: boolean
+  onSaved?: () => void
 }
 
-export function TelegramConnectDialog({ open, onOpenChange, onConnected }: TelegramConnectDialogProps) {
+type TestResult =
+  | { state: 'idle' }
+  | { state: 'testing' }
+  | { state: 'success'; botName?: string; botUsername?: string }
+  | { state: 'error'; error: string }
+
+export function TelegramConnectDialog({
+  open,
+  onOpenChange,
+  reconfigure = false,
+  onSaved,
+}: TelegramConnectDialogProps) {
   const { t } = useTranslation()
   const [token, setToken] = React.useState('')
-  const [tested, setTested] = React.useState(false)
-  const [busy, setBusy] = React.useState(false)
-  const [error, setError] = React.useState<string | null>(null)
+  const [saving, setSaving] = React.useState(false)
+  const [test, setTest] = React.useState<TestResult>({ state: 'idle' })
 
-  const reset = () => {
-    setToken('')
-    setTested(false)
-    setBusy(false)
-    setError(null)
-  }
+  // Reset local state whenever dialog (re)opens — keeps reconfigure attempts
+  // from leaking previous success/error badges.
+  React.useEffect(() => {
+    if (!open) {
+      setToken('')
+      setTest({ state: 'idle' })
+      setSaving(false)
+    }
+  }, [open])
 
-  const handleOpenChange = (nextOpen: boolean) => {
-    if (!nextOpen) reset()
-    onOpenChange(nextOpen)
-  }
-
-  const test = async () => {
-    if (!token.trim()) return
-    setBusy(true)
-    setError(null)
-    setTested(false)
+  const handleTest = async () => {
+    const trimmed = token.trim()
+    if (!trimmed) return
+    setTest({ state: 'testing' })
     try {
-      const result = await (window.electronAPI as typeof window.electronAPI & MessagingTestAPI).testTelegramToken(token.trim())
-      if (!result.success) {
-        setError(result.error || t('settings.messaging.telegram.testFailed'))
-        return
+      const result = await window.electronAPI.testTelegramToken(trimmed)
+      if (result.success) {
+        setTest({ state: 'success', botName: result.botName, botUsername: result.botUsername })
+      } else {
+        setTest({ state: 'error', error: result.error ?? t('common.error') })
       }
-      setTested(true)
-    } catch {
-      setError(t('settings.messaging.telegram.testFailed'))
-    } finally {
-      setBusy(false)
+    } catch (err) {
+      setTest({
+        state: 'error',
+        error: err instanceof Error ? err.message : t('common.error'),
+      })
     }
   }
 
-  const save = async () => {
-    if (!tested || !token.trim()) return
-    setBusy(true)
-    setError(null)
+  const handleSave = async () => {
+    const trimmed = token.trim()
+    if (!trimmed) return
+    setSaving(true)
     try {
-      await window.electronAPI.saveMessagingCredential('telegram', token.trim())
-      await window.electronAPI.connectMessagingPlatform('telegram')
-      reset()
-      onConnected()
-    } catch {
-      setError(t('settings.messaging.telegram.saveFailed'))
+      await window.electronAPI.saveTelegramToken(trimmed)
+      toast.success(t('settings.messaging.telegram.saved'))
+      onSaved?.()
+      onOpenChange(false)
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t('settings.messaging.telegram.saveFailed'))
     } finally {
-      setBusy(false)
+      setSaving(false)
     }
   }
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[440px]">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[480px]">
         <DialogHeader>
-          <DialogTitle>{t('settings.messaging.telegram.connectTitle')}</DialogTitle>
-          <DialogDescription className="whitespace-pre-line">{t('settings.messaging.telegram.instructions')}</DialogDescription>
+          <DialogTitle>
+            {reconfigure
+              ? t('settings.messaging.telegram.reconfigureTitle')
+              : t('settings.messaging.telegram.connectTitle')}
+          </DialogTitle>
+          <DialogDescription className="whitespace-pre-line">
+            {t('settings.messaging.telegram.instructions')}
+          </DialogDescription>
         </DialogHeader>
-        <div className="space-y-2">
-          <label className="text-sm font-medium" htmlFor="telegram-bot-token">{t('settings.messaging.telegram.tokenLabel')}</label>
-          <input
-            id="telegram-bot-token"
-            type="password"
+
+        <div className="space-y-3 py-2">
+          <SettingsSecretInput
             value={token}
-            onChange={event => { setToken(event.target.value); setTested(false); setError(null) }}
+            onChange={setToken}
             placeholder={t('settings.messaging.telegram.tokenPlaceholder')}
-            autoComplete="off"
-            className="h-9 w-full rounded-md border bg-background px-3 text-sm"
+            disabled={saving}
           />
-          {tested && <p className="text-sm text-emerald-600">{t('settings.messaging.telegram.testOk')}</p>}
-          {error && <p className="text-sm text-destructive">{error}</p>}
+
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleTest}
+              disabled={!token.trim() || test.state === 'testing' || saving}
+            >
+              {test.state === 'testing' && <Spinner className="mr-1 text-[14px]" />}
+              {t('settings.messaging.telegram.testConnection')}
+            </Button>
+
+            {test.state === 'success' && (
+              <span className="inline-flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400">
+                <Check className="h-3.5 w-3.5" />
+                {t('settings.messaging.telegram.validBot', {
+                  username: test.botUsername ?? test.botName ?? 'bot',
+                })}
+              </span>
+            )}
+            {test.state === 'error' && (
+              <span className="inline-flex items-center gap-1 text-xs text-destructive">
+                <X className="h-3.5 w-3.5" />
+                {test.error}
+              </span>
+            )}
+          </div>
         </div>
+
         <DialogFooter>
-          <Button variant="outline" onClick={() => handleOpenChange(false)} disabled={busy}>{t('common.cancel')}</Button>
-          <Button variant="outline" onClick={() => void test()} disabled={busy || !token.trim()}>{t('settings.messaging.telegram.testConnection')}</Button>
-          <Button onClick={() => void save()} disabled={busy || !tested}>{t('settings.messaging.telegram.save')}</Button>
+          <Button variant="outline" size="sm" onClick={() => onOpenChange(false)} disabled={saving}>
+            {t('common.cancel')}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleSave}
+            disabled={!token.trim() || test.state !== 'success' || saving}
+          >
+            {saving && <Spinner className="mr-1 text-[14px]" />}
+            {t('settings.messaging.telegram.save')}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -6,15 +6,17 @@
  * names.
  */
 
-export type MessagingBindingAccessMode = 'inherit' | 'allow-list' | 'open'
-export type MessagingPlatformAccessMode = 'open' | 'owner-only'
-export interface MessagingPlatformOwnerInfo { userId: string; displayName?: string; username?: string; addedAt: number }
-export interface MessagingPendingSenderInfo { platform: string; userId: string }
+import type {
+  MessagingBindingAccessMode,
+  MessagingPendingSender,
+  MessagingPlatformAccessMode,
+  MessagingPlatformOwnerInfo,
+} from '../../../../shared/types'
 
 export type PlatformAccessMode = MessagingPlatformAccessMode
 export type BindingAccessMode = MessagingBindingAccessMode
 export type PlatformOwner = MessagingPlatformOwnerInfo
-export type PendingSender = MessagingPendingSenderInfo
+export type PendingSender = MessagingPendingSender
 
 export interface BindingAccess {
   mode: BindingAccessMode

@@ -22,6 +22,7 @@ import { getFileManagerName } from '@/lib/platform'
 import type { SessionMeta } from '@/atoms/sessions'
 import { hasUnreadMeta, hasMessagesMeta } from '@/utils/session'
 import { useSessionMenuActions } from '@/hooks/useSessionMenuActions'
+import { MessagingSessionMenuItem } from '@/components/messaging/MessagingSessionMenuItem'
 
 export interface SessionMenuProps {
   item: SessionMeta
@@ -113,6 +114,8 @@ export function SessionMenu({
         <Copy className="h-3.5 w-3.5" />
         <span className="flex-1">{t('sessionMenu.copyPath')}</span>
       </MenuItem>
+
+      <MessagingSessionMenuItem sessionId={item.id} />
 
       <Separator />
 

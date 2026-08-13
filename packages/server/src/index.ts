@@ -24,6 +24,7 @@
  */
 
 import { join } from 'node:path'
+import { homedir } from 'node:os'
 import { readFileSync, existsSync } from 'node:fs'
 import { version as packageVersion } from '../package.json'
 import { enableDebug } from '@mkagent/shared/utils/debug'
@@ -57,6 +58,7 @@ import { SessionManager, setSessionPlatform, setSessionRuntimeHooks } from '@mka
 import { initModelRefreshService, setFetcherPlatform } from '@mkagent/server-core/model-fetchers'
 import { setSearchPlatform, setImageProcessor } from '@mkagent/server-core/services'
 import type { HandlerDeps } from '@mkagent/server-core/handlers'
+import { createMessagingBootstrap } from '@mkagent/messaging-gateway'
 
 process.env.MKAGENT_IS_PACKAGED ??= 'false'
 
@@ -144,6 +146,7 @@ const serverToken = process.env.MKAGENT_SERVER_TOKEN
 
 let webuiHandler: WebuiHandler | null = null
 let webuiNodeHandler: ReturnType<typeof nodeHttpAdapter> | undefined
+let messagingBootstrap: ReturnType<typeof createMessagingBootstrap> | null = null
 
 // Health check is injected lazily — the session manager isn't ready until
 // after bootstrap completes, but the handler captures the closure.
@@ -218,11 +221,27 @@ const instance = await (async () => {
         return new SessionManager()
       },
       bindRpcServer: (sm, server) => sm.setRpcServer(server),
-      createHandlerDeps: ({ sessionManager, platform, oauthFlowStore }) => ({
-        sessionManager,
-        platform,
-        oauthFlowStore,
-      }),
+      createHandlerDeps: ({ sessionManager, platform, oauthFlowStore }) => {
+        messagingBootstrap = createMessagingBootstrap({
+          sessionManager,
+          credentialManager: getCredentialManager(),
+          getMessagingDir: workspaceId => join(homedir(), '.mkagent', 'workspaces', workspaceId, 'messaging'),
+          whatsapp: {
+            workerEntry: process.env.MKAGENT_MESSAGING_WA_WORKER
+              ?? join(bundledAssetsRoot, 'packages', 'messaging-whatsapp-worker', 'dist', 'worker.cjs'),
+            nodeBin: process.env.MKAGENT_MESSAGING_NODE_BIN ?? 'node',
+          },
+        })
+        sessionManager.setAutomationBinder(async input => {
+          await messagingBootstrap!.registry.bindAutomationTopic(input.workspaceId, input.topicName, input.sessionId)
+        })
+        return {
+          sessionManager,
+          platform,
+          oauthFlowStore,
+          messagingRegistry: messagingBootstrap.registry,
+        }
+      },
       registerAllRpcHandlers: (server, deps, serverCtx) => {
         registerCoreRpcHandlers(server, deps, serverCtx)
         server.handle(RPC_CHANNELS.notification.GET_ENABLED, async () => {
@@ -234,7 +253,7 @@ const instance = await (async () => {
           setNotificationsEnabled(enabled)
         })
       },
-      setSessionEventSink: (sessionManager, sink) => sessionManager.setEventSink(sink),
+      setSessionEventSink: (sessionManager, sink) => sessionManager.setEventSink(messagingBootstrap?.wrapSink(sink) ?? sink),
       initializeSessionManager: async (sessionManager) => {
         await sessionManager.initialize()
       },
@@ -243,6 +262,8 @@ const instance = await (async () => {
           await sessionManager.flushAllSessions()
         } finally {
           sessionManager.cleanup()
+          await messagingBootstrap?.dispose()
+          messagingBootstrap = null
         }
       },
       cleanupClientResources: cleanupSessionFileWatchForClient,
@@ -252,6 +273,12 @@ const instance = await (async () => {
     process.exit(1)
   }
 })()
+
+const messagingHandle = messagingBootstrap as ReturnType<typeof createMessagingBootstrap> | null
+if (messagingHandle) {
+  messagingHandle.setPublisher(instance.wsServer.push.bind(instance.wsServer))
+  await messagingHandle.initializeWorkspaces(getWorkspaces().map(workspace => workspace.id))
+}
 
 // Wire up the lazy health check now that the session manager is ready
 if (webuiHandler) {
@@ -303,13 +330,13 @@ const isLocalBind = instance.host === '127.0.0.1' || instance.host === 'localhos
 if (!isLocalBind && instance.protocol === 'ws') {
   if (process.argv.includes('--allow-insecure-bind')) {
     console.warn(
-      '\n⚠️  WARNING: Server is listening on a network address without TLS.\n' +
+      '\nWARNING: Server is listening on a network address without TLS.\n' +
       '   Authentication tokens will be sent in cleartext.\n' +
       '   Set MKAGENT_RPC_TLS_CERT and MKAGENT_RPC_TLS_KEY to enable wss://.\n'
     )
   } else {
     console.error(
-      '\n❌  Refusing to bind to a network address without TLS.\n' +
+      '\nERROR: Refusing to bind to a network address without TLS.\n' +
       '   Authentication tokens would be sent in cleartext.\n\n' +
       '   Options:\n' +
       '     1. Set MKAGENT_RPC_TLS_CERT and MKAGENT_RPC_TLS_KEY to enable wss://\n' +
@@ -323,6 +350,7 @@ if (!isLocalBind && instance.protocol === 'ws') {
 const shutdown = async () => {
   webuiHandler?.dispose()
   healthServer?.stop()
+  await messagingBootstrap?.dispose()
   await instance.stop()
   process.exit(0)
 }

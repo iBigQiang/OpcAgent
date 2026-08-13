@@ -13,6 +13,9 @@ describe('WebUI Client API contract', () => {
     expect(CHANNEL_MAP.getAutomations.channel).toBe(RPC_CHANNELS.automations.GET)
     expect(CHANNEL_MAP.getMessagingRuntime.channel).toBe(RPC_CHANNELS.messaging.GET_RUNTIME)
     expect(CHANNEL_MAP.onMessagingPendingChanged.channel).toBe(RPC_CHANNELS.messaging.PENDING_CHANGED)
+    expect(CHANNEL_MAP.generateMessagingPairingCode.channel).toBe(RPC_CHANNELS.messaging.GENERATE_CODE)
+    expect(CHANNEL_MAP.generateMessagingSupergroupCode.channel).toBe(RPC_CHANNELS.messaging.GENERATE_SUPERGROUP_CODE)
+    expect(CHANNEL_MAP.startWhatsAppConnect.channel).toBe(RPC_CHANNELS.messaging.WA_START_CONNECT)
   })
 
   it('contains only channels that exist in the shared protocol', () => {

@@ -18,6 +18,7 @@ import {
   Pencil,
   RefreshCw,
   Trash2,
+  MessageSquare,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
@@ -31,6 +32,7 @@ import type { SessionMeta } from '@/atoms/sessions'
 import { hasUnreadMeta, hasMessagesMeta } from '@/utils/session'
 import { getFileManagerName } from '@/lib/platform'
 import { useSessionMenuActions } from '@/hooks/useSessionMenuActions'
+import { useMessagingConnect } from '@/components/messaging/MessagingSessionMenuItem'
 
 export interface CompactSessionMenuProps {
   title?: string
@@ -74,6 +76,7 @@ export function CompactSessionMenu({
     onOpenChange?.(next)
   }, [controlledOpen, onOpenChange])
   const actions = useSessionMenuActions({ item })
+  const connectMessaging = useMessagingConnect({ sessionId: item.id })
   const closeAfter = React.useCallback(
     (action: () => void) => () => {
       action()
@@ -157,6 +160,12 @@ export function CompactSessionMenu({
             actions.showInFinder,
           )}
           {row(<Copy className="h-4 w-4" />, t('sessionMenu.copyPath'), actions.copyPath)}
+          <div className="px-3 pt-2 pb-1 text-xs font-medium text-foreground/50">
+            {t('sessionMenu.connectMessaging')}
+          </div>
+          {row(<MessageSquare className="h-4 w-4" />, 'Telegram', () => { void connectMessaging('telegram') })}
+          {row(<MessageSquare className="h-4 w-4" />, 'WhatsApp', () => { void connectMessaging('whatsapp') })}
+          {row(<MessageSquare className="h-4 w-4" />, 'Lark / Feishu', () => { void connectMessaging('lark') })}
           <div className="my-1 mx-3 h-px bg-foreground/[0.06]" />
           {row(<Trash2 className="h-4 w-4" />, t('common.delete'), onDelete, true)}
         </div>

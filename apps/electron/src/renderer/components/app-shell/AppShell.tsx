@@ -77,6 +77,7 @@ import { McpIcon } from "@/components/icons/McpIcon"
 import { clearSourceIconCaches } from "@/lib/icon-cache"
 import { PanelHeader } from "./PanelHeader"
 import { FabNewChat } from "./FabNewChat"
+import { MessagingDialogHost } from "@/components/messaging/MessagingDialogHost"
 import { EditPopover, getEditConfig, type EditContextKey } from "@/components/ui/EditPopover"
 import SettingsNavigator from "@/pages/settings/SettingsNavigator"
 import { AutomationsListPanel } from "../automations/AutomationsListPanel"
@@ -1671,6 +1672,7 @@ function AppShellContent({
         onOpenUrl={(url) => window.electronAPI.openUrl(url)}
       />
 
+      <MessagingDialogHost />
     </AppShellProvider>
   )
 }
