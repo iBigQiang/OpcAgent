@@ -1,0 +1,4 @@
+import type { PlatformType } from './types'
+export interface TopicBinding { workspaceId: string; platform: PlatformType; name: string; channelId: string; threadId: number }
+/** Telegram topic lookup isolated by workspace and channel. */
+export class TopicRegistry { private readonly topics = new Map<string, TopicBinding>(); private key(workspaceId: string, channelId: string, name: string): string { return `${workspaceId}\u0000${channelId}\u0000${name}` } get(workspaceId: string, channelId: string, name: string): TopicBinding | undefined { return this.topics.get(this.key(workspaceId, channelId, name)) } put(value: TopicBinding): void { this.topics.set(this.key(value.workspaceId, value.channelId, value.name), value) } clearWorkspace(workspaceId: string): void { for (const [key, value] of this.topics) if (value.workspaceId === workspaceId) this.topics.delete(key) } }

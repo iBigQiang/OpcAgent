@@ -1,0 +1,22 @@
+{
+  "name": "@mkagent/messaging-whatsapp-worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/worker.ts",
+  "types": "src/protocol.ts",
+  "exports": {
+    ".": "./src/protocol.ts",
+    "./worker": "./src/worker.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@whiskeysockets/baileys": "^6.7.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.8",
+    "typescript": "^5.0.0"
+  }
+}

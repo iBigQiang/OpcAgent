@@ -25,6 +25,8 @@ extraResources:
     to: LICENSE
   - from: ../../NOTICE
     to: NOTICE
+  - from: ../../packages/messaging-whatsapp-worker/dist/worker.cjs
+    to: messaging-whatsapp-worker/worker.cjs
 
 publish:
   provider: github

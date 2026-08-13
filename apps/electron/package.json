@@ -37,6 +37,7 @@
   },
   "devDependencies": {
     "@mkagent/core": "workspace:*",
+    "@mkagent/messaging-gateway": "workspace:*",
     "@mkagent/server-core": "workspace:*",
     "@mkagent/shared": "workspace:*",
     "@mkagent/ui": "workspace:*",

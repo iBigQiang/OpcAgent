@@ -1,0 +1,2 @@
+import { randomBytes } from 'node:crypto'
+export class PlanTokenStore { private readonly tokens = new Map<string, { bindingId: string; expiresAt: number }>(); constructor(private readonly now: () => number = Date.now) {} issue(bindingId: string): string { const token = randomBytes(16).toString('hex'); this.tokens.set(token, { bindingId, expiresAt: this.now() + 5 * 60_000 }); return token } consume(token: string): string | null { const value = this.tokens.get(token); this.tokens.delete(token); return value && value.expiresAt > this.now() ? value.bindingId : null } }

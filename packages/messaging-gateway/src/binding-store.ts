@@ -1,0 +1,20 @@
+import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { randomUUID } from 'node:crypto'
+import type { BindingAccessMode, ChannelBinding, PlatformType } from './types'
+
+export class BindingStore {
+  private readonly filePath: string
+  private bindings: ChannelBinding[]
+  constructor(storageDir: string) { this.filePath = join(storageDir, 'bindings.json'); this.bindings = this.load() }
+  getAll(): ChannelBinding[] { return this.bindings.map(item => ({ ...item, config: { ...item.config, allowedSenderIds: item.config.allowedSenderIds?.slice() } })) }
+  findByChannel(platform: PlatformType, channelId: string, threadId?: number): ChannelBinding | undefined { return this.bindings.find(item => item.enabled && item.platform === platform && item.channelId === channelId && item.threadId === threadId) }
+  bind(input: Omit<ChannelBinding, 'id' | 'createdAt' | 'enabled' | 'config'> & { config?: Partial<ChannelBinding['config']> }): ChannelBinding { this.bindings = this.bindings.filter(item => !(item.platform === input.platform && item.channelId === input.channelId && item.threadId === input.threadId)); const binding: ChannelBinding = { ...input, id: randomUUID(), createdAt: Date.now(), enabled: true, config: { accessMode: input.config?.accessMode ?? 'inherit', allowedSenderIds: input.config?.allowedSenderIds?.slice(), responseMode: input.config?.responseMode ?? 'progress' } }; this.bindings.push(binding); this.save(); return binding }
+  unbindById(id: string): boolean { const before = this.bindings.length; this.bindings = this.bindings.filter(item => item.id !== id); if (before === this.bindings.length) return false; this.save(); return true }
+  unbindSession(sessionId: string, platform?: PlatformType): number { const removed = this.bindings.filter(item => item.sessionId === sessionId && (!platform || item.platform === platform)); if (!removed.length) return 0; this.bindings = this.bindings.filter(item => !removed.includes(item)); this.save(); return removed.length }
+  setAccess(id: string, accessMode: BindingAccessMode, allowedSenderIds?: string[]): ChannelBinding | null { const binding = this.bindings.find(item => item.id === id); if (!binding) return null; binding.config = { ...binding.config, accessMode, allowedSenderIds: allowedSenderIds?.slice() }; this.save(); return { ...binding, config: { ...binding.config } } }
+  private load(): ChannelBinding[] { if (!existsSync(this.filePath)) return []; try { const raw = JSON.parse(readFileSync(this.filePath, 'utf8')); return Array.isArray(raw) ? raw.filter(isBinding).map(normalize) : [] } catch { return [] } }
+  private save(): void { mkdirSync(dirname(this.filePath), { recursive: true }); const temp = `${this.filePath}.tmp`; writeFileSync(temp, `${JSON.stringify(this.bindings, null, 2)}\n`, 'utf8'); renameSync(temp, this.filePath) }
+}
+function isBinding(value: unknown): value is Partial<ChannelBinding> { return !!value && typeof value === 'object' && typeof (value as ChannelBinding).id === 'string' && typeof (value as ChannelBinding).workspaceId === 'string' && typeof (value as ChannelBinding).sessionId === 'string' }
+function normalize(value: Partial<ChannelBinding>): ChannelBinding { return { id: value.id!, workspaceId: value.workspaceId!, sessionId: value.sessionId!, platform: value.platform as PlatformType, channelId: String(value.channelId ?? ''), ...(typeof value.threadId === 'number' ? { threadId: value.threadId } : {}), channelName: value.channelName, enabled: value.enabled !== false, createdAt: typeof value.createdAt === 'number' ? value.createdAt : 0, config: { accessMode: value.config?.accessMode ?? 'open', allowedSenderIds: value.config?.allowedSenderIds?.filter(item => typeof item === 'string'), responseMode: value.config?.responseMode ?? 'progress' } } }
