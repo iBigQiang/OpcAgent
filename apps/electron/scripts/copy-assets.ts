@@ -33,6 +33,8 @@ for (const directory of ['permissions', 'themes']) {
   cpSync(join(source, directory), join(destination, directory), { recursive: true })
 }
 
+cpSync(join(source, 'release-notes'), join(destination, 'release-notes'), { recursive: true })
+
 mkdirSync(join(destination, 'tool-icons'), { recursive: true })
 for (const name of readdirSync(join(source, 'tool-icons'))) {
   if (name === 'craft-agent.svg') continue

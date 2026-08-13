@@ -158,6 +158,28 @@ test('pairing-code generation rejects a session from another workspace', () => {
     .toThrow('Session does not belong to this workspace')
 })
 
+test('workspace owner pairing adds only the Telegram owner and no session binding', async () => {
+  const root = mkdtempSync(join(tmpdir(), 'messaging-owner-pair-'))
+  const telegram = adapter('telegram')
+  const events: string[] = []
+  const registry = new MessagingGatewayRegistry({
+    getMessagingDir: () => root,
+    credentialManager: { async get() { return { value: 'test-only' } }, async set() {}, async delete() { return true } },
+    adapters: { telegram },
+    publish: channel => events.push(channel),
+    sessionManager: { getSessions: () => { throw new Error('owner pairing must not inspect sessions') } } as never,
+  })
+  const issued = registry.generateOwnerPairingCode('one', 'telegram')
+  expect(issued.code).toMatch(/^\d{6}$/)
+  expect(issued.expiresAt).toBeGreaterThan(Date.now())
+  await registry.connect('one', 'telegram')
+  await telegram.receive({ platform: 'telegram', chatType: 'private', channelId: 'private', messageId: '1', senderId: 'invited-owner', text: `/pair ${issued.code}`, timestamp: 1 })
+
+  expect(registry.getPlatformOwners('one', 'telegram')).toMatchObject([{ userId: 'invited-owner' }])
+  expect(registry.getBindings('one')).toEqual([])
+  expect(events).toContain('messaging:bindingChanged')
+})
+
 test('approved owners survive a registry restart without exposing credentials', () => {
   const secretCanary = 'secret-canary-9b2e6c'
   const root = mkdtempSync(join(tmpdir(), 'messaging-registry-persist-'))

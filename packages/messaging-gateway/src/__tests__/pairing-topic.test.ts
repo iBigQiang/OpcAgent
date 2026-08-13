@@ -121,3 +121,36 @@ test('owner-only pairing seeds the first owner and rejects later strangers befor
   expect(sent.at(-1)).toContain('existing owner')
   expect(pairing.consume(second.code, 'one', 'telegram', 'owner')?.sessionId).toBe('session-two')
 })
+
+test('workspace owner codes are private Telegram-only, rate limited, and do not create bindings', async () => {
+  const pairing = new PairingCodeManager()
+  const store = new BindingStore(mkdtempSync(join(tmpdir(), 'opcagent-owner-pair-')))
+  let owners = ['existing-owner']
+  const sent: string[] = []
+  const commands = new Commands({
+    workspaceId: 'one',
+    bindingStore: store,
+    pairing,
+    getConfig: () => ({ version: 1, enabled: true, platforms: {}, access: { telegram: { mode: 'owner-only', ownerIds: owners } } }),
+    onWorkspaceOwnerPaired: message => { if (!owners.includes(message.senderId)) owners = [...owners, message.senderId] },
+  })
+  const telegram: PlatformAdapter = { platform: 'telegram', async initialize() {}, async destroy() {}, isConnected: () => true, onMessage() {}, async sendText(_channel, text) { sent.push(text) } }
+  const whatsapp: PlatformAdapter = { platform: 'whatsapp', async initialize() {}, async destroy() {}, isConnected: () => true, onMessage() {}, async sendText(_channel, text) { sent.push(text) } }
+  const privateMessage = (senderId: string, text: string): IncomingMessage => ({ platform: 'telegram', chatType: 'private', channelId: `private-${senderId}`, messageId: text, senderId, text, timestamp: 1 })
+
+  const rateLimited = pairing.createOwner('one', 'telegram')
+  for (let index = 0; index < 5; index++) await commands.handle(telegram, privateMessage('guesser', `/pair 00000${index}`))
+  await commands.handle(telegram, privateMessage('guesser', `/pair ${rateLimited.code}`))
+  expect(owners).toEqual(['existing-owner'])
+  await commands.handle(telegram, privateMessage('invited', `/pair ${rateLimited.code}`))
+  expect(owners).toEqual(['existing-owner', 'invited'])
+  expect(store.getAll()).toEqual([])
+
+  const restricted = pairing.createOwner('one', 'telegram')
+  await commands.handle(telegram, { platform: 'telegram', chatType: 'supergroup', channelId: 'group', messageId: 'group', senderId: 'existing-owner', text: `/pair ${restricted.code}`, timestamp: 1 })
+  await commands.handle(whatsapp, { platform: 'whatsapp', channelId: 'wa', messageId: 'wa', senderId: 'wa-user', text: `/pair ${restricted.code}`, timestamp: 1 })
+  await commands.handle(telegram, privateMessage('second-invited', `/pair ${restricted.code}`))
+  expect(owners).toEqual(['existing-owner', 'invited', 'second-invited'])
+  expect(store.getAll()).toEqual([])
+  expect(sent).toContain('You are now allowed to use this workspace.')
+})

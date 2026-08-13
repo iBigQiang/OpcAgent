@@ -12,6 +12,7 @@ files:
   - dist/**/*
   - "!dist/renderer/src/**"
   - "!**/*.map"
+  - "!release{,/**/*}"
   - "!node_modules/@opcagent{,/**/*}"
   - "!node_modules/@anthropic-ai/claude-agent-sdk{,/**/*}"
   - "!node_modules/@anthropic-ai/claude-agent-sdk-*{,/**/*}"
@@ -79,6 +80,7 @@ win:
     - nsis
   artifactName: OPC-Agent-${version}-${arch}.${ext}
   files:
+    - "!release{,/**/*}"
     - "!vendor/bun/**/*"
   extraResources:
     - from: vendor/bun/bun.exe
@@ -91,7 +93,8 @@ nsis:
   oneClick: false
   allowToChangeInstallationDirectory: true
   perMachine: false
-  deleteAppDataOnUninstall: true
+  deleteAppDataOnUninstall: false
+  include: installer.nsh
 
 linux:
   icon: resources/icon.png

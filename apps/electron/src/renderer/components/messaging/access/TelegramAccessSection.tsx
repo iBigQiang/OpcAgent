@@ -17,8 +17,10 @@ import { useAtomValue } from 'jotai'
 import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'motion/react'
 import { toast } from 'sonner'
-import { ChevronDown, ChevronRight, MessageSquare, Users } from 'lucide-react'
+import { ChevronDown, ChevronRight, MessageSquare, UserPlus, Users } from 'lucide-react'
 import { messagingBindingsAtom } from '@/atoms/messaging'
+import { Button } from '@/components/ui/button'
+import { PairingCodeDialog } from '../PairingCodeDialog'
 import {
   AccessModeBanner,
   OwnersListEditor,
@@ -53,13 +55,23 @@ interface Props {
    *  the platform-row dropdown's Lock-down / Unlock affordances. */
   accessMode: PlatformAccessMode
   onAccessModeChange: (mode: PlatformAccessMode) => void
+  botUsername?: string
 }
 
-export function TelegramAccessSection({ workspaceId, accessMode, onAccessModeChange }: Props) {
+export function TelegramAccessSection({ workspaceId, accessMode, onAccessModeChange, botUsername }: Props) {
   const { t } = useTranslation()
   const allBindings = useAtomValue(messagingBindingsAtom)
   const [owners, setOwners] = React.useState<PlatformOwner[]>([])
   const [pending, setPending] = React.useState<PendingSender[]>([])
+  const [ownerPairing, setOwnerPairing] = React.useState<{
+    open: boolean
+    code: string | null
+    expiresAt: number | null
+    error?: string
+    ownerIds: string[]
+  }>({ open: false, code: null, expiresAt: null, ownerIds: [] })
+  const ownerPairingRef = React.useRef(ownerPairing)
+  ownerPairingRef.current = ownerPairing
 
   // The banner stays visible whenever the bot is publicly addressable —
   // either at the workspace level (`accessMode === 'open'`) OR via any
@@ -79,12 +91,20 @@ export function TelegramAccessSection({ workspaceId, accessMode, onAccessModeCha
     ])
     setOwners(o)
     setPending(p)
+    return o
   }, [])
 
   React.useEffect(() => {
     void loadAll()
-    const offBinding = window.electronAPI.onMessagingBindingChanged((wsId) => {
-      if (wsId === workspaceId) void loadAll()
+    const offBinding = window.electronAPI.onMessagingBindingChanged(async (wsId) => {
+      if (wsId !== workspaceId) return
+      const nextOwners = await loadAll()
+      const pairing = ownerPairingRef.current
+      const previousOwnerIds = new Set(pairing.ownerIds)
+      if (pairing.open && pairing.code && nextOwners.some(owner => !previousOwnerIds.has(owner.userId))) {
+        setOwnerPairing({ open: false, code: null, expiresAt: null, ownerIds: nextOwners.map(owner => owner.userId) })
+        toast.success(t('settings.messaging.telegram.access.ownerPairing.pairedToast'))
+      }
     })
     const offPending = window.electronAPI.onMessagingPendingChanged?.((wsId) => {
       if (wsId === workspaceId) void loadAll()
@@ -93,7 +113,29 @@ export function TelegramAccessSection({ workspaceId, accessMode, onAccessModeCha
       offBinding()
       offPending?.()
     }
-  }, [workspaceId, loadAll])
+  }, [workspaceId, loadAll, t])
+
+  const openOwnerPairing = async () => {
+    const ownerIds = owners.map(owner => owner.userId)
+    setOwnerPairing({ open: true, code: null, expiresAt: null, ownerIds })
+    try {
+      const result = await window.electronAPI.generateMessagingOwnerCode('telegram')
+      setOwnerPairing({
+        open: true,
+        code: result.code,
+        expiresAt: result.expiresAt,
+        ownerIds,
+      })
+    } catch (error) {
+      setOwnerPairing({
+        open: true,
+        code: null,
+        expiresAt: null,
+        error: error instanceof Error ? error.message : t('common.error'),
+        ownerIds,
+      })
+    }
+  }
 
   const handleLockDown = async () => {
     try {
@@ -179,6 +221,7 @@ export function TelegramAccessSection({ workspaceId, accessMode, onAccessModeCha
         owners={owners}
         accessMode={accessMode}
         onRemove={handleRemoveOwner}
+        onPair={() => void openOwnerPairing()}
       />
 
       {pending.length > 0 && (
@@ -197,6 +240,23 @@ export function TelegramAccessSection({ workspaceId, accessMode, onAccessModeCha
           />
         </>
       )}
+
+      <PairingCodeDialog
+        open={ownerPairing.open}
+        onOpenChange={(open) => {
+          if (!open) {
+            setOwnerPairing({ open: false, code: null, expiresAt: null, ownerIds: owners.map(owner => owner.userId) })
+          }
+        }}
+        platform="telegram"
+        code={ownerPairing.code}
+        expiresAt={ownerPairing.expiresAt}
+        botUsername={botUsername}
+        error={ownerPairing.error}
+        title={t('settings.messaging.telegram.access.ownerPairing.title')}
+        description={t('settings.messaging.telegram.access.ownerPairing.description')}
+        sendHint={t('settings.messaging.telegram.access.ownerPairing.sendHint')}
+      />
     </>
   )
 }
@@ -210,16 +270,18 @@ function AllowedUsersCollapsible({
   owners,
   accessMode,
   onRemove,
+  onPair,
 }: {
   owners: PlatformOwner[]
   accessMode: PlatformAccessMode
   onRemove: (userId: string) => void
+  onPair: () => void
 }) {
   const { t } = useTranslation()
   // Default open when there are owners to draw the operator's eye to who's
   // on the list; closed when empty (the banner / pending list handles the
   // "do something" prompt instead).
-  const [isExpanded, setIsExpanded] = React.useState(owners.length > 0)
+  const [isExpanded, setIsExpanded] = React.useState(true)
 
   const subtitle =
     accessMode === 'open'
@@ -264,6 +326,13 @@ function AllowedUsersCollapsible({
                 enforced={accessMode === 'owner-only'}
                 onRemove={onRemove}
               />
+              <div className="flex items-center gap-3 px-4 py-2.5">
+                <div className="shrink-0" style={{ width: ROW_ICON_SIZE, height: ROW_ICON_SIZE }} />
+                <Button variant="outline" size="sm" onClick={onPair}>
+                  <UserPlus className="h-3.5 w-3.5" />
+                  {t('settings.messaging.telegram.access.ownerPairing.button')}
+                </Button>
+              </div>
             </div>
           </motion.div>
         )}

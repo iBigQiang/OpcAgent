@@ -13,7 +13,8 @@ function createHarness() {
   const testLarkCredentials = mock(async () => ({ success: true }))
   const saveTelegramToken = mock(async () => {})
   const saveLarkCredentials = mock(async () => {})
-  const registry = new Proxy({ testTelegramToken, testLarkCredentials, saveTelegramToken, saveLarkCredentials }, {
+  const generateOwnerPairingCode = mock(async () => ({ code: '123456', expiresAt: 1 }))
+  const registry = new Proxy({ testTelegramToken, testLarkCredentials, saveTelegramToken, saveLarkCredentials, generateOwnerPairingCode }, {
     get(target, key) {
       if (key in target) return target[key as keyof typeof target]
       return () => undefined
@@ -27,13 +28,21 @@ function createHarness() {
     findClientsWithCapability() { return [] },
   }
   registerMessagingHandlers(server, { messagingRegistry: registry } as unknown as HandlerDeps)
-  return { handlers, testTelegramToken, testLarkCredentials, saveTelegramToken, saveLarkCredentials }
+  return { handlers, testTelegramToken, testLarkCredentials, saveTelegramToken, saveLarkCredentials, generateOwnerPairingCode }
 }
 
 describe('messaging credential test RPC', () => {
   test('registers both explicit test channels', () => {
     expect(HANDLED_CHANNELS).toContain(RPC_CHANNELS.messaging.TEST_TELEGRAM)
     expect(HANDLED_CHANNELS).toContain(RPC_CHANNELS.messaging.TEST_LARK)
+  })
+
+  test('owner pairing code is Telegram-only and scoped to the requesting workspace', async () => {
+    const { handlers, generateOwnerPairingCode } = createHarness()
+    const result = await handlers.get(RPC_CHANNELS.messaging.GENERATE_OWNER_CODE)!({ ...context, workspaceId: 'workspace-one' }, 'telegram')
+
+    expect(result).toEqual({ code: '123456', expiresAt: 1 })
+    expect(generateOwnerPairingCode).toHaveBeenCalledWith('workspace-one', 'telegram')
   })
 
   test('Telegram test delegates without workspace access or persistence', async () => {

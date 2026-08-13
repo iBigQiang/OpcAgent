@@ -12,6 +12,7 @@ const CHANNEL = {
   unbindBinding: RPC_CHANNELS.messaging.UNBIND_BINDING,
   unbindSession: RPC_CHANNELS.messaging.UNBIND,
   generateCode: RPC_CHANNELS.messaging.GENERATE_CODE,
+  generateOwnerCode: RPC_CHANNELS.messaging.GENERATE_OWNER_CODE,
   generateSupergroupCode: RPC_CHANNELS.messaging.GENERATE_SUPERGROUP_CODE,
   getSupergroup: RPC_CHANNELS.messaging.GET_SUPERGROUP,
   unbindSupergroup: RPC_CHANNELS.messaging.UNBIND_SUPERGROUP,
@@ -53,6 +54,7 @@ export function registerMessagingHandlers(server: RpcServer, deps: HandlerDeps &
   server.handle(CHANNEL.unbindBinding, async (ctx, bindingId: string) => ({ success: registry.unbindBinding(workspaceId(ctx.workspaceId), bindingId) }))
   server.handle(CHANNEL.unbindSession, async (ctx, sessionId: string, platform?: PlatformType) => ({ success: registry.unbindSession(workspaceId(ctx.workspaceId), sessionId, platform) > 0 }))
   server.handle(CHANNEL.generateCode, async (ctx, sessionId: string, platform: PlatformType) => registry.generatePairingCode(workspaceId(ctx.workspaceId), sessionId, platform))
+  server.handle(CHANNEL.generateOwnerCode, async (ctx, platform: 'telegram') => registry.generateOwnerPairingCode(workspaceId(ctx.workspaceId), platform))
   server.handle(CHANNEL.generateSupergroupCode, async (ctx, platform: 'telegram') => registry.generateSupergroupPairingCode(workspaceId(ctx.workspaceId), platform))
   server.handle(CHANNEL.getSupergroup, async ctx => registry.getWorkspaceSupergroup(workspaceId(ctx.workspaceId)))
   server.handle(CHANNEL.unbindSupergroup, async ctx => { await registry.unbindWorkspaceSupergroup(workspaceId(ctx.workspaceId)); return { success: true } })

@@ -24,6 +24,7 @@ export interface CommandDeps {
   pairing: PairingCodeManager
   getConfig(): MessagingConfig
   seedOwnerOnFirstPair?(platform: PlatformType, message: IncomingMessage): boolean | void
+  onWorkspaceOwnerPaired?(message: IncomingMessage): void | Promise<void>
   onBindingChanged?(): void
   onSupergroupPaired?(message: IncomingMessage): Promise<void> | void
 }
@@ -95,6 +96,18 @@ export class Commands {
     }
     const access = this.deps.getConfig().access?.[adapter.platform]
     const isExistingOwner = Boolean(access?.ownerIds.includes(message.senderId))
+    const isPairingDenied = Boolean(access?.ownerIds.length && !isExistingOwner) || (message.chatType === 'supergroup' && !isExistingOwner)
+    const entry = this.deps.pairing.consumeIf(code, this.deps.workspaceId, adapter.platform, message.senderId, value => {
+      if (value.kind === 'workspace-owner') {
+        return adapter.platform === 'telegram' && message.platform === 'telegram' && message.chatType === 'private' && Boolean(this.deps.onWorkspaceOwnerPaired)
+      }
+      return !isPairingDenied
+    })
+    if (entry?.kind === 'workspace-owner') {
+      await this.deps.onWorkspaceOwnerPaired?.(message)
+      await adapter.sendText(message.channelId, 'You are now allowed to use this workspace.', options)
+      return
+    }
     if (access?.ownerIds.length && !isExistingOwner) {
       await adapter.sendText(message.channelId, 'Only an existing owner can use this pairing code.', options)
       return
@@ -103,7 +116,6 @@ export class Commands {
       await adapter.sendText(message.channelId, 'Only an existing owner can use this pairing code in a supergroup.', options)
       return
     }
-    const entry = this.deps.pairing.consume(code, this.deps.workspaceId, adapter.platform, message.senderId)
     if (!entry) {
       await adapter.sendText(message.channelId, 'That pairing code is invalid, expired, or rate limited.', options)
       return

@@ -5,6 +5,7 @@ import { CHANNEL_MAP } from '../../transport/channel-map'
 describe('restored Messaging renderer contract', () => {
   test('maps pairing, supergroup, WhatsApp, and exact pending actions', () => {
     expect(CHANNEL_MAP.generateMessagingPairingCode.channel).toBe(RPC_CHANNELS.messaging.GENERATE_CODE)
+    expect(CHANNEL_MAP.generateMessagingOwnerCode.channel).toBe(RPC_CHANNELS.messaging.GENERATE_OWNER_CODE)
     expect(CHANNEL_MAP.unbindMessagingSession.channel).toBe(RPC_CHANNELS.messaging.UNBIND)
     expect(CHANNEL_MAP.generateMessagingSupergroupCode.channel).toBe(RPC_CHANNELS.messaging.GENERATE_SUPERGROUP_CODE)
     expect(CHANNEL_MAP.getMessagingSupergroup.channel).toBe(RPC_CHANNELS.messaging.GET_SUPERGROUP)

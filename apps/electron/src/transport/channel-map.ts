@@ -91,6 +91,7 @@ export const CHANNEL_MAP = {
   bindMessaging: invoke(RPC_CHANNELS.messaging.BIND),
   unbindMessagingBinding: invoke(RPC_CHANNELS.messaging.UNBIND_BINDING),
   generateMessagingPairingCode: invoke(RPC_CHANNELS.messaging.GENERATE_CODE),
+  generateMessagingOwnerCode: invoke(RPC_CHANNELS.messaging.GENERATE_OWNER_CODE),
   unbindMessagingSession: invoke(RPC_CHANNELS.messaging.UNBIND),
   generateMessagingSupergroupCode: invoke(RPC_CHANNELS.messaging.GENERATE_SUPERGROUP_CODE),
   getMessagingSupergroup: invoke(RPC_CHANNELS.messaging.GET_SUPERGROUP),

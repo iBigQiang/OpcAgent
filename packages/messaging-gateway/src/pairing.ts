@@ -1,7 +1,7 @@
 import { randomInt } from 'node:crypto'
 import type { PlatformType } from './types'
 
-export type PairingKind = 'session' | 'workspace-supergroup'
+export type PairingKind = 'session' | 'workspace-supergroup' | 'workspace-owner'
 export interface PairingCode {
   code: string
   workspaceId: string
@@ -30,16 +30,26 @@ export class PairingCodeManager {
   createSupergroup(workspaceId: string, platform: 'telegram'): PairingCode {
     return this.createEntry({ workspaceId, platform, kind: 'workspace-supergroup' })
   }
+  createOwner(workspaceId: string, platform: 'telegram'): PairingCode {
+    return this.createEntry({ workspaceId, platform, kind: 'workspace-owner' })
+  }
   canGenerate(workspaceId: string): boolean { return this.hasCapacity(this.generated, workspaceId, PAIRING_RATE_LIMIT_PER_MINUTE) }
   canConsume(workspaceId: string, platform: PlatformType, senderId: string): boolean {
     return this.hasCapacity(this.consumed, `${workspaceId}:${platform}:${senderId}`, PAIR_CONSUME_RATE_PER_MINUTE)
   }
   consume(code: string, workspaceId: string, platform: PlatformType, senderId = ''): PairingCode | null {
+    return this.consumeIf(code, workspaceId, platform, senderId, () => true)
+  }
+  /**
+   * Applies the normal consume limits before atomically consuming an entry only
+   * when its caller-supplied authorization predicate accepts that entry.
+   */
+  consumeIf(code: string, workspaceId: string, platform: PlatformType, senderId: string, allowed: (entry: PairingCode) => boolean): PairingCode | null {
     this.prune()
     if (!this.recordUse(this.consumed, `${workspaceId}:${platform}:${senderId}`, PAIR_CONSUME_RATE_PER_MINUTE)) return null
     if (!this.recordUse(this.workspaceConsumed, `${workspaceId}:${platform}`, PAIR_CONSUME_WORKSPACE_RATE_PER_MINUTE)) return null
     const value = this.codes.get(code)
-    if (!value || value.workspaceId !== workspaceId || value.platform !== platform) return null
+    if (!value || value.workspaceId !== workspaceId || value.platform !== platform || !allowed(value)) return null
     this.codes.delete(code)
     return value
   }

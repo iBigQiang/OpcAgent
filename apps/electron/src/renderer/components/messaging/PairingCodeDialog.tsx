@@ -26,6 +26,10 @@ interface PairingCodeDialogProps {
   botUsername?: string
   /** Error text to show in place of the code (e.g., rate limit, adapter down). */
   error?: string
+  /** Optional copy for workspace-level pairing flows that do not bind a session. */
+  title?: string
+  description?: string
+  sendHint?: string
 }
 
 export function PairingCodeDialog({
@@ -36,6 +40,9 @@ export function PairingCodeDialog({
   expiresAt,
   botUsername,
   error,
+  title,
+  description,
+  sendHint,
 }: PairingCodeDialogProps) {
   const { t } = useTranslation()
   const [secondsLeft, setSecondsLeft] = React.useState(0)
@@ -75,8 +82,8 @@ export function PairingCodeDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[440px]">
         <DialogHeader>
-          <DialogTitle>{t('dialog.pairingCode.title')}</DialogTitle>
-          <DialogDescription>{t(instructionsKey)}</DialogDescription>
+          <DialogTitle>{title ?? t('dialog.pairingCode.title')}</DialogTitle>
+          <DialogDescription>{description ?? t(instructionsKey)}</DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col items-center gap-4 py-4">
@@ -101,7 +108,7 @@ export function PairingCodeDialog({
               </div>
 
               <p className="text-center text-sm text-muted-foreground">
-                {t(sendCommandKey)}
+                {sendHint ?? t(sendCommandKey)}
               </p>
 
               {platform === 'whatsapp' && (

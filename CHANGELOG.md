@@ -8,6 +8,18 @@ All notable changes to OPC Agent are documented in this file. The format follows
 
 Add user-visible changes here before running `bun run release:prepare <version>`.
 
+## [0.1.3] - 2026-08-13
+
+### Added
+
+- Added secure, one-time Telegram workspace-owner pairing codes that can only be redeemed in private chats and do not bind a session.
+- Added a Windows uninstall choice to keep or remove local OPC Agent configuration and history, while preserving data during upgrades by default.
+
+### Fixed
+
+- Refreshed Telegram connection state immediately after saving, reconfiguring, disconnecting, or removing credentials.
+- Fixed the What's New view so packaged release notes load correctly, the view always has a close action, and a GitHub Releases fallback is shown when notes are unavailable.
+
 ## [0.1.2] - 2026-08-13
 
 ### Fixed
@@ -33,6 +45,7 @@ Add user-visible changes here before running `bun run release:prepare <version>`
 - Local session search, flags, archives, import, export, and branching.
 
 [Unreleased]: https://github.com/iBigQiang/OpcAgent/releases
+[0.1.3]: https://github.com/iBigQiang/OpcAgent/releases/tag/v0.1.3
 [0.1.2]: https://github.com/iBigQiang/OpcAgent/releases/tag/v0.1.2
 [0.1.1]: https://github.com/iBigQiang/OpcAgent/releases/tag/v0.1.1
 [0.1.0]: https://github.com/iBigQiang/OpcAgent/releases/tag/v0.1.0

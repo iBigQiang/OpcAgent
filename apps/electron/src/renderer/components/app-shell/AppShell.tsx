@@ -40,6 +40,7 @@ import { MainContentPanel } from "./MainContentPanel"
 import { PanelStackContainer } from "./PanelStackContainer"
 import type { ChatDisplayHandle } from "./ChatDisplay"
 import { LeftSidebar, type SidebarItem as LeftSidebarItem } from "./LeftSidebar"
+import { getWhatsNewFallbackContent } from "./whats-new"
 import { useSession } from "@/hooks/useSession"
 import { ensureSessionMessagesLoadedAtom } from "@/atoms/sessions"
 import { AppShellProvider, type AppShellContextType } from "@/context/AppShellContext"
@@ -930,16 +931,22 @@ function AppShellContent({
 
   // Handler for What's New overlay
   const handleWhatsNewClick = useCallback(async () => {
-    const content = await window.electronAPI.getReleaseNotes()
-    setReleaseNotesContent(content)
+    try {
+      const content = await window.electronAPI.getReleaseNotes()
+      setReleaseNotesContent(content.trim() || getWhatsNewFallbackContent(t))
+    } catch (error) {
+      console.error('[AppShell] Failed to load release notes:', error)
+      setReleaseNotesContent(getWhatsNewFallbackContent(t))
+    }
     setShowWhatsNew(true)
     setHasUnseenReleaseNotes(false)
     // Update last seen version
-    const latestVersion = await window.electronAPI.getLatestReleaseVersion()
-    if (latestVersion) {
-      storage.set(storage.KEYS.whatsNewLastSeenVersion, latestVersion)
-    }
-  }, [])
+    window.electronAPI.getLatestReleaseVersion().then((latestVersion) => {
+      if (latestVersion) storage.set(storage.KEYS.whatsNewLastSeenVersion, latestVersion)
+    }).catch((error) => {
+      console.error('[AppShell] Failed to load latest release version:', error)
+    })
+  }, [t])
 
   // ============================================================================
   // EditPopover state retained for the Skills creation flow.

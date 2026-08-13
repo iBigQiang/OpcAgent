@@ -47,6 +47,7 @@ export interface IMessagingGatewayRegistry {
 
   /** Required gateway-core extensions for the restored desktop flow. */
   generatePairingCode(workspaceId: string, sessionId: string, platform: PlatformType): MessagingPairingCode
+  generateOwnerPairingCode(workspaceId: string, platform: 'telegram'): MessagingPairingCode
   generateSupergroupPairingCode(workspaceId: string, platform: 'telegram'): MessagingPairingCode
   getWorkspaceSupergroup(workspaceId: string): MessagingSupergroupInfo | null
   unbindWorkspaceSupergroup(workspaceId: string): Promise<void>

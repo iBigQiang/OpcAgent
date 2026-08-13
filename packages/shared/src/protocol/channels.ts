@@ -300,6 +300,7 @@ export const RPC_CHANNELS = {
     FORGET: 'messaging:forget',
     GET_BINDINGS: 'messaging:getBindings',
     GENERATE_CODE: 'messaging:generateCode',
+    GENERATE_OWNER_CODE: 'messaging:generateOwnerCode',
     UNBIND: 'messaging:unbind',
     UNBIND_BINDING: 'messaging:unbindBinding',
     GENERATE_SUPERGROUP_CODE: 'messaging:generateSupergroupCode',

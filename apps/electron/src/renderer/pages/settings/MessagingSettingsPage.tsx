@@ -230,6 +230,20 @@ function PlatformRow({ platform, workspaceId }: { platform: Platform; workspaceI
     }
   }, [platform])
 
+  const refreshRuntime = React.useCallback(async () => {
+    const items = await window.electronAPI.getMessagingRuntime()
+    const next = items.find((item) => item.platform === platform)
+    setRuntime((next ?? defaultRuntime(platform)) as MessagingPlatformRuntimeInfo)
+  }, [platform])
+
+  const refreshRuntimeSafely = React.useCallback(async () => {
+    try {
+      await refreshRuntime()
+    } catch (error) {
+      console.error(`[MessagingSettings] Failed to refresh ${platform} runtime:`, error)
+    }
+  }, [platform, refreshRuntime])
+
   React.useEffect(() => {
     refreshSupergroup()
   }, [refreshSupergroup, workspaceId])
@@ -303,6 +317,7 @@ function PlatformRow({ platform, workspaceId }: { platform: Platform; workspaceI
   const handleDisconnect = async () => {
     try {
       await window.electronAPI.disconnectMessagingPlatform(platform)
+      await refreshRuntimeSafely()
       toast.success(
         t(`settings.messaging.${platform}.disconnected`, {
           defaultValue: 'Disconnected',
@@ -316,6 +331,7 @@ function PlatformRow({ platform, workspaceId }: { platform: Platform; workspaceI
   const handleForget = async () => {
     try {
       await window.electronAPI.forgetMessagingPlatform(platform)
+      await refreshRuntimeSafely()
       toast.success(
         t(`settings.messaging.${platform}.disconnected`, {
           defaultValue: 'Disconnected',
@@ -412,6 +428,7 @@ function PlatformRow({ platform, workspaceId }: { platform: Platform; workspaceI
               workspaceId={workspaceId}
               accessMode={telegramAccessMode}
               onAccessModeChange={setTelegramAccessMode}
+              botUsername={runtime.identity}
             />
             <TelegramBindingsBody
               bindings={platformBindings}
@@ -459,6 +476,7 @@ function PlatformRow({ platform, workspaceId }: { platform: Platform; workspaceI
             open={connectOpen}
             onOpenChange={setConnectOpen}
             reconfigure={reconfigure}
+            onSaved={() => void refreshRuntimeSafely()}
           />
           <TelegramSupergroupPairingDialog
             open={supergroupDialogOpen}

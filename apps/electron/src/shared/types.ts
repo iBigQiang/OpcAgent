@@ -645,6 +645,7 @@ export interface ElectronAPI {
   bindMessaging(input: { platform: MessagingPlatform; sessionId: string; channelId: string }): Promise<MessagingBinding>
   unbindMessagingBinding(bindingId: string): Promise<{ success: boolean }>
   generateMessagingPairingCode(sessionId: string, platform: MessagingPlatform): Promise<MessagingPairingCode>
+  generateMessagingOwnerCode(platform: 'telegram'): Promise<MessagingPairingCode>
   unbindMessagingSession(sessionId: string, platform?: MessagingPlatform): Promise<{ success: boolean }>
   generateMessagingSupergroupCode(platform: 'telegram'): Promise<MessagingPairingCode>
   getMessagingSupergroup(): Promise<MessagingSupergroupInfo | null>

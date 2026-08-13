@@ -1,4 +1,4 @@
-import { existsSync, statSync } from 'node:fs'
+import { existsSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
 const appDir = join(import.meta.dir, '..')
@@ -6,6 +6,7 @@ const targetPlatform = process.env.OPCAGENT_TARGET_PLATFORM ?? process.platform
 const targetArch = process.env.OPCAGENT_TARGET_ARCH ?? process.arch
 const platformKey = `${targetPlatform}-${targetArch}`
 const executable = targetPlatform === 'win32' ? '.exe' : ''
+const { version } = JSON.parse(readFileSync(join(appDir, 'package.json'), 'utf-8')) as { version: string }
 const required = [
   'dist/main.cjs',
   'dist/bootstrap-preload.cjs',
@@ -13,6 +14,7 @@ const required = [
   'dist/interceptor.cjs',
   'dist/renderer/index.html',
   'dist/resources/config-defaults.json',
+  `dist/resources/release-notes/${version}.md`,
   'dist/resources/pi-agent-server/index.js',
   `dist/resources/bin/${platformKey}/uv${executable}`,
   `vendor/bun/bun${executable}`,
@@ -21,6 +23,11 @@ const required = [
 for (const relative of required) {
   const path = join(appDir, relative)
   if (!existsSync(path) || !statSync(path).isFile()) throw new Error(`Missing packaged asset: ${relative}`)
+}
+
+const releaseNote = join(appDir, 'dist', 'resources', 'release-notes', `${version}.md`)
+if (readFileSync(releaseNote, 'utf-8').trim() === '') {
+  throw new Error(`Packaged release note is empty: ${releaseNote}`)
 }
 
 for (const removed of ['dist/resources/bridge-mcp-server', 'dist/resources/session-mcp-server', 'dist/resources/bin/craft-agent']) {
