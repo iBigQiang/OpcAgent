@@ -37,14 +37,20 @@ export interface LarkCredentialTestResult {
 export interface MessagingGatewayRegistryOptions {
   getMessagingDir(workspaceId: string): string
   sessionManager?: MessagingSessionManager
-  /** Kept in the host contract; credentials remain accessed only inside this package. */
-  credentialManager?: unknown
+  /** Credentials remain accessed only inside this package and are never returned by Messaging APIs. */
+  credentialManager?: MessagingCredentialManager
   whatsapp?: { workerEntry: string; nodeBin?: string; pairingMode?: 'qr' | 'code'; electronRunAsNode?: boolean }
   sendToSession?: (workspaceId: string, sessionId: string, text: string, attachments?: import('@mkagent/shared/protocol').FileAttachment[]) => Promise<void>
   logger?: MessagingLogger
   adapters?: Partial<Record<PlatformType, PlatformAdapter>>
   createAdapter?: (platform: PlatformType, workspaceId: string) => PlatformAdapter | undefined
   publish?: (channel: string, workspaceId: string, payload?: unknown) => void
+}
+
+interface MessagingCredentialManager {
+  get(id: { type: 'source_bearer'; workspaceId: string; sourceId: string }): Promise<{ value: string } | null>
+  set(id: { type: 'source_bearer'; workspaceId: string; sourceId: string }, value: { value: string }): Promise<void>
+  delete(id: { type: 'source_bearer'; workspaceId: string; sourceId: string }): Promise<boolean>
 }
 
 interface WorkspaceState {
@@ -76,7 +82,13 @@ export class MessagingGatewayRegistry {
   /** Eagerly create workspace state so hosts can initialize configured workspaces at startup. */
   async initializeWorkspace(workspaceId: string): Promise<void> {
     const state = this.state(workspaceId)
-    const config = state.config.get()
+    let config = state.config.get()
+    for (const platform of ['telegram', 'lark'] as const) {
+      if (config.platforms[platform]?.enabled) continue
+      const credential = await this.credentials().get(credentialId(workspaceId, platform)).catch(() => null)
+      if (!credential?.value) continue
+      config = state.config.update({ enabled: true, platforms: { [platform]: { enabled: true } } })
+    }
     for (const platform of platforms) {
       if (config.platforms[platform]?.enabled) await this.connect(workspaceId, platform)
     }
@@ -143,8 +155,8 @@ export class MessagingGatewayRegistry {
     this.publish('messaging:bindingChanged', workspaceId)
     return { owners: this.getPlatformOwners(workspaceId, platform) }
   }
-  async saveCredential(workspaceId: string, platform: PlatformType, value: string): Promise<void> { if (!value.trim()) throw new Error('Credential is required'); await getCredentialManager().set({ type: 'source_bearer', workspaceId, sourceId: `messaging-${platform}` }, { value }); this.patchRuntime(workspaceId, platform, { configured: true, state: 'disconnected', connected: false }) }
-  async forgetCredential(workspaceId: string, platform: PlatformType): Promise<void> { await getCredentialManager().delete({ type: 'source_bearer', workspaceId, sourceId: `messaging-${platform}` }); this.patchRuntime(workspaceId, platform, { configured: false, state: 'disconnected', connected: false }) }
+  async saveCredential(workspaceId: string, platform: PlatformType, value: string): Promise<void> { if (!value.trim()) throw new Error('Credential is required'); await this.credentials().set(credentialId(workspaceId, platform), { value }); this.patchRuntime(workspaceId, platform, { configured: true, state: 'disconnected', connected: false }) }
+  async forgetCredential(workspaceId: string, platform: PlatformType): Promise<void> { await this.credentials().delete(credentialId(workspaceId, platform)); this.patchRuntime(workspaceId, platform, { configured: false, state: 'disconnected', connected: false }) }
   async saveTelegramToken(workspaceId: string, token: string): Promise<void> { await this.saveCredential(workspaceId, 'telegram', token); this.enablePlatform(workspaceId, 'telegram'); await this.connect(workspaceId, 'telegram') }
   async saveLarkCredentials(workspaceId: string, credentials: LarkCredentials): Promise<void> { await this.saveCredential(workspaceId, 'lark', JSON.stringify(credentials)); this.enablePlatform(workspaceId, 'lark'); await this.connect(workspaceId, 'lark') }
   async disconnectPlatform(workspaceId: string, platform: PlatformType): Promise<void> { await this.disconnect(workspaceId, platform) }
@@ -185,7 +197,7 @@ export class MessagingGatewayRegistry {
       return { success: false, error: 'Unable to verify the Lark credentials' }
     }
   }
-  async connect(workspaceId: string, platform: PlatformType): Promise<void> { const state = this.state(workspaceId); const adapter = state.adapters[platform]; let credential: { value: string } | null = null; try { credential = await getCredentialManager().get({ type: 'source_bearer', workspaceId, sourceId: `messaging-${platform}` }) } catch { this.patchRuntime(workspaceId, platform, { configured: false, connected: false, state: 'disconnected', lastError: 'Credential is unavailable' }); return } const canConnect = platform === 'whatsapp' || Boolean(credential); if (!adapter || !canConnect) { this.patchRuntime(workspaceId, platform, { configured: Boolean(credential) || platform === 'whatsapp', connected: false, state: adapter ? 'disconnected' : 'error', lastError: adapter ? 'Credential is not configured' : 'Platform adapter is unavailable' }); return } if (adapter.isConnected()) { this.patchRuntime(workspaceId, platform, { configured: true, connected: true, state: 'connected', lastError: undefined }); return } this.patchRuntime(workspaceId, platform, { configured: true, connected: false, state: 'connecting', lastError: undefined }); try { adapter.onMessage(async message => { await state.router.route(message, adapter) }); adapter.onButtonPress?.(async press => { await this.handleButtonPress(workspaceId, press) }); adapter.onStatus?.(patch => this.patchRuntime(workspaceId, platform, patch)); adapter.onUiEvent?.(event => this.emitWhatsAppUiEvent(workspaceId, event)); await adapter.initialize({ credential: credential?.value ?? '', config: this.getConfig(workspaceId).platforms[platform] ?? {} }); this.patchRuntime(workspaceId, platform, { configured: true, connected: adapter.isConnected(), state: adapter.isConnected() ? 'connected' : 'connecting' }) } catch { this.patchRuntime(workspaceId, platform, { configured: true, connected: false, state: 'error', lastError: 'Connection failed. Check configuration and provider permissions.' }) } }
+  async connect(workspaceId: string, platform: PlatformType): Promise<void> { const state = this.state(workspaceId); const adapter = state.adapters[platform]; let credential: { value: string } | null = null; try { credential = await this.credentials().get(credentialId(workspaceId, platform)) } catch { this.patchRuntime(workspaceId, platform, { configured: false, connected: false, state: 'disconnected', lastError: 'Credential is unavailable' }); return } const canConnect = platform === 'whatsapp' || Boolean(credential); if (!adapter || !canConnect) { this.patchRuntime(workspaceId, platform, { configured: Boolean(credential) || platform === 'whatsapp', connected: false, state: adapter ? 'disconnected' : 'error', lastError: adapter ? 'Credential is not configured' : 'Platform adapter is unavailable' }); return } if (adapter.isConnected()) { this.patchRuntime(workspaceId, platform, { configured: true, connected: true, state: 'connected', lastError: undefined }); return } this.patchRuntime(workspaceId, platform, { configured: true, connected: false, state: 'connecting', lastError: undefined }); try { adapter.onMessage(async message => { await state.router.route(message, adapter) }); adapter.onButtonPress?.(async press => { await this.handleButtonPress(workspaceId, press) }); adapter.onStatus?.(patch => this.patchRuntime(workspaceId, platform, patch)); adapter.onUiEvent?.(event => this.emitWhatsAppUiEvent(workspaceId, event)); await adapter.initialize({ credential: credential?.value ?? '', config: this.getConfig(workspaceId).platforms[platform] ?? {} }); this.patchRuntime(workspaceId, platform, { configured: true, connected: adapter.isConnected(), state: adapter.isConnected() ? 'connected' : 'connecting' }) } catch { this.patchRuntime(workspaceId, platform, { configured: true, connected: false, state: 'error', lastError: 'Connection failed. Check configuration and provider permissions.' }) } }
   async disconnect(workspaceId: string, platform: PlatformType): Promise<void> { const adapter = this.state(workspaceId).adapters[platform]; if (adapter) await adapter.destroy().then(() => undefined, () => undefined); this.patchRuntime(workspaceId, platform, { connected: false, state: 'disconnected' }) }
   getRuntime(workspaceId: string): PlatformRuntimeInfo[] { return platforms.map(platform => ({ ...this.state(workspaceId).runtime[platform] })) }
   async sendSessionText(workspaceId: string, sessionId: string, text: string): Promise<void> { const state = this.state(workspaceId); const bindings = state.bindings.getAll().filter(binding => binding.enabled && binding.sessionId === sessionId); await Promise.allSettled(bindings.map(binding => state.adapters[binding.platform]?.sendText(binding.channelId, text.slice(0, 30_000), binding.threadId === undefined ? undefined : { threadId: binding.threadId }))) }
@@ -195,12 +207,15 @@ export class MessagingGatewayRegistry {
   private async finishCompact(workspaceId: string, sessionId: string): Promise<void> { const state = this.workspaces.get(workspaceId); const pending = state?.pendingCompact.get(sessionId); if (!state || !pending || !this.options.sessionManager) return; const binding = state.bindings.getAll().find(value => value.id === pending.bindingId && value.sessionId === sessionId); if (!binding) { state.pendingCompact.delete(sessionId); return } state.pendingCompact.delete(sessionId); await this.options.sessionManager.acceptPlan(sessionId, pending.planPath); await this.options.sessionManager.clearPendingPlanExecution(sessionId); const adapter = state.adapters[binding.platform]; if (adapter?.isConnected()) await adapter.sendText(pending.channelId, 'Plan executing after compaction.', pending.threadId === undefined ? undefined : { threadId: pending.threadId }) }
   private sessionBelongsToWorkspace(workspaceId: string, sessionId: string): boolean { return this.options.sessionManager ? this.options.sessionManager.getSessions(workspaceId).some(session => session.id === sessionId && session.workspaceId === workspaceId) : Boolean(this.options.sendToSession) }
   private enablePlatform(workspaceId: string, platform: PlatformType): void { const state = this.state(workspaceId); const current = state.config.get(); state.config.update({ enabled: true, platforms: { ...current.platforms, [platform]: { ...current.platforms[platform], enabled: true } } }) }
+  private credentials(): MessagingCredentialManager { return this.options.credentialManager ?? getCredentialManager() }
   private createDefaultAdapter(platform: PlatformType, directory: string): PlatformAdapter | undefined { if (platform === 'telegram') return new TelegramAdapter(); if (platform === 'lark') return new LarkAdapter(); if (platform === 'whatsapp' && this.options.whatsapp) return new WhatsAppAdapter({ workerEntry: this.options.whatsapp.workerEntry, authDir: `${directory}/whatsapp`, ...(this.options.whatsapp.nodeBin ? { nodeBin: this.options.whatsapp.nodeBin } : {}), ...(this.options.whatsapp.pairingMode ? { pairingMode: this.options.whatsapp.pairingMode } : {}), ...(this.options.whatsapp.electronRunAsNode === undefined ? {} : { electronRunAsNode: this.options.whatsapp.electronRunAsNode }) }); return undefined }
   private claimAdapter(adapter: PlatformAdapter | undefined, workspaceId: string): PlatformAdapter | undefined { if (!adapter) return undefined; const owner = this.adapterOwners.get(adapter); if (owner && owner !== workspaceId) { this.logger.warn('Messaging adapter instance already belongs to another workspace'); return undefined } this.adapterOwners.set(adapter, workspaceId); return adapter }
   private patchRuntime(workspaceId: string, platform: PlatformType, patch: Partial<PlatformRuntimeInfo>): void { const state = this.state(workspaceId); state.runtime[platform] = { ...state.runtime[platform], ...patch, platform, updatedAt: Date.now() }; this.publish('messaging:platformStatus', workspaceId, { ...state.runtime[platform] }) }
   private emitWhatsAppUiEvent(workspaceId: string, event: WhatsAppUiEvent): void { for (const listener of this.whatsAppUiListeners) listener(workspaceId, event); this.publish('messaging:wa:uiEvent', workspaceId, event) }
   private publish(channel: string, workspaceId: string, payload?: unknown): void { this.options.publish?.(channel, workspaceId, payload) }
 }
+
+function credentialId(workspaceId: string, platform: PlatformType): { type: 'source_bearer'; workspaceId: string; sourceId: string } { return { type: 'source_bearer', workspaceId, sourceId: `messaging-${platform}` } }
 
 function normalizeOwners(owners: Array<{ userId: string; displayName?: string; username?: string; addedAt: number }>): Array<{ userId: string; displayName?: string; username?: string; addedAt: number }> { const values = new Map<string, { userId: string; displayName?: string; username?: string; addedAt: number }>(); for (const owner of owners) if (owner?.userId) values.set(owner.userId, { ...owner }); return [...values.values()] }
 

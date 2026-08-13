@@ -112,6 +112,24 @@ test('WhatsApp enablement persists and reconnects during workspace initializatio
   await second.dispose()
 })
 
+test('legacy platform credentials are enabled and reconnected without exposing their value', async () => {
+  const root = mkdtempSync(join(tmpdir(), 'messaging-legacy-'))
+  const telegram = adapter('telegram')
+  const reads: string[] = []
+  const credentials = {
+    async get(id: { sourceId: string }) { reads.push(id.sourceId); return id.sourceId === 'messaging-telegram' ? { value: 'test-only-secret' } : null },
+    async set() {},
+    async delete() { return true },
+  }
+  const registry = new MessagingGatewayRegistry({ getMessagingDir: () => root, sendToSession: async () => {}, credentialManager: credentials, adapters: { telegram } })
+  await registry.initializeWorkspace('one')
+  expect(reads).toEqual(['messaging-telegram', 'messaging-lark', 'messaging-telegram'])
+  expect(registry.getConfig('one')).toMatchObject({ enabled: true, platforms: { telegram: { enabled: true } } })
+  expect(telegram.initialized).toBe(1)
+  expect(JSON.stringify(registry.getConfig('one'))).not.toContain('test-only-secret')
+  await registry.dispose()
+})
+
 test('a supplied adapter cannot cross workspace boundaries', async () => {
   const shared = adapter('whatsapp')
   const registry = new MessagingGatewayRegistry({
