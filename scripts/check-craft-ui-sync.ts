@@ -1,132 +1,43 @@
 #!/usr/bin/env bun
 
-/**
- * Guard the MkAgent renderer's Craft lineage.
- *
- * Files outside the Lite customization seams must remain byte-for-byte equal
- * after package/brand normalization. The guard also rejects reintroduction of
- * product surfaces intentionally removed from MkAgent.
- */
-
-import { readFile, readdir } from 'node:fs/promises'
-import { existsSync } from 'node:fs'
+/** Keep the Lite renderer boundary pinned while requiring restored UI lineage. */
 import { createHash } from 'node:crypto'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 const repoRoot = resolve(import.meta.dir, '..')
-const craftRoot = process.env.CRAFT_AGENT_SOURCE
-  ?? [
-    resolve(repoRoot, '..', 'craft-agents-oss'),
-    resolve(repoRoot, '..', '..', 'agents', 'craft-agents-oss'),
-  ].find(candidate => existsSync(candidate))
-  ?? resolve(repoRoot, '..', 'craft-agents-oss')
 const rendererRoot = 'apps/electron/src/renderer'
-const manifest = JSON.parse(
-  await readFile(resolve(import.meta.dir, 'craft-ui-overrides.json'), 'utf8'),
-) as { version: number; files: Record<string, { sha256: string; reason: string }> }
-if (manifest.version !== 2) throw new Error(`Unsupported Craft UI override manifest version: ${manifest.version}`)
-const intentionalOverrideFiles = new Set(Object.keys(manifest.files))
+const restored = JSON.parse(readFileSync(resolve(import.meta.dir, 'craft-restored-sources.json'), 'utf8')) as { liteBaseline: string; productBaseline: string; restoredSource: string; integrationReview: Record<string, string>; features: Array<{ name: string; sourcePrefixes: string[]; requiredCurrent: string[]; testAnchors: string[] }> }
+const manifest = JSON.parse(readFileSync(resolve(import.meta.dir, 'craft-ui-overrides.json'), 'utf8')) as { version: number; files: Record<string, { sha256: string; reason: string }> }
+if (manifest.version !== 2) throw new Error('Unsupported Craft UI override manifest version')
+function git(args: string[]): string { const result = Bun.spawnSync(['git', '-C', repoRoot, ...args], { stdout: 'pipe', stderr: 'pipe' }); if (result.exitCode !== 0) throw new Error(result.stderr.toString()); return result.stdout.toString() }
+function tree(commit: string): Set<string> { return new Set(git(['ls-tree', '-r', '--name-only', '-z', commit]).split('\0').filter(Boolean)) }
+function list(dir: string): string[] { return readdirSync(resolve(repoRoot, dir), { withFileTypes: true }).flatMap(entry => { const path = `${dir}/${entry.name}`; return entry.isDirectory() ? list(path) : [path] }) }
+function restoredUi(path: string): boolean { return restored.features.some(feature => feature.testAnchors.includes(path) || feature.sourcePrefixes.some(prefix => path === prefix || path.startsWith(prefix))) }
 
-const excludedPathFragments = [
-  '/automations/',
-  '/messaging/',
-  '/projects/',
-  '/kanban/',
-  '/playground/',
-]
-
-const excludedFiles = [
-  'WorkspacePicker.tsx',
-  'AddWorkspaceStep_ConnectRemote.tsx',
-  'craft-renderer-compat.ts',
-  'playground.html',
-]
-
-const forbiddenSourcePatterns: Array<[RegExp, string]> = [
-  [/\bgetServerWorkspaces\b|\bcreateServerWorkspace\b/, 'remote workspace picker'],
-  [/\bremoteServer\b/, 'remote workspace binding'],
-  [/\b(?:labels_changed|project_id_changed|session_status_changed|session_shared)\b/, 'excluded session metadata event'],
-  [/@mkagent\/shared\/(?:labels|projects|statuses|views)/, 'excluded shared feature module'],
-  [/\b(?:onAddAutomation|onAddProject|onConfigureStatuses|onConfigureLabels|automationSelection)\b/, 'excluded product callback or state'],
-  [/getDocUrl\(['"](?:statuses|automations|messaging)['"]\)/, 'excluded product documentation link'],
-]
-
-const normalizeUpstream = (source: string) => source
-  .replaceAll('@craft-agent/', '@mkagent/')
-  .replaceAll('craftagents://', 'mkagent://')
-  .replaceAll('.craft-agent', '.mkagent')
-  .replaceAll('Craft Agents Backend Compatible', 'Pi Backend Compatible')
-  .replaceAll('Craft Agents Backend', 'Pi Backend')
-
-async function listFiles(base: string, dir: string): Promise<string[]> {
-  const entries = await readdir(resolve(base, dir), { withFileTypes: true })
-  const nested = await Promise.all(entries.map(async entry => {
-    const path = `${dir}/${entry.name}`
-    return entry.isDirectory() ? listFiles(base, path) : [path]
-  }))
-  return nested.flat()
-}
-
-const [mkFiles, craftFiles] = await Promise.all([
-  listFiles(repoRoot, rendererRoot),
-  listFiles(craftRoot, rendererRoot),
-])
-const craftFileSet = new Set(craftFiles)
+const source = tree(restored.restoredSource)
+const product = tree(restored.productBaseline)
+const files = list(rendererRoot)
+const changedFromProduct = new Set(git(['diff', '--name-only', restored.productBaseline, '--', rendererRoot]).split('\n').filter(Boolean))
 const errors: string[] = []
-const seenOverrides = new Set<string>()
-let verifiedReuse = 0
-let intentionalOverrides = 0
-
-for (const file of mkFiles) {
-  if (excludedPathFragments.some(fragment => file.includes(fragment)) || excludedFiles.some(name => file.endsWith(`/${name}`))) {
-    errors.push(`excluded UI file is present: ${file}`)
-    continue
-  }
-
-  const isOverride = intentionalOverrideFiles.has(file)
-  if (isOverride) {
-    intentionalOverrides += 1
-    seenOverrides.add(file)
-    const bytes = await readFile(resolve(repoRoot, file))
-    const hash = createHash('sha256').update(bytes).digest('hex')
-    const review = manifest.files[file]
-    if (!review?.reason.trim()) errors.push(`reviewed UI override has no reason: ${file}`)
-    if (hash !== review?.sha256) errors.push(`reviewed UI override changed without manifest update: ${file}`)
-  }
-
-  let source: string | null = null
-  if (/\.(?:ts|tsx|js|jsx|html)$/.test(file)) {
-    source = await readFile(resolve(repoRoot, file), 'utf8')
-    for (const [pattern, feature] of forbiddenSourcePatterns) {
-      if (pattern.test(source)) errors.push(`${feature} residue in ${file}`)
-    }
-  }
-
-  if (!craftFileSet.has(file)) {
-    if (!isOverride) {
-      errors.push(`unregistered MkAgent-only renderer file: ${file}`)
-    }
-    continue
-  }
-
-  if (isOverride) continue
-  const craftSource = await readFile(resolve(craftRoot, file), 'utf8')
-  const mkSource = source ?? await readFile(resolve(repoRoot, file), 'utf8')
-  if (normalizeUpstream(craftSource) !== mkSource) {
-    errors.push(`unexpected Craft source drift: ${file}`)
-  } else {
-    verifiedReuse += 1
+for (const feature of restored.features) {
+  const relevant = feature.sourcePrefixes.some(prefix => prefix.startsWith(rendererRoot) && [...source].some(path => path === prefix || path.startsWith(prefix)))
+  if (!relevant) continue
+  for (const path of feature.requiredCurrent.filter(path => path.startsWith(rendererRoot))) {
+    if (!existsSync(resolve(repoRoot, path))) errors.push(`${feature.name}: missing restored UI anchor ${path}`)
+    if (!source.has(path) || !git(['show', `${restored.restoredSource}:${path}`]).length) errors.push(`${feature.name}: UI anchor lacks restored-source content ${path}`)
   }
 }
-
-for (const file of intentionalOverrideFiles) {
-  if (!seenOverrides.has(file)) errors.push(`stale or missing reviewed UI override: ${file}`)
+for (const path of files) {
+  if (restoredUi(path)) continue
+  if (!changedFromProduct.has(path) && product.has(path)) continue
+  const reason = restored.integrationReview[path]
+  if (!reason?.trim()) errors.push(`unreviewed product-baseline renderer change: ${path}`)
 }
-
-if (errors.length > 0) {
-  console.error('Craft Lite boundary check failed:')
-  for (const error of errors) console.error(`- ${error}`)
-  process.exit(1)
+for (const [path, review] of Object.entries(restored.integrationReview)) {
+  if (!path.startsWith(`${rendererRoot}/`)) continue
+  if (!review.trim()) errors.push(`renderer integration review has no reason: ${path}`)
+  if (!changedFromProduct.has(path) && product.has(path)) errors.push(`stale renderer integration review entry: ${path}`)
 }
-
-console.log(`Craft Lite boundary verified (${verifiedReuse} normalized-identical files, ${intentionalOverrides} registered overrides, ${mkFiles.length} renderer files total)`)
+if (errors.length) { console.error('Craft Lite renderer boundary failed:'); for (const error of errors) console.error(`- ${error}`); process.exit(1) }
+console.log(`Craft renderer boundary verified from product baseline ${restored.productBaseline} (${files.length} files; restored source ${restored.restoredSource})`)

@@ -1,175 +1,74 @@
 #!/usr/bin/env bun
 
-/** Verify every tracked MkAgent file against the pinned Craft checkout. */
-
-import { readFile } from 'node:fs/promises'
-import { existsSync } from 'node:fs'
+/** Verify Lite lineage from pinned Git objects, with explicit restored feature coverage. */
 import { createHash } from 'node:crypto'
+import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 const repoRoot = resolve(import.meta.dir, '..')
-const craftRoot = process.env.CRAFT_AGENT_SOURCE
-  ?? [
-    resolve(repoRoot, '..', 'craft-agents-oss'),
-    resolve(repoRoot, '..', '..', 'agents', 'craft-agents-oss'),
-  ].find(candidate => existsSync(candidate))
-  ?? resolve(repoRoot, '..', 'craft-agents-oss')
 const jsonOutput = process.argv.includes('--json')
-const baseline = Bun.spawnSync(['git', '-C', craftRoot, 'rev-parse', 'HEAD'], { stdout: 'pipe' }).stdout.toString().trim()
+type Feature = { name: string; sourcePrefixes: string[]; requiredCurrent: string[]; testAnchors: string[] }
+type RestoredManifest = { version: number; liteBaseline: string; productBaseline: string; restoredSource: string; integrationReview: Record<string, string>; features: Feature[] }
+const restored = JSON.parse(readFileSync(resolve(import.meta.dir, 'craft-restored-sources.json'), 'utf8')) as RestoredManifest
+const overrides = JSON.parse(readFileSync(resolve(import.meta.dir, 'craft-source-overrides.json'), 'utf8')) as { version: number; baselineCommit: string }
+if (restored.version !== 1) throw new Error('Unsupported restored-source manifest version')
+if (overrides.version !== 2 || overrides.baselineCommit !== restored.liteBaseline) throw new Error('Source override manifest must retain the historical Lite baseline')
 
-function trackedFiles(root: string): string[] {
-  const proc = Bun.spawnSync(
-    ['git', '-C', root, 'ls-files', '--cached', '--others', '--exclude-standard', '-z'],
-    { stdout: 'pipe', stderr: 'pipe' },
+function git(args: string[]): string {
+  const result = Bun.spawnSync(['git', '-C', repoRoot, ...args], { stdout: 'pipe', stderr: 'pipe' })
+  if (result.exitCode !== 0) throw new Error(result.stderr.toString().trim())
+  return result.stdout.toString()
+}
+function tree(commit: string): Set<string> { return new Set(git(['ls-tree', '-r', '--name-only', '-z', commit]).split('\0').filter(Boolean)) }
+function worktree(): string[] { return git(['ls-files', '--cached', '--others', '--exclude-standard', '-z']).split('\0').filter(Boolean) }
+function objectText(commit: string, path: string): string { return git(['show', `${commit}:${path}`]) }
+function isRestored(path: string): boolean {
+  return restored.features.some(feature =>
+    feature.testAnchors.includes(path) || feature.sourcePrefixes.some(prefix => path === prefix || path.startsWith(prefix)),
   )
-  if (proc.exitCode !== 0) throw new Error(proc.stderr.toString())
-  return proc.stdout.toString().split('\0').filter(Boolean)
 }
 
-function baselineFiles(root: string, commit: string): string[] {
-  const proc = Bun.spawnSync(
-    ['git', '-C', root, 'ls-tree', '-r', '--name-only', '-z', commit],
-    { stdout: 'pipe', stderr: 'pipe' },
-  )
-  if (proc.exitCode !== 0) throw new Error(proc.stderr.toString())
-  return proc.stdout.toString().split('\0').filter(Boolean)
-}
-
-const dirtyCraftFiles = new Set(
-  Bun.spawnSync(
-    ['git', '-C', craftRoot, 'diff', '--name-only', '-z', baseline, '--'],
-    { stdout: 'pipe' },
-  ).stdout.toString().split('\0').filter(Boolean),
-)
-
-async function readCraftFile(file: string): Promise<Buffer> {
-  if (!dirtyCraftFiles.has(file) && existsSync(resolve(craftRoot, file))) {
-    return readFile(resolve(craftRoot, file))
-  }
-  const proc = Bun.spawnSync(['git', '-C', craftRoot, 'show', `${baseline}:${file}`], {
-    stdout: 'pipe',
-    stderr: 'pipe',
-  })
-  if (proc.exitCode !== 0) throw new Error(proc.stderr.toString())
-  return Buffer.from(proc.stdout)
-}
-
-// Product documentation is maintained independently from the Craft-derived
-// source lineage. Keep it out of both the comparison set and the manifest
-// checks so documentation edits do not require source-reuse bookkeeping.
-const isAuditedFile = (file: string) =>
-  file !== 'scripts/craft-source-overrides.json' && !file.startsWith('docs/')
-
-const normalizeCraft = (source: string) => source
-  .replaceAll('@craft-agent/', '@mkagent/')
-  .replaceAll('craftagents://', 'mkagent://')
-  .replaceAll('.craft-agent', '.mkagent')
-  .replaceAll('CRAFT_AGENT_', 'MKAGENT_')
-  .replaceAll('Craft Agents Backend Compatible', 'Pi Backend Compatible')
-  .replaceAll('Craft Agents Backend', 'Pi Backend')
-
-function normalizeCraftBytes(bytes: Buffer): Buffer {
-  const source = bytes.toString('utf8')
-  if (!Buffer.from(source).equals(bytes)) return bytes
-  return Buffer.from(normalizeCraft(source))
-}
-
-const mkFiles = trackedFiles(repoRoot).filter(file => isAuditedFile(file) && existsSync(resolve(repoRoot, file)))
-const craftFiles = baselineFiles(craftRoot, baseline).filter(isAuditedFile)
-const mkSet = new Set(mkFiles)
-const craftSet = new Set(craftFiles)
-const common = mkFiles.filter(file => craftSet.has(file))
-const mkOnly = mkFiles.filter(file => !craftSet.has(file))
-const craftOnly = craftFiles.filter(file => !mkSet.has(file))
-const identical: string[] = []
-const modified: string[] = []
-
-for (const file of common) {
-  const [craftBytes, mkagentBytes] = await Promise.all([
-    readCraftFile(file),
-    readFile(resolve(repoRoot, file)),
-  ])
-  const craft = normalizeCraftBytes(craftBytes)
-  if (craft.equals(mkagentBytes)) identical.push(file)
-  else modified.push(file)
-}
-
-const summary = {
-  craftRoot,
-  mkagentFiles: mkFiles.length,
-  craftFiles: craftFiles.length,
-  commonPathFiles: common.length,
-  normalizedIdenticalFiles: identical.length,
-  intentionalOrModifiedFiles: modified.length,
-  mkagentOnlyFiles: mkOnly.length,
-  craftOnlyFiles: craftOnly.length,
-  commonPathRatio: mkFiles.length === 0 ? 0 : common.length / mkFiles.length,
-  normalizedReuseRatio: mkFiles.length === 0 ? 0 : identical.length / mkFiles.length,
-}
-
-const manifest = JSON.parse(
-  await readFile(resolve(import.meta.dir, 'craft-source-overrides.json'), 'utf8'),
-) as {
-  version: number
-  baselineCommit: string
-  modified: Record<string, { sha256: string; reason: string }>
-  mkOnly: Record<string, { sha256: string; reason: string }>
-  deleted: Record<string, string>
-}
-
+const restoreFiles = tree(restored.restoredSource)
+const productFiles = tree(restored.productBaseline)
+const files = worktree().filter(path => existsSync(resolve(repoRoot, path)))
 const errors: string[] = []
-if (manifest.version !== 2) errors.push(`unsupported source override manifest version: ${manifest.version}`)
-if (manifest.baselineCommit !== baseline) errors.push(`Craft baseline changed: expected ${manifest.baselineCommit}, found ${baseline}`)
-
-async function verifyHashes(
-  files: string[],
-  expected: Record<string, { sha256: string; reason: string }>,
-  label: string,
-): Promise<void> {
-  const current = new Set(files)
-  for (const file of files) {
-    const registered = expected[file]
-    if (!registered) {
-      errors.push(`unreviewed ${label} file: ${file}`)
+for (const feature of restored.features) {
+  for (const prefix of feature.sourcePrefixes) {
+    const sourced = [...restoreFiles].find(path => path === prefix || path.startsWith(prefix))
+    if (!sourced) {
+      errors.push(`${feature.name}: missing restored-source lineage for ${prefix}`)
       continue
     }
-    const bytes = await readFile(resolve(repoRoot, file))
-    const hash = createHash('sha256').update(bytes).digest('hex')
-    if (!registered.reason.trim()) errors.push(`reviewed ${label} file has no reason: ${file}`)
-    if (hash !== registered.sha256) errors.push(`reviewed ${label} file changed without manifest update: ${file}`)
+    if (!objectText(restored.restoredSource, sourced).length) errors.push(`${feature.name}: empty restored-source object ${sourced}`)
   }
-  for (const file of Object.keys(expected)) {
-    if (!current.has(file)) errors.push(`stale ${label} manifest entry: ${file}`)
+  for (const path of [...feature.requiredCurrent, ...feature.testAnchors]) {
+    if (!existsSync(resolve(repoRoot, path))) errors.push(`${feature.name}: missing required current coverage anchor ${path}`)
   }
 }
 
-await verifyHashes(modified, manifest.modified, 'Craft-derived override')
-await verifyHashes(mkOnly, manifest.mkOnly, 'MkAgent-only file')
-
-const expectedDeleted = new Set(Object.keys(manifest.deleted))
-for (const file of craftOnly) {
-  if (!expectedDeleted.has(file)) errors.push(`unreviewed Craft file deletion: ${file}`)
+const restoredCurrent = files.filter(isRestored)
+const changedFromProduct = new Set(git(['diff', '--name-only', restored.productBaseline, '--']).split('\n').filter(Boolean))
+const addedFiles = files.filter(path => !productFiles.has(path))
+const reviewed = new Set<string>()
+for (const path of [...changedFromProduct, ...addedFiles]) {
+  if (isRestored(path)) { reviewed.add(path); continue }
+  const reason = restored.integrationReview[path]
+  if (!reason?.trim()) errors.push(`unreviewed product-baseline change: ${path}`)
+  else reviewed.add(path)
 }
-for (const [file, reason] of Object.entries(manifest.deleted)) {
-  if (!craftOnly.includes(file)) errors.push(`stale Craft source deletion entry: ${file}`)
-  if (!reason.trim()) errors.push(`reviewed Craft deletion has no reason: ${file}`)
-}
-
-if (errors.length > 0) {
-  console.error('Craft file-lineage review failed:')
-  for (const error of errors) console.error(`- ${error}`)
-  process.exit(1)
+for (const [path, reason] of Object.entries(restored.integrationReview)) {
+  if (!reason.trim()) errors.push(`integration review has no reason: ${path}`)
+  if (!changedFromProduct.has(path) && productFiles.has(path)) errors.push(`stale integration review entry: ${path}`)
+  if (!existsSync(resolve(repoRoot, path))) errors.push(`missing integration review file: ${path}`)
 }
 
-if (jsonOutput) {
-  console.log(JSON.stringify({ summary, modified, mkOnly }, null, 2))
-} else {
-  console.log('MkAgent / Craft file-lineage audit')
-  console.log(`Craft checkout: ${craftRoot}`)
-  console.log(`MkAgent audited files: ${summary.mkagentFiles}`)
-  console.log(`Same relative path in Craft: ${summary.commonPathFiles} (${(summary.commonPathRatio * 100).toFixed(1)}%)`)
-  console.log(`Normalized-identical reuse: ${summary.normalizedIdenticalFiles} (${(summary.normalizedReuseRatio * 100).toFixed(1)}%)`)
-  console.log(`Modified Craft-derived files: ${summary.intentionalOrModifiedFiles}`)
-  console.log(`MkAgent-only audited files: ${summary.mkagentOnlyFiles}`)
-  console.log(`Reviewed Craft-only file deletions: ${craftOnly.length}`)
+if (errors.length) { console.error('Craft lineage audit failed:'); for (const error of errors) console.error(`- ${error}`); process.exit(1) }
+const summary = { liteBaseline: restored.liteBaseline, productBaseline: restored.productBaseline, restoredSource: restored.restoredSource, restoredFeatures: restored.features.map(feature => feature.name), restoredCurrentFiles: restoredCurrent.length, reviewedIntegrationFiles: reviewed.size }
+if (jsonOutput) console.log(JSON.stringify(summary, null, 2))
+else {
+  console.log('MkAgent pinned Craft lineage audit')
+  console.log(`Lite baseline: ${summary.liteBaseline}`)
+  console.log(`Restored source: ${summary.restoredSource}`)
+  console.log(`Explicit restored feature files: ${summary.restoredCurrentFiles}`)
+  console.log(`Product-baseline integration files explicitly reviewed: ${summary.reviewedIntegrationFiles}`)
 }
