@@ -2117,11 +2117,11 @@
   },
   "mkOnly": {
     ".github/workflows/ci.yml": {
-      "sha256": "c648b811f59cca0a365143e393e723e31210602dbfc1e39402f24eb738f5ec54",
+      "sha256": "72aef8e0a8d06a9bd164d3d7d8946d74f6d0e59f4776dbd1f70d242d9288dadc",
       "reason": "OPC-Agent-specific file required by branding, packaging, or the locked Lite boundary"
     },
     ".github/workflows/release.yml": {
-      "sha256": "70de0c88dd66517ea651090ed11e4034c420853cfe8aa1d8a0f87b59b77f67a7",
+      "sha256": "441b4949d2adc85d8922c5b063973ff02bd65aee10af32e813cee3630ef00f2f",
       "reason": "OPC-Agent-specific file required by branding, packaging, or the locked Lite boundary"
     },
     ".github/workflows/upstream-drift.yml": {
