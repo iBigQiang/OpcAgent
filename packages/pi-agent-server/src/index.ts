@@ -102,7 +102,11 @@ type PiCredential =
   | { type: 'oauth'; access: string; refresh: string; expires: number };
 
 /** Custom endpoint protocol — determines which streaming adapter Pi SDK uses */
-type CustomEndpointApi = 'openai-completions' | 'anthropic-messages';
+type CustomEndpointApi =
+  | 'openai-completions'
+  | 'openai-responses'
+  | 'anthropic-messages'
+  | 'google-generative-ai';
 
 /** Init message from main process — configures the Pi agent server */
 interface InitMessage {

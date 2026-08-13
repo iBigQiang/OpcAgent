@@ -8,6 +8,20 @@ All notable changes to OPC Agent are documented in this file. The format follows
 
 Add user-visible changes here before running `bun run release:prepare <version>`.
 
+## [0.1.4] - 2026-08-14
+
+### Added
+
+- Added editable endpoint-protocol selection for AgentRouter and custom providers, covering OpenAI Chat Completions, OpenAI Responses, Anthropic Messages, and Google Gemini.
+
+### Changed
+
+- Changed AgentRouter's default protocol to OpenAI Chat Completions and added `gpt-5.6-sol` to its default model list.
+
+### Fixed
+
+- Normalized root, versioned, and full request URLs into SDK-compatible base URLs without duplicating protocol-specific request paths.
+
 ## [0.1.3] - 2026-08-13
 
 ### Added
@@ -45,6 +59,7 @@ Add user-visible changes here before running `bun run release:prepare <version>`
 - Local session search, flags, archives, import, export, and branching.
 
 [Unreleased]: https://github.com/iBigQiang/OpcAgent/releases
+[0.1.4]: https://github.com/iBigQiang/OpcAgent/releases/tag/v0.1.4
 [0.1.3]: https://github.com/iBigQiang/OpcAgent/releases/tag/v0.1.3
 [0.1.2]: https://github.com/iBigQiang/OpcAgent/releases/tag/v0.1.2
 [0.1.1]: https://github.com/iBigQiang/OpcAgent/releases/tag/v0.1.1

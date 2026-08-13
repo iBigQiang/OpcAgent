@@ -54,7 +54,7 @@ import { RenameDialog } from '@/components/ui/rename-dialog'
 import { useAppShellContext } from '@/context/AppShellContext'
 import { getModelShortName, type ModelDefinition } from '@config/models'
 import { getModelsForProviderType, resolveMidStreamBehavior, type CustomEndpointApi, type MidStreamBehavior } from '@config/llm-connections'
-import { getPlatformConnectionDescription } from './connection-display'
+import { getEndpointProtocolLabel, getPlatformConnectionDescription } from './connection-display'
 import { toast } from 'sonner'
 
 /**
@@ -227,7 +227,17 @@ function ConnectionRow({ connection, isLastConnection, onRenameClick, onDelete, 
     if (validationState === 'error') return validationError || t("settings.ai.validationFailed")
 
     const platformDescription = getPlatformConnectionDescription(connection.platformProfile, t)
-    if (platformDescription) return platformDescription
+    const protocolDescription = getEndpointProtocolLabel(connection.customEndpoint?.api, t)
+    if (platformDescription) {
+      const endpointHost = (() => {
+        try {
+          return connection.baseUrl ? new URL(connection.baseUrl).host : null
+        } catch {
+          return connection.baseUrl || null
+        }
+      })()
+      return [platformDescription, protocolDescription, endpointHost].filter(Boolean).join(' · ')
+    }
 
     const parts: string[] = []
 
@@ -246,6 +256,7 @@ function ConnectionRow({ connection, isLastConnection, onRenameClick, onDelete, 
         parts.push(connection.baseUrl?.toLowerCase().includes('manifest.build')
           ? 'Manifest'
           : t('settings.ai.piBackendCompatible'))
+        if (protocolDescription) parts.push(protocolDescription)
         break
       default: parts.push(provider || t('common.unknown'))
     }

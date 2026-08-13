@@ -7,6 +7,7 @@
 
 import type { ModelDefinition } from '@opcagent/shared/config/models'
 import {
+  getPiAuthProviderForCustomEndpointApi,
   type LlmConnection,
   type CustomEndpointApi,
   type LlmPlatformProfile,
@@ -112,7 +113,7 @@ export function resolveCustomEndpointSetup(input: {
 }): {
   authType: Extract<LlmConnection['authType'], 'none' | 'api_key_with_endpoint'>
   name?: 'Local Model'
-  piAuthProvider?: 'openai' | 'anthropic'
+  piAuthProvider?: 'openai' | 'anthropic' | 'google'
 } {
   const isKeylessLoopback = isLoopbackBaseUrl(input.baseUrl) && !input.credential
   if (isKeylessLoopback) {
@@ -120,7 +121,7 @@ export function resolveCustomEndpointSetup(input: {
   }
   return {
     authType: 'api_key_with_endpoint',
-    piAuthProvider: input.customEndpointApi === 'anthropic-messages' ? 'anthropic' : 'openai',
+    piAuthProvider: getPiAuthProviderForCustomEndpointApi(input.customEndpointApi),
   }
 }
 

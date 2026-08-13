@@ -13,23 +13,23 @@ import {
 describe('custom endpoint provider routing', () => {
   it('uses AgentRouter as the provider for initial and runtime Pi model resolution', () => {
     expect(resolveCustomEndpointProviderId('agentrouter')).toBe('agentrouter');
-    expect(resolveCustomEndpointAuthProvider('agentrouter', 'anthropic')).toBe('agentrouter');
-    expect(resolveCustomEndpointCredentialProviders('agentrouter', 'anthropic'))
-      .toEqual(['anthropic', 'agentrouter']);
+    expect(resolveCustomEndpointAuthProvider('agentrouter', 'openai')).toBe('agentrouter');
+    expect(resolveCustomEndpointCredentialProviders('agentrouter', 'openai'))
+      .toEqual(['openai', 'agentrouter']);
     expect(isCompatibleCustomEndpointModelProvider('agentrouter', 'agentrouter', 'agentrouter')).toBe(true);
     expect(isCompatibleCustomEndpointModelProvider('anthropic', 'agentrouter', 'agentrouter')).toBe(false);
   });
 
   it('resolves the initial AgentRouter model credential from auth storage', async () => {
     const authStorage = PiAuthStorage.inMemory();
-    for (const provider of resolveCustomEndpointCredentialProviders('agentrouter', 'anthropic')) {
+    for (const provider of resolveCustomEndpointCredentialProviders('agentrouter', 'openai')) {
       authStorage.set(provider, { type: 'api_key', key: 'test-agentrouter-token' });
     }
     const modelRegistry = PiModelRegistry.inMemory(authStorage);
     modelRegistry.registerProvider(resolveCustomEndpointProviderId('agentrouter'), {
-      baseUrl: 'https://agentrouter.org',
+      baseUrl: 'https://agentrouter.org/v1',
       apiKey: 'test-agentrouter-token',
-      api: 'anthropic-messages',
+      api: 'openai-completions',
       authHeader: true,
       models: [{
         id: 'claude-opus-5',

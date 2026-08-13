@@ -12,9 +12,136 @@ export function registerPiModelResolver(resolver: PiModelResolver): void {
 export type LlmProviderType = 'pi' | 'pi_compat';
 export type LlmAuthType = 'api_key' | 'api_key_with_endpoint' | 'oauth' | 'none';
 export type ModelSelectionMode = 'automaticallySyncedFromProvider' | 'userDefined3Tier';
-export type CustomEndpointApi = 'openai-completions' | 'anthropic-messages';
+export type CustomEndpointApi =
+  | 'openai-completions'
+  | 'openai-responses'
+  | 'anthropic-messages'
+  | 'google-generative-ai';
 export type LlmPlatformProfile = 'agentrouter' | 'anyrouter' | 'anyrouter_pi';
 export type MidStreamBehavior = 'steer' | 'queue';
+
+export interface NormalizedCustomEndpointUrl {
+  baseUrl: string;
+  requestPreviewUrl: string;
+}
+
+const CUSTOM_ENDPOINT_ERROR = 'Custom endpoint requires a valid HTTP(S) URL';
+const CUSTOM_ENDPOINT_APIS = new Set<CustomEndpointApi>([
+  'openai-completions',
+  'openai-responses',
+  'anthropic-messages',
+  'google-generative-ai',
+]);
+
+function trimTrailingSlashes(pathname: string): string {
+  return pathname.replace(/\/+$/, '') || '/';
+}
+
+function appendPath(origin: string, pathname: string): string {
+  const normalizedPath = trimTrailingSlashes(pathname);
+  return normalizedPath === '/' ? origin : `${origin}${normalizedPath}`;
+}
+
+function appendToBasePath(pathname: string, suffix: string): string {
+  const normalizedPath = trimTrailingSlashes(pathname);
+  return normalizedPath === '/' ? suffix : `${normalizedPath}${suffix}`;
+}
+
+function removeTerminalPath(pathname: string, terminalPath: string): string {
+  const normalizedPath = trimTrailingSlashes(pathname);
+  return normalizedPath.endsWith(terminalPath)
+    ? normalizedPath.slice(0, -terminalPath.length) || '/'
+    : normalizedPath;
+}
+
+function removeKnownOperationPath(pathname: string): string {
+  const withoutGemini = pathname.replace(/\/models\/[^/]+:(?:streamGenerateContent|generateContent)$/, '') || '/';
+  for (const terminalPath of ['/v1/chat/completions', '/chat/completions', '/v1/responses', '/responses', '/v1/messages', '/messages']) {
+    const stripped = removeTerminalPath(withoutGemini, terminalPath);
+    if (stripped !== withoutGemini) return stripped;
+  }
+  return withoutGemini;
+}
+
+function toEndpointUrl(input: string): URL {
+  const trimmed = input.trim();
+  if (!trimmed) throw new Error(CUSTOM_ENDPOINT_ERROR);
+
+  const value = /^[a-z][a-z\d+.-]*:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+  let parsed: URL;
+  try {
+    parsed = new URL(value);
+  } catch {
+    throw new Error(CUSTOM_ENDPOINT_ERROR);
+  }
+
+  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+    throw new Error(CUSTOM_ENDPOINT_ERROR);
+  }
+  if (!parsed.hostname || parsed.username || parsed.password || parsed.search || parsed.hash) {
+    throw new Error(CUSTOM_ENDPOINT_ERROR);
+  }
+  return parsed;
+}
+
+/** Maps a custom endpoint protocol to Pi's credential provider identifier. */
+export function getPiAuthProviderForCustomEndpointApi(
+  api: CustomEndpointApi,
+): 'openai' | 'anthropic' | 'google' {
+  switch (api) {
+    case 'anthropic-messages': return 'anthropic';
+    case 'google-generative-ai': return 'google';
+    case 'openai-completions':
+    case 'openai-responses': return 'openai';
+    default: throw new Error(`Unsupported custom endpoint API: ${api as string}`);
+  }
+}
+
+/**
+ * Converts a user-supplied custom endpoint into the base URL expected by Pi's
+ * selected protocol adapter, plus the effective request URL shown in setup UI.
+ */
+export function normalizeCustomEndpointUrl(
+  api: CustomEndpointApi,
+  input: string,
+  modelId?: string,
+): NormalizedCustomEndpointUrl {
+  if (!CUSTOM_ENDPOINT_APIS.has(api)) {
+    throw new Error(`Unsupported custom endpoint API: ${api as string}`);
+  }
+  const parsed = toEndpointUrl(input);
+  const origin = parsed.origin;
+  const pathname = trimTrailingSlashes(parsed.pathname);
+
+  if (api === 'openai-completions' || api === 'openai-responses') {
+    const operationPath = api === 'openai-completions' ? '/chat/completions' : '/responses';
+    const withoutOperation = removeKnownOperationPath(pathname);
+    const basePath = withoutOperation === '/' ? '/v1' : withoutOperation;
+    const baseUrl = appendPath(origin, basePath);
+    return { baseUrl, requestPreviewUrl: `${baseUrl}${operationPath}` };
+  }
+
+  if (api === 'anthropic-messages') {
+    const withoutOperation = removeKnownOperationPath(pathname);
+    const basePath = removeTerminalPath(withoutOperation, '/v1');
+    const baseUrl = appendPath(origin, basePath);
+    return { baseUrl, requestPreviewUrl: `${baseUrl}/v1/messages` };
+  }
+
+  const withoutOperation = removeKnownOperationPath(pathname);
+  const withoutKnownVersion = removeTerminalPath(
+    removeTerminalPath(withoutOperation, '/v1beta/models'),
+    '/v1beta',
+  );
+  const basePrefix = removeTerminalPath(withoutKnownVersion, '/v1');
+  const basePath = appendToBasePath(basePrefix, '/v1beta/models');
+  const baseUrl = appendPath(origin, basePath);
+  const encodedModelId = encodeURIComponent(modelId || '{modelId}');
+  return {
+    baseUrl,
+    requestPreviewUrl: `${baseUrl}/${encodedModelId}:streamGenerateContent?alt=sse`,
+  };
+}
 
 export function normalizePlatformProfileBaseUrl(
   platformProfile: LlmPlatformProfile,

@@ -12,8 +12,8 @@ export function resolveCustomEndpointProviderId(
 
 /**
  * Select the provider used for Pi model resolution and compatibility checks.
- * AgentRouter credentials are stored under the connection's existing provider
- * (currently anthropic), but its registered Pi models require `agentrouter`.
+ * AgentRouter credentials are stored under the connection's selected protocol
+ * provider, while its registered Pi models require the `agentrouter` alias.
  */
 export function resolveCustomEndpointAuthProvider(
   platformProfile: string | null | undefined,

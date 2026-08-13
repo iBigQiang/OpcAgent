@@ -1,6 +1,6 @@
 # OPC Agent 文档（中文）
 
-本目录是 OPC Agent 用户文档的中文译本，与 [`docs/`](../) 下的英文文档一一对应。OPC Agent 是基于 [Craft Agents OSS](https://github.com/craft-ai-agents/craft-agents-oss) `v0.11.2` 派生的跨平台、本地优先 AI Agent 工作区。当前运行时只有 Pi：`@earendil-works/pi-coding-agent` 在独立 Bun 子进程中运行，Electron、WebUI、CLI 与 headless server 共用同一套 RPC 合约。OPC Agent 支持 API key、OpenAI/Anthropic 兼容端点、Ollama，以及保留的 ChatGPT Plus / Claude Pro/Max 订阅流程。不包含 Claude Agent SDK、GitHub Copilot、外部消息、产品 Automations、Projects/Kanban、Sources/MCP、Viewer/公开分享或图片生成。
+本目录是 OPC Agent 用户文档的中文译本，与 [`docs/`](../) 下的英文文档一一对应。OPC Agent 是从 MkAgent 源码谱系派生的跨平台、本地优先 AI Agent 工作区；该谱系包含 [Craft Agents OSS](https://github.com/craft-ai-agents/craft-agents-oss) `v0.11.2`。当前 Agent 运行时基于 Pi：`@earendil-works/pi-coding-agent` 在独立 Bun 子进程中运行，Electron、WebUI、CLI 与 headless server 共用同一套 RPC 合约。OPC Agent 支持 API key 与订阅连接、Ollama、AgentRouter、AnyRouter、自定义 OpenAI Chat / OpenAI Responses / Anthropic Messages / Google Gemini 端点、API/MCP/本地文件夹 Sources、项目、自动化，以及可选的 Telegram、WhatsApp、Lark / 飞书消息连接。不打包 Claude Agent SDK、GitHub Copilot、Viewer/公开分享或图片生成 Agent 工具。
 
 ## 文档导航
 

@@ -165,7 +165,7 @@ describe('resolveCustomEndpointPayload', () => {
     })
   })
 
-  it('pins AgentRouter to Anthropic Messages and persists its platform profile', () => {
+  it('defaults AgentRouter to OpenAI Chat and persists its platform profile', () => {
     expect(resolveCustomEndpointPayload({
       activePreset: 'agentrouter',
       baseUrl: 'https://agentrouter.org',
@@ -173,10 +173,32 @@ describe('resolveCustomEndpointPayload', () => {
       brandedOpenAiCompatPresets: BRANDED,
       fallbackPiAuthProvider: undefined,
     })).toEqual({
-      customEndpoint: { api: 'anthropic-messages' },
-      piAuthProvider: 'anthropic',
+      customEndpoint: { api: 'openai-completions' },
+      piAuthProvider: 'openai',
       platformProfile: 'agentrouter',
     })
+  })
+
+  it('allows AgentRouter to use each supported editable protocol', () => {
+    const cases = [
+      ['openai-responses', 'openai'],
+      ['anthropic-messages', 'anthropic'],
+      ['google-generative-ai', 'google'],
+    ] as const
+
+    for (const [customApi, piAuthProvider] of cases) {
+      expect(resolveCustomEndpointPayload({
+        activePreset: 'agentrouter',
+        baseUrl: 'https://agentrouter.org/v1',
+        customApi,
+        brandedOpenAiCompatPresets: BRANDED,
+        fallbackPiAuthProvider: undefined,
+      })).toEqual({
+        customEndpoint: { api: customApi },
+        piAuthProvider,
+        platformProfile: 'agentrouter',
+      })
+    }
   })
 
   it('pins AnyRouter to Anthropic Messages and persists its platform profile', () => {

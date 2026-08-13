@@ -112,6 +112,20 @@ describe('resolveCustomEndpointSetup', () => {
     expect(result).toEqual({ authType: 'api_key_with_endpoint', piAuthProvider: 'anthropic' })
   })
 
+  it('uses the protocol-specific provider hint for Responses and Gemini', () => {
+    expect(resolveCustomEndpointSetup({
+      baseUrl: 'https://api.example.com/v1',
+      credential: 'sk-responses',
+      customEndpointApi: 'openai-responses',
+    })).toEqual({ authType: 'api_key_with_endpoint', piAuthProvider: 'openai' })
+
+    expect(resolveCustomEndpointSetup({
+      baseUrl: 'https://api.example.com/v1beta/models',
+      credential: 'gemini-key',
+      customEndpointApi: 'google-generative-ai',
+    })).toEqual({ authType: 'api_key_with_endpoint', piAuthProvider: 'google' })
+  })
+
   it('treats remote endpoints with a credential as keyed custom endpoints', () => {
     expect(resolveCustomEndpointSetup({
       baseUrl: 'https://api.example.com/v1',

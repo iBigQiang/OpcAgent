@@ -5,8 +5,15 @@
  * model resolution used for title generation, summarization, and call_llm.
  */
 import { describe, it, expect } from 'bun:test';
-import { getMiniModel, getSummarizationModel, isDeniedMiniModelId, normalizePlatformProfileBaseUrl } from '../src/config/llm-connections.ts';
-import type { LlmProviderType } from '../src/config/llm-connections.ts';
+import {
+  getMiniModel,
+  getPiAuthProviderForCustomEndpointApi,
+  getSummarizationModel,
+  isDeniedMiniModelId,
+  normalizeCustomEndpointUrl,
+  normalizePlatformProfileBaseUrl,
+} from '../src/config/llm-connections.ts';
+import type { CustomEndpointApi, LlmProviderType } from '../src/config/llm-connections.ts';
 
 // ============================================================
 // Helpers
@@ -219,4 +226,178 @@ describe('AnyRouter platform profiles', () => {
     expect(() => normalizePlatformProfileBaseUrl('anyrouter_pi', 'https://anyrouter.top/v1'))
       .toThrow('requires a valid HTTPS endpoint');
   });
+});
+
+describe('normalizeCustomEndpointUrl()', () => {
+  const cases: Array<{
+    name: string;
+    api: CustomEndpointApi;
+    input: string;
+    modelId?: string;
+    expected: { baseUrl: string; requestPreviewUrl: string };
+  }> = [
+    {
+      name: 'normalizes OpenAI Chat origin, v1, and full request URL to one endpoint',
+      api: 'openai-completions',
+      input: 'api.example.test',
+      expected: {
+        baseUrl: 'https://api.example.test/v1',
+        requestPreviewUrl: 'https://api.example.test/v1/chat/completions',
+      },
+    },
+    {
+      name: 'normalizes OpenAI Chat v1 URL',
+      api: 'openai-completions',
+      input: 'http://api.example.test/v1/',
+      expected: {
+        baseUrl: 'http://api.example.test/v1',
+        requestPreviewUrl: 'http://api.example.test/v1/chat/completions',
+      },
+    },
+    {
+      name: 'strips an OpenAI Chat full request URL once',
+      api: 'openai-completions',
+      input: 'https://api.example.test/v1/chat/completions/',
+      expected: {
+        baseUrl: 'https://api.example.test/v1',
+        requestPreviewUrl: 'https://api.example.test/v1/chat/completions',
+      },
+    },
+    {
+      name: 'keeps an OpenAI custom prefix while stripping its known operation path',
+      api: 'openai-completions',
+      input: 'https://gateway.example.test/tenant/openai/chat/completions',
+      expected: {
+        baseUrl: 'https://gateway.example.test/tenant/openai',
+        requestPreviewUrl: 'https://gateway.example.test/tenant/openai/chat/completions',
+      },
+    },
+    {
+      name: 'normalizes OpenAI Responses full request URL',
+      api: 'openai-responses',
+      input: 'https://api.example.test/v1/responses',
+      expected: {
+        baseUrl: 'https://api.example.test/v1',
+        requestPreviewUrl: 'https://api.example.test/v1/responses',
+      },
+    },
+    {
+      name: 'switches a full Chat request URL to Responses without retaining the old operation',
+      api: 'openai-responses',
+      input: 'https://api.example.test/v1/chat/completions',
+      expected: {
+        baseUrl: 'https://api.example.test/v1',
+        requestPreviewUrl: 'https://api.example.test/v1/responses',
+      },
+    },
+    {
+      name: 'normalizes Anthropic full messages URL without duplication',
+      api: 'anthropic-messages',
+      input: 'https://api.example.test/v1/messages',
+      expected: {
+        baseUrl: 'https://api.example.test',
+        requestPreviewUrl: 'https://api.example.test/v1/messages',
+      },
+    },
+    {
+      name: 'normalizes Anthropic v1 URL and preserves a custom prefix',
+      api: 'anthropic-messages',
+      input: 'https://gateway.example.test/tenant/v1',
+      expected: {
+        baseUrl: 'https://gateway.example.test/tenant',
+        requestPreviewUrl: 'https://gateway.example.test/tenant/v1/messages',
+      },
+    },
+    {
+      name: 'normalizes Gemini full stream URL and encodes the preview model',
+      api: 'google-generative-ai',
+      input: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:streamGenerateContent',
+      modelId: 'models/gemini 2.5 flash',
+      expected: {
+        baseUrl: 'https://generativelanguage.googleapis.com/v1beta/models',
+        requestPreviewUrl: 'https://generativelanguage.googleapis.com/v1beta/models/models%2Fgemini%202.5%20flash:streamGenerateContent?alt=sse',
+      },
+    },
+    {
+      name: 'adds Gemini SDK path beneath a custom prefix',
+      api: 'google-generative-ai',
+      input: 'https://gateway.example.test/tenant/',
+      modelId: 'gemini-2.5-flash',
+      expected: {
+        baseUrl: 'https://gateway.example.test/tenant/v1beta/models',
+        requestPreviewUrl: 'https://gateway.example.test/tenant/v1beta/models/gemini-2.5-flash:streamGenerateContent?alt=sse',
+      },
+    },
+    {
+      name: 'switches an OpenAI v1 request URL to Gemini without retaining the old operation',
+      api: 'google-generative-ai',
+      input: 'https://gateway.example.test/tenant/v1/chat/completions',
+      modelId: 'gemini-2.5-flash',
+      expected: {
+        baseUrl: 'https://gateway.example.test/tenant/v1beta/models',
+        requestPreviewUrl: 'https://gateway.example.test/tenant/v1beta/models/gemini-2.5-flash:streamGenerateContent?alt=sse',
+      },
+    },
+    {
+      name: 'strips a Gemini operation path below a custom prefix only',
+      api: 'google-generative-ai',
+      input: 'https://gateway.example.test/tenant/models/gemini-2.5-flash:streamGenerateContent',
+      modelId: 'gemini-2.5-flash',
+      expected: {
+        baseUrl: 'https://gateway.example.test/tenant/v1beta/models',
+        requestPreviewUrl: 'https://gateway.example.test/tenant/v1beta/models/gemini-2.5-flash:streamGenerateContent?alt=sse',
+      },
+    },
+    {
+      name: 'adds Gemini SDK path to a root endpoint without duplicate slashes',
+      api: 'google-generative-ai',
+      input: 'https://generativelanguage.googleapis.com/',
+      modelId: 'gemini-2.5-flash',
+      expected: {
+        baseUrl: 'https://generativelanguage.googleapis.com/v1beta/models',
+        requestPreviewUrl: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:streamGenerateContent?alt=sse',
+      },
+    },
+  ];
+
+  for (const testCase of cases) {
+    it(testCase.name, () => {
+      expect(normalizeCustomEndpointUrl(testCase.api, testCase.input, testCase.modelId))
+        .toEqual(testCase.expected);
+    });
+  }
+
+  const invalidInputs = [
+    'ftp://api.example.test',
+    'https://user:pass@api.example.test',
+    'https://api.example.test/v1?api_key=secret',
+    'https://api.example.test/v1#fragment',
+  ];
+
+  for (const input of invalidInputs) {
+    it(`rejects an unsafe endpoint URL: ${input}`, () => {
+      expect(() => normalizeCustomEndpointUrl('openai-completions', input))
+        .toThrow('requires a valid HTTP(S) URL');
+    });
+  }
+
+  it('rejects unsupported protocol values at runtime', () => {
+    expect(() => normalizeCustomEndpointUrl('unsupported' as CustomEndpointApi, 'https://api.example.test'))
+      .toThrow('Unsupported custom endpoint API');
+  });
+});
+
+describe('getPiAuthProviderForCustomEndpointApi()', () => {
+  const cases: Array<[CustomEndpointApi, 'openai' | 'anthropic' | 'google']> = [
+    ['openai-completions', 'openai'],
+    ['openai-responses', 'openai'],
+    ['anthropic-messages', 'anthropic'],
+    ['google-generative-ai', 'google'],
+  ];
+
+  for (const [api, provider] of cases) {
+    it(`maps ${api} to ${provider}`, () => {
+      expect(getPiAuthProviderForCustomEndpointApi(api)).toBe(provider);
+    });
+  }
 });

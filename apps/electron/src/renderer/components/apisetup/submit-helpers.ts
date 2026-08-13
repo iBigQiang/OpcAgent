@@ -1,4 +1,9 @@
-import type { CustomEndpointApi, CustomEndpointConfig, LlmPlatformProfile } from '@config/llm-connections'
+import {
+  getPiAuthProviderForCustomEndpointApi,
+  type CustomEndpointApi,
+  type CustomEndpointConfig,
+  type LlmPlatformProfile,
+} from '@config/llm-connections'
 
 export type PresetKey = string
 
@@ -83,7 +88,8 @@ export function resolvePresetStateForBaseUrlChange(params: {
  * Resolve the customEndpoint + piAuthProvider payload at submit time.
  *
  * Four submit branches:
- *  - platform profile preset                    → pinned to anthropic-messages with its profile
+ *  - AgentRouter platform profile               → honors the editable protocol
+ *  - AnyRouter platform profiles                → remain pinned to anthropic-messages
  *  - branded openai-compat preset (e.g. Manifest)  → pinned to openai-completions
  *  - generic custom preset with a base URL         → honors the protocol toggle
  *  - everything else                               → no customEndpoint, passthrough piAuth
@@ -106,7 +112,7 @@ export function resolveCustomEndpointPayload(params: {
   const isPlatformProfileEndpoint = !!platformProfile && !!baseUrl
   const isCustomEndpoint = (activePreset === 'custom' && !!baseUrl) || isBrandedOpenAiCompat || isPlatformProfileEndpoint
   const effectiveApi: CustomEndpointApi = isPlatformProfileEndpoint
-    ? 'anthropic-messages'
+    ? (platformProfile === 'agentrouter' ? customApi : 'anthropic-messages')
     : isBrandedOpenAiCompat
       ? 'openai-completions'
       : customApi
@@ -114,7 +120,7 @@ export function resolveCustomEndpointPayload(params: {
   return {
     customEndpoint: isCustomEndpoint ? { api: effectiveApi } : undefined,
     piAuthProvider: isCustomEndpoint
-      ? (effectiveApi === 'anthropic-messages' ? 'anthropic' : 'openai')
+      ? getPiAuthProviderForCustomEndpointApi(effectiveApi)
       : fallbackPiAuthProvider,
     ...(platformProfile ? { platformProfile } : {}),
   }

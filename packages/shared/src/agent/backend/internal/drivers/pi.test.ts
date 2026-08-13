@@ -64,6 +64,34 @@ describe('piDriver.buildRuntime custom endpoint models', () => {
       customEndpoint: { api: 'anthropic-messages' },
     });
   });
+
+  it('preserves AgentRouter protocol, provider hint, and versioned Base URL', () => {
+    const runtime = piDriver.buildRuntime({
+      context: {
+        provider: 'pi', authType: 'api_key', resolvedModel: 'gpt-5.6-sol',
+        capabilities: { needsHttpPoolServer: false },
+        connection: {
+          slug: 'agentrouter', name: 'AgentRouter', providerType: 'pi_compat',
+          authType: 'api_key_with_endpoint', baseUrl: 'https://agentrouter.org/v1',
+          piAuthProvider: 'openai', platformProfile: 'agentrouter',
+          customEndpoint: { api: 'openai-completions' },
+          models: ['gpt-5.6-sol'], createdAt: Date.now(),
+        },
+      },
+      coreConfig: {} as any, hostRuntime: {} as any,
+      resolvedPaths: {
+        piServerPath: '/tmp/pi-agent-server.js', interceptorBundlePath: '/tmp/interceptor.cjs', nodeRuntimePath: '/usr/bin/node',
+      },
+    });
+
+    expect(runtime).toMatchObject({
+      piAuthProvider: 'openai',
+      baseUrl: 'https://agentrouter.org/v1',
+      platformProfile: 'agentrouter',
+      customEndpoint: { api: 'openai-completions' },
+      customModels: ['gpt-5.6-sol'],
+    });
+  });
 });
 
 describe('piDriver.testConnection custom Anthropic endpoint auth', () => {

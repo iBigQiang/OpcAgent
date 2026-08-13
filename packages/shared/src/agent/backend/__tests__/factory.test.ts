@@ -13,7 +13,6 @@ import {
 } from '../factory.ts';
 import { createMockBackendConfig } from '../../__tests__/test-utils.ts';
 import { normalizeAnyRouterBaseUrl } from '../internal/drivers/anthropic.ts';
-import { normalizePlatformProfileBaseUrl } from '../../../config/llm-connections.ts';
 
 describe('backend registry', () => {
   it('registers Claude CLI and Pi', () => {
@@ -60,13 +59,6 @@ describe('backend registry', () => {
     expect(normalizeAnyRouterBaseUrl('https://anyrouter.top:444')).toBe('https://anyrouter.top:444');
   });
 
-  it('accepts a clean HTTPS endpoint for the AgentRouter profile', () => {
-    expect(normalizePlatformProfileBaseUrl('agentrouter', 'https://agentrouter.org/'))
-      .toBe('https://agentrouter.org');
-    expect(normalizePlatformProfileBaseUrl('agentrouter', 'https://overseas.example.test'))
-      .toBe('https://overseas.example.test');
-  });
-
   it('passes through retained API key auth types', () => {
     expect(connectionAuthTypeToBackendAuthType('api_key')).toBe('api_key');
     expect(connectionAuthTypeToBackendAuthType('api_key_with_endpoint')).toBe('api_key_with_endpoint');
@@ -99,6 +91,20 @@ describe('backend registry', () => {
       piAuthProvider: 'openai',
       customEndpoint: { api: 'openai-completions' },
     });
+  });
+
+  it('maps custom Responses and Gemini endpoints to their Pi credential providers', () => {
+    expect(resolveSetupTestConnectionHint({
+      provider: 'pi',
+      baseUrl: 'https://example.test/v1',
+      customEndpoint: { api: 'openai-responses' },
+    })).toMatchObject({ providerType: 'pi_compat', piAuthProvider: 'openai' });
+
+    expect(resolveSetupTestConnectionHint({
+      provider: 'pi',
+      baseUrl: 'https://example.test/v1beta/models',
+      customEndpoint: { api: 'google-generative-ai' },
+    })).toMatchObject({ providerType: 'pi_compat', piAuthProvider: 'google' });
   });
 
   it('preserves a platform profile for custom endpoint setup tests', () => {

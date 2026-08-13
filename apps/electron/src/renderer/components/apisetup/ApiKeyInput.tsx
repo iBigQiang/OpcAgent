@@ -38,7 +38,12 @@ import {
   type PresetKey,
 } from "./submit-helpers"
 
-import type { CustomEndpointApi, CustomEndpointConfig, LlmPlatformProfile } from '@config/llm-connections'
+import {
+  normalizeCustomEndpointUrl,
+  type CustomEndpointApi,
+  type CustomEndpointConfig,
+  type LlmPlatformProfile,
+} from '@config/llm-connections'
 import type { ClaudeCliStatus } from '../../../shared/types'
 
 export type ApiKeyStatus = 'idle' | 'validating' | 'success' | 'error'
@@ -113,7 +118,7 @@ const PI_PROVIDER_PRESETS: Preset[] = [
   { key: 'kimi-coding', label: 'Kimi (Coding)', url: 'https://api.kimi.com/coding', placeholder: 'sk-kimi-...' },
   { key: 'vercel-ai-gateway', label: 'Vercel AI Gateway', url: 'https://ai-gateway.vercel.sh' },
   { key: 'manifest', label: 'Manifest', url: 'https://app.manifest.build/v1', placeholder: 'mnfst_...' },
-  { key: 'agentrouter', label: 'AgentRouter', url: 'https://agentrouter.org' },
+  { key: 'agentrouter', label: 'AgentRouter', url: 'https://agentrouter.org/v1' },
   { key: 'anyrouter', label: 'AnyRouter-CC', url: 'https://anyrouter.top' },
   { key: 'anyrouter_pi', label: 'AnyRouter-Pi', url: 'https://anyrouter.top', descriptionKey: 'apiSetup.experimentalPiProfile' },
   { key: 'custom', label: '', labelKey: 'apiSetup.custom', url: '' },
@@ -131,7 +136,7 @@ const OPENAI_COMPAT_CUSTOM_URL_PRESETS: ReadonlySet<string> = new Set(['manifest
 const COMPAT_CUSTOM_DEFAULTS = 'claude-opus-4-8, claude-opus-4-7, claude-sonnet-4-6, claude-haiku-4-5'
 const COMPAT_MINIMAX_DEFAULTS = 'MiniMax-M2.5, MiniMax-M2.5-highspeed'
 const COMPAT_KIMI_DEFAULTS = 'k2p5, kimi-k2-thinking'
-const AGENTROUTER_DEFAULTS = 'claude-opus-5, claude-opus-4-8'
+const AGENTROUTER_DEFAULTS = 'gpt-5.6-sol, claude-opus-5, claude-opus-4-8'
 const ANYROUTER_DEFAULTS = 'claude-opus-5[1m], claude-fable-5[1m], claude-opus-4-8[1m]'
 
 function getPresetForUrl(url: string, presets: Preset[]): PresetKey {
@@ -176,6 +181,7 @@ export function ApiKeyInput({
   )
   const [connectionDefaultModel, setConnectionDefaultModel] = useState(initialValues?.connectionDefaultModel ?? '')
   const [customApi, setCustomApi] = useState<CustomEndpointApi>(initialValues?.customApi ?? 'openai-completions')
+  const [endpointError, setEndpointError] = useState<string | null>(null)
   const [modelError, setModelError] = useState<string | null>(null)
   const [claudeCliStatus, setClaudeCliStatus] = useState<ClaudeCliStatus | null>(null)
   const [claudeCliError, setClaudeCliError] = useState<string | undefined>(undefined)
@@ -200,6 +206,7 @@ export function ApiKeyInput({
   // Hide endpoint/model fields for providers with well-known endpoints handled by the SDK
   const isDefaultProviderPreset = DEFAULT_ENDPOINT_PROVIDERS.has(activePreset)
   const isPlatformProfilePreset = Boolean(PLATFORM_PROFILE_BY_PRESET[activePreset])
+  const showsEditableProtocol = activePreset === 'custom' || activePreset === 'agentrouter'
   const shouldShowClaudeCli = shouldShowClaudeCliControls(activePreset)
 
   // Provider-specific placeholders from the active preset
@@ -310,6 +317,8 @@ export function ApiKeyInput({
       setBaseUrl(preset.url)
     }
     setModelError(null)
+    setEndpointError(null)
+    if (preset.key === 'agentrouter') setCustomApi('openai-completions')
     // Pre-fill recommended model for Ollama; clear for all others
     // (Default provider presets hide the field entirely, others default to provider model IDs when empty)
     if (preset.key === 'ollama') {
@@ -335,6 +344,7 @@ export function ApiKeyInput({
 
   const handleBaseUrlChange = (value: string) => {
     setBaseUrl(value)
+    setEndpointError(null)
     const presetKey = getPresetForUrl(value, presets)
     const currentPresetObj = presets.find(p => p.key === activePreset)
     const nextPresetState = resolvePresetStateForBaseUrlChange({
@@ -411,9 +421,23 @@ export function ApiKeyInput({
       fallbackPiAuthProvider: effectivePiAuthProvider,
     })
 
+    let normalizedBaseUrl = effectiveBaseUrl
+    if (customEndpoint && effectiveBaseUrl) {
+      try {
+        normalizedBaseUrl = normalizeCustomEndpointUrl(
+          customEndpoint.api,
+          effectiveBaseUrl,
+          parsedModels[0],
+        ).baseUrl
+      } catch {
+        setEndpointError(t('apiSetup.endpointInvalid'))
+        return
+      }
+    }
+
     onSubmit({
       apiKey: apiKey.trim(),
-      baseUrl: isUsingDefaultEndpoint ? undefined : effectiveBaseUrl,
+      baseUrl: isUsingDefaultEndpoint ? undefined : normalizedBaseUrl,
       connectionDefaultModel: parsedModels[0],
       models: parsedModels.length > 0 ? parsedModels : undefined,
       piAuthProvider: resolvedPiAuthProvider,
@@ -429,6 +453,20 @@ export function ApiKeyInput({
     { id: 'fast', label: t('apiSetup.tiers.fast'), desc: t('apiSetup.tiers.fastDesc'), value: cheapModel, onChange: setCheapModel },
   ]
   const activeTierConfig = openTier ? tierConfigs.find(tier => tier.id === openTier) : null
+  const protocolOptions: Array<{ value: CustomEndpointApi; label: string; description: string }> = [
+    { value: 'openai-completions', label: t('apiSetup.protocol.openAiChat'), description: '/chat/completions' },
+    { value: 'openai-responses', label: t('apiSetup.protocol.openAiResponses'), description: '/responses' },
+    { value: 'anthropic-messages', label: t('apiSetup.protocol.anthropicMessages'), description: '/v1/messages' },
+    { value: 'google-generative-ai', label: t('apiSetup.protocol.googleGemini'), description: '/models/{model}:streamGenerateContent' },
+  ]
+  const endpointPreview = (() => {
+    if (!baseUrl.trim() || !showsEditableProtocol) return null
+    try {
+      return normalizeCustomEndpointUrl(customApi, baseUrl, parseModelList(connectionDefaultModel)[0])
+    } catch {
+      return null
+    }
+  })()
 
   return (
     <form id={formId} onSubmit={handleSubmit} className="space-y-6">
@@ -504,20 +542,26 @@ export function ApiKeyInput({
         </div>
         {/* Base URL input - hidden for default provider presets (Anthropic/OpenAI) */}
         {!isDefaultProviderPreset && (
-          <div className={cn(
-            "rounded-md shadow-minimal transition-colors",
-            "bg-foreground-2 focus-within:bg-background"
-          )}>
-            <Input
-              id="base-url"
-              type="text"
-              value={baseUrl}
-              onChange={(e) => handleBaseUrlChange(e.target.value)}
-              placeholder={t('apiSetup.endpointPlaceholder')}
-              className="border-0 bg-transparent shadow-none"
-              disabled={isDisabled}
-            />
-          </div>
+          <>
+            <div className={cn(
+              "rounded-md shadow-minimal transition-colors",
+              "bg-foreground-2 focus-within:bg-background"
+            )}>
+              <Input
+                id="base-url"
+                type="text"
+                value={baseUrl}
+                onChange={(e) => handleBaseUrlChange(e.target.value)}
+                placeholder={t('apiSetup.endpointPlaceholder')}
+                className="border-0 bg-transparent shadow-none"
+                disabled={isDisabled}
+              />
+            </div>
+            {showsEditableProtocol && (
+              <p className="text-xs text-foreground/30">{t('apiSetup.endpointInputHelper')}</p>
+            )}
+            {endpointError && <p className="text-xs text-destructive">{endpointError}</p>}
+          </>
         )}
       </div>
       )}
@@ -579,38 +623,56 @@ export function ApiKeyInput({
         </div>
       )}
 
-      {/* Protocol Toggle — visible as soon as Custom preset is selected */}
-      {activePreset === 'custom' && !isDefaultProviderPreset && (
+      {/* Protocol selector for generic custom endpoints and AgentRouter. */}
+      {showsEditableProtocol && !isDefaultProviderPreset && (
         <div className="space-y-2">
           <Label>{t('apiSetup.protocol')}</Label>
-          <div className={cn(
-            "flex rounded-md shadow-minimal overflow-hidden",
-            "bg-foreground-2",
-            isDisabled && "opacity-50 pointer-events-none"
-          )}>
-            {([
-              { value: 'openai-completions' as const, label: t('apiSetup.openAiCompatible') },
-              { value: 'anthropic-messages' as const, label: t('apiSetup.anthropicCompatible') },
-            ]).map(({ value, label }) => (
-              <button
-                key={value}
-                type="button"
-                disabled={isDisabled}
-                onClick={() => setCustomApi(value)}
-                className={cn(
-                  "flex-1 py-1.5 text-[12px] font-medium transition-colors",
-                  customApi === value
-                    ? "bg-background text-foreground shadow-minimal"
-                    : "text-foreground/50 hover:text-foreground/70"
-                )}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              disabled={isDisabled}
+              className={cn(
+                "flex h-9 w-full items-center justify-between rounded-md bg-foreground-2 px-3 text-sm shadow-minimal",
+                "hover:bg-background focus:outline-none",
+                isDisabled && "opacity-50 pointer-events-none",
+              )}
+            >
+              <span>{protocolOptions.find(option => option.value === customApi)?.label}</span>
+              <ChevronDown className="size-3 opacity-50" />
+            </DropdownMenuTrigger>
+            <StyledDropdownMenuContent align="start" className="z-floating-menu min-w-[280px]">
+              {protocolOptions.map(option => (
+                <StyledDropdownMenuItem
+                  key={option.value}
+                  onClick={() => {
+                    setCustomApi(option.value)
+                    setEndpointError(null)
+                  }}
+                  className="justify-between gap-4"
+                >
+                  <span className="flex min-w-0 flex-col">
+                    <span>{option.label}</span>
+                    <span className="font-mono text-[10px] font-normal text-foreground/40">{option.description}</span>
+                  </span>
+                  <Check className={cn("size-3 shrink-0", customApi === option.value ? "opacity-100" : "opacity-0")} />
+                </StyledDropdownMenuItem>
+              ))}
+            </StyledDropdownMenuContent>
+          </DropdownMenu>
           <p className="text-xs text-foreground/30">
             {t('apiSetup.protocolHelper')}
           </p>
+          {endpointPreview && (
+            <div className="space-y-1 rounded-md bg-foreground-2 px-3 py-2 text-xs">
+              <p className="break-all text-foreground/50">
+                <span className="font-medium text-foreground/70">{t('apiSetup.sdkBaseUrl')}:</span>{' '}
+                {endpointPreview.baseUrl}
+              </p>
+              <p className="break-all text-foreground/50">
+                <span className="font-medium text-foreground/70">{t('apiSetup.requestPreview')}:</span>{' '}
+                {endpointPreview.requestPreviewUrl}
+              </p>
+            </div>
+          )}
         </div>
       )}
 

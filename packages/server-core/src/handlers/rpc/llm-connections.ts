@@ -10,6 +10,8 @@ import {
   getPiApiKeyProviders,
   getPiProviderBaseUrl,
   isCompatProvider,
+  normalizeCustomEndpointUrl,
+  normalizePlatformProfileBaseUrl,
   normalizeApiKeyInput,
   parseValidationError,
   setDefaultLlmConnection,
@@ -68,8 +70,17 @@ export const HANDLED_CHANNELS = [
   RPC_CHANNELS.chatgpt.LOGOUT,
 ] as const
 
-function createConnection(setup: LlmConnectionSetup): LlmConnection {
-  const baseUrl = setup.baseUrl?.trim() || undefined
+export function createConnection(setup: LlmConnectionSetup): LlmConnection {
+  const inputBaseUrl = setup.baseUrl?.trim() || undefined
+  const isAnyRouterProfile = setup.platformProfile === 'anyrouter' || setup.platformProfile === 'anyrouter_pi'
+  const customEndpoint = inputBaseUrl && setup.customEndpoint
+    ? { ...setup.customEndpoint, api: isAnyRouterProfile ? 'anthropic-messages' as const : setup.customEndpoint.api }
+    : undefined
+  const baseUrl = inputBaseUrl && isAnyRouterProfile
+    ? normalizePlatformProfileBaseUrl(setup.platformProfile!, inputBaseUrl)
+    : inputBaseUrl && customEndpoint
+      ? normalizeCustomEndpointUrl(customEndpoint.api, inputBaseUrl, setup.defaultModel ?? setup.models?.[0] ?? undefined).baseUrl
+      : inputBaseUrl
   const baseSlug = setup.slug.replace(/-\d+$/, '')
   if (!baseUrl && (baseSlug === 'chatgpt-plus' || baseSlug === 'claude-max')) {
     const connection = createBuiltInConnection(setup.slug)
@@ -81,15 +92,15 @@ function createConnection(setup: LlmConnectionSetup): LlmConnection {
     if (identity?.account || identity?.organization) connection.oauthProfileVerifiedAt = Date.now()
     return connection
   }
-  const customEndpoint = baseUrl ? setup.customEndpoint : undefined
-  const custom = customEndpoint
+  const persistedCustomEndpoint = baseUrl ? customEndpoint : undefined
+  const custom = persistedCustomEndpoint
     ? resolveCustomEndpointSetup({
         baseUrl,
         credential: setup.credential,
-        customEndpointApi: customEndpoint.api,
+        customEndpointApi: persistedCustomEndpoint.api,
       })
     : undefined
-  const providerType = customEndpoint ? 'pi_compat' : 'pi'
+  const providerType = persistedCustomEndpoint ? 'pi_compat' : 'pi'
   const piAuthProvider = custom?.piAuthProvider ?? setup.piAuthProvider
   const models = setup.models?.length
     ? setup.models
@@ -107,7 +118,7 @@ function createConnection(setup: LlmConnectionSetup): LlmConnection {
     providerType,
     authType: custom?.authType ?? 'api_key',
     ...(baseUrl ? { baseUrl } : {}),
-    ...(customEndpoint ? { customEndpoint } : {}),
+    ...(persistedCustomEndpoint ? { customEndpoint: persistedCustomEndpoint } : {}),
     ...(setup.platformProfile ? { platformProfile: setup.platformProfile } : {}),
     ...(piAuthProvider ? { piAuthProvider } : {}),
     models,
@@ -173,6 +184,20 @@ export function registerLlmConnectionsHandlers(server: RpcServer, deps: HandlerD
     customEndpoint?: LlmConnection['customEndpoint']
     platformProfile?: LlmConnection['platformProfile']
   }) => {
+    if (params.baseUrl && params.customEndpoint) {
+      try {
+        params = {
+          ...params,
+          baseUrl: normalizeCustomEndpointUrl(
+            params.customEndpoint.api,
+            params.baseUrl,
+            params.model,
+          ).baseUrl,
+        }
+      } catch (error) {
+        return { success: false, error: error instanceof Error ? error.message : 'Invalid endpoint URL' }
+      }
+    }
     const validation = validateSetupTestInput(params)
     if (!validation.valid) return { success: false, error: validation.error }
     let apiKey: string

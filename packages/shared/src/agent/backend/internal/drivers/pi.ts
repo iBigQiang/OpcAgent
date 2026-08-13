@@ -121,7 +121,7 @@ export const piDriver: ProviderDriver = {
       piAuthProvider: platformProfile === ANYROUTER_PI_PROFILE
         ? 'anthropic'
         : providerOptions?.piAuthProvider || context.connection?.piAuthProvider,
-      baseUrl: platformProfile === 'agentrouter' || platformProfile === ANYROUTER_PI_PROFILE
+      baseUrl: platformProfile === ANYROUTER_PI_PROFILE
         ? normalizePlatformProfileBaseUrl(platformProfile, context.connection?.baseUrl)
         : context.connection?.baseUrl,
       platformProfile,
@@ -212,7 +212,7 @@ export const piDriver: ProviderDriver = {
     );
   },
   validateStoredConnection: async ({ connection }) => {
-    if (connection.platformProfile === 'agentrouter' || connection.platformProfile === ANYROUTER_PI_PROFILE) {
+    if (connection.platformProfile === ANYROUTER_PI_PROFILE) {
       normalizePlatformProfileBaseUrl(connection.platformProfile, connection.baseUrl);
     }
     return { success: true };

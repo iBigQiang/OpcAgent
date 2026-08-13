@@ -11,7 +11,7 @@
       "reason": "Craft file reviewed and adapted for the locked OPC Agent Lite product boundary"
     },
     "apps/cli/package.json": {
-      "sha256": "2c1216c2da76e9d47a9e40f8a6f8fe20a695e89312efe81de35503d17d9ced3f",
+      "sha256": "113ce36f14810da8de4325c795ae02179226a620383a3434da5836054437c32d",
       "reason": "Craft CLI reduced to retained commands and the Pi-only OPC Agent runtime"
     },
     "apps/cli/src/client.ts": {
@@ -51,7 +51,7 @@
       "reason": "Craft file reviewed and adapted for the locked OPC Agent Lite product boundary"
     },
     "apps/electron/package.json": {
-      "sha256": "f19e639f24f912177d5f96e529a185bde6f9e5a4fedcf8df38299868a570872d",
+      "sha256": "14d4dc05a1d22067e804bdabf626149c0d9be657b70c17978caefcc131e6b0ad",
       "reason": "Craft file reviewed and adapted for the locked OPC Agent Lite product boundary"
     },
     "apps/electron/resources/bin/doc-diff": {
@@ -411,7 +411,7 @@
       "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
     },
     "apps/electron/src/renderer/components/apisetup/ApiKeyInput.tsx": {
-      "sha256": "eee9810d117336e60f5d5b012324ac4010cfd3995d60a516f62d5307a69a0089",
+      "sha256": "292df170824f8cf2d4dd0bcc27c24c6ebd442e41359c19a6df0ca80ece67b235",
       "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
     },
     "apps/electron/src/renderer/components/app-menu/DesktopAppMenu.tsx": {
@@ -747,7 +747,7 @@
       "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
     },
     "apps/electron/src/renderer/pages/settings/AiSettingsPage.tsx": {
-      "sha256": "4205f9b59f1e5ad13d75cc40b8331359df1d5ff0ba47e72bc0fe4a21abe55980",
+      "sha256": "30b5209fabb05e9aea6d61077494ff55f1bd171dbe4134df9b381720c247cfbb",
       "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
     },
     "apps/electron/src/renderer/pages/settings/AppearanceSettingsPage.tsx": {
@@ -823,7 +823,7 @@
       "reason": "Craft file reviewed and adapted for the locked OPC Agent Lite product boundary"
     },
     "apps/webui/package.json": {
-      "sha256": "7c54036c0203f6361098a6d2c7b77b07cedeca7eb5b14a149e4a6509d0c74691",
+      "sha256": "4f90f0fb2c66d935c6fd17dfe39d24fa0edd6787fd37eeaf5c67cddaae79f0ab",
       "reason": "Craft Sources WebUI protocol support restored through the existing OPC Agent web adapter."
     },
     "apps/webui/src/adapter/web-api.ts": {
@@ -875,7 +875,7 @@
       "reason": "Craft Sources WebUI protocol support restored through the existing OPC Agent web adapter."
     },
     "bun.lock": {
-      "sha256": "239d0b6c31a41ad82189f8a6b52bf6bf180d1e21381d5a5f4182298570ca26c5",
+      "sha256": "6cd68f491e367dbf899af52a90fd4c40fe7406e39380274558665b679653e61d",
       "reason": "Craft Sources runtime dependencies and validation scripts restored within the existing OPC Agent package layout."
     },
     "NOTICE": {
@@ -883,11 +883,11 @@
       "reason": "Craft file reviewed and adapted for the locked OPC Agent Lite product boundary"
     },
     "package.json": {
-      "sha256": "12b87accc1e0d2c50e0cbb89ab7b1c0ca218b01c5391fe0322a4317797536374",
+      "sha256": "19d6f208e6a8e4b82e2bb8a45dae9cefd24f5cbebf7d35bb2c5452f54a6b6849",
       "reason": "Craft Sources runtime dependencies and validation scripts restored within the existing OPC Agent package layout."
     },
     "packages/core/package.json": {
-      "sha256": "a3ed8ba69af4f4b17fefb7956b24bfcb2381c6289154abd8d9adbd6e81fea1a2",
+      "sha256": "2f83f427cdddb0e2498b737806d21e1013684a890615708a5e84260ad0b95869",
       "reason": "Craft Sources event and message contracts restored while retaining OPC Agent core session types."
     },
     "packages/core/README.md": {
@@ -919,11 +919,11 @@
       "reason": "Craft Sources event and message contracts restored while retaining OPC Agent core session types."
     },
     "packages/pi-agent-server/package.json": {
-      "sha256": "003a21649f9b2d8ed71ecea7f30d6448c462f2eb49295096b980d0c33aedf55d",
+      "sha256": "fa03cac35df420b8072a499a214b6922a8f5a8dfc266687ec65d9c39aab40d1b",
       "reason": "Craft Pi subprocess adapted to the retained provider and session-tool contract"
     },
     "packages/pi-agent-server/src/index.ts": {
-      "sha256": "06ca8dc5ecdefad205ae6c91abab4457de3f095036276ef25381f9d34e5081c6",
+      "sha256": "144a9134489d4077ad17913f07caafa4a3868b4a09ae900f4513c2b7e2b0d00b",
       "reason": "Craft Pi subprocess preserves Pi request identity for custom Anthropic-compatible endpoints while retaining OPC Agent instructions"
     },
     "packages/pi-agent-server/src/model-resolution.test.ts": {
@@ -983,7 +983,7 @@
       "reason": "Craft Pi subprocess adapted to the retained provider and session-tool contract"
     },
     "packages/server-core/package.json": {
-      "sha256": "f3b9bc7ee151e21ed1c6bd727f8cfea39e63d201e8d6e4361a56043049af7fb3",
+      "sha256": "c762cfc63ab0eb2e350c8ae67ca4af82ed040b7ada7ae2700117b0fa06a24136",
       "reason": "Craft Sources server integration restored with OPC Agent Pi sessions, RPC transport, Browser, and queued-message behavior preserved."
     },
     "packages/server-core/src/bootstrap/headless-start.ts": {
@@ -995,11 +995,11 @@
       "reason": "Craft Sources server integration restored with OPC Agent Pi sessions, RPC transport, Browser, and queued-message behavior preserved."
     },
     "packages/server-core/src/domain/connection-setup-logic.test.ts": {
-      "sha256": "8a1cf71dc4f8a5b330a0d7b01b592f494f5e817141dee5efd3051f8739863e6c",
+      "sha256": "f1d44113c62f883c2be093d8e570b004a7657dc7d4006ad7aa01d50ea5e1c67f",
       "reason": "Craft Sources server integration restored with OPC Agent Pi sessions, RPC transport, Browser, and queued-message behavior preserved."
     },
     "packages/server-core/src/domain/connection-setup-logic.ts": {
-      "sha256": "61e7116c27e0a72fb17421a933fed68f88e2ae4aa7746fa1b20c7c4aa8c18d3c",
+      "sha256": "1f8fab8de3d63e200d5959af6afa16a734afb65053c916468c55e04c342bca7d",
       "reason": "Craft Sources server integration restored with OPC Agent Pi sessions, RPC transport, Browser, and queued-message behavior preserved."
     },
     "packages/server-core/src/handlers/__tests__/validate-file-path.test.ts": {
@@ -1031,7 +1031,7 @@
       "reason": "Craft Sources server integration restored with OPC Agent Pi sessions, RPC transport, Browser, and queued-message behavior preserved."
     },
     "packages/server-core/src/handlers/rpc/llm-connections.ts": {
-      "sha256": "2338ed0d42ca90db577de95293e09861afb0baab65ad10fcc155865be9358d98",
+      "sha256": "6e95991d70f2db0ba8f476b1cee54dcee0a0557954d16f2acb32f7ad27d8c03b",
       "reason": "Craft Sources server integration restored with OPC Agent Pi sessions, RPC transport, Browser, and queued-message behavior preserved."
     },
     "packages/server-core/src/handlers/rpc/oauth.ts": {
@@ -1171,7 +1171,7 @@
       "reason": "Craft WebUI source and OAuth exports restored while retaining OPC Agent server composition."
     },
     "packages/server/package.json": {
-      "sha256": "e4b0268616f942b68dee11c3e5f872ca7ed33053e514f5cec997011f811945c7",
+      "sha256": "d6fd77efd6d94dafdff96e4b9ef3e07674068e2c4d66a13e58502fd50e509eb0",
       "reason": "Craft server module reduced to retained local workspace, session, and WebUI behavior"
     },
     "packages/server/src/__tests__/smoke.test.ts": {
@@ -1183,7 +1183,7 @@
       "reason": "Craft Sources server integration restored with OPC Agent Pi sessions, RPC transport, Browser, and queued-message behavior preserved."
     },
     "packages/session-tools-core/package.json": {
-      "sha256": "94fe34be045d1187fa758212f993695acaaa37579191d178c4fa8d4ea5632f2a",
+      "sha256": "1585371bd709c3fac6248d4e584841274a7d0392debea3312c1a5e191b6d4a78",
       "reason": "Craft source session tools restored with OPC Agent package names and retained Browser and session-management contracts."
     },
     "packages/session-tools-core/src/context.ts": {
@@ -1315,7 +1315,7 @@
       "reason": "Craft shared module reduced to retained Pi, session, configuration, Skill, and UI behavior"
     },
     "packages/shared/package.json": {
-      "sha256": "179f4613723e8a30e882ba1ae53a6a0eccd608dea9ee982af586a142a3f3ebb6",
+      "sha256": "82d1e68356d842ece805af0e71a27fb29d17e343b9cf3888c7f4057a81836b40",
       "reason": "Craft Sources runtime dependencies are restored with narrow OAuth exports required by the Electron preload boundary."
     },
     "packages/shared/src/__tests__/feature-flags.test.ts": {
@@ -1435,7 +1435,7 @@
       "reason": "Craft test adapted to the retained Lite feature set or strengthened for retained behavior"
     },
     "packages/shared/src/agent/backend/__tests__/factory.test.ts": {
-      "sha256": "d4b416d062aee315b1e7d27535d32abad65cff3e80ceb88620e8ba4fdf2700fa",
+      "sha256": "bfb32cf7f667e7b29dcfd2a379d0bea5f940e25b1ea637f0fdc7acc592edbada",
       "reason": "Craft test adapted to the retained Lite feature set or strengthened for retained behavior"
     },
     "packages/shared/src/agent/backend/__tests__/runtime-resolver.test.ts": {
@@ -1451,7 +1451,7 @@
       "reason": "Craft shared module reduced to retained Pi, session, configuration, Skill, and UI behavior"
     },
     "packages/shared/src/agent/backend/factory.ts": {
-      "sha256": "3f33bb8d19afaf4c6f30ba53205da5b6ff9cdfd39702d56d39d7c9eb9f2a0ba4",
+      "sha256": "4b2ac4e3d707f21b71aa9810f6b444f8c1cbcb20a62be042fd932ee0b35beefc",
       "reason": "Craft connection testing uses the full Pi path and compatible timeout for custom Anthropic endpoints"
     },
     "packages/shared/src/agent/backend/index.ts": {
@@ -1463,11 +1463,11 @@
       "reason": "Craft shared module reduced to retained Pi, session, configuration, Skill, and UI behavior"
     },
     "packages/shared/src/agent/backend/internal/drivers/pi.test.ts": {
-      "sha256": "ff3fd36657aa92d73a7435bbca8e0063fd013518fd98c2f6efcd54bdd9199970",
+      "sha256": "240117a1a744477c8918f13b4902516336e6a227997d36c9f7e05497c2ae02bc",
       "reason": "OPC Agent custom Anthropic endpoint authentication regression coverage"
     },
     "packages/shared/src/agent/backend/internal/drivers/pi.ts": {
-      "sha256": "9995c7e9a4d6dbdbac7bebbb83390b0eebc3ffffedd0674269b47eea03b082c2",
+      "sha256": "762e6aa4100ce7cf51023e070079681470489ded52b67e3e8c2e750e1bf45be8",
       "reason": "Craft shared module reduced to retained Pi, session, configuration, Skill, and UI behavior"
     },
     "packages/shared/src/agent/backend/internal/runtime-resolver.ts": {
@@ -1687,7 +1687,7 @@
       "reason": "Craft shared module reduced to retained Pi, session, configuration, Skill, and UI behavior"
     },
     "packages/shared/src/config/llm-connections.ts": {
-      "sha256": "cc571727e30c512aafd68d6950655a9f71037b0dd82e337ed34a8ad08924d885",
+      "sha256": "4213a257767e0cf84c1bbfc68869a7ccdbc84a6ec1fbf161317acb2dee14c31d",
       "reason": "Craft shared module reduced to retained Pi, session, configuration, Skill, and UI behavior"
     },
     "packages/shared/src/config/llm-validation.ts": {
@@ -1759,11 +1759,11 @@
       "reason": "Craft Sources locale strings restored and synchronized with OPC Agent product wording."
     },
     "packages/shared/src/i18n/locales/en.json": {
-      "sha256": "42a80d8a06a85cdc019958d5b890a688c4b4cc685abfa2cf080e9499f9403faa",
+      "sha256": "215bb6031da74a554e06eef1cf2f07c92b696990298a7b42478f031c98f0cd53",
       "reason": "Craft Sources locale strings restored and synchronized with OPC Agent product wording."
     },
     "packages/shared/src/i18n/locales/zh-Hans.json": {
-      "sha256": "3438844265a07e4bf5b7de4518e2bcb949cb941beb9850aba25ca2fea8a4b43c",
+      "sha256": "cbf6f8a0724b0cd8249ac789e1877af97ea3a53bbc3d36686033c2231d5ddd1e",
       "reason": "Craft Sources locale strings restored and synchronized with OPC Agent product wording."
     },
     "packages/shared/src/i18n/registry.ts": {
@@ -1947,7 +1947,7 @@
       "reason": "Craft test adapted to the retained Lite feature set or strengthened for retained behavior"
     },
     "packages/shared/tests/llm-connections.test.ts": {
-      "sha256": "7cd763b92808c24176fd34ec53204d63e39c1b1ce11b715e17beda8c35529abf",
+      "sha256": "f7aa50e1ad34ebd416b2fe2c8e1366891ec8d7fe6f05687a56b8d07b27a95921",
       "reason": "Craft test adapted to the retained Lite feature set or strengthened for retained behavior"
     },
     "packages/shared/tests/mcp-pool.test.ts": {
@@ -1983,7 +1983,7 @@
       "reason": "Craft source activation event handling restored in the retained OPC Agent shared chat UI."
     },
     "packages/ui/package.json": {
-      "sha256": "ad33fd4391d0ff801ddaa4f51ef49c65a644cba078603676a11e18c1e81c8279",
+      "sha256": "1fb4dfa7f0800d1ea952f083e8df7b53f7ffb8db79f9433da0478f2b01005577",
       "reason": "Craft source activation event handling restored in the retained OPC Agent shared chat UI."
     },
     "packages/ui/src/components/annotations/block-markers.ts": {
@@ -2079,7 +2079,7 @@
       "reason": "Craft source activation event handling restored in the retained OPC Agent shared chat UI."
     },
     "README.md": {
-      "sha256": "c56d3a69a3a27f55e6f8e7da41e6ac05f0050a2b5ef9f4ca8088e39c72550920",
+      "sha256": "2960f07e6d5fbf2564adf0bf0139c2690098a6bd13541a26dd0e12be739e62ac",
       "reason": "Craft documentation adapted to the retained OPC Agent feature set and product identifiers"
     },
     "scripts/browser-tool.ts": {
@@ -2189,7 +2189,7 @@
       "reason": "Regression test for retained OPC Agent behavior not covered at the same Craft path"
     },
     "CHANGELOG.md": {
-      "sha256": "fc80072e352fc4ba4eb3fa2b4c272dc29d16e5ddc003097d4c8049766226cab1",
+      "sha256": "c304cd57bbe53c7c7835901fdf87f1fd263fef84d88bf6ec2cd19037858e4972",
       "reason": "OPC-Agent-specific release metadata required by the public artifact workflow"
     },
     "packages/pi-agent-server/src/opcagent-metadata-schema.test.ts": {
@@ -2337,51 +2337,51 @@
       "reason": "OPC Agent test discovery excludes generated artifacts and vendored submodule tests from CI"
     },
     "apps\\cli\\package.json": {
-      "sha256": "cf9264db02ef084b6c8bb18334b6545ba88b5683b054a5a7f33276ad7069ff7b",
+      "sha256": "113ce36f14810da8de4325c795ae02179226a620383a3434da5836054437c32d",
       "reason": "OPC-Agent-specific release metadata required by the release workflow"
     },
     "apps\\electron\\package.json": {
-      "sha256": "3f295d307b7510c10104dd74572ff15c810488d84b825e94c45086b3f8591994",
+      "sha256": "14d4dc05a1d22067e804bdabf626149c0d9be657b70c17978caefcc131e6b0ad",
       "reason": "OPC-Agent-specific release metadata required by the release workflow"
     },
     "apps\\webui\\package.json": {
-      "sha256": "76990dca685af9f0eceb51c91b8a3864b971c58621c560d3702a3975d973587d",
+      "sha256": "4f90f0fb2c66d935c6fd17dfe39d24fa0edd6787fd37eeaf5c67cddaae79f0ab",
       "reason": "OPC-Agent-specific release metadata required by the release workflow"
     },
     "packages\\core\\package.json": {
-      "sha256": "62ad9da11499211e701bdbbe95f16b5942d000338c3e97392e147d4f03507745",
+      "sha256": "2f83f427cdddb0e2498b737806d21e1013684a890615708a5e84260ad0b95869",
       "reason": "OPC-Agent-specific release metadata required by the release workflow"
     },
     "packages\\messaging-gateway\\package.json": {
-      "sha256": "823b7dc4aef58113beca0718cf35e121752f30b44cbb970f49156749d11f7661",
+      "sha256": "3feb04aee50ef3d0022182a6cbafbee213a69628b79957f147fbf1fbb8ce42e4",
       "reason": "OPC-Agent-specific release metadata required by the release workflow"
     },
     "packages\\messaging-whatsapp-worker\\package.json": {
-      "sha256": "0daf1eb8441540fbca02a2070084514bf092d681a5c49ed52d244d588658c015",
+      "sha256": "4f68c335a934176af6e489e74cc8f1d28657f29f26f14d9146a40b0bbf3e71d9",
       "reason": "OPC-Agent-specific release metadata required by the release workflow"
     },
     "packages\\pi-agent-server\\package.json": {
-      "sha256": "60934b03786b3e260ad75addb3692e9add4d3f06460179f9125ca2a33ee844a0",
+      "sha256": "fa03cac35df420b8072a499a214b6922a8f5a8dfc266687ec65d9c39aab40d1b",
       "reason": "OPC-Agent-specific release metadata required by the release workflow"
     },
     "packages\\server-core\\package.json": {
-      "sha256": "33370f57ba288a948fd975cdf43ebeedbfc56a8e400e1b7e0793b0df53fce3a6",
+      "sha256": "c762cfc63ab0eb2e350c8ae67ca4af82ed040b7ada7ae2700117b0fa06a24136",
       "reason": "OPC-Agent-specific release metadata required by the release workflow"
     },
     "packages\\server\\package.json": {
-      "sha256": "9f71b7902d5c0e6b74b14901ccc8d1f17b627cc9248df9b259f444b536770503",
+      "sha256": "d6fd77efd6d94dafdff96e4b9ef3e07674068e2c4d66a13e58502fd50e509eb0",
       "reason": "OPC-Agent-specific release metadata required by the release workflow"
     },
     "packages\\session-tools-core\\package.json": {
-      "sha256": "236f1551603134f6e7c3147da3a992cd46ac760ae54e3b3a0b3d1d5c854f8aeb",
+      "sha256": "1585371bd709c3fac6248d4e584841274a7d0392debea3312c1a5e191b6d4a78",
       "reason": "OPC-Agent-specific release metadata required by the release workflow"
     },
     "packages\\shared\\package.json": {
-      "sha256": "497065e41b4e88646c6b84729ea093c22e33e5cc0cf3e3dbd1472c0fb099306d",
+      "sha256": "82d1e68356d842ece805af0e71a27fb29d17e343b9cf3888c7f4057a81836b40",
       "reason": "OPC-Agent-specific release metadata required by the release workflow"
     },
     "packages\\ui\\package.json": {
-      "sha256": "d04951c1d2b31a6430adfd4b494817e78a25b3c05ded9714a56b89da95d3c287",
+      "sha256": "1fb4dfa7f0800d1ea952f083e8df7b53f7ffb8db79f9433da0478f2b01005577",
       "reason": "OPC-Agent-specific release metadata required by the release workflow"
     },
     "apps\\electron\\resources\\release-notes\\0.1.1.md": {
@@ -2817,7 +2817,7 @@
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "docs/README.md": {
-      "sha256": "a749cd5aa095803d9d2e9ea758a67e862ad48e6e334b66c55cedbed07ce44774",
+      "sha256": "51a4ace5b7acdda9352feb3e5287bc3fe67377f36c1f51550a2402d3c0724107",
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "docs/architecture.md": {
@@ -2913,7 +2913,7 @@
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "docs/releases.md": {
-      "sha256": "ff531335e11617d716266134355f8b6bbf18846690886a36b777b4b95eea3f08",
+      "sha256": "0479bbcd60e85b9221d67f197bce3c8170366d0843f4517b65d32c47428f72e1",
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "docs/sessions.md": {
@@ -2937,7 +2937,7 @@
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "docs/zh/README.md": {
-      "sha256": "020eab88290609e26263e9ede57a3cee10a295ffbec96b6e804ba606869bc0b9",
+      "sha256": "936d62917c23fda424180eac8933e7b0481e7faccdcf792eada2b8f4de0643a5",
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "docs/zh/architecture.md": {
@@ -3025,7 +3025,7 @@
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "packages/messaging-gateway/package.json": {
-      "sha256": "30e813b73a410aec7e2454dbc2fc77e09e5aff36376a455026f1e88c20d1b546",
+      "sha256": "3feb04aee50ef3d0022182a6cbafbee213a69628b79957f147fbf1fbb8ce42e4",
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "packages/messaging-gateway/src/__tests__/binding-access-router.test.ts": {
@@ -3069,7 +3069,7 @@
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "packages/messaging-whatsapp-worker/package.json": {
-      "sha256": "6a00f51ced4c51dffcc10796e77ec8519f4274c04b2d891539dc7e8f390d815f",
+      "sha256": "4f68c335a934176af6e489e74cc8f1d28657f29f26f14d9146a40b0bbf3e71d9",
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "packages/messaging-whatsapp-worker/src/media.ts": {
@@ -3453,7 +3453,7 @@
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "apps/electron/src/renderer/components/apisetup/__tests__/ApiKeyInput.test.ts": {
-      "sha256": "2095cd494bc5c6e51a660d478e1d9d628ca1859b67a48fa339634dcc45fd527c",
+      "sha256": "921117dd4f51e80dd8e4d9a7d4f1faba5d56155dcb14ca5f2b81dd97e6f34fc4",
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "apps/electron/src/renderer/components/apisetup/__tests__/claude-cli-status.test.ts": {
@@ -3465,7 +3465,7 @@
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "apps/electron/src/renderer/components/apisetup/submit-helpers.ts": {
-      "sha256": "79e9b57d9d70a3329f0f2b9aeea1917b12986027d816ca25b9320b0e4bed0108",
+      "sha256": "2bbaa952052a9a7d2e694d19a0efcd35d641700a400060a29e94da966c4283fd",
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "apps/electron/src/renderer/components/app-shell/input/structured/CredentialRequest.tsx": {
@@ -3633,11 +3633,11 @@
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "apps/electron/src/renderer/pages/settings/connection-display.test.ts": {
-      "sha256": "3123916b8263615d7da5a545e8388aa5bf605e0bfb048b2fd8131be1490acc5c",
+      "sha256": "fbaf342ceb119bba206fdce827cfc477b7f9c007ef8709b625d99b28c68db609",
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "apps/electron/src/renderer/pages/settings/connection-display.ts": {
-      "sha256": "0ab168073c77bdd94ac100368109d68fae328a86f144f079f55c75c681574e7b",
+      "sha256": "7383a650addbcf0e5c90928d19efcc36ef7c6d015f11dcf290a425a6366928a7",
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "apps/electron/src/renderer/utils/project-colors.ts": {
@@ -4086,6 +4086,678 @@
     },
     "apps/electron/resources/release-notes/0.1.3.md": {
       "sha256": "4d2461a51f4f574192863be2180e6fcfcb00cca0e315f55323b29ac53ac9df9c",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "apps\\electron\\resources\\release-notes\\0.1.4.md": {
+      "sha256": "0516deae0ee90f182f15c0d9b11d03f6335d9c10e236572264b9fa4e6a0aae82",
+      "reason": "OPC-Agent-specific release metadata required by the release workflow"
+    },
+    "packages/pi-agent-server/src/custom-endpoint-provider.test.ts": {
+      "sha256": "587abd1162867e1ed2432c2bbfba67b4cea462d5ad12d6ecccf5113302c367ae",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "packages/pi-agent-server/src/custom-endpoint-provider.ts": {
+      "sha256": "c7ee2efa543e30250e0e20058ae61783c8372f6f85ed0e42b5551b7311496ae1",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "apps/electron/resources/release-notes/0.1.4.md": {
+      "sha256": "0516deae0ee90f182f15c0d9b11d03f6335d9c10e236572264b9fa4e6a0aae82",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/project-delivery/20260814-endpoint-protocols-v014/INDEX.md": {
+      "sha256": "698dac7089e16f126363bb33d07d2dbb60bc369a1d39fa56425e84dabd0b8192",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/project-delivery/20260814-endpoint-protocols-v014/decisions/AUTH-001.json": {
+      "sha256": "174fb3086c91fc371541712b2d909489db652958bfdb8289aa74d7939ac5c27e",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/project-delivery/20260814-endpoint-protocols-v014/evidence/gate-input.json": {
+      "sha256": "ae853db1371e7c3ceac8e66e2e17ad4d62602aed140acf773ba8b7f9a9f1d83e",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/project-delivery/20260814-endpoint-protocols-v014/specs/CHANGE-SPEC-v1.md": {
+      "sha256": "aa95fa3c1ed796ea1b2a8c4224942cc2a70893fd2ec0a38e89fc274ed376aab1",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/project-delivery/20260814-endpoint-protocols-v014/specs/GOAL-01-v1.md": {
+      "sha256": "c79ac77ceb6299799114bdfc666674feddaaded74dc7cd82bb8f368f6d6d0660",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/project-delivery/20260814-endpoint-protocols-v014/specs/TRACE-SPEC-v1.md": {
+      "sha256": "471a6088f3dc80b33b383c19ef51114bc576405b6455d886ff31e8bfb28e3f3e",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "packages/server-core/src/handlers/rpc/llm-connections-create.test.ts": {
+      "sha256": "4c94104066bcfc4300d6c6ddd83f1769da1d16768fcc401af6e8cb19c778fc1b",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/project-delivery/20260814-endpoint-protocols-v014/evidence/ui-agentrouter-action-menu.png": {
+      "sha256": "0ba54e0aeaf3169f62241cafe4fd7f08a41d1b87a870adcf34730c4d8ba4942a",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/project-delivery/20260814-endpoint-protocols-v014/evidence/ui-agentrouter-editor.png": {
+      "sha256": "cbe13bab037c9206b1757dea16cfda6cde601e25d11bb6a489a18b2e8edf1fdd",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/project-delivery/20260814-endpoint-protocols-v014/evidence/ui-agentrouter-summary.png": {
+      "sha256": "9a4c41f69bdcaa877c21d6063152e53374e1e5b530b3d86ee8c655723723e5e6",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/project-delivery/20260814-endpoint-protocols-v014/evidence/ui-openai-responses-preview.png": {
+      "sha256": "dcaf6c820d710b04e8b9215eb826223d6d4391db00fee6650303b2936b917de6",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/project-delivery/20260814-endpoint-protocols-v014/evidence/ui-protocol-dropdown.png": {
+      "sha256": "ca6d5c43051b2eb0bb0338cb84edc3ed497788581581cb9e42430252760bfa75",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/project-delivery/20260814-endpoint-protocols-v014/evidence/ui-verification-result.json": {
+      "sha256": "4eb525c38644bcfa6a010ada68e43b31008f6491e57e2c7af09c3ebc7e370e9d",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/project-delivery/20260814-endpoint-protocols-v014/evidence/ui-verify-v014.mjs": {
+      "sha256": "b6e6f50f52ed520c17245b25b43695fa3e1e6bef7f07d896883ca9526cde0939",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/.server.lock": {
+      "sha256": "7796873c39aee5d50725f37aeca6d71f83e22ab4233810d3be3c80a3bd05e0b4",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/config-defaults.json": {
+      "sha256": "9be419bf61638f751845d6bf78e7d53230b5ece9c8ab5a27ac0e49371c73a99c",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/config.json": {
+      "sha256": "78d746ac95d17d8a4e07b5a4179e0000bcfe92cb87111bb1456c1d040f864d46",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/config.json.bak-2026-08-14": {
+      "sha256": "d1ad4824546f47ce37c5315d6defefec93a23aa51b7c0c9048e595e42f19025a",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/docs/browser-tools.md": {
+      "sha256": "831be39cecf4ddd5c9af78801468e67e55e2d2f6f70faf2a874973b99793c2ea",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/docs/data-tables.md": {
+      "sha256": "e60afcaa89602606841bd5446524bdb1863f47880306692f739c0ab01509c787",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/docs/html-preview.md": {
+      "sha256": "2f9bdb055a7eab215c67fe8d09f9126dc665506c9122b53d9f96bd87765f7d25",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/docs/image-preview.md": {
+      "sha256": "75f71f97c988846f5eeb3bf816105f247298aaa868b0ba8ee422637e7d212060",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/docs/llm-tool.md": {
+      "sha256": "e14864684f572429ca7626e4dccaa3d646a9d03d1b2828ba8886a39afefe1500",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/docs/markdown-preview.md": {
+      "sha256": "a1ddf82051a2de160235ea6ea822d448711180f85723fa45c3a1d14e0b8affa4",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/docs/mermaid.md": {
+      "sha256": "52984ca402ad5f9c0b4db61dce48e6cd26dcd43452cc5967a98852980cce2f1c",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/docs/pdf-preview.md": {
+      "sha256": "37af349f69f30116a45cae8f12d618d44b4a0a8622739c403bf2f01fa00a7b79",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/docs/permissions.md": {
+      "sha256": "ba1e87b897c7869d5a19254574b12be668b4a298c2a104f442cad7ab9dc1a8f3",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/docs/skills.md": {
+      "sha256": "29b2d9806c900ef7826d3de165885db3d4dbf94e3359d29c61a5e5c629fc2f36",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/docs/themes.md": {
+      "sha256": "3d6dfb9f8ebdcb7fdf881d5ae2f3fa468b1bbeab9cbe14172657b0fff6432b55",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/docs/tool-icons.md": {
+      "sha256": "329df13f3459013e43f7d4139c19f9c8a3c2630c5b140cee732b71413e39711b",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/.updaterId": {
+      "sha256": "b8e759deee29c58d3e0da9d3cf879773e05f0f6c8dc5472c8c16ff8a49cebf72",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/Cache/Cache_Data/data_0": {
+      "sha256": "30eb897848f75798455efcb6c8a237966b1c4f69a2534500bd37ffb41686df22",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/Cache/Cache_Data/data_1": {
+      "sha256": "1c1a3c4961837ed46cb764fe0476c3f6c6ea743d9fd9f04bb39e3289095fb0ab",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/Cache/Cache_Data/data_2": {
+      "sha256": "35fea4708da45f70dc469a175fc5970c19fc47d664ef0a72bacc90d2a80e874b",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/Cache/Cache_Data/data_3": {
+      "sha256": "7f8242324be4b8d84a8b19618217be6a7aa4bd0cd72287eaf951e0290b39b58b",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/Cache/Cache_Data/f_000001": {
+      "sha256": "a075b01d9b015c616511a9e87da77da3d9881621db32f584e4606ddabf1c1100",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/Cache/Cache_Data/index": {
+      "sha256": "1978c463dc76980db43338013fbb1a9de74eee5d9cde52ac49fa493d22c8a8a3",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/Cache/No_Vary_Search/journal.baj": {
+      "sha256": "c23b40bda5db2dadc7bce1a94b93df0e505b93aec1088b413127044408071445",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/Cache/No_Vary_Search/snapshot.baf": {
+      "sha256": "4ffecbc8f7fe9e1719035fdca2af7fd1e8c4cc66dc501e4dfecff0e81a81e686",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/Code Cache/js/index": {
+      "sha256": "fbcfe23a2ecb82b7100c50811691dde0a33aa3da8d176be9882a9db485dc0f2d",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/Code Cache/js/index-dir/the-real-index": {
+      "sha256": "7ca01d07abbc5bdca4b783aeed10403065d0e7ac77d4b9339f6a32db8350071b",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/Code Cache/wasm/index": {
+      "sha256": "fbcfe23a2ecb82b7100c50811691dde0a33aa3da8d176be9882a9db485dc0f2d",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/Code Cache/wasm/index-dir/the-real-index": {
+      "sha256": "3537488cbb1a04e209d567f093440d5a799c1ddd319479967f642e0c07a8d2d0",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/DIPS": {
+      "sha256": "5c9dec1886cc01f5f2307ee1ea87f9b32a4cef0f8f9a2c68beebc558013bedab",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/DIPS-wal": {
+      "sha256": "7af7f47a4f26f6732376127e9aa604facef4b4efe14a88a67a33e230793032a0",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/DawnGraphiteCache/data_0": {
+      "sha256": "d6a5fe39cd672781b256e0e3102f7022635f1d4bb7cfcc90a80fffe4d0f3877e",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/DawnGraphiteCache/data_1": {
+      "sha256": "902f30c1fb0597d0734bc34b979ec5d131f8f39a4b71b338083821216ec8d61b",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/DawnGraphiteCache/data_2": {
+      "sha256": "ec1702806f4cc7c42a82fc2b38e89835fde7c64bb32060e0823c9077ca92efb7",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/DawnGraphiteCache/data_3": {
+      "sha256": "e09f42c398d688dce168570291f1f92d079987deda3099a34adb9e8c0522b30c",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/DawnGraphiteCache/index": {
+      "sha256": "11ce428b3f5d546f213aa27f0dd037050a2591a2adc3cab32d7a2f11321d071d",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/DawnWebGPUCache/data_0": {
+      "sha256": "d6a5fe39cd672781b256e0e3102f7022635f1d4bb7cfcc90a80fffe4d0f3877e",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/DawnWebGPUCache/data_1": {
+      "sha256": "902f30c1fb0597d0734bc34b979ec5d131f8f39a4b71b338083821216ec8d61b",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/DawnWebGPUCache/data_2": {
+      "sha256": "ec1702806f4cc7c42a82fc2b38e89835fde7c64bb32060e0823c9077ca92efb7",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/DawnWebGPUCache/data_3": {
+      "sha256": "e09f42c398d688dce168570291f1f92d079987deda3099a34adb9e8c0522b30c",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/DawnWebGPUCache/index": {
+      "sha256": "36a61b290b81568a73766c9d7e4fafe1baedcd89201dabcad57dc100901e776d",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/DevToolsActivePort": {
+      "sha256": "a89b888e42cf522a01f74ebe7571352331e77f15c04c6ed007c7ed302a2d2188",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/Dictionaries/en-US-10-1.bdic": {
+      "sha256": "a075b01d9b015c616511a9e87da77da3d9881621db32f584e4606ddabf1c1100",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/GPUCache/data_0": {
+      "sha256": "c9d005fe49de708c4d6d0807266c4c0f26ae3242d5a36ce37ddf167a74847823",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/GPUCache/data_1": {
+      "sha256": "4e3d137f7c593e800b08d37b8c67210f8d605b30f8ac89059181d63b6491628d",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/GPUCache/data_2": {
+      "sha256": "b27410e14b326898349383766b21ce41fad074392d8358c53d986ed0898a32c2",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/GPUCache/data_3": {
+      "sha256": "e09f42c398d688dce168570291f1f92d079987deda3099a34adb9e8c0522b30c",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/GPUCache/index": {
+      "sha256": "44f853c21faf3d182844957ae74050846c6e7f8e141905d95ddf83f1c370ef6b",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/Local Storage/leveldb/CURRENT": {
+      "sha256": "0f1bad70c7bd1e0a69562853ec529355462fcd0423263a3d39d6d0d70b780443",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/Local Storage/leveldb/LOCK": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/Local Storage/leveldb/LOG": {
+      "sha256": "30a148d9220f0922ac6a7204b3b9587a324420108069be27002c113853e7ff0b",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/Local Storage/leveldb/MANIFEST-000001": {
+      "sha256": "f9d31b278e215eb0d0e9cd709edfa037e828f36214ab7906f612160fead4b2b4",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/Network/Cookies": {
+      "sha256": "d8f47f256c6c76e93615ae3f6de9155006c96b7c94f92b039d8f8d9c3a851135",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/Network/Cookies-journal": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/Network/NetworkDataMigrated": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/Network/Trust Tokens": {
+      "sha256": "fe03fb82cfe74a64c7094c810f9e8167c3b61c254c27569cc6b7db5ed84b0b18",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/Network/Trust Tokens-journal": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/Session Storage/CURRENT": {
+      "sha256": "0f1bad70c7bd1e0a69562853ec529355462fcd0423263a3d39d6d0d70b780443",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/Session Storage/LOCK": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/Session Storage/LOG": {
+      "sha256": "20fc09f713d2872af38f798c15b7c669f2d7f5dd60b2098d1e08e88e081ece21",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/Session Storage/MANIFEST-000001": {
+      "sha256": "f9d31b278e215eb0d0e9cd709edfa037e828f36214ab7906f612160fead4b2b4",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/Shared Dictionary/cache/index": {
+      "sha256": "fbcfe23a2ecb82b7100c50811691dde0a33aa3da8d176be9882a9db485dc0f2d",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/Shared Dictionary/cache/index-dir/the-real-index": {
+      "sha256": "e03e0fb55b35690a19afb163ed746b77fde26ba950545a5ecd08ef2dcd201369",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/Shared Dictionary/db": {
+      "sha256": "9dfba1d139c9933668e58e9c7777804c8ae01b2942dcc2dfaaa65ac139853a59",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/Shared Dictionary/db-journal": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/electron-log-preload.js": {
+      "sha256": "c0a3747f82fc3d2bedce8394075c338819356f12e0f4ce7661bd8fcb0cc8171c",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/electron-user-data/en-US-10-1.bdic": {
+      "sha256": "a075b01d9b015c616511a9e87da77da3d9881621db32f584e4606ddabf1c1100",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/permissions/default.json": {
+      "sha256": "ec8fe6d45b2b12f733a1d3993a3b98adaf093ac2b83ccc00e9254a995cc6f962",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/preferences.json": {
+      "sha256": "a47d8caa757fdf11f8090fb263a21bb252da4686c93a540ed57cc750d40446f2",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/release-notes/0.1.0.md": {
+      "sha256": "de0652c6a9a0f4f7c627c0b8ce2596da8b478e599a04be481775a277879bcd72",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/release-notes/0.1.1.md": {
+      "sha256": "19687a03893c1d2fc425eb4d65cf697ad0a6ee6e8a10f548a2a13b2508480f16",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/release-notes/0.1.2.md": {
+      "sha256": "8f4bdb0f9ebf4567c563ba5deebbebddcd9167ca55b11645f5c5304424f4533b",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/release-notes/0.1.3.md": {
+      "sha256": "4d2461a51f4f574192863be2180e6fcfcb00cca0e315f55323b29ac53ac9df9c",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/release-notes/0.1.4.md": {
+      "sha256": "0516deae0ee90f182f15c0d9b11d03f6335d9c10e236572264b9fa4e6a0aae82",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/themes/catppuccin.json": {
+      "sha256": "a3c8cc47ba1fcdf284ff7a3c23b108ecd39640b2a43edd6545b6095a6c43cf02",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/themes/default.json": {
+      "sha256": "194e366a410621aea48eb230a2002e2108573d6f0a415a90f19d440dbc74fee1",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/themes/dracula.json": {
+      "sha256": "4fc4e2595264ebff139440f7fb18678e7283915b8ec0c6f879d798c885deaf6f",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/themes/ghostty.json": {
+      "sha256": "4e4fc16e94f775506423960eddd188b50f9b49eba80c036f094531fe9294a5b0",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/themes/github.json": {
+      "sha256": "8f9b2e2cea2354318872d23b42c7173a325daae2bdcffe9a0d7625467c77158f",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/themes/gruvbox.json": {
+      "sha256": "ca9148cded3b3650a25a30c0e339246b7ca8f6e095159ab4de25b51e886d0aae",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/themes/haze.json": {
+      "sha256": "8ed903515ba74240098d9d1447446b1e660a7b680cbd9540708d673c0cdafe62",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/themes/night-owl.json": {
+      "sha256": "6593e7a8b06d7fc928ea900c53d489e4d74defe5a630094f8929d641993df0dc",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/themes/nord.json": {
+      "sha256": "17cc36bf3e452b20de611dd7319cc92cbf9c61065b091a8c2f23576d2ab88df3",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/themes/one-dark-pro.json": {
+      "sha256": "3b55b9953193669d46a74730c59da7c0fdf1ae4820627185dc8ec3c0043061f3",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/themes/pierre.json": {
+      "sha256": "1436c6b9507f7a94ba41cb9b7398d7b75f4af1cd11efde7a022cab1ed774ba59",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/themes/rose-pine.json": {
+      "sha256": "4fc7bb844e439e61eff10380c7b890714bd222ef8a1f41ee6e1d2d04d9e0a758",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/themes/solarized.json": {
+      "sha256": "ce21497fbb79f4b1dd9b954aa5d5246be99c2dbe837299dee16b84acfbbc222e",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/themes/tokyo-night.json": {
+      "sha256": "d3d80a8320fe8a625ca85cfc9c0a7380100a91e7730c8a317812a1c3381023ae",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/themes/vitesse.json": {
+      "sha256": "fb46aa74800bbe47d7c0b71372887fdcbbd9b55ef538750d905af49ad6c89b39",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/1password.png": {
+      "sha256": "7fa32d128a53272afbce2d855ea79359aaaed485266bebfb614d3d2e810ca533",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/amazonaws.png": {
+      "sha256": "f80d3ec6c5b2adee55267ecfcf2fc4131aa8551a546b7a1971b5e465c05c2403",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/bun.png": {
+      "sha256": "dc58648fa3076af1608cdc0a512541e2dcd398aa2ced930a3846ae0f6ec9200c",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/chrome.svg": {
+      "sha256": "3b3e442388145192a5b2f17f5c0d2d543ecc969af13a4f3a0995e1e306af0c45",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/cloudflare.png": {
+      "sha256": "0f84307ad691800e391fccb42b4ba290a87febf001abedfbe03b34767d45e441",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/cmake.ico": {
+      "sha256": "7056b969eaf9826ad668aee81affd50f55f654777a0ef79cf9932356b64ff5db",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/cocoapods.png": {
+      "sha256": "85f4490beb42d4e5d5617fdc9f954e048fa72424530b070eb594bd6a8546b01a",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/curl.svg": {
+      "sha256": "e1686432a1d35991f4a48b8a4ccaaa9d5a009c9ad116b2accd4e0e5b0389d417",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/deno.png": {
+      "sha256": "a9624bdff91a7b7de07249102639d44d646f9801e9e59d3aa3e6ee99e784bfce",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/docker.png": {
+      "sha256": "5cb5caeeef34a0979a0b21640ea6bbbfb8345a9fff0d0e910c345ce4d0b65718",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/esbuild.svg": {
+      "sha256": "ea34d6ebf2f5134a776243cb83a2ca7180e2f8132ef45cf10192af9d21a50219",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/eslint.png": {
+      "sha256": "1d319ee9fa6f8338003cce9714e5229f1c93ff747eef26397ae394c78175d4dd",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/firebase.png": {
+      "sha256": "f7d596ba99b42959b41076af51a73edae82cb366d8199ae465d42fcad144a70b",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/flydotio.png": {
+      "sha256": "50ced2a240deee800188f0aa51af8e3151509fa86bdd4455bc90c73e50f9571b",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/git.ico": {
+      "sha256": "833cdb9802075297de2daed735378355c351da9575e11bf76a79b703c4d87c6e",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/github.png": {
+      "sha256": "1bedd6a1948971f07970414717012503805309f25af0b2c542dbc3524b5880e9",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/gnumake.png": {
+      "sha256": "a402f4b396836770e24ab283cd3b32398474e3160f27aacd327e6c0593422284",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/go.png": {
+      "sha256": "8bf938ca7a737e0478cd119c920e93943f6fb8562e21461aa5030cf0597fc107",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/googlecloud.png": {
+      "sha256": "9d6cba870cebc57aca0226cbba7e0f5a08a2e1fb65883b40b4546358400aaf10",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/heroku.png": {
+      "sha256": "0c41ed3cbb142bacb0bd437644519566ec3056d7eb11851316ec15d32ea3c215",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/homebrew.png": {
+      "sha256": "0b8d060003012b7748527e9ec23839b1a1eab89d145096dc289558c181efd1e1",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/jest.png": {
+      "sha256": "a006ea3b0aa2540fe4284d4834e9edcf5fe3f7ad009bb9c7372ba63a28ffdb4f",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/jq.png": {
+      "sha256": "50897a977f14b874994101cc096da4155e599a8e31e0a0be12c065c5aa519fcb",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/kubernetes.png": {
+      "sha256": "8450c523e0332662197cb25cdf158b24aae33c2819d6e3f10928bf31795cd618",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/microsoftazure.ico": {
+      "sha256": "90cdaf487716184e4034000935c605d1633926d348116d198f355a98b8c6cd21",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/mongodb.ico": {
+      "sha256": "1143ff8a5619ad9d016e3d94462f44ae9047ab4ac4c39722d265c88961591a1a",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/mysql.png": {
+      "sha256": "b2f0c9c426e0c7b842734af8d601829b441d1be9a928ff67c0a542afa47d7007",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/netlify.png": {
+      "sha256": "e067b3637d9dfc54630b17d77f28284699f029ef2b3a42dd37f673229f5cea90",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/ngrok.svg": {
+      "sha256": "c70262c22ae481b44d9b6db7aef8a74eda8aa06064eb0192aa8c880f0545b672",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/nodedotjs.png": {
+      "sha256": "3113d214c0396e4783a0baf0afa3b33317bfa075775efa39f6b708d41acb25f3",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/npm.png": {
+      "sha256": "c3c90ef0a31451f152896fefe381ea1b4a90e9d84b63defe2045dbe7b6388864",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/nx.png": {
+      "sha256": "a78f2ed84661cdeff63a1f1a09ce44200510c4ce0942da994f020ae41ec7e74c",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/opcagent.svg": {
+      "sha256": "f9b92899e747f6a2e0624b4495616cf94ec1cc303f1baab4ff92f31e68ccffc8",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/openssh.png": {
+      "sha256": "9d72aadc532c77dcf5b6fa3d7005ebbdf37e6bb19d35acb7bcfc2d33c9c787cb",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/pnpm.png": {
+      "sha256": "97c0104f190345be07d001af229891c6d1e7884507258191304e0967c4a7a67a",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/postgresql.png": {
+      "sha256": "50d3e0cb73ca3490192ede8b225fda20837b716d8f7f856538027a699b471e5e",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/prettier.png": {
+      "sha256": "f6893e5cafb2cd2c9249e3ce16d40851dd6fca1387af1b5ed42c390c87912063",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/pypi.png": {
+      "sha256": "4644e64f1a07b1a6eebfdcac5ef47ab4f0a2f51f3dc2aeb1e9cd18d147b9a5a2",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/pytest.png": {
+      "sha256": "27055a4e52d49c7593a3cd70624fce09836d5327639f4e67f2da1fd0a65201aa",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/python.ico": {
+      "sha256": "39a32ed052ec937b46c40afcc3b87b98ecf2526cf8b6e2cd1698a8b4cd9a6e39",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/redis.png": {
+      "sha256": "5bb7f4d969ab288e637d327e6446ac94dbc6ab245ed317355b1edf16e46637d1",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/ruby.ico": {
+      "sha256": "b14aaa419c6a8da7950211343ca36045d3d78b250f1ab44ad46cd946aac2b873",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/rust.png": {
+      "sha256": "b81fc3ff9bfd1f375337c8767e3aaf3a534e42e45d5f74207e82a99941d0e191",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/sentry.png": {
+      "sha256": "34860979d391b4091ac1ae4d01b26f89861a0d64be28e9980343673b621fac5b",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/sqlite.jpg": {
+      "sha256": "2590ba4953009ddb3e1d0fa92e30d7b999ab6d8c15d1513fd2dee418f10dd19e",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/stripe.png": {
+      "sha256": "af3bacdcd1badb3b4a7bb90428042e77f4169e075bceee8b3e8a8f3db4e181dd",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/supabase.png": {
+      "sha256": "ad48e4348178a3eee479d5d0a9c40c078ab1b34b52f1c676ef24cd5972fe05ca",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/swift.ico": {
+      "sha256": "5047233430e980eb5040fc2cb031d034dd814d046683d6be4f82d9a7448780a4",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/terraform.png": {
+      "sha256": "d70e3ce054838063c12091c1106ec6b0c209b84fa1f2a12d587a60e84ebcc1a8",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/tool-icons.json": {
+      "sha256": "5c0074db14d0c335addb6b06d2de6439ecb9a2d1d4c08efc9bf64ecd4245a180",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/turborepo.png": {
+      "sha256": "6e3433e62b844b7d0c9245145ede7d08ccb493cb714879619cb7c8400e0a8fc7",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/vercel.png": {
+      "sha256": "527984385aaadb1ee0cebafc3d2c3873fbea854bb41817982d24f0e31b0f931e",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/vite.svg": {
+      "sha256": "64d973a3a997902bd7c89923e29fb165460cbf4e396cc45bdf454c9ded362ef3",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/vitest.png": {
+      "sha256": "01b9c25cdb144de530cb310a5ee82f852610319c7dd8879b586b3b4f1b8ffbe4",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/webpack.png": {
+      "sha256": "b75c4e8155a5f414b520bfeb066d3533f3a8bf62cf1b38914b452b552a8ee854",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/xcode.png": {
+      "sha256": "6789a941c19bc9b69db66f6d6988a6c4d92946b598c701644cf993426ac1ab7c",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/tool-icons/yarn.svg": {
+      "sha256": "2dd2aa230223252264522450e035654d21fb8ad0217e471d9449db7b97ac0570",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/workspace/config.json": {
+      "sha256": "80fce597eaf8e361278ab013397f15cbe9c3191798b8d23e43a3199f0b2e684a",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    ".tmp/endpoint-protocol-v014-ui/workspaces/default/config.json": {
+      "sha256": "5183415048cd0542ae7176b6ebd9c4884e082f6bccbc88d51bc06a1d67349271",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/project-delivery/20260814-endpoint-protocols-v014/FINAL-ACCEPTANCE.md": {
+      "sha256": "5237b8d1f1a09225599d2bcaa7c7bf4bda17c15fe5aa8118a18a4df45f2518f5",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/project-delivery/20260814-endpoint-protocols-v014/evidence/ui-after-edit-click.txt": {
+      "sha256": "35e7ba37e49e7b78bb535ffa7425ef59d59fce4bbb6e0cb89bca6be2189f58ae",
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     }
   },

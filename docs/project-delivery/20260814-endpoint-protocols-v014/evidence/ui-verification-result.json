@@ -1,0 +1,12 @@
+{
+  "status": "passed",
+  "executable": "packaged OPC Agent 0.1.4",
+  "browserWs": "ws://127.0.0.1:19214/devtools/browser/<redacted>",
+  "assertions": [
+    "AgentRouter settings summary shows OpenAI Chat Completions",
+    "AgentRouter editor hydrates gpt-5.6-sol and https://agentrouter.org/v1",
+    "OpenAI Chat request preview is https://agentrouter.org/v1/chat/completions",
+    "Protocol dropdown shows all four supported protocols",
+    "Switching to OpenAI Responses previews https://agentrouter.org/v1/responses without duplication"
+  ]
+}

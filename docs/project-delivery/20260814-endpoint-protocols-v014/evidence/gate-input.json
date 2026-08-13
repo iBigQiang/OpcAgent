@@ -1,0 +1,91 @@
+{
+  "fixture_id": "opcagent-v014-endpoint-protocols",
+  "requested_goal": "GOAL-01",
+  "repo_root": "D:\\AiCode\\OPCAgent",
+  "branch": "craft-sources-auto",
+  "head": "8064a16",
+  "requested_write_path": "D:\\AiCode\\OPCAgent\\apps\\electron",
+  "auth": {
+    "id": "AUTH-001",
+    "status": "approved",
+    "user_request": "Implement the approved endpoint protocol and URL normalization design, verify it, package OPC-Agent-0.1.4-x64.exe, commit, tag, and push the update.",
+    "spec_hashes": [
+      {
+        "path": "docs/project-delivery/20260814-endpoint-protocols-v014/specs/CHANGE-SPEC-v1.md",
+        "algorithm": "sha256-raw-bytes-v1",
+        "sha256": "aa95fa3c1ed796ea1b2a8c4224942cc2a70893fd2ec0a38e89fc274ed376aab1"
+      },
+      {
+        "path": "docs/project-delivery/20260814-endpoint-protocols-v014/specs/GOAL-01-v1.md",
+        "algorithm": "sha256-raw-bytes-v1",
+        "sha256": "c79ac77ceb6299799114bdfc666674feddaaded74dc7cd82bb8f368f6d6d0660"
+      },
+      {
+        "path": "docs/project-delivery/20260814-endpoint-protocols-v014/specs/TRACE-SPEC-v1.md",
+        "algorithm": "sha256-raw-bytes-v1",
+        "sha256": "471a6088f3dc80b33b383c19ef51114bc576405b6455d886ff31e8bfb28e3f3e"
+      }
+    ],
+    "repo_root": "D:\\AiCode\\OPCAgent",
+    "branch": "craft-sources-auto",
+    "head": "8064a16",
+    "dirty_wip_summary": "Baseline was clean at 8064a16. Only delivery specification records were added before this AUTH and gate.",
+    "allowed_write_paths": [
+      "D:\\AiCode\\OPCAgent\\apps\\electron",
+      "D:\\AiCode\\OPCAgent\\packages\\shared",
+      "D:\\AiCode\\OPCAgent\\packages\\server-core",
+      "D:\\AiCode\\OPCAgent\\packages\\pi-agent-server",
+      "D:\\AiCode\\OPCAgent\\docs\\project-delivery\\20260814-endpoint-protocols-v014",
+      "D:\\AiCode\\OPCAgent\\CHANGELOG.md",
+      "D:\\AiCode\\OPCAgent\\package.json",
+      "D:\\AiCode\\OPCAgent\\apps",
+      "D:\\AiCode\\OPCAgent\\packages",
+      "D:\\AiCode\\OPCAgent\\bun.lock",
+      "D:\\AiCode\\OPCAgent\\scripts\\craft-source-overrides.json"
+    ],
+    "allowed_goals": [
+      "GOAL-01"
+    ],
+    "allowed_sensitive_actions": [
+      "build-windows-installer",
+      "git-commit",
+      "git-create-annotated-tag",
+      "git-push-branch",
+      "git-push-tag"
+    ],
+    "default_exclusions": [
+      "modify-installed-user-data",
+      "delete-v0.1.3-artifact",
+      "create-github-release",
+      "push-upstream-remote",
+      "modify-old-repository-copy"
+    ],
+    "approved_at": "2026-08-14T00:26:46+08:00",
+    "expires_or_revisit_when": "Any frozen requirement, write path, sensitive action, branch, or baseline HEAD changes before execution."
+  },
+  "spec_hashes": [
+    {
+      "path": "docs/project-delivery/20260814-endpoint-protocols-v014/specs/CHANGE-SPEC-v1.md",
+      "algorithm": "sha256-raw-bytes-v1",
+      "sha256": "aa95fa3c1ed796ea1b2a8c4224942cc2a70893fd2ec0a38e89fc274ed376aab1"
+    },
+    {
+      "path": "docs/project-delivery/20260814-endpoint-protocols-v014/specs/GOAL-01-v1.md",
+      "algorithm": "sha256-raw-bytes-v1",
+      "sha256": "c79ac77ceb6299799114bdfc666674feddaaded74dc7cd82bb8f368f6d6d0660"
+    },
+    {
+      "path": "docs/project-delivery/20260814-endpoint-protocols-v014/specs/TRACE-SPEC-v1.md",
+      "algorithm": "sha256-raw-bytes-v1",
+      "sha256": "471a6088f3dc80b33b383c19ef51114bc576405b6455d886ff31e8bfb28e3f3e"
+    }
+  ],
+  "document_contract_errors": [],
+  "requested_sensitive_actions": [
+    "build-windows-installer",
+    "git-commit",
+    "git-create-annotated-tag",
+    "git-push-branch",
+    "git-push-tag"
+  ]
+}

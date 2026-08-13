@@ -29,7 +29,10 @@ import {
   type LlmConnection,
 } from '../../config/storage.ts';
 import type { CustomEndpointConfig } from '../../config/llm-connections.ts';
-import { normalizeApiKeyInput } from '../../config/llm-connections.ts';
+import {
+  getPiAuthProviderForCustomEndpointApi,
+  normalizeApiKeyInput,
+} from '../../config/llm-connections.ts';
 // Import validation helpers for provider-auth combinations
 import {
   isValidProviderAuthCombination,
@@ -345,7 +348,7 @@ export function resolveSetupTestConnectionHint(args: {
     if (args.customEndpoint && args.baseUrl?.trim()) {
       return {
         providerType: 'pi_compat',
-        piAuthProvider: args.customEndpoint.api === 'anthropic-messages' ? 'anthropic' : 'openai',
+        piAuthProvider: getPiAuthProviderForCustomEndpointApi(args.customEndpoint.api),
         customEndpoint: args.customEndpoint,
         ...(args.platformProfile ? { platformProfile: args.platformProfile } : {}),
       };
