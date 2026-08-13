@@ -8,6 +8,13 @@ All notable changes to OPC Agent are documented in this file. The format follows
 
 Add user-visible changes here before running `bun run release:prepare <version>`.
 
+## [0.1.2] - 2026-08-13
+
+### Fixed
+
+- Removed the unintended Claude Agent SDK runtime dependency while preserving API and MCP Sources through the standard MCP SDK.
+- Fixed the Windows package startup crash caused by the missing `@anthropic-ai/claude-agent-sdk` module.
+
 ## [0.1.1] - 2026-08-13
 
 ### Changed
@@ -26,5 +33,6 @@ Add user-visible changes here before running `bun run release:prepare <version>`
 - Local session search, flags, archives, import, export, and branching.
 
 [Unreleased]: https://github.com/iBigQiang/OpcAgent/releases
+[0.1.2]: https://github.com/iBigQiang/OpcAgent/releases/tag/v0.1.2
 [0.1.1]: https://github.com/iBigQiang/OpcAgent/releases/tag/v0.1.1
 [0.1.0]: https://github.com/iBigQiang/OpcAgent/releases/tag/v0.1.0

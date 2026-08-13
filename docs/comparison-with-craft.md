@@ -16,7 +16,7 @@ Both repositories are Bun monorepos with the same workspace layout (`apps/{elect
 | Same-path Lite-customized | 430 | — | Lite boundary (e.g. deleted Sources/MCP branch) plus brand |
 | OPC-Agent-only source files | 47 | — | OPC Agent brand assets, `audit:craft-reuse`, lint/CLI scripts, `apps/online-docs`-equivalent leftovers removed |
 | Source files Craft has that OPC Agent does not | — | 606 | Removed by the Lite boundary (Claude backend, OAuth, Sources, MCP, Messaging, Viewer, automations, ...) |
-| Top-level `dependencies` | 55 | 61 | OPC Agent drops `@anthropic-ai/claude-agent-sdk`, `@anthropic-ai/sdk`, `@dnd-kit/{dom,helpers}`, `@github/copilot-sdk`, `@modelcontextprotocol/sdk`, plus the messaging OAuth flow packages (the lowered number reflects the Lite backend registry, not a runtime regression) |
+| Top-level `dependencies` | 56 | 61 | OPC Agent drops `@anthropic-ai/claude-agent-sdk`, `@dnd-kit/{dom,helpers}`, `@github/copilot-sdk`, plus the messaging OAuth flow packages. It retains `@anthropic-ai/sdk` for Pi-compatible Anthropic access and `@modelcontextprotocol/sdk` for Sources without the Claude Agent runtime. |
 | Top-level `devDependencies` | 33 | 34 | Only meaningful drop is `@aws-sdk/client-s3` (used only for the upstream release upload to S3; OPC Agent's `electron-updater` GitHub provider does not need it) |
 | `node_modules/` size on a clean `bun install --frozen-lockfile` | **2.0 GB** | 2.5 GB | The 0.5 GB delta matches the dropped native + SDK bundles below |
 

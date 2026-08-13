@@ -5,10 +5,13 @@ import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 const repoRoot = resolve(import.meta.dir, '..')
+const craftSourceRoot = process.env.CRAFT_AGENT_SOURCE
+  ? resolve(process.env.CRAFT_AGENT_SOURCE)
+  : repoRoot
 const restored = JSON.parse(readFileSync(resolve(import.meta.dir, 'craft-restored-sources.json'), 'utf8')) as { liteBaseline: string; restoredSource: string; features: Array<{ name: string; testAnchors: string[] }> }
-function git(args: string[]): string { const result = Bun.spawnSync(['git', '-C', repoRoot, ...args], { stdout: 'pipe', stderr: 'pipe' }); if (result.exitCode !== 0) throw new Error(result.stderr.toString()); return result.stdout.toString() }
+function git(args: string[], root = repoRoot): string { const result = Bun.spawnSync(['git', '-C', root, ...args], { stdout: 'pipe', stderr: 'pipe' }); if (result.exitCode !== 0) throw new Error(result.stderr.toString()); return result.stdout.toString() }
 function isTest(path: string): boolean { return /\.(?:test|spec)\.(?:ts|tsx|js|jsx)$/.test(path) || path.endsWith('.isolated.ts') }
-const liteTests = git(['ls-tree', '-r', '--name-only', '-z', restored.liteBaseline]).split('\0').filter(isTest)
+const liteTests = git(['ls-tree', '-r', '--name-only', '-z', restored.liteBaseline], craftSourceRoot).split('\0').filter(isTest)
 const errors: string[] = []
 for (const feature of restored.features) for (const test of feature.testAnchors) if (!existsSync(resolve(repoRoot, test))) errors.push(`${feature.name}: missing restored test anchor ${test}`)
 // Lite's original cut-down gate stays active: every Lite test is present or is

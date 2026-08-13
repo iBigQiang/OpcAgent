@@ -9,6 +9,7 @@ describe("Windows installer configuration", () => {
       readFileSync(resolve(import.meta.dir, "../electron-builder.yml"), "utf8"),
     ) as {
       productName?: string;
+      files?: string[];
       nsis?: {
         oneClick?: boolean;
         allowToChangeInstallationDirectory?: boolean;
@@ -18,5 +19,8 @@ describe("Windows installer configuration", () => {
     expect(config.productName).toBe("OPC Agent");
     expect(config.nsis?.oneClick).toBe(false);
     expect(config.nsis?.allowToChangeInstallationDirectory).toBe(true);
+    expect(config.files).toContain("!node_modules/@opcagent{,/**/*}");
+    expect(config.files).toContain("!node_modules/@anthropic-ai/claude-agent-sdk{,/**/*}");
+    expect(config.files).toContain("!node_modules/@anthropic-ai/claude-agent-sdk-*{,/**/*}");
   });
 });

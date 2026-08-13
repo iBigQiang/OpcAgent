@@ -18,7 +18,7 @@
 | 同路径但属于 Lite 定制缝 | 430 | — | Lite 边界（如 Sources/MCP 分支被删）+ 品牌替换 |
 | OPC Agent 独有源文件 | 47 | — | OPC Agent 品牌资产、`audit:craft-reuse`、lint/CLI 脚本；等价于 Craft 的 `apps/online-docs` 文件已移除 |
 | Craft 有而 OPC Agent 没有的源文件 | — | 606 | 被 Lite 边界删除（Claude backend、OAuth、Sources、MCP、Messaging、Viewer、automations...） |
-| `dependencies` 顶层条目 | 55 | 61 | OPC Agent 删去 `@anthropic-ai/claude-agent-sdk`、`@anthropic-ai/sdk`、`@dnd-kit/{dom,helpers}`、`@github/copilot-sdk`、`@modelcontextprotocol/sdk`，以及 messaging OAuth 流程相关包；数字下降反映的是 Lite 后端注册表，不是运行时缺失 |
+| `dependencies` 顶层条目 | 56 | 61 | OPC Agent 删去 `@anthropic-ai/claude-agent-sdk`、`@dnd-kit/{dom,helpers}`、`@github/copilot-sdk` 以及 messaging OAuth 流程相关包；保留 `@anthropic-ai/sdk` 供 Pi 兼容的 Anthropic 接入使用，保留 `@modelcontextprotocol/sdk` 在不引入 Claude Agent 运行时的情况下支持 Sources。 |
 | `devDependencies` 顶层条目 | 33 | 34 | 唯一有意义的差异是 `@aws-sdk/client-s3`（只在上游 release 上传到 S3 时使用；OPC Agent 的 `electron-updater` 走 GitHub Releases，不需要它） |
 | 在干净 `bun install --frozen-lockfile` 下的 `node_modules/` 大小 | **2.0 GB** | 2.5 GB | 0.5 GB 差量与下文删除的 native + SDK bundle 一致 |
 

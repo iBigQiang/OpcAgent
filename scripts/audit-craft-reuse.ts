@@ -6,6 +6,9 @@ import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 const repoRoot = resolve(import.meta.dir, '..')
+const craftSourceRoot = process.env.CRAFT_AGENT_SOURCE
+  ? resolve(process.env.CRAFT_AGENT_SOURCE)
+  : repoRoot
 const jsonOutput = process.argv.includes('--json')
 type Feature = { name: string; sourcePrefixes: string[]; requiredCurrent: string[]; testAnchors: string[] }
 type RestoredManifest = { version: number; liteBaseline: string; productBaseline: string; restoredSource: string; integrationReview: Record<string, string>; features: Feature[] }
@@ -23,14 +26,14 @@ const overrides = JSON.parse(readFileSync(resolve(import.meta.dir, 'craft-source
 if (restored.version !== 1) throw new Error('Unsupported restored-source manifest version')
 if (overrides.version !== 2 || overrides.baselineCommit !== restored.liteBaseline) throw new Error('Source override manifest must retain the historical Lite baseline')
 
-function git(args: string[]): string {
-  const result = Bun.spawnSync(['git', '-C', repoRoot, ...args], { stdout: 'pipe', stderr: 'pipe' })
+function git(args: string[], root = repoRoot): string {
+  const result = Bun.spawnSync(['git', '-C', root, ...args], { stdout: 'pipe', stderr: 'pipe' })
   if (result.exitCode !== 0) throw new Error(result.stderr.toString().trim())
   return result.stdout.toString()
 }
-function tree(commit: string): Set<string> { return new Set(git(['ls-tree', '-r', '--name-only', '-z', commit]).split('\0').filter(Boolean)) }
+function tree(commit: string, root = repoRoot): Set<string> { return new Set(git(['ls-tree', '-r', '--name-only', '-z', commit], root).split('\0').filter(Boolean)) }
 function worktree(): string[] { return git(['ls-files', '--cached', '--others', '--exclude-standard', '-z']).split('\0').filter(Boolean) }
-function objectText(commit: string, path: string): string { return git(['show', `${commit}:${path}`]) }
+function objectText(commit: string, path: string): string { return git(['show', `${commit}:${path}`], craftSourceRoot) }
 function fileSha256(path: string): string {
   return createHash('sha256').update(readFileSync(resolve(repoRoot, path))).digest('hex')
 }
@@ -40,7 +43,7 @@ function isRestored(path: string): boolean {
   )
 }
 
-const restoreFiles = tree(restored.restoredSource)
+const restoreFiles = tree(restored.restoredSource, craftSourceRoot)
 const productFiles = tree(restored.productBaseline)
 const files = worktree().filter(path => existsSync(resolve(repoRoot, path)))
 const errors: string[] = []

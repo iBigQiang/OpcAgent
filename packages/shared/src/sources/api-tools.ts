@@ -5,7 +5,8 @@
  * Each tool accepts { path, method, params } and auto-injects authentication.
  */
 
-import { createSdkMcpServer, tool } from '@anthropic-ai/claude-agent-sdk';
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { z } from 'zod';
 import type { ApiConfig } from './types.ts';
 import { debug } from '../utils/debug.ts';
@@ -84,6 +85,12 @@ function isTokenGetter(
 /** Summarize callback type — typically agent.runMiniCompletion.bind(agent) */
 export type SummarizeCallback = (prompt: string) => Promise<string | null>;
 
+interface ApiToolInput {
+  path: string;
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+  params?: Record<string, unknown>;
+  _intent?: string;
+}
 
 /**
  * Build headers for an API request, injecting authentication and default headers
@@ -223,7 +230,7 @@ export function buildToolDescription(config: ApiConfig): string {
  * @param credential - API credential source (string for API key/token, BasicAuthCredential for basic auth,
  *                     empty string for public APIs, or async function for OAuth token refresh)
  * @param sessionPath - Optional path to session folder for saving large responses
- * @returns SDK tool that can be included in an MCP server
+ * @returns Tool definition that can be registered with an MCP server
  */
 export function createApiTool(
   config: ApiConfig,
@@ -236,16 +243,21 @@ export function createApiTool(
 
   const description = buildToolDescription(config);
 
-  return tool(
-    toolName,
+  const inputSchema = {
+    path: z.string().describe('API endpoint path, e.g., "/search" or "/v1/completions"'),
+    method: z.enum(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'])
+      .describe('HTTP method - check documentation for correct method per endpoint'),
+    params: z.record(z.string(), z.unknown()).optional()
+      .describe('Request body (POST/PUT/PATCH) or query parameters (GET). For non-JSON bodies, pass { _rawBody: "raw string content", _contentType: "text/plain" } — _rawBody is sent as-is without JSON encoding, _contentType defaults to text/plain if omitted'),
+    _intent: z.string().optional()
+      .describe('REQUIRED: Describe what you are trying to accomplish with this API call (1-2 sentences)'),
+  };
+
+  return {
+    name: toolName,
     description,
-    {
-      path: z.string().describe('API endpoint path, e.g., "/search" or "/v1/completions"'),
-      method: z.enum(['GET', 'POST', 'PUT', 'DELETE', 'PATCH']).describe('HTTP method - check documentation for correct method per endpoint'),
-      params: z.record(z.string(), z.unknown()).optional().describe('Request body (POST/PUT/PATCH) or query parameters (GET). For non-JSON bodies, pass { _rawBody: "raw string content", _contentType: "text/plain" } — _rawBody is sent as-is without JSON encoding, _contentType defaults to text/plain if omitted'),
-      _intent: z.string().optional().describe('REQUIRED: Describe what you are trying to accomplish with this API call (1-2 sentences)'),
-    },
-    async (args) => {
+    inputSchema,
+    handler: async (args: ApiToolInput): Promise<CallToolResult> => {
       const { path, method, params, _intent } = args;
 
       try {
@@ -339,8 +351,8 @@ export function createApiTool(
           isError: true,
         };
       }
-    }
-  );
+    },
+  };
 }
 
 /**
@@ -350,21 +362,32 @@ export function createApiTool(
  * @param credential - API credential source (string for API key/token, BasicAuthCredential for basic auth,
  *                     empty string for public APIs, or async function for OAuth token refresh)
  * @param sessionPath - Optional path to session folder for saving large responses
- * @returns SDK MCP server that can be passed to query()
+ * @returns In-process MCP server configuration used by the shared client pool
  */
 export function createApiServer(
   config: ApiConfig,
   credential: ApiCredentialSource,
   sessionPath?: string,
   summarize?: SummarizeCallback
-): ReturnType<typeof createSdkMcpServer> {
+): { type: 'sdk'; name: string; instance: McpServer } {
   debug(`[api-tools] Creating server for ${config.name}${sessionPath ? ` (session: ${sessionPath})` : ''}`);
 
   const apiTool = createApiTool(config, credential, sessionPath, summarize);
 
-  return createSdkMcpServer({
-    name: `api_${config.name}`,
-    version: '1.0.0',
-    tools: [apiTool],
-  });
+  const name = `api_${config.name}`;
+  const server = new McpServer({ name, version: '1.0.0' });
+  server.registerTool(
+    apiTool.name,
+    {
+      description: apiTool.description,
+      inputSchema: apiTool.inputSchema,
+    },
+    apiTool.handler,
+  );
+
+  return {
+    type: 'sdk',
+    name,
+    instance: server,
+  };
 }

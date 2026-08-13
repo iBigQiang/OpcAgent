@@ -2,23 +2,23 @@ import { describe, expect, it } from 'bun:test'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
-const SDK_EXTERNAL = '@anthropic-ai/claude-agent-sdk'
+const CLAUDE_SDK = '@anthropic-ai/claude-agent-sdk'
 
 describe('Electron CJS build configuration', () => {
-  it('externalizes the Claude SDK in main-process bundles', () => {
+  it('keeps the removed Claude SDK out of main-process bundles', () => {
     const buildScript = readFileSync(resolve(import.meta.dir, 'electron-build-main.ts'), 'utf-8')
     const devScript = readFileSync(resolve(import.meta.dir, 'electron-dev.ts'), 'utf-8')
     const packageJson = JSON.parse(
       readFileSync(resolve(import.meta.dir, '../apps/electron/package.json'), 'utf-8'),
     ) as { scripts: Record<string, string> }
 
-    expect(buildScript).toContain(`--external:${SDK_EXTERNAL}`)
-    expect(devScript).toContain(`"${SDK_EXTERNAL}"`)
+    expect(buildScript).not.toContain(CLAUDE_SDK)
+    expect(devScript).not.toContain(CLAUDE_SDK)
     expect(devScript).toMatch(
       /const mainContext = await esbuild\.context\([\s\S]*?external: MAIN_BUNDLE_EXTERNALS/,
     )
-    expect(packageJson.scripts['build:main']).toContain(`--external:${SDK_EXTERNAL}`)
-    expect(packageJson.scripts['build:main:win']).toContain(`--external:${SDK_EXTERNAL}`)
+    expect(packageJson.scripts['build:main']).not.toContain(CLAUDE_SDK)
+    expect(packageJson.scripts['build:main:win']).not.toContain(CLAUDE_SDK)
   })
 
   it('keeps agent runtime modules out of the preload dependency graph', () => {

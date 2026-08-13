@@ -202,12 +202,8 @@ function getElectronCommand(): string[] {
   return [ELECTRON_BIN, ...userDataArg, ...remoteDebuggingArg, "apps/electron"];
 }
 
-// Claude Agent SDK calls `createRequire(import.meta.url)` during module init.
-// Externalizing it preserves the native ESM import.meta.url when Electron loads
-// the otherwise-CJS main bundle. Keep this aligned with electron-build-main.ts.
 const MAIN_BUNDLE_EXTERNALS = [
   "electron",
-  "@anthropic-ai/claude-agent-sdk",
   "@aws-sdk/client-s3",
 ];
 

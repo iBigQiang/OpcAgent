@@ -11,7 +11,7 @@
       "reason": "Craft file reviewed and adapted for the locked OPC Agent Lite product boundary"
     },
     "apps/cli/package.json": {
-      "sha256": "d5a191658faa60f4087875dc8a32dd1cb43a9a409d2bda57df6bb25580aafdac",
+      "sha256": "cf9264db02ef084b6c8bb18334b6545ba88b5683b054a5a7f33276ad7069ff7b",
       "reason": "Craft CLI reduced to retained commands and the Pi-only OPC Agent runtime"
     },
     "apps/cli/src/client.ts": {
@@ -35,7 +35,7 @@
       "reason": "Craft CLI reduced to retained commands and the Pi-only OPC Agent runtime"
     },
     "apps/electron/electron-builder.yml": {
-      "sha256": "b3dec6cfaf1732808e0b6a499cf82a1af202d120f1b32a5734019ddfb105fad3",
+      "sha256": "e004fd904166e2ae87fdb674bb5aa351f8a7f6bf6fe0331d69cf5897136ce7b8",
       "reason": "Craft file reviewed and adapted for the locked OPC Agent Lite product boundary"
     },
     "apps/electron/eslint-rules/no-direct-navigation-state.cjs": {
@@ -51,7 +51,7 @@
       "reason": "Craft file reviewed and adapted for the locked OPC Agent Lite product boundary"
     },
     "apps/electron/package.json": {
-      "sha256": "cb39bef4d3b8d9a439586b2fb6374e305a925304ad054ea22345d1d4bb122fa7",
+      "sha256": "3f295d307b7510c10104dd74572ff15c810488d84b825e94c45086b3f8591994",
       "reason": "Craft file reviewed and adapted for the locked OPC Agent Lite product boundary"
     },
     "apps/electron/resources/bin/doc-diff": {
@@ -823,7 +823,7 @@
       "reason": "Craft file reviewed and adapted for the locked OPC Agent Lite product boundary"
     },
     "apps/webui/package.json": {
-      "sha256": "03e1f5d0d0282f093e5721f165d6fd16fb9c92ba816d1c968507e349c1e67edf",
+      "sha256": "76990dca685af9f0eceb51c91b8a3864b971c58621c560d3702a3975d973587d",
       "reason": "Craft Sources WebUI protocol support restored through the existing OPC Agent web adapter."
     },
     "apps/webui/src/adapter/web-api.ts": {
@@ -875,7 +875,7 @@
       "reason": "Craft Sources WebUI protocol support restored through the existing OPC Agent web adapter."
     },
     "bun.lock": {
-      "sha256": "41972803b1a211ffaeb0bb6128dd3335f12ec70e27055d93e60829a385892e29",
+      "sha256": "e84c9b26f385b3f07ab9b0e8f310b9f50d6d35ee07e2e92c879a007a5b0c1377",
       "reason": "Craft Sources runtime dependencies and validation scripts restored within the existing OPC Agent package layout."
     },
     "NOTICE": {
@@ -883,11 +883,11 @@
       "reason": "Craft file reviewed and adapted for the locked OPC Agent Lite product boundary"
     },
     "package.json": {
-      "sha256": "9510b213b6851f21724a26fc629b7bd46848b2b44bd3f8cc9efec2cb2bc076de",
+      "sha256": "51230256dbbb1a6f3c94251c6219559755f49ba7d3f16739d1b198f7cf156bec",
       "reason": "Craft Sources runtime dependencies and validation scripts restored within the existing OPC Agent package layout."
     },
     "packages/core/package.json": {
-      "sha256": "d8bf4dd18296a98fdb9e01ed063bce9aa84fce90beefa94cb6476b578dacf092",
+      "sha256": "62ad9da11499211e701bdbbe95f16b5942d000338c3e97392e147d4f03507745",
       "reason": "Craft Sources event and message contracts restored while retaining OPC Agent core session types."
     },
     "packages/core/README.md": {
@@ -919,7 +919,7 @@
       "reason": "Craft Sources event and message contracts restored while retaining OPC Agent core session types."
     },
     "packages/pi-agent-server/package.json": {
-      "sha256": "0d4502fea7e79801774a5b7a4c433877f017fc399a3c071594dbf5c67f46cf9c",
+      "sha256": "60934b03786b3e260ad75addb3692e9add4d3f06460179f9125ca2a33ee844a0",
       "reason": "Craft Pi subprocess adapted to the retained provider and session-tool contract"
     },
     "packages/pi-agent-server/src/index.ts": {
@@ -983,7 +983,7 @@
       "reason": "Craft Pi subprocess adapted to the retained provider and session-tool contract"
     },
     "packages/server-core/package.json": {
-      "sha256": "5edd5c12de002a712e843e2824e4576a95dfd992dfe5f5cb79991460e11bbca0",
+      "sha256": "33370f57ba288a948fd975cdf43ebeedbfc56a8e400e1b7e0793b0df53fce3a6",
       "reason": "Craft Sources server integration restored with OPC Agent Pi sessions, RPC transport, Browser, and queued-message behavior preserved."
     },
     "packages/server-core/src/bootstrap/headless-start.ts": {
@@ -1171,7 +1171,7 @@
       "reason": "Craft WebUI source and OAuth exports restored while retaining OPC Agent server composition."
     },
     "packages/server/package.json": {
-      "sha256": "e3fb62797652ac5e216414b6d741a023255bc51972965f6d8044baaf6d51d843",
+      "sha256": "9f71b7902d5c0e6b74b14901ccc8d1f17b627cc9248df9b259f444b536770503",
       "reason": "Craft server module reduced to retained local workspace, session, and WebUI behavior"
     },
     "packages/server/src/__tests__/smoke.test.ts": {
@@ -1183,7 +1183,7 @@
       "reason": "Craft Sources server integration restored with OPC Agent Pi sessions, RPC transport, Browser, and queued-message behavior preserved."
     },
     "packages/session-tools-core/package.json": {
-      "sha256": "f47b29d72cdf50f3609559a19ce059a586dbf33fa0692ae25cc60fe24be4cfa0",
+      "sha256": "236f1551603134f6e7c3147da3a992cd46ac760ae54e3b3a0b3d1d5c854f8aeb",
       "reason": "Craft source session tools restored with OPC Agent package names and retained Browser and session-management contracts."
     },
     "packages/session-tools-core/src/context.ts": {
@@ -1315,7 +1315,7 @@
       "reason": "Craft shared module reduced to retained Pi, session, configuration, Skill, and UI behavior"
     },
     "packages/shared/package.json": {
-      "sha256": "b6c5fa6db43638e4ca4c1fd843a04e194e7078cb30af240efbae5b34609e4669",
+      "sha256": "497065e41b4e88646c6b84729ea093c22e33e5cc0cf3e3dbd1472c0fb099306d",
       "reason": "Craft Sources runtime dependencies are restored with narrow OAuth exports required by the Electron preload boundary."
     },
     "packages/shared/src/__tests__/feature-flags.test.ts": {
@@ -1983,7 +1983,7 @@
       "reason": "Craft source activation event handling restored in the retained OPC Agent shared chat UI."
     },
     "packages/ui/package.json": {
-      "sha256": "57f39b752330aaccb3c439e1877b09a05780762e202c1763b32e87cd8a562210",
+      "sha256": "d04951c1d2b31a6430adfd4b494817e78a25b3c05ded9714a56b89da95d3c287",
       "reason": "Craft source activation event handling restored in the retained OPC Agent shared chat UI."
     },
     "packages/ui/src/components/annotations/block-markers.ts": {
@@ -2095,7 +2095,7 @@
       "reason": "Craft quality automation adapted for OPC Agent localization validation"
     },
     "scripts/electron-build-main.ts": {
-      "sha256": "654cdc60cb58c6b6fd758af141f59905d86f46cd104ec48c43723421d1ed96d0",
+      "sha256": "d76184d49dd57d89ac5de992cb535e86c202efc4e161e2ba5e79de7c2f62eb08",
       "reason": "Craft build or quality automation adapted to OPC Agent targets and the pinned lineage checks"
     },
     "scripts/electron-build-resources.ts": {
@@ -2103,7 +2103,7 @@
       "reason": "Craft build or quality automation adapted to OPC Agent targets and the pinned lineage checks"
     },
     "scripts/electron-dev.ts": {
-      "sha256": "3a9083980e7ed88a50b93d43e91cf7466d4a52f7a6f3b1845bec119657d6d394",
+      "sha256": "2cc24d8fa7fae597802d55993c07d7abd39412841420bef91816a9d909ab9def",
       "reason": "Craft build or quality automation adapted to OPC Agent targets and the pinned lineage checks"
     },
     "scripts/install-app.ps1": {
@@ -2117,11 +2117,11 @@
   },
   "mkOnly": {
     ".github/workflows/ci.yml": {
-      "sha256": "72aef8e0a8d06a9bd164d3d7d8946d74f6d0e59f4776dbd1f70d242d9288dadc",
+      "sha256": "12b62633d037d17e68588170c9fb29dfc052e55fed4ee28305c314367edfe037",
       "reason": "OPC-Agent-specific file required by branding, packaging, or the locked Lite boundary"
     },
     ".github/workflows/release.yml": {
-      "sha256": "441b4949d2adc85d8922c5b063973ff02bd65aee10af32e813cee3630ef00f2f",
+      "sha256": "a04ff818afa7a02224e5d0ee664e97966ca73f8da7494ad041592ee696b77993",
       "reason": "OPC-Agent-specific file required by branding, packaging, or the locked Lite boundary"
     },
     ".github/workflows/upstream-drift.yml": {
@@ -2189,7 +2189,7 @@
       "reason": "Regression test for retained OPC Agent behavior not covered at the same Craft path"
     },
     "CHANGELOG.md": {
-      "sha256": "712923f4d2d70069e1731a84983a786bc39c6e9e41abe3bdba50fe8beb423c43",
+      "sha256": "6e0b669bc079db499fcf9d7c25a05410fee0ad7885377161056f5d854e52ffa8",
       "reason": "OPC-Agent-specific release metadata required by the public artifact workflow"
     },
     "packages/pi-agent-server/src/opcagent-metadata-schema.test.ts": {
@@ -2297,7 +2297,7 @@
       "reason": "OPC Agent chat utility isolates user-message timestamp formatting from renderer-only dependencies"
     },
     "scripts/audit-craft-reuse.ts": {
-      "sha256": "4b336dc8abb230ee341300a3cfdca5b2785c9f959b72b5f06ca8148892091c28",
+      "sha256": "c4290d66104ed8324f4252b66e2b76cb788ee970eea15c16d4d6e49dc0e2b309",
       "reason": "OPC Agent lineage, build, or validation guard required by the derivative release workflow"
     },
     "scripts/build-server.test.ts": {
@@ -2305,11 +2305,11 @@
       "reason": "Regression test for retained OPC Agent behavior not covered at the same Craft path"
     },
     "scripts/check-craft-test-coverage.ts": {
-      "sha256": "d67616829e04f98f7597b53dd2b81e0451e732ba97fcf294482a443a763c400f",
+      "sha256": "385c36387cf5ff72cf46737323454eb2fda2dd50342853839858133e047fabc7",
       "reason": "OPC Agent lineage, build, or validation guard required by the derivative release workflow"
     },
     "scripts/check-craft-ui-sync.ts": {
-      "sha256": "3148dafe453a846eff060d18cc38647defd4f2dfb6c2f4400ec3ca4264a6fb77",
+      "sha256": "828b28f55dd1cb3524f8f966978d5225127d8301d5a408c22c21b88b9107884f",
       "reason": "OPC Agent lineage, build, or validation guard required by the derivative release workflow"
     },
     "scripts/check-i18n-usage.ts": {
@@ -2325,7 +2325,7 @@
       "reason": "OPC Agent lineage, build, or validation guard required by the derivative release workflow"
     },
     "scripts/electron-build.test.ts": {
-      "sha256": "63362faf29dd34cd94efdf832faec3d8c09c28895480900d2003b38447c728eb",
+      "sha256": "07a557767cadf54a7ad78079ea3d7c17332866250dc980d4c534da6a08713c01",
       "reason": "Regression tests keep Electron main builds aligned on native SDK loading and prevent agent runtime modules from entering the preload graph."
     },
     "scripts/release.ts": {
@@ -2337,51 +2337,51 @@
       "reason": "OPC Agent test discovery excludes generated artifacts and vendored submodule tests from CI"
     },
     "apps\\cli\\package.json": {
-      "sha256": "d5a191658faa60f4087875dc8a32dd1cb43a9a409d2bda57df6bb25580aafdac",
+      "sha256": "cf9264db02ef084b6c8bb18334b6545ba88b5683b054a5a7f33276ad7069ff7b",
       "reason": "OPC-Agent-specific release metadata required by the release workflow"
     },
     "apps\\electron\\package.json": {
-      "sha256": "cb39bef4d3b8d9a439586b2fb6374e305a925304ad054ea22345d1d4bb122fa7",
+      "sha256": "3f295d307b7510c10104dd74572ff15c810488d84b825e94c45086b3f8591994",
       "reason": "OPC-Agent-specific release metadata required by the release workflow"
     },
     "apps\\webui\\package.json": {
-      "sha256": "03e1f5d0d0282f093e5721f165d6fd16fb9c92ba816d1c968507e349c1e67edf",
+      "sha256": "76990dca685af9f0eceb51c91b8a3864b971c58621c560d3702a3975d973587d",
       "reason": "OPC-Agent-specific release metadata required by the release workflow"
     },
     "packages\\core\\package.json": {
-      "sha256": "e5f361da39e07bff5aea3165e7e1610b057bfd7ff69b970bb7394c4f99dc7fa3",
+      "sha256": "62ad9da11499211e701bdbbe95f16b5942d000338c3e97392e147d4f03507745",
       "reason": "OPC-Agent-specific release metadata required by the release workflow"
     },
     "packages\\messaging-gateway\\package.json": {
-      "sha256": "95b534225a8315f419476c744d48eb7b9757f243608cc58784c851e4aec7641c",
+      "sha256": "823b7dc4aef58113beca0718cf35e121752f30b44cbb970f49156749d11f7661",
       "reason": "OPC-Agent-specific release metadata required by the release workflow"
     },
     "packages\\messaging-whatsapp-worker\\package.json": {
-      "sha256": "aa5323c31ccae026cffd93c438b4d0f89425fcb858cc42be3e44a98e1f3b39da",
+      "sha256": "0daf1eb8441540fbca02a2070084514bf092d681a5c49ed52d244d588658c015",
       "reason": "OPC-Agent-specific release metadata required by the release workflow"
     },
     "packages\\pi-agent-server\\package.json": {
-      "sha256": "0d4502fea7e79801774a5b7a4c433877f017fc399a3c071594dbf5c67f46cf9c",
+      "sha256": "60934b03786b3e260ad75addb3692e9add4d3f06460179f9125ca2a33ee844a0",
       "reason": "OPC-Agent-specific release metadata required by the release workflow"
     },
     "packages\\server-core\\package.json": {
-      "sha256": "3eff7c2db0d73c2b9dbffdb6f1bd0bbff3186ba0b4cd0c2e5f6cc42b014f599b",
+      "sha256": "33370f57ba288a948fd975cdf43ebeedbfc56a8e400e1b7e0793b0df53fce3a6",
       "reason": "OPC-Agent-specific release metadata required by the release workflow"
     },
     "packages\\server\\package.json": {
-      "sha256": "53b19be69a7d122eb372847d9e937ab48f0aea90b89916193a5813e5a7dff9cb",
+      "sha256": "9f71b7902d5c0e6b74b14901ccc8d1f17b627cc9248df9b259f444b536770503",
       "reason": "OPC-Agent-specific release metadata required by the release workflow"
     },
     "packages\\session-tools-core\\package.json": {
-      "sha256": "f47b29d72cdf50f3609559a19ce059a586dbf33fa0692ae25cc60fe24be4cfa0",
+      "sha256": "236f1551603134f6e7c3147da3a992cd46ac760ae54e3b3a0b3d1d5c854f8aeb",
       "reason": "OPC-Agent-specific release metadata required by the release workflow"
     },
     "packages\\shared\\package.json": {
-      "sha256": "169993d2088ac75a258737406ad2cf716a4b8e4737f433f9f299c3ec028d624a",
+      "sha256": "497065e41b4e88646c6b84729ea093c22e33e5cc0cf3e3dbd1472c0fb099306d",
       "reason": "OPC-Agent-specific release metadata required by the release workflow"
     },
     "packages\\ui\\package.json": {
-      "sha256": "fe820baf447a0b559c5984dd91df7d6bd915227f5c9a85510dabd45fd23be424",
+      "sha256": "d04951c1d2b31a6430adfd4b494817e78a25b3c05ded9714a56b89da95d3c287",
       "reason": "OPC-Agent-specific release metadata required by the release workflow"
     },
     "apps\\electron\\resources\\release-notes\\0.1.1.md": {
@@ -2841,7 +2841,7 @@
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "docs/comparison-with-craft.md": {
-      "sha256": "3a3faec437acc904ff9b23bd59f7cf7fa8eff79a6cb6acfac079200a43556a0d",
+      "sha256": "2b011beba7aefbc3be380515ca3c4f24d8788fa3fb3723bdfa262b2ac5e48468",
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "docs/connections.md": {
@@ -2957,7 +2957,7 @@
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "docs/zh/comparison-with-craft.md": {
-      "sha256": "d525c39cf918df71f7ae4356f909f35ad504ff95d6142f1392a7bcb1205b8d8e",
+      "sha256": "b0427f4022dd3689ade69d383a3b3c0463b3d44468230bfd8693188abe6a7d0a",
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "docs/zh/connections.md": {
@@ -3025,7 +3025,7 @@
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "packages/messaging-gateway/package.json": {
-      "sha256": "95b534225a8315f419476c744d48eb7b9757f243608cc58784c851e4aec7641c",
+      "sha256": "823b7dc4aef58113beca0718cf35e121752f30b44cbb970f49156749d11f7661",
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "packages/messaging-gateway/src/__tests__/binding-access-router.test.ts": {
@@ -3069,7 +3069,7 @@
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "packages/messaging-whatsapp-worker/package.json": {
-      "sha256": "aa5323c31ccae026cffd93c438b4d0f89425fcb858cc42be3e44a98e1f3b39da",
+      "sha256": "0daf1eb8441540fbca02a2070084514bf092d681a5c49ed52d244d588658c015",
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "packages/messaging-whatsapp-worker/src/media.ts": {
@@ -4025,7 +4025,7 @@
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "apps/electron/scripts/installer-config.test.ts": {
-      "sha256": "9ddad4fa9b28ccffcb7bdc16bad8f0d34ddf7d0175ecbbdc52cd0f2e96c5cd11",
+      "sha256": "5833f46e23b7cf74a5d5c1a7380cc7c733cab19b80f4705e5acc375d90a7afad",
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "packages/shared/src/version/manifest.test.ts": {
@@ -4034,6 +4034,30 @@
     },
     "scripts/generate-release-manifest.ts": {
       "sha256": "55f75d71033299d4b1367afe63276c264da98a26d8342310acf6a960983cdc8e",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "apps\\electron\\resources\\release-notes\\0.1.2.md": {
+      "sha256": "8f4bdb0f9ebf4567c563ba5deebbebddcd9167ca55b11645f5c5304424f4533b",
+      "reason": "OPC-Agent-specific release metadata required by the release workflow"
+    },
+    "packages/shared/src/mcp/api-source-pool-client.ts": {
+      "sha256": "1e1c81e3500d4cbd55e3ae2599dca8b8798c6b4f3d8aeaa01d4dd8b31858e82b",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "packages/shared/src/sources/__tests__/api-tools-credential-freshness.test.ts": {
+      "sha256": "984ee312119ba6c6adc863cfa51527d48eef90348fdefa4351dc99c140c435e6",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "packages/shared/src/sources/api-tools.ts": {
+      "sha256": "b94af23d024d75dbeb001e6c8f5c107a08389fee473e677b695077a7407f771d",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "packages/shared/src/sources/server-builder.ts": {
+      "sha256": "2eccfdaa4eae35248e94f16b6395110fe14e8508413fb31df2203c7e3c8c3a0f",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "apps/electron/resources/release-notes/0.1.2.md": {
+      "sha256": "8f4bdb0f9ebf4567c563ba5deebbebddcd9167ca55b11645f5c5304424f4533b",
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     }
   },

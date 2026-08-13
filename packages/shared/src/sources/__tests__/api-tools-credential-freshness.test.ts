@@ -16,7 +16,8 @@
  */
 
 import { describe, test, expect } from 'bun:test';
-import { createApiTool } from '../api-tools.ts';
+import { createApiServer, createApiTool } from '../api-tools.ts';
+import { ApiSourcePoolClient } from '../../mcp/api-source-pool-client.ts';
 import type { ApiConfig } from '../types.ts';
 
 interface MinimalTool {
@@ -122,6 +123,30 @@ describe('createApiTool: credential freshness', () => {
       await tool.handler({ path: '/ping', method: 'GET' });
       expect(f.lastHeaders()?.['X-API-Key']).toBe('key-B');
     } finally {
+      f.restore();
+    }
+  });
+});
+
+describe('createApiServer: standard MCP SDK transport', () => {
+  test('lists and calls an API source tool without the Claude Agent SDK', async () => {
+    const server = createApiServer(makeBearerConfig(), 'test-token');
+    const client = new ApiSourcePoolClient(server.instance);
+    const f = captureFetch();
+
+    try {
+      const tools = await client.listTools();
+      expect(tools.map(tool => tool.name)).toEqual(['api_test-bearer']);
+
+      const result = await client.callTool('api_test-bearer', {
+        path: '/ping',
+        method: 'GET',
+      }) as { content: Array<{ type: string; text: string }> };
+
+      expect(result.content).toEqual([{ type: 'text', text: '{}' }]);
+      expect(f.lastHeaders()?.['Authorization']).toBe('Bearer test-token');
+    } finally {
+      await client.close();
       f.restore();
     }
   });

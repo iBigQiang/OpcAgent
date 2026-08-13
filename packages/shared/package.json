@@ -1,6 +1,6 @@
 {
   "name": "@opcagent/shared",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "license": "Apache-2.0",
   "description": "Shared business logic for OPC Agent clients and the Pi backend",
   "type": "module",
@@ -83,7 +83,6 @@
     "@earendil-works/pi-coding-agent": "0.80.6"
   },
   "peerDependencies": {
-    "@anthropic-ai/claude-agent-sdk": "0.3.197",
     "@modelcontextprotocol/sdk": ">=1.29.0",
     "zod": ">=4.0.0"
   },

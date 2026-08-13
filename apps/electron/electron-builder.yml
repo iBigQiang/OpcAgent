@@ -12,6 +12,9 @@ files:
   - dist/**/*
   - "!dist/renderer/src/**"
   - "!**/*.map"
+  - "!node_modules/@opcagent{,/**/*}"
+  - "!node_modules/@anthropic-ai/claude-agent-sdk{,/**/*}"
+  - "!node_modules/@anthropic-ai/claude-agent-sdk-*{,/**/*}"
   - package.json
   - vendor/bun/**/*
 
