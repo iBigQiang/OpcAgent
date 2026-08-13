@@ -49,6 +49,9 @@ export {
   canUpdateSdkCwd,
   flagSession,
   unflagSession,
+  setSessionLabels,
+  setSessionProjectId,
+  unbindProjectFromSessions,
   // Pending plan execution (Accept & Compact flow)
   setPendingPlanExecution,
   markCompactionComplete,

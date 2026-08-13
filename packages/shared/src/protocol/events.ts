@@ -9,6 +9,8 @@ import type {
   UnreadSummary,
   UpdateInfo,
 } from './dto.ts';
+import type { LoadedProject } from '../projects/types.ts';
+import type { PlatformRuntimeInfo } from '@mkagent/messaging-gateway';
 
 export interface BroadcastEventMap {
   [RPC_CHANNELS.sessions.EVENT]: [event: SessionEvent];
@@ -16,6 +18,12 @@ export interface BroadcastEventMap {
   [RPC_CHANNELS.sessions.FILES_CHANGED]: [sessionId: string];
   [RPC_CHANNELS.sources.CHANGED]: [workspaceId: string, sources: LoadedSource[]];
   [RPC_CHANNELS.skills.CHANGED]: [workspaceId: string, skills: LoadedSkill[]];
+  [RPC_CHANNELS.labels.CHANGED]: [workspaceId: string];
+  [RPC_CHANNELS.projects.CHANGED]: [workspaceId: string, projects: LoadedProject[]];
+  [RPC_CHANNELS.automations.CHANGED]: [workspaceId: string];
+  [RPC_CHANNELS.messaging.BINDING_CHANGED]: [workspaceId: string];
+  [RPC_CHANNELS.messaging.PLATFORM_STATUS]: [workspaceId: string, runtime: PlatformRuntimeInfo | PlatformRuntimeInfo[]];
+  [RPC_CHANNELS.messaging.PENDING_CHANGED]: [workspaceId: string];
   [RPC_CHANNELS.llmConnections.CHANGED]: [];
   [RPC_CHANNELS.permissions.DEFAULTS_CHANGED]: [value: null];
   [RPC_CHANNELS.theme.APP_CHANGED]: [theme: ThemeOverrides | null];

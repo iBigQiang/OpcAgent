@@ -135,6 +135,7 @@ export abstract class BaseAgent implements AgentBackend {
       session: config.session,
       debugMode: config.debugMode,
       systemPromptPreset: config.systemPromptPreset,
+      getProjectPromptContext: config.getProjectPromptContext,
       isHeadless: config.isHeadless,
     });
     this.prerequisiteManager = new PrerequisiteManager({

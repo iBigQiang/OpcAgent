@@ -51,6 +51,11 @@ import {
 } from '@mkagent/shared/config'
 import { loadSkillBySlug, type LoadedSkill } from '@mkagent/shared/skills'
 import { loadWorkspaceConfig } from '@mkagent/shared/workspaces'
+import { loadProjectPromptContext } from '@mkagent/shared/projects'
+import { AutomationSystem, type PendingPrompt } from '@mkagent/shared/automations'
+import { evaluateAutoLabels } from '@mkagent/shared/labels/auto/evaluator'
+import { formatLabelEntry } from '@mkagent/shared/labels'
+import { listLabels } from '@mkagent/shared/labels/storage'
 import { McpClientPool } from '@mkagent/shared/mcp'
 import {
   SERVER_BUILD_ERRORS,
@@ -80,6 +85,8 @@ import {
   markCompactionComplete as markStoredCompactionComplete,
   markPendingPlanExecutionDispatched as markStoredPendingPlanExecutionDispatched,
   saveSession as saveStoredSession,
+  setSessionLabels as setStoredSessionLabels,
+  setSessionProjectId as setStoredSessionProjectId,
   sessionPersistenceQueue,
   serializeSession,
   setPendingPlanExecution as setStoredPendingPlanExecution,
@@ -334,12 +341,32 @@ interface ManagedSession extends SessionConfig {
   pendingExternalHeader?: SessionHeader
 }
 
+export interface ExecutePromptAutomationInput {
+  workspaceId: string
+  workspaceRootPath: string
+  prompt: string
+  labels?: string[]
+  permissionMode?: PermissionMode
+  mentions?: string[]
+  llmConnection?: string
+  model?: string
+  thinkingLevel?: ThinkingLevel
+  automationName?: string
+  telegramTopic?: string
+  waitForCompletion?: boolean
+  sourceEvent?: string
+}
+
 export interface AutoRetryPendingHost {
   autoRetryPending?: {
     content: string
     deadlineMs: number
     committed: boolean
   }
+}
+
+export function shouldDispatchAgentAutomation(triggeredBy: ManagedSession['triggeredBy']): boolean {
+  return triggeredBy === undefined
 }
 
 export function claimAutoRetryPending(
@@ -389,6 +416,9 @@ export function createManagedSession(
     llmConnection: session.llmConnection,
     connectionLocked: session.connectionLocked,
     thinkingLevel: normalizeThinkingLevel(session.thinkingLevel),
+    labels: session.labels,
+    projectId: session.projectId,
+    triggeredBy: session.triggeredBy,
     pendingPlanExecution: session.pendingPlanExecution,
     isArchived: session.isArchived,
     archivedAt: session.archivedAt,
@@ -439,6 +469,8 @@ export function resolveMidStreamDeliveryOutcome(
 export class SessionManager implements ISessionManager {
   private sessions = new Map<string, ManagedSession>()
   private configWatchers = new Map<string, ConfigWatcher>()
+  /** Inert until enableAutomationRuntime() is called by an explicitly authorized host. */
+  private automationSystems = new Map<string, AutomationSystem>()
   private eventSink: EventSink = () => {}
   private initPromise: Promise<void> | null = null
   private activeViewingByWorkspace = new Map<string, string>()
@@ -458,7 +490,8 @@ export class SessionManager implements ISessionManager {
       for (const workspace of getWorkspaces()) {
         this.setupConfigWatcher(workspace.rootPath, workspace.id)
         for (const metadata of listStoredSessions(workspace.rootPath)) {
-          this.sessions.set(metadata.id, createManagedSession(metadata, workspace))
+          const managed = createManagedSession(metadata, workspace)
+          this.sessions.set(metadata.id, managed)
         }
       }
       this.refreshBadge()
@@ -593,6 +626,8 @@ export class SessionManager implements ISessionManager {
       archivedAt: managed.archivedAt,
       supportsBranching: managed.agent?.supportsBranching ?? true,
       parentSessionId: managed.parentSessionId,
+      labels: managed.labels,
+      projectId: managed.projectId,
     }
   }
 
@@ -654,6 +689,15 @@ export class SessionManager implements ISessionManager {
       parentSessionId: options.parentSessionId,
     })
 
+    if (options.labels) {
+      await setStoredSessionLabels(workspace.rootPath, stored.id, options.labels)
+      stored.labels = options.labels
+    }
+    if (options.projectId) {
+      await setStoredSessionProjectId(workspace.rootPath, stored.id, options.projectId)
+      stored.projectId = options.projectId
+    }
+
     if (branchSource && options.branchFromSessionId && options.branchFromMessageId) {
       const branchPath = getSessionStoragePath(workspace.rootPath, stored.id)
       const sourcePath = getSessionStoragePath(workspace.rootPath, options.branchFromSessionId)
@@ -698,6 +742,7 @@ export class SessionManager implements ISessionManager {
     }
 
     this.sessions.set(managed.id, managed)
+    this.automationSystems.get(workspace.rootPath)?.setInitialSessionMetadata(managed.id, this.automationMetadata(managed))
     await this.flushSession(managed.id)
     if (internal.emitCreatedEvent !== false) this.notifySessionCreated(workspace.id, managed.id)
     return this.toSession(managed, true)
@@ -723,8 +768,21 @@ export class SessionManager implements ISessionManager {
     sessionPersistenceQueue.cancel(sessionId)
     deleteStoredSession(managed.workspace.rootPath, sessionId)
     this.sessions.delete(sessionId)
+    this.automationSystems.get(managed.workspace.rootPath)?.removeSessionMetadata(sessionId)
     this.emit(managed.workspace.id, { type: 'session_deleted', sessionId })
     this.refreshBadge()
+  }
+
+  async unbindProjectFromLoadedSessions(workspaceId: string, projectId: string): Promise<number> {
+    const matches = [...this.sessions.values()].filter(managed => (
+      managed.workspace.id === workspaceId && managed.projectId === projectId
+    ))
+    for (const managed of matches) {
+      managed.projectId = undefined
+      await this.flushSession(managed.id)
+      this.emit(managed.workspace.id, { type: 'project_id_changed', sessionId: managed.id, projectId: null })
+    }
+    return matches.length
   }
 
   private async updateMetadata(
@@ -736,6 +794,7 @@ export class SessionManager implements ISessionManager {
     if (!managed) return
     Object.assign(managed, updates)
     await this.flushSession(sessionId)
+    this.notifyAutomationMetadata(managed)
     if (event) this.emit(managed.workspace.id, event)
   }
 
@@ -776,6 +835,23 @@ export class SessionManager implements ISessionManager {
       return
     }
     this.ensureMessagesLoaded(managed)
+
+    if (!options?.hidden && shouldDispatchAgentAutomation(managed.triggeredBy)) {
+      const automatic = evaluateAutoLabels(message, listLabels(managed.workspace.rootPath))
+        .map(match => formatLabelEntry(match.labelId, match.value || undefined))
+      if (automatic.length > 0) {
+        const nextLabels = [...new Set([...(managed.labels ?? []), ...automatic])]
+        if (nextLabels.length !== managed.labels?.length) await this.setSessionLabels(sessionId, nextLabels)
+      }
+    }
+
+    const automationSystem = this.automationSystems.get(managed.workspace.rootPath)
+    if (!options?.hidden && shouldDispatchAgentAutomation(managed.triggeredBy)) {
+      void automationSystem?.executeAgentEvent('UserPromptSubmit', {
+        hook_event_name: 'UserPromptSubmit',
+        prompt: message,
+      }).catch(error => log.error('UserPromptSubmit automation failed', error))
+    }
 
     // Pre-enable sources required by invoked skills (Issue #249)
     // This eliminates the two-turn penalty where the agent discovers missing sources at runtime.
@@ -940,6 +1016,14 @@ export class SessionManager implements ISessionManager {
     let stopReason: SessionCompletionEvent['stopReason'] = 'complete'
     try {
       const agent = await this.getOrCreateAgent(managed)
+      const automationSystem = this.automationSystems.get(managed.workspace.rootPath)
+      if (shouldDispatchAgentAutomation(managed.triggeredBy)) {
+        void automationSystem?.executeAgentEvent('SessionStart', {
+          hook_event_name: 'SessionStart',
+          source: managed.sdkSessionId ? 'resume' : 'startup',
+          model: managed.model,
+        }).catch(error => log.error('SessionStart automation failed', error))
+      }
       for await (const event of agent.chat(message, attachments)) {
         if (this.handleAgentEvent(managed, event)) stopReason = 'error'
       }
@@ -964,6 +1048,11 @@ export class SessionManager implements ISessionManager {
       }
       await this.flushSession(managed.id)
       runtimeHooks.onSessionStopped()
+      if (shouldDispatchAgentAutomation(managed.triggeredBy)) {
+        void this.automationSystems.get(managed.workspace.rootPath)?.executeAgentEvent('Stop', {
+          hook_event_name: 'Stop',
+        }).catch(error => log.error('Stop automation failed', error))
+      }
       for (const listener of this.completionListeners) listener({ sessionId: managed.id, stopReason })
       if (managed.messageQueue.length) this.processNextQueuedMessage(managed.id)
     }
@@ -991,9 +1080,27 @@ export class SessionManager implements ISessionManager {
         this.emit(managed.workspace.id, { type: 'text_delta', sessionId, delta: event.text, turnId: event.turnId })
         break
       case 'tool_start':
+        if (shouldDispatchAgentAutomation(managed.triggeredBy)) {
+          void this.automationSystems.get(managed.workspace.rootPath)?.executeAgentEvent('PreToolUse', {
+            hook_event_name: 'PreToolUse',
+            tool_name: event.toolName,
+            tool_input: event.input,
+            tool_use_id: event.toolUseId,
+          }).catch(error => log.error('PreToolUse automation failed', error))
+        }
         this.emit(managed.workspace.id, { type: 'tool_start', sessionId, toolName: event.toolName, toolUseId: event.toolUseId, toolInput: event.input, toolIntent: event.intent, toolDisplayName: event.displayName, toolDisplayMeta: event.toolDisplayMeta, turnId: event.turnId, parentToolUseId: event.parentToolUseId, timestamp: this.nextTimestamp() })
         break
       case 'tool_result':
+        if (shouldDispatchAgentAutomation(managed.triggeredBy)) {
+          void this.automationSystems.get(managed.workspace.rootPath)?.executeAgentEvent(event.isError ? 'PostToolUseFailure' : 'PostToolUse', {
+            hook_event_name: event.isError ? 'PostToolUseFailure' : 'PostToolUse',
+            tool_name: event.toolName,
+            tool_input: event.input,
+            tool_response: event.result,
+            tool_use_id: event.toolUseId,
+            ...(event.isError ? { error: event.result } : {}),
+          }).catch(error => log.error('PostToolUse automation failed', error))
+        }
         this.emit(managed.workspace.id, { type: 'tool_result', sessionId, toolUseId: event.toolUseId, toolName: event.toolName ?? 'tool', result: event.result, isError: event.isError, turnId: event.turnId, parentToolUseId: event.parentToolUseId, timestamp: this.nextTimestamp() })
         break
       case 'status':
@@ -1174,6 +1281,7 @@ export class SessionManager implements ISessionManager {
         break
     }
     this.persistSession(managed)
+    this.notifyAutomationMetadata(managed)
     return isTurnError
   }
 
@@ -1300,6 +1408,9 @@ export class SessionManager implements ISessionManager {
         thinkingLevel: managed.thinkingLevel,
         isHeadless: !this.browserPaneManager,
         skipConfigWatcher: true,
+        getProjectPromptContext: () => managed.projectId
+          ? loadProjectPromptContext(managed.workspace.rootPath, managed.projectId)
+          : null,
         mcpPool: managed.mcpPool,
         initialSources: {
           enabledSources,
@@ -1732,6 +1843,17 @@ export class SessionManager implements ISessionManager {
       sessionId,
       enabledSourceSlugs: managed.enabledSourceSlugs,
     })
+  }
+
+  async setSessionLabels(sessionId: string, labels: string[]): Promise<void> {
+    const managed = this.sessions.get(sessionId)
+    if (!managed) throw new Error(`Session not found: ${sessionId}`)
+    const normalized = [...new Set(labels.map(label => label.trim()).filter(Boolean))]
+    await setStoredSessionLabels(managed.workspace.rootPath, sessionId, normalized)
+    managed.labels = normalized
+    await this.flushSession(sessionId)
+    this.notifyAutomationMetadata(managed)
+    this.emit(managed.workspace.id, { type: 'labels_changed', sessionId, labels: normalized })
   }
 
   async respondToCredential(
@@ -2215,12 +2337,78 @@ export class SessionManager implements ISessionManager {
         if (!managed) return
         if (managed.isProcessing) managed.pendingExternalHeader = header
         else this.applyExternalSessionMetadata(managed, header)
+        this.notifyAutomationMetadata(managed)
       },
     }
 
     const watcher = new ConfigWatcher(workspaceRootPath, callbacks)
     watcher.start()
     this.configWatchers.set(workspaceRootPath, watcher)
+  }
+
+  /**
+   * Explicit opt-in runtime contract. initialize() does not invoke this, so
+   * opening MkAgent cannot execute persisted prompt or webhook automations.
+   */
+  enableAutomationRuntime(workspaceId: string): boolean {
+    const workspace = getWorkspaces().find(item => item.id === workspaceId || item.slug === workspaceId)
+    if (!workspace || this.automationSystems.has(workspace.rootPath)) return false
+    const system = new AutomationSystem({
+      workspaceRootPath: workspace.rootPath,
+      workspaceId: workspace.id,
+      enableScheduler: true,
+      onPromptsReady: prompts => { void this.executeAutomationPrompts(workspace.id, workspace.rootPath, prompts) },
+      onError: (event, error) => log.error(`Automation ${event} failed`, error),
+    })
+    for (const managed of this.sessions.values()) {
+      if (managed.workspace.rootPath === workspace.rootPath) system.setInitialSessionMetadata(managed.id, this.automationMetadata(managed))
+    }
+    this.automationSystems.set(workspace.rootPath, system)
+    return true
+  }
+
+  disableAutomationRuntime(workspaceId: string): void {
+    const workspace = getWorkspaces().find(item => item.id === workspaceId || item.slug === workspaceId)
+    if (!workspace) return
+    const system = this.automationSystems.get(workspace.rootPath)
+    if (!system) return
+    void system.dispose()
+    this.automationSystems.delete(workspace.rootPath)
+  }
+
+  private automationMetadata(managed: ManagedSession) {
+    return { permissionMode: managed.permissionMode, labels: managed.labels, isFlagged: managed.isFlagged, sessionName: managed.name }
+  }
+
+  private notifyAutomationMetadata(managed: ManagedSession): void {
+    void this.automationSystems.get(managed.workspace.rootPath)?.updateSessionMetadata(managed.id, this.automationMetadata(managed))
+      .catch(error => log.error('Failed to emit automation metadata event', error))
+  }
+
+  private async executeAutomationPrompts(workspaceId: string, workspaceRootPath: string, prompts: PendingPrompt[]): Promise<void> {
+    await Promise.allSettled(prompts.map(prompt => this.executePromptAutomation({
+      workspaceId, workspaceRootPath, prompt: prompt.prompt, labels: prompt.labels, permissionMode: prompt.permissionMode,
+      mentions: prompt.mentions, llmConnection: prompt.llmConnection, model: prompt.model,
+      thinkingLevel: prompt.thinkingLevel, automationName: prompt.automationName,
+      sourceEvent: prompt.sourceEvent,
+    })))
+  }
+
+  async executePromptAutomation(input: ExecutePromptAutomationInput): Promise<{ sessionId: string }> {
+    const session = await this.createSession(input.workspaceId, {
+      name: input.automationName ?? `Automation: ${input.prompt.slice(0, 50)}`,
+      labels: input.labels, permissionMode: input.permissionMode, llmConnection: input.llmConnection,
+      model: input.model, thinkingLevel: input.thinkingLevel,
+    })
+    const managed = this.sessions.get(session.id)
+    if (managed) {
+      managed.triggeredBy = { automationName: input.automationName, event: input.sourceEvent, timestamp: Date.now() }
+      await this.flushSession(session.id)
+    }
+    const send = this.sendMessage(session.id, input.prompt)
+    if (input.waitForCompletion === false) void send.catch(error => log.error('Automation prompt dispatch failed', error))
+    else await send
+    return { sessionId: session.id }
   }
 
   notifyConfigFileChange(workspaceRootPath: string, relativePath: string): void {
@@ -2326,6 +2514,8 @@ export class SessionManager implements ISessionManager {
   cleanup(): void {
     for (const watcher of this.configWatchers.values()) watcher.stop()
     this.configWatchers.clear()
+    for (const system of this.automationSystems.values()) void system.dispose()
+    this.automationSystems.clear()
     for (const managed of this.sessions.values()) {
       if (managed.autoRetryTimer) clearTimeout(managed.autoRetryTimer)
       void managed.mcpPool?.disconnectAll()

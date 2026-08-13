@@ -81,6 +81,7 @@ export type EditContextKey =
   | 'add-source-local' // Filter-specific: user is viewing Local Folders
   | 'add-skill'
   | 'edit-tool-icons'
+  | 'automation-config'
 
 /**
  * Full edit configuration including context for agent and example for UI.
@@ -114,6 +115,17 @@ export interface EditConfig {
  * Each entry contains all strings needed for the edit popover and agent context.
  */
 const EDIT_CONFIGS: Record<EditContextKey, (location: string) => EditConfig> = {
+  'automation-config': (location) => ({
+    context: {
+      label: 'Automation Configuration',
+      filePath: `${location}/automations.json`,
+      context: 'Edit the workspace automation configuration. Preserve valid JSON and do not add credentials.',
+    },
+    example: 'Add a scheduled automation',
+    model: 'default',
+    systemPromptPreset: 'mini',
+    inlineExecution: true,
+  }),
   'workspace-permissions': (location) => ({
     context: {
       label: 'Permission Settings',

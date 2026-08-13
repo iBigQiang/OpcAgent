@@ -92,6 +92,8 @@ export interface PromptBuilderConfig {
   };
   /** System prompt preset ('default' | 'mini' | custom string) */
   systemPromptPreset?: 'default' | 'mini' | string;
+  /** Re-resolves authorized project context immediately before a model call. */
+  getProjectPromptContext?: () => import('../../projects/types.ts').ProjectPromptContext | null;
   /** Whether running in headless mode */
   isHeadless?: boolean;
 }

@@ -1809,6 +1809,7 @@ export class PiAgent extends BaseAgent {
         this.config.systemPromptPreset,
         'MkAgent Backend', // backendName
         getCoAuthorPreference(),
+        this.promptBuilder.getProjectPromptContext(),
       );
 
       const promptModeDiagnostics = getPermissionModeDiagnostics(this._sessionId)

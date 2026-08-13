@@ -37,6 +37,22 @@ describe('session persistence header conflict helpers', () => {
     expect(getHeaderMetadataSignature(a)).not.toBe(getHeaderMetadataSignature(b))
   })
 
+  it('treats project bindings as metadata', () => {
+    const a = makeHeader({ projectId: 'proj_11111111' })
+    const b = makeHeader({ projectId: 'proj_22222222' })
+
+    expect(getHeaderMetadataSignature(a)).not.toBe(getHeaderMetadataSignature(b))
+    expect(mergeHeaderWithExternalMetadata(a, b).projectId).toBe('proj_22222222')
+  })
+
+  it('treats labels as metadata so external deletion cleanup is preserved', () => {
+    const a = makeHeader({ labels: ['label-one', 'label-two'] })
+    const b = makeHeader({ labels: ['label-two'] })
+
+    expect(getHeaderMetadataSignature(a)).not.toBe(getHeaderMetadataSignature(b))
+    expect(mergeHeaderWithExternalMetadata(a, b).labels).toEqual(['label-two'])
+  })
+
   it('merge preserves external metadata while keeping local computed fields', () => {
     const local = makeHeader({
       name: 'Local Name',

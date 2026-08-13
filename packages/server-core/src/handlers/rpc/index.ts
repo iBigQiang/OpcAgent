@@ -2,11 +2,15 @@ import type { RpcServer } from '@mkagent/server-core/transport'
 import type { HandlerDeps } from '../handler-deps'
 
 import { registerAuthHandlers } from './auth'
+import { registerAutomationsHandlers } from './automations'
 import { registerFilesHandlers } from './files'
+import { registerLabelsHandlers } from './labels'
 import { registerLlmConnectionsHandlers } from './llm-connections'
 import { registerOnboardingHandlers } from './onboarding'
 import { registerOAuthHandlers } from './oauth'
 import { registerResourcesHandlers } from './resources'
+import { registerProjectsHandlers } from './projects'
+import { registerMessagingHandlers } from './messaging'
 import { registerSessionsHandlers } from './sessions'
 export { registerSessionsHandlers, cleanupSessionFileWatchForClient } from './sessions'
 import { registerServerHandlers } from './server'
@@ -25,11 +29,15 @@ export function registerCoreRpcHandlers(
   serverCtx?: ServerHandlerContext,
 ): void {
   registerAuthHandlers(server, deps)
+  registerAutomationsHandlers(server, deps)
   registerFilesHandlers(server, deps)
+  registerLabelsHandlers(server, deps)
   registerLlmConnectionsHandlers(server, deps)
   registerOnboardingHandlers(server, deps)
   registerOAuthHandlers(server, deps)
   registerResourcesHandlers(server, deps)
+  registerProjectsHandlers(server, deps)
+  registerMessagingHandlers(server, deps)
   registerSessionsHandlers(server, deps)
   if (serverCtx) registerServerHandlers(server, deps, serverCtx)
   registerSettingsHandlers(server, deps)

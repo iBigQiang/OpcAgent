@@ -35,6 +35,20 @@ function makeBuilder() {
 describe('PromptBuilder volatile/stable context split (issue #862)', () => {
   afterEach(() => cleanupModeState(SESSION_ID))
 
+  it('resolves project context only in stable context and refreshes it per call', () => {
+    let memory = 'first'
+    const builder = new PromptBuilder({
+      workspace: createMockWorkspace(),
+      session: createMockSession(),
+      getProjectPromptContext: () => ({ memoryContent: memory, assetFilenames: ['reference.txt'] }),
+    })
+    expect(builder.buildVolatileContextParts(OPTS).join('\n')).not.toContain('<project_context>')
+    expect(builder.buildStableContextParts().join('\n')).toContain('<project_memory>\nfirst\n</project_memory>')
+    expect(builder.buildStableContextParts({ includeProjectContext: false }).join('\n')).not.toContain('<project_context>')
+    memory = 'second'
+    expect(builder.buildStableContextParts().join('\n')).toContain('<project_memory>\nsecond\n</project_memory>')
+  })
+
   it('buildContextParts equals [...volatile, ...stable]', () => {
     // No pending one-shot signal → consume is a no-op → repeated calls are stable.
     cleanupModeState(SESSION_ID)

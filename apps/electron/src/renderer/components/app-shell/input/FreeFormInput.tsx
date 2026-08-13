@@ -86,6 +86,8 @@ import {
   stripPiPrefixForDisplay,
 } from './model-picker-helpers'
 import { useModelVisionToggle } from './useModelVisionToggle'
+import { LabelBadgeRow } from '@/components/ui/label-badge-row'
+import type { LabelConfig } from '@mkagent/shared/labels'
 
 function formatFollowUpChipText(text: string, fallback: string, maxLength = 50): string {
   const normalized = text.replace(/\s+/g, ' ').trim()
@@ -184,6 +186,9 @@ export interface FreeFormInputProps {
   sessionFolderPath?: string
   /** Session ID for scoping events like approve-plan */
   sessionId?: string
+  sessionLabels?: string[]
+  labels?: LabelConfig[]
+  onLabelsChange?: (labels: string[]) => void
   /** Disable send action (for tutorial guidance) */
   disableSend?: boolean
   /** Whether the session is empty (no messages yet) - affects context badge prominence */
@@ -274,6 +279,9 @@ export function FreeFormInput({
   onWorkingDirectoryChange,
   sessionFolderPath,
   sessionId,
+  sessionLabels = [],
+  labels = [],
+  onLabelsChange,
   disableSend = false,
   isEmptySession = false,
   contextStatus,
@@ -1476,6 +1484,13 @@ export function FreeFormInput({
         onDragOver={handleDragOver}
         onDrop={handleDrop}
       >
+        {sessionLabels.length > 0 && (
+          <LabelBadgeRow
+            sessionLabels={sessionLabels}
+            labels={labels}
+            onLabelsChange={onLabelsChange}
+          />
+        )}
         {/* Inline Slash Command Autocomplete */}
         <InlineSlashCommand
           open={inlineSlash.isOpen}

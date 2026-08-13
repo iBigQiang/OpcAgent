@@ -490,6 +490,7 @@ export const ChatDisplay = React.forwardRef<ChatDisplayHandle, ChatDisplayProps>
   // Panel focus state (for multi-panel auto-scroll behavior)
   const appShellContext = useAppShellContext()
   const isFocusedPanel = appShellContext?.isFocusedPanel ?? true
+  const { labels = [], onSessionLabelsChange } = appShellContext
 
   // Input is only disabled when explicitly disabled (e.g., agent needs activation)
   // User can type during streaming - submitting will stop the stream and send
@@ -1333,6 +1334,11 @@ export const ChatDisplay = React.forwardRef<ChatDisplayHandle, ChatDisplayProps>
     })
   }
 
+  const handleLabelsChange = React.useCallback((labels: string[]) => {
+    if (!session) return
+    onSessionLabelsChange?.(session.id, labels)
+  }, [session, onSessionLabelsChange])
+
   // Per-frame scroll compensation during input height animation
   // Only compensate when user is "stuck to bottom" - otherwise let them control their scroll position
   const handleAnimatedHeightChange = React.useCallback((delta: number) => {
@@ -1969,6 +1975,9 @@ export const ChatDisplay = React.forwardRef<ChatDisplayHandle, ChatDisplayProps>
               workspaceId,
               workingDirectory,
               onWorkingDirectoryChange,
+              sessionLabels: session.labels,
+              labels,
+              onLabelsChange: handleLabelsChange,
               disableSend: disableSend || connectionUnavailable,
               connectionUnavailable,
               isEmptySession: session.messages.length === 0,

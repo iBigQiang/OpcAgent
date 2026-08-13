@@ -10,6 +10,7 @@ import { APP_VERSION } from '../version/index.ts';
 import { formatBytes } from '../utils/binary-detection.ts';
 import { globSync } from 'glob';
 import os from 'os';
+import type { ProjectPromptContext } from '../projects/types.ts';
 
 /** Maximum size of CLAUDE.md file to include (10KB) */
 const MAX_CONTEXT_FILE_SIZE = 10 * 1024;
@@ -351,6 +352,7 @@ export function getSystemPrompt(
   preset?: SystemPromptPreset | string,
   backendName?: string,
   includeCoAuthoredBy?: boolean,
+  projectContext?: ProjectPromptContext | null,
 ): string {
   // Use mini agent prompt for quick edits (pass workspace root for config paths)
   if (preset === 'mini') {
@@ -364,6 +366,7 @@ export function getSystemPrompt(
 
   // Get project context files for monorepo support (lives in system prompt for persistence across compaction)
   const projectContextFiles = getProjectContextFilesPrompt(workingDirectory);
+  const projectBlock = projectContext ? formatProjectContextForPrompt(projectContext) : '';
 
   // Fall back to the user's current preference when callers don't pin/pass a value,
   // so forgetting the argument can't silently re-enable the co-author trailer (see #576).
@@ -373,11 +376,37 @@ export function getSystemPrompt(
   // to enable prompt caching. The system prompt stays static and cacheable.
   // Safe Mode context is also in user messages for the same reason.
   const basePrompt = getMkAgentAssistantPrompt(workspaceRootPath, backendName, resolvedIncludeCoAuthoredBy);
-  const fullPrompt = `${basePrompt}${preferences}${debugContext}${projectContextFiles}`;
+  const fullPrompt = `${basePrompt}${preferences}${projectBlock}${debugContext}${projectContextFiles}`;
 
   debug('[getSystemPrompt] full prompt length:', fullPrompt.length);
 
   return fullPrompt;
+}
+
+const PROJECT_BLOCK_TAGS = ['project_context', 'project_memory', 'project_assets'] as const;
+
+function sanitizeProjectPromptText(content: string, singleLine = false): string {
+  // eslint-disable-next-line no-control-regex
+  const withoutControls = content.replace(singleLine ? /[\x00-\x1f\x7f]/g : /[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g, '');
+  return PROJECT_BLOCK_TAGS.reduce(
+    (value, tag) => value.replace(new RegExp(`<\\s*/\\s*${tag}\\s*>`, 'gi'), `&lt;/${tag}&gt;`),
+    withoutControls,
+  );
+}
+
+/** Format only the explicitly authorized Project memory and asset file names. */
+export function formatProjectContextForPrompt(context: ProjectPromptContext): string {
+  const lines = ['\n<project_context>'];
+  if (context.memoryContent?.trim()) {
+    lines.push('<project_memory>', sanitizeProjectPromptText(context.memoryContent.trim()), '</project_memory>');
+  }
+  if (context.assetFilenames.length > 0) {
+    lines.push('<project_assets>');
+    for (const filename of context.assetFilenames) lines.push(`- ${sanitizeProjectPromptText(filename, true)}`);
+    lines.push('</project_assets>');
+  }
+  lines.push('This session is explicitly bound to this Project. Use only the context provided above.', '</project_context>\n');
+  return lines.join('\n');
 }
 
 /**

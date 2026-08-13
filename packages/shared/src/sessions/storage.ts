@@ -37,7 +37,7 @@ import type {
 } from './types.ts';
 import type { Plan } from '../agent/plan-types.ts';
 import { debug } from '../utils/debug.ts';
-import { readSessionHeader, readSessionJsonl } from './jsonl.ts';
+import { readSessionHeader, readSessionJsonl, writeSessionJsonl } from './jsonl.ts';
 import { sessionPersistenceQueue } from './persistence-queue.ts';
 
 // Re-export types for convenience
@@ -516,6 +516,7 @@ export async function updateSessionMetadata(
   updates: Partial<Pick<SessionConfig,
     | 'isFlagged'
     | 'name'
+    | 'labels'
     | 'lastReadMessageId'
     | 'hasUnread'
     | 'enabledSourceSlugs'
@@ -526,6 +527,7 @@ export async function updateSessionMetadata(
     | 'llmConnection'
     | 'isArchived'
     | 'archivedAt'
+    | 'projectId'
   >>
 ): Promise<void> {
   const session = loadSession(workspaceRootPath, sessionId);
@@ -533,6 +535,7 @@ export async function updateSessionMetadata(
 
   if (updates.isFlagged !== undefined) session.isFlagged = updates.isFlagged;
   if (updates.name !== undefined) session.name = updates.name;
+  if (updates.labels !== undefined) session.labels = updates.labels;
   if (updates.enabledSourceSlugs !== undefined) session.enabledSourceSlugs = updates.enabledSourceSlugs;
   if (updates.workingDirectory !== undefined) session.workingDirectory = updates.workingDirectory;
   if (updates.sdkCwd !== undefined) session.sdkCwd = updates.sdkCwd;
@@ -543,6 +546,10 @@ export async function updateSessionMetadata(
   if (updates.llmConnection !== undefined) session.llmConnection = updates.llmConnection;
   if (updates.isArchived !== undefined) session.isArchived = updates.isArchived;
   if ('archivedAt' in updates) session.archivedAt = updates.archivedAt;
+  if ('projectId' in updates) {
+    if (updates.projectId === undefined) delete session.projectId;
+    else session.projectId = updates.projectId;
+  }
 
   await saveSession(session);
 }
@@ -559,6 +566,48 @@ export async function flagSession(workspaceRootPath: string, sessionId: string):
  */
 export async function unflagSession(workspaceRootPath: string, sessionId: string): Promise<void> {
   await updateSessionMetadata(workspaceRootPath, sessionId, { isFlagged: false });
+}
+
+/** Set labels for a session. */
+export async function setSessionLabels(
+  workspaceRootPath: string,
+  sessionId: string,
+  labels: string[],
+): Promise<void> {
+  await updateSessionMetadata(workspaceRootPath, sessionId, { labels });
+}
+
+/** Set or clear the project binding for a session. */
+export async function setSessionProjectId(
+  workspaceRootPath: string,
+  sessionId: string,
+  projectId: string | null,
+): Promise<void> {
+  const session = loadSession(workspaceRootPath, sessionId);
+  if (!session) return;
+  if (projectId === null) delete session.projectId;
+  else session.projectId = projectId;
+  // Project binding must be durable before project deletion can unbind its
+  // sessions. Persist it directly rather than allowing the queue's stale disk
+  // header merge to discard this newly added metadata field.
+  writeSessionJsonl(getSessionFilePath(workspaceRootPath, sessionId), session);
+}
+
+/** Unbind all sessions that reference a deleted project. */
+export async function unbindProjectFromSessions(
+  workspaceRootPath: string,
+  projectId: string,
+): Promise<number> {
+  const sessions = listSessions(workspaceRootPath);
+  let touched = 0;
+  for (const metadata of sessions) {
+    const session = loadSession(workspaceRootPath, metadata.id);
+    if (session?.projectId === projectId) {
+      await setSessionProjectId(workspaceRootPath, metadata.id, null);
+      touched++;
+    }
+  }
+  return touched;
 }
 
 

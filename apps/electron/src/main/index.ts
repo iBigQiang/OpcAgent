@@ -29,6 +29,7 @@ import { initializeBackendHostRuntime } from '@mkagent/shared/agent/backend'
 import { initializeReleaseNotes } from '@mkagent/shared/release-notes'
 import { getAllPiModels, getPiModelsForAuthProvider } from '@mkagent/shared/config'
 import { getDefaultWorkspacesDir, ensureDefaultWorkspace } from '@mkagent/shared/workspaces'
+import { createMessagingBootstrap, LarkAdapter, TelegramAdapter, WhatsAppAdapter } from '@mkagent/messaging-gateway'
 import { setBundledAssetsRoot } from '@mkagent/shared/utils'
 import { BrowserPaneManager } from './browser-pane-manager'
 import { registerAllRpcHandlers } from './handlers'
@@ -45,6 +46,9 @@ setupI18n()
 const persistedUiLanguage = getPersistedUiLanguage()
 if (persistedUiLanguage) void i18n.changeLanguage(persistedUiLanguage)
 app.setName(process.env.MKAGENT_APP_NAME || 'MkAgent')
+if (process.env.MKAGENT_USER_DATA_DIR) {
+  app.setPath('userData', process.env.MKAGENT_USER_DATA_DIR)
+}
 
 Sentry.init({
   dsn: process.env.SENTRY_ELECTRON_INGEST_URL,
@@ -75,6 +79,8 @@ let eventSink: ReturnType<WindowManager['getRpcEventSink']> = null
 let resolveClientId: ((webContentsId: number) => string | undefined) | null = null
 let pendingDeepLink: string | null = null
 let isQuitting = false
+let messagingBootstrap: ReturnType<typeof createMessagingBootstrap> | null = null
+let unsubscribeMessagingCompletion: (() => void) | null = null
 
 function findDeepLink(args: string[]): string | undefined {
   return args.find(argument => argument.startsWith('mkagent://'))
@@ -156,6 +162,22 @@ async function start() {
     captureError: error => Sentry.captureException(error),
   })
   const clients = new Map<number, string>()
+  // Registry construction is offline. Adapters are registered here, but no
+  // provider connection starts until the user explicitly invokes connect.
+  messagingBootstrap = createMessagingBootstrap({
+    getMessagingDir: workspaceId => join(getWorkspaces().find(workspace => workspace.id === workspaceId)?.rootPath ?? getDefaultWorkspacesDir(), 'messaging'),
+    sendToSession: async (_workspaceId, sessionId, text) => instance.sessionManager.sendMessage(sessionId, text),
+    logger: mainLog,
+    createAdapter: (platformName, workspaceId) => {
+      if (platformName === 'telegram') return new TelegramAdapter()
+      if (platformName === 'lark') return new LarkAdapter()
+      const workspaceRoot = getWorkspaces().find(workspace => workspace.id === workspaceId)?.rootPath ?? getDefaultWorkspacesDir()
+      const workerEntry = app.isPackaged
+        ? join(process.resourcesPath, 'messaging-whatsapp-worker', 'worker.cjs')
+        : join(process.cwd(), 'packages', 'messaging-whatsapp-worker', 'dist', 'worker.cjs')
+      return new WhatsAppAdapter({ workerEntry, authDir: join(workspaceRoot, 'messaging', 'whatsapp-auth'), electronRunAsNode: app.isPackaged, nodeBin: app.isPackaged ? process.execPath : 'node' })
+    },
+  })
   const token = randomUUID()
   const instance = await bootstrapServer<SessionManager, HandlerDeps>({
     serverToken: token,
@@ -188,14 +210,28 @@ async function start() {
       oauthFlowStore,
       windowManager: windowManager!,
       browserPaneManager: browserPaneManager!,
+      messagingRegistry: messagingBootstrap!.registry,
       onThemePreferencesChanged: preferences => browserPaneManager!.setThemeMode(preferences.mode),
     }),
     registerAllRpcHandlers,
     setSessionEventSink: (manager, sink) => manager.setEventSink(sink),
-    initializeSessionManager: manager => manager.initialize(),
+    initializeSessionManager: async manager => {
+      await manager.initialize()
+      for (const workspace of getWorkspaces()) manager.enableAutomationRuntime(workspace.id)
+      unsubscribeMessagingCompletion = manager.onSessionComplete(event => {
+        if (event.stopReason !== 'complete') return
+        const session = manager.getSessions().find(item => item.id === event.sessionId)
+        const text = manager.getSessionFinalText(event.sessionId)
+        if (session?.workspaceId && text) void messagingBootstrap?.registry.sendSessionText(session.workspaceId, event.sessionId, text)
+      })
+    },
     cleanupSessionManager: async manager => {
       await manager.flushAllSessions()
       manager.cleanup()
+      unsubscribeMessagingCompletion?.()
+      unsubscribeMessagingCompletion = null
+      await messagingBootstrap?.dispose()
+      messagingBootstrap = null
     },
     onClientConnected: ({ clientId, webContentsId }) => {
       if (webContentsId !== null) clients.set(webContentsId, clientId)
@@ -208,6 +244,7 @@ async function start() {
   stopServer = instance.stop
   const sink = instance.wsServer.push.bind(instance.wsServer)
   eventSink = sink
+  messagingBootstrap!.registry.setPublisher((channel, workspaceId, payload) => sink(channel, { to: 'workspace', workspaceId }, workspaceId, payload))
   resolveClientId = id => clients.get(id)
   windowManager.setRpcEventSink(sink, id => clients.get(id))
   setMenuEventSink(sink, id => clients.get(id))

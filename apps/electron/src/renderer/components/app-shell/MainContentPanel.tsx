@@ -19,6 +19,8 @@ import {
   isSettingsNavigation,
   isSourcesNavigation,
   isSkillsNavigation,
+  isAutomationsNavigation,
+  isProjectsNavigation,
 } from '@/contexts/NavigationContext'
 import {
   useSessionSelection,
@@ -32,6 +34,10 @@ import SkillInfoPage from '@/pages/SkillInfoPage'
 import SourceInfoPage from '@/pages/SourceInfoPage'
 import { navigate, routes } from '@/lib/navigate'
 import { getSettingsPageComponent } from '@/pages/settings/settings-pages'
+import { useAtomValue } from 'jotai'
+import { automationsAtom } from '@/atoms/automations'
+import { AutomationInfoPage } from '../automations/AutomationInfoPage'
+import ProjectInfoPage from '@/pages/ProjectInfoPage'
 
 export interface MainContentPanelProps {
   isSidebarAndNavigatorHidden?: boolean
@@ -63,6 +69,7 @@ export function MainContentPanel({
   const isSourceMultiSelectActive = sourceSelection.useIsMultiSelectActive()
   const sourceSelectionCount = sourceSelection.useSelectionCount()
   const { clearMultiSelect: clearSourceSelection } = sourceSelection.useSelection()
+  const automations = useAtomValue(automationsAtom)
 
   const handleBatchArchive = useCallback(() => {
     selectedIds.forEach(sessionId => onArchiveSession(sessionId))
@@ -146,6 +153,16 @@ export function MainContentPanel({
         </div>
       </Panel>,
     )
+  }
+
+  if (isProjectsNavigation(navState)) {
+    if (navState.details) return wrapWithStoplight(<Panel variant="grow" className={className}><ProjectInfoPage projectSlug={navState.details.projectSlug} /></Panel>)
+    return wrapWithStoplight(<Panel variant="grow" className={className}><div className="flex h-full items-center justify-center text-muted-foreground"><p className="text-sm">{t('projectsList.noProjectSelected')}</p></div></Panel>)
+  }
+
+  if (isAutomationsNavigation(navState)) {
+    const automation = navState.details ? automations.find((item) => item.id === navState.details?.automationId) : undefined
+    return wrapWithStoplight(<Panel variant="grow" className={className}>{automation ? <AutomationInfoPage automation={automation} /> : <div className="flex h-full items-center justify-center text-muted-foreground"><p className="text-sm">{t('automations.noAutomationsConfigured')}</p></div>}</Panel>)
   }
 
   if (isSessionsNavigation(navState)) {

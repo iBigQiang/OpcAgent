@@ -5,7 +5,7 @@
  * sessions, Skills, and settings still share the same URL-driven panel model.
  */
 
-import type { NavigationState, SessionFilter, SourceFilter, RightSidebarPanel } from './types'
+import type { AutomationFilter, NavigationState, SessionFilter, SourceFilter, RightSidebarPanel } from './types'
 import { isValidSettingsSubpage } from './settings-registry'
 
 export type RouteType = 'action' | 'view'
@@ -17,16 +17,17 @@ export interface ParsedRoute {
   params: Record<string, string>
 }
 
-export type NavigatorType = 'sessions' | 'sources' | 'skills' | 'settings'
+export type NavigatorType = 'sessions' | 'sources' | 'skills' | 'automations' | 'projects' | 'settings'
 
 export interface ParsedCompoundRoute {
   navigator: NavigatorType
   sessionFilter?: SessionFilter
   sourceFilter?: SourceFilter
+  automationFilter?: AutomationFilter
   details: { type: string; id: string } | null
 }
 
-const COMPOUND_ROUTE_PREFIXES = ['allSessions', 'flagged', 'archived', 'sources', 'skills', 'settings']
+const COMPOUND_ROUTE_PREFIXES = ['allSessions', 'flagged', 'archived', 'label', 'sources', 'skills', 'automations', 'projects', 'settings']
 
 export function isCompoundRoute(route: string): boolean {
   const firstSegment = route.split('?')[0].split('/')[0]
@@ -73,20 +74,43 @@ export function parseCompoundRoute(route: string): ParsedCompoundRoute | null {
     return null
   }
 
+  if (first === 'projects') {
+    if (segments.length === 1) return { navigator: 'projects', details: null }
+    if (segments[1] === 'project' && segments[2] && segments.length === 3) {
+      return { navigator: 'projects', details: { type: 'project', id: segments[2] } }
+    }
+    return null
+  }
+
+  if (first === 'automations') {
+    const type = segments[1] === 'scheduled' || segments[1] === 'event' || segments[1] === 'agentic'
+      ? segments[1] as AutomationFilter['automationType']
+      : undefined
+    const offset = type ? 2 : 1
+    const automationFilter = type ? { kind: 'type' as const, automationType: type } : undefined
+    if (segments.length === offset) return { navigator: 'automations', automationFilter, details: null }
+    if (segments[offset] === 'automation' && segments[offset + 1] && segments.length === offset + 2) {
+      return { navigator: 'automations', automationFilter, details: { type: 'automation', id: segments[offset + 1] } }
+    }
+    return null
+  }
+
   const filter: SessionFilter | null =
     first === 'allSessions' ? { kind: 'allSessions' }
       : first === 'flagged' ? { kind: 'flagged' }
         : first === 'archived' ? { kind: 'archived' }
+          : first === 'label' && segments[1] ? { kind: 'label', labelId: decodeURIComponent(segments[1]) }
           : null
   if (!filter) return null
-  if (segments.length === 1) {
+  const filterOffset = filter.kind === 'label' ? 2 : 1
+  if (segments.length === filterOffset) {
     return { navigator: 'sessions', sessionFilter: filter, details: null }
   }
-  if (segments[1] === 'session' && segments[2] && segments.length === 3) {
+  if (segments[filterOffset] === 'session' && segments[filterOffset + 1] && segments.length === filterOffset + 2) {
     return {
       navigator: 'sessions',
       sessionFilter: filter,
-      details: { type: 'session', id: segments[2] },
+      details: { type: 'session', id: segments[filterOffset + 1] },
     }
   }
   return null
@@ -103,7 +127,16 @@ export function buildCompoundRoute(parsed: ParsedCompoundRoute): string {
   if (parsed.navigator === 'skills') {
     return parsed.details ? `skills/skill/${parsed.details.id}` : 'skills'
   }
-  const base = parsed.sessionFilter?.kind ?? 'allSessions'
+  if (parsed.navigator === 'projects') {
+    return parsed.details ? `projects/project/${parsed.details.id}` : 'projects'
+  }
+  if (parsed.navigator === 'automations') {
+    const base = parsed.automationFilter ? `automations/${parsed.automationFilter.automationType}` : 'automations'
+    return parsed.details ? `${base}/automation/${parsed.details.id}` : base
+  }
+  const base = parsed.sessionFilter?.kind === 'label'
+    ? `label/${encodeURIComponent(parsed.sessionFilter.labelId)}`
+    : parsed.sessionFilter?.kind ?? 'allSessions'
   return parsed.details ? `${base}/session/${parsed.details.id}` : base
 }
 
@@ -122,6 +155,12 @@ function compoundToParsedRoute(compound: ParsedCompoundRoute): ParsedRoute {
     return compound.details
       ? { type: 'view', name: 'skill-info', id: compound.details.id, params: {} }
       : { type: 'view', name: 'skills', params: {} }
+  }
+  if (compound.navigator === 'projects') {
+    return compound.details ? { type: 'view', name: 'project-info', id: compound.details.id, params: {} } : { type: 'view', name: 'projects', params: {} }
+  }
+  if (compound.navigator === 'automations') {
+    return compound.details ? { type: 'view', name: 'automation-info', id: compound.details.id, params: {} } : { type: 'view', name: 'automations', params: {} }
   }
   const filter = compound.sessionFilter ?? { kind: 'allSessions' as const }
   return compound.details
@@ -171,6 +210,12 @@ function compoundToNavigationState(compound: ParsedCompoundRoute): NavigationSta
       details: compound.details ? { type: 'skill', skillSlug: compound.details.id } : null,
     }
   }
+  if (compound.navigator === 'projects') {
+    return { navigator: 'projects', details: compound.details ? { type: 'project', projectSlug: compound.details.id } : null }
+  }
+  if (compound.navigator === 'automations') {
+    return { navigator: 'automations', filter: compound.automationFilter, details: compound.details ? { type: 'automation', automationId: compound.details.id } : null }
+  }
   return {
     navigator: 'sessions',
     filter: compound.sessionFilter ?? { kind: 'allSessions' },
@@ -198,7 +243,16 @@ export function buildRouteFromNavigationState(state: NavigationState): string {
   if (state.navigator === 'skills') {
     return state.details ? `skills/skill/${state.details.skillSlug}` : 'skills'
   }
-  const base = state.filter.kind
+  if (state.navigator === 'projects') {
+    return state.details ? `projects/project/${state.details.projectSlug}` : 'projects'
+  }
+  if (state.navigator === 'automations') {
+    const base = state.filter ? `automations/${state.filter.automationType}` : 'automations'
+    return state.details ? `${base}/automation/${state.details.automationId}` : base
+  }
+  const base = state.filter.kind === 'label'
+    ? `label/${encodeURIComponent(state.filter.labelId)}`
+    : state.filter.kind
   return state.details ? `${base}/session/${state.details.sessionId}` : base
 }
 

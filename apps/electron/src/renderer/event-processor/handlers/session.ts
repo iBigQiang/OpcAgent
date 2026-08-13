@@ -12,6 +12,7 @@ import type {
   ErrorEvent,
   TypedErrorEvent,
   SourcesChangedEvent,
+  ProjectIdChangedEvent,
   SessionFlaggedEvent,
   SessionUnflaggedEvent,
   SessionArchivedEvent,
@@ -623,6 +624,25 @@ export function handleSourcesChanged(
       session: { ...session, enabledSourceSlugs: event.enabledSourceSlugs },
       streaming,
     },
+    effects: [],
+  }
+}
+
+export function handleLabelsChanged(
+  state: SessionState,
+  event: import('../types').LabelsChangedEvent
+): ProcessResult {
+  const { session, streaming } = state
+  return { state: { session: { ...session, labels: event.labels }, streaming }, effects: [] }
+}
+
+export function handleProjectIdChanged(
+  state: SessionState,
+  event: ProjectIdChangedEvent,
+): ProcessResult {
+  const { session, streaming } = state
+  return {
+    state: { session: { ...session, projectId: event.projectId ?? undefined }, streaming },
     effects: [],
   }
 }

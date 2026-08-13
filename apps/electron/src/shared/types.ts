@@ -599,6 +599,62 @@ export interface ElectronAPI {
   setDefaultThinkingLevel(level: ThinkingLevel): Promise<{ success: boolean; error?: string }>
   setWorkspaceDefaultLlmConnection(workspaceId: string, slug: string | null): Promise<{ success: boolean; error?: string }>
 
+  // Labels (workspace-scoped)
+  listLabels(workspaceId: string): Promise<import('@mkagent/shared/labels').LabelConfig[]>
+  createLabel(workspaceId: string, input: import('@mkagent/shared/labels').CreateLabelInput): Promise<import('@mkagent/shared/labels').LabelConfig>
+  updateLabel(workspaceId: string, labelId: string, updates: import('@mkagent/shared/labels').UpdateLabelInput): Promise<import('@mkagent/shared/labels').LabelConfig>
+  deleteLabel(workspaceId: string, labelId: string): Promise<{ stripped: number }>
+  moveLabel(workspaceId: string, labelId: string, parentId: string | null): Promise<void>
+  reorderLabels(workspaceId: string, parentId: string | null, orderedIds: string[]): Promise<void>
+  onLabelsChanged(callback: (workspaceId: string) => void): () => void
+
+  // Projects (workspace-scoped)
+  getProjects(workspaceId: string): Promise<import('@mkagent/shared/projects').LoadedProject[]>
+  getProject(workspaceId: string, projectIdOrSlug: string): Promise<import('@mkagent/shared/projects').LoadedProject | null>
+  createProject(workspaceId: string, input: import('@mkagent/shared/projects').CreateProjectInput): Promise<import('@mkagent/shared/projects').LoadedProject>
+  updateProject(workspaceId: string, projectSlug: string, patch: Partial<Omit<import('@mkagent/shared/projects').ProjectConfig, 'id' | 'slug' | 'createdAt'>>): Promise<import('@mkagent/shared/projects').LoadedProject | null>
+  deleteProject(workspaceId: string, projectSlug: string): Promise<void>
+  listProjectAssets(workspaceId: string, projectSlug: string): Promise<import('@mkagent/shared/projects').ProjectAsset[]>
+  uploadProjectAsset(workspaceId: string, projectSlug: string, input: import('@mkagent/shared/projects').UploadProjectAssetInput): Promise<import('@mkagent/shared/projects').ProjectAsset>
+  deleteProjectAsset(workspaceId: string, projectSlug: string, filename: string): Promise<void>
+  onProjectsChanged(callback: (workspaceId: string, projects: import('@mkagent/shared/projects').LoadedProject[]) => void): () => void
+
+  // Automations
+  getAutomations(workspaceId: string): Promise<unknown>
+  testAutomation(payload: import('@mkagent/shared/protocol').TestAutomationPayload): Promise<import('@mkagent/shared/protocol').TestAutomationResult>
+  setAutomationEnabled(workspaceId: string, eventName: string, matcherIndex: number, enabled: boolean): Promise<void>
+  duplicateAutomation(workspaceId: string, eventName: string, matcherIndex: number): Promise<void>
+  deleteAutomation(workspaceId: string, eventName: string, matcherIndex: number): Promise<void>
+  getAutomationHistory(workspaceId: string, automationId: string, limit?: number): Promise<Array<{ id: string; ts: number; ok: boolean; sessionId?: string; prompt?: string; error?: string; webhook?: { method: string; url: string; statusCode: number; durationMs: number; attempts?: number; error?: string; responseBody?: string } }>>
+  getAutomationLastExecuted(workspaceId: string): Promise<Record<string, number>>
+  replayAutomation(workspaceId: string, automationId: string, eventName: string): Promise<unknown>
+  onAutomationsChanged(callback: (workspaceId: string) => void): () => void
+
+  // Messaging configuration and status. Credentials remain main-process only.
+  getMessagingConfig(): Promise<{ version: 1; enabled: boolean; platforms: Record<string, { enabled?: boolean }> }>
+  updateMessagingConfig(config: Record<string, unknown>): Promise<void>
+  getMessagingRuntime(): Promise<MessagingPlatformRuntimeInfo[]>
+  saveMessagingCredential(platform: MessagingPlatform, value: string): Promise<{ success: boolean }>
+  forgetMessagingCredential(platform: MessagingPlatform): Promise<{ success: boolean }>
+  testTelegramToken(token: string): Promise<{ success: boolean; botName?: string; botUsername?: string; error?: string }>
+  testLarkCredentials(credentials: { appId: string; appSecret: string; domain: 'lark' | 'feishu' }): Promise<{ success: boolean; error?: string }>
+  connectMessagingPlatform(platform: MessagingPlatform): Promise<MessagingPlatformRuntimeInfo[]>
+  disconnectMessagingPlatform(platform: MessagingPlatform): Promise<MessagingPlatformRuntimeInfo[]>
+  getMessagingBindings(): Promise<MessagingBinding[]>
+  bindMessaging(input: { platform: MessagingPlatform; sessionId: string; channelId: string }): Promise<MessagingBinding>
+  unbindMessagingBinding(bindingId: string): Promise<{ success: boolean }>
+  setMessagingBindingAccess(bindingId: string, mode: 'inherit' | 'allow-list' | 'open', allowedSenderIds?: string[]): Promise<void>
+  getMessagingPlatformOwners(platform: MessagingPlatform): Promise<string[]>
+  setMessagingPlatformOwners(platform: MessagingPlatform, ownerIds: string[]): Promise<unknown>
+  getMessagingPlatformAccessMode(platform: MessagingPlatform): Promise<'open' | 'owner-only'>
+  setMessagingPlatformAccessMode(platform: MessagingPlatform, mode: 'open' | 'owner-only'): Promise<unknown>
+  getMessagingPendingSenders(platform?: MessagingPlatform): Promise<MessagingPendingSender[]>
+  dismissMessagingPendingSender(platform: MessagingPlatform, senderId: string): Promise<{ success: boolean }>
+  allowMessagingPendingSender(platform: MessagingPlatform, senderId: string): Promise<string[]>
+  onMessagingBindingChanged(callback: (workspaceId: string) => void): () => void
+  onMessagingPlatformStatus(callback: (workspaceId: string, runtime: MessagingPlatformRuntimeInfo | MessagingPlatformRuntimeInfo[]) => void): () => void
+  onMessagingPendingChanged(callback: (workspaceId: string) => void): () => void
+
   // Language
   changeLanguage(lang: string): Promise<void>
 
@@ -617,6 +673,40 @@ export type SessionFilter =
   | { kind: 'allSessions' }
   | { kind: 'flagged' }
   | { kind: 'archived' }
+  | { kind: 'label'; labelId: string }
+
+export interface AutomationFilter {
+  kind: 'type'
+  automationType: 'scheduled' | 'event' | 'agentic'
+}
+
+export type MessagingPlatform = 'telegram' | 'whatsapp' | 'lark'
+export interface MessagingPlatformRuntimeInfo {
+  platform?: MessagingPlatform
+  configured?: boolean
+  connected?: boolean
+  state?: 'disconnected' | 'connecting' | 'connected' | 'reconnect_required' | 'error'
+  identity?: string
+  qrCode?: string
+  lastError?: string
+}
+export interface MessagingBinding {
+  id: string
+  workspaceId: string
+  sessionId: string
+  platform: MessagingPlatform
+  channelId: string
+  enabled: boolean
+  createdAt: number
+}
+export interface MessagingPendingSender {
+  platform: MessagingPlatform
+  senderId: string
+  senderName?: string
+  bindingId?: string
+  reason: 'not-owner' | 'not-on-binding-allowlist'
+  createdAt: number
+}
 
 export type { SettingsSubpage } from './settings-registry'
 import { isValidSettingsSubpage, type SettingsSubpage } from './settings-registry'
@@ -652,11 +742,26 @@ export interface SkillsNavigationState {
   rightSidebar?: RightSidebarPanel
 }
 
+export interface AutomationsNavigationState {
+  navigator: 'automations'
+  filter?: AutomationFilter
+  details: { type: 'automation'; automationId: string } | null
+  rightSidebar?: RightSidebarPanel
+}
+
+export interface ProjectsNavigationState {
+  navigator: 'projects'
+  details: { type: 'project'; projectSlug: string } | null
+  rightSidebar?: RightSidebarPanel
+}
+
 export type NavigationState =
   | SessionsNavigationState
   | SourcesNavigationState
   | SettingsNavigationState
   | SkillsNavigationState
+  | AutomationsNavigationState
+  | ProjectsNavigationState
 
 export const isSessionsNavigation = (
   state: NavigationState
@@ -674,6 +779,14 @@ export const isSkillsNavigation = (
   state: NavigationState
 ): state is SkillsNavigationState => state.navigator === 'skills'
 
+export const isAutomationsNavigation = (
+  state: NavigationState,
+): state is AutomationsNavigationState => state.navigator === 'automations'
+
+export const isProjectsNavigation = (
+  state: NavigationState,
+): state is ProjectsNavigationState => state.navigator === 'projects'
+
 export const DEFAULT_NAVIGATION_STATE: NavigationState = {
   navigator: 'sessions',
   filter: { kind: 'allSessions' },
@@ -690,6 +803,13 @@ export const getNavigationStateKey = (state: NavigationState): string => {
   }
   if (state.navigator === 'settings') {
     return state.subpage === null ? 'settings' : `settings:${state.subpage}`
+  }
+  if (state.navigator === 'automations') {
+    const base = state.filter ? `automations/${state.filter.automationType}` : 'automations'
+    return state.details ? `${base}/automation/${state.details.automationId}` : base
+  }
+  if (state.navigator === 'projects') {
+    return state.details ? `projects/project/${state.details.projectSlug}` : 'projects'
   }
   const base = state.filter.kind
   return state.details ? `${base}/session/${state.details.sessionId}` : base
@@ -726,12 +846,28 @@ export const parseNavigationStateKey = (key: string): NavigationState | null => 
     const subpage = key.slice(9)
     return isValidSettingsSubpage(subpage) ? { navigator: 'settings', subpage } : null
   }
+  if (key === 'projects') return { navigator: 'projects', details: null }
+  if (key.startsWith('projects/project/')) {
+    const projectSlug = key.slice('projects/project/'.length)
+    return projectSlug ? { navigator: 'projects', details: { type: 'project', projectSlug } } : null
+  }
+  if (key === 'automations') return { navigator: 'automations', details: null }
+  const automationMatch = key.match(/^automations(?:\/(scheduled|event|agentic))?(?:\/automation\/(.+))?$/)
+  if (automationMatch) {
+    const [, automationType, automationId] = automationMatch
+    return {
+      navigator: 'automations',
+      filter: automationType ? { kind: 'type', automationType: automationType as AutomationFilter['automationType'] } : undefined,
+      details: automationId ? { type: 'automation', automationId } : null,
+    }
+  }
 
   const [filterKey, detailType, sessionId] = key.split('/')
   const filter: SessionFilter | null =
     filterKey === 'allSessions' ? { kind: 'allSessions' }
       : filterKey === 'flagged' ? { kind: 'flagged' }
         : filterKey === 'archived' ? { kind: 'archived' }
+          : filterKey === 'label' && detailType ? { kind: 'label', labelId: detailType }
           : null
   if (!filter) return null
   return {

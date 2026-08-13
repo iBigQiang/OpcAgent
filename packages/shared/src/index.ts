@@ -23,3 +23,9 @@
 
 // Export branding (standalone, no dependencies)
 export * from './branding.ts';
+
+// Domain modules restored by AUTH-001. Consumers that need filesystem-backed
+// helpers should continue to import the explicit subpath.
+export * from './automations/index.ts';
+export * from './projects/index.ts';
+export * from './labels/index.ts';

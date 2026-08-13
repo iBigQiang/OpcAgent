@@ -25,7 +25,7 @@ import { useWorkspaceIcons } from '@/hooks/useWorkspaceIcon'
 import { cn } from '@/lib/utils'
 import type { Workspace, ExportResourcesOptions, ResourceImportMode } from '../../../shared/types'
 
-export type SendResourceType = 'source' | 'skill'
+export type SendResourceType = 'source' | 'skill' | 'automation'
 
 export interface SendResourceToWorkspaceDialogProps {
   open: boolean
@@ -47,6 +47,7 @@ export interface SendResourceToWorkspaceDialogProps {
 const RESOURCE_TYPE_LABELS: Record<SendResourceType, { singular: string; plural: string }> = {
   source: { singular: 'source', plural: 'sources' },
   skill: { singular: 'skill', plural: 'skills' },
+  automation: { singular: 'automation', plural: 'automations' },
 }
 
 export function SendResourceToWorkspaceDialog({
@@ -85,7 +86,8 @@ export function SendResourceToWorkspaceDialog({
       // 1. Export the selected resource(s) from current workspace
       const exportOptions: ExportResourcesOptions = {}
       if (resourceType === 'source') exportOptions.sources = resourceIds
-      else exportOptions.skills = resourceIds
+      else if (resourceType === 'skill') exportOptions.skills = resourceIds
+      else throw new Error('Automation transfer is not available in this build')
 
       const { bundle, warnings: exportWarnings } = await window.electronAPI.exportResources(
         activeWorkspaceId,

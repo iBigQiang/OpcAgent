@@ -14,6 +14,8 @@ import {
   Sparkles,
   ToggleRight,
   UserCircle,
+  Tags,
+  MessageSquare,
 } from 'lucide-react'
 import type { SettingsSubpage } from '../../../shared/types'
 
@@ -27,6 +29,8 @@ export const WorkspaceIcon = ({ className }: IconProps) => <Building2 className=
 export const PermissionsIcon = ({ className }: IconProps) => <ShieldCheck className={className} />
 export const ShortcutsIcon = ({ className }: IconProps) => <Keyboard className={className} />
 export const PreferencesIcon = ({ className }: IconProps) => <UserCircle className={className} />
+export const LabelsIcon = ({ className }: IconProps) => <Tags className={className} />
+export const MessagingIcon = ({ className }: IconProps) => <MessageSquare className={className} />
 
 /**
  * Map of settings subpage IDs to their icon components.
@@ -39,6 +43,8 @@ export const SETTINGS_ICONS: Record<SettingsSubpage, React.ComponentType<IconPro
   input: InputIcon,
   workspace: WorkspaceIcon,
   permissions: PermissionsIcon,
+  labels: LabelsIcon,
+  messaging: MessagingIcon,
   shortcuts: ShortcutsIcon,
   preferences: PreferencesIcon,
 }

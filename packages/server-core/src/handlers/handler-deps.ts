@@ -3,6 +3,7 @@ import type { ISessionManager } from './session-manager-interface'
 import type { IOAuthFlowStore } from './oauth-flow-store-interface'
 import type { IBrowserPaneManager } from './browser-pane-manager-interface'
 import type { IWindowManager } from './window-manager-interface'
+import type { IMessagingGatewayRegistry } from './messaging-registry-interface'
 
 /**
  * Generic handler dependency bag.
@@ -24,5 +25,7 @@ export interface HandlerDeps<
   windowManager?: TWindowManager
   browserPaneManager?: TBrowserPaneManager
   oauthFlowStore: TOAuthFlowStore
+  /** Optional host-owned registry; server-core never owns provider credentials. */
+  messagingRegistry?: IMessagingGatewayRegistry
   onThemePreferencesChanged?: (preferences: { mode: string; colorTheme: string; font: string }) => void
 }

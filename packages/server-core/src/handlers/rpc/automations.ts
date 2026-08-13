@@ -4,7 +4,7 @@ import { RPC_CHANNELS } from '@mkagent/shared/protocol'
 import { getWorkspaceByNameOrId } from '@mkagent/shared/config'
 import { appendAutomationHistoryEntry } from '@mkagent/shared/automations/history-store'
 import { AUTOMATION_HISTORY_MAX_RUNS_PER_MATCHER } from '@mkagent/shared/automations/constants'
-import type { RpcServer } from '@mkagent/server-core/transport'
+import { pushTyped, type RpcServer } from '@mkagent/server-core/transport'
 import type { HandlerDeps } from '../handler-deps'
 
 // History file name — matches AUTOMATIONS_HISTORY_FILE from @mkagent/shared/automations/constants
@@ -67,6 +67,10 @@ export const HANDLED_CHANNELS = [
 
 export function registerAutomationsHandlers(server: RpcServer, deps: HandlerDeps): void {
   const log = deps.platform.logger
+
+  function broadcastChanged(workspaceId: string): void {
+    pushTyped(server, RPC_CHANNELS.automations.CHANGED, { to: 'workspace', workspaceId }, workspaceId)
+  }
 
   function requireWorkspaceContext(contextWorkspaceId: string | null, requestedWorkspaceId: string): void {
     if (!contextWorkspaceId || contextWorkspaceId !== requestedWorkspaceId) {
@@ -216,6 +220,7 @@ export function registerAutomationsHandlers(server: RpcServer, deps: HandlerDeps
         matchers[idx].enabled = false
       }
     })
+    broadcastChanged(workspaceId)
   })
 
   // Duplicate an automation matcher
@@ -227,6 +232,7 @@ export function registerAutomationsHandlers(server: RpcServer, deps: HandlerDeps
       clone.name = clone.name ? `${clone.name} Copy` : 'Untitled Copy'
       matchers.splice(idx + 1, 0, clone)
     })
+    broadcastChanged(workspaceId)
   })
 
   // Delete an automation matcher
@@ -239,6 +245,7 @@ export function registerAutomationsHandlers(server: RpcServer, deps: HandlerDeps
         if (eventMap) delete eventMap[eventName]
       }
     })
+    broadcastChanged(workspaceId)
   })
 
   // Read execution history for a specific automation
@@ -306,7 +313,9 @@ export function registerAutomationsHandlers(server: RpcServer, deps: HandlerDeps
       }
     }
 
-    return { results: results.map(r => ({ ...r, duration: r.durationMs ?? 0 })) }
+    const response = { results: results.map(r => ({ ...r, duration: r.durationMs ?? 0 })) }
+    broadcastChanged(workspaceId)
+    return response
   })
 
   // Return last execution timestamp for all automations

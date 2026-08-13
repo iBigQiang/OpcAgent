@@ -56,6 +56,10 @@ export interface AppShellContextType {
   skills?: LoadedSkill[]
   /** Working directory of the active session — needed for project-level skill resolution */
   activeSessionWorkingDirectory?: string
+  /** Workspace label tree, when Labels is enabled. */
+  labels?: import('@mkagent/shared/labels').LabelConfig[]
+  /** Persist session labels through the session command boundary. */
+  onSessionLabelsChange?: (sessionId: string, labels: string[]) => void
   /** Enabled permission modes for Shift+Tab cycling */
   enabledModes?: PermissionMode[]
 
@@ -143,6 +147,15 @@ export interface AppShellContextType {
   chatDisplayRef?: React.RefObject<ChatDisplayHandle>
   /** Callback when ChatDisplay match info changes (for immediate UI updates) */
   onChatMatchInfoChange?: (info: { sessionId: string | null; count: number; index: number; isHighlighting: boolean }) => void
+
+  // Automation management. Optional until the server capability is registered.
+  onTestAutomation?: (automationId: string) => void
+  onToggleAutomation?: (automationId: string) => void
+  onDuplicateAutomation?: (automationId: string) => void
+  onDeleteAutomation?: (automationId: string) => void
+  automationTestResults?: Record<string, import('../components/automations/types').TestResult>
+  getAutomationHistory?: (automationId: string) => Promise<import('../components/automations/types').ExecutionEntry[]>
+  onReplayAutomation?: (automationId: string, event: string) => void
 
 }
 

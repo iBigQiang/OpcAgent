@@ -182,7 +182,7 @@ export class ClaudeCliAgent extends BaseAgent {
   async runMiniCompletion(prompt: string): Promise<string | null> {
     return this.runCli(prompt, {
       model: this.config.miniModel ?? this._model,
-      systemPrompt: this.buildSystemPrompt(),
+      systemPrompt: this.buildSystemPrompt(false),
       resume: false,
       persistSession: false,
     });
@@ -353,10 +353,10 @@ export class ClaudeCliAgent extends BaseAgent {
     return [...attachmentContext, message].join('\n\n');
   }
 
-  private buildSystemPrompt(): string {
+  private buildSystemPrompt(includeProjectContext = true): string {
     return [
       'You are MkAgent, a local coding assistant. Follow workspace instructions and use available tools carefully.',
-      ...this.promptBuilder.buildStableContextParts(),
+      ...this.promptBuilder.buildStableContextParts({ includeProjectContext }),
     ].filter(Boolean).join('\n\n');
   }
 }

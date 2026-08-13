@@ -1251,6 +1251,13 @@ export default function App() {
     window.electronAPI.sessionCommand(sessionId, { type: 'rename', name })
   }, [updateSessionById])
 
+  const handleSessionLabelsChange = useCallback((sessionId: string, labels: string[]) => {
+    updateSessionById(sessionId, { labels })
+    void window.electronAPI.sessionCommand(sessionId, { type: 'setLabels', labels }).catch(error => {
+      console.error('[App] Failed to set session labels:', error)
+    })
+  }, [updateSessionById])
+
   const handleSendMessage = useCallback(async (sessionId: string, message: string, attachments?: FileAttachment[], skillSlugs?: string[], externalBadges?: ContentBadge[]) => {
     try {
       // Capture pre-send processing state so we can flag mid-stream sends
@@ -1294,7 +1301,7 @@ export default function App() {
             messages: [...s.messages, {
               id: generateMessageId(),
               role: 'warning' as const,
-              content: `⚠️ ${failedCount} attachment(s) could not be stored and will not be sent: ${failedNames}`,
+              content: `Warning: ${failedCount} attachment(s) could not be stored and will not be sent: ${failedNames}`,
               timestamp: Date.now()
             }]
           }))
@@ -1831,6 +1838,7 @@ export default function App() {
     onCreateSession: handleCreateSession,
     onSendMessage: handleSendMessage,
     onRenameSession: handleRenameSession,
+    onSessionLabelsChange: handleSessionLabelsChange,
     onFlagSession: handleFlagSession,
     onUnflagSession: handleUnflagSession,
     onArchiveSession: handleArchiveSession,
@@ -1875,6 +1883,7 @@ export default function App() {
     handleCreateSession,
     handleSendMessage,
     handleRenameSession,
+    handleSessionLabelsChange,
     handleFlagSession,
     handleUnflagSession,
     handleArchiveSession,

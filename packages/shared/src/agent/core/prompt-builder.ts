@@ -14,7 +14,7 @@
 
 import { formatPreferencesForPrompt } from '../../config/preferences.ts';
 import { formatSessionState } from '../mode-manager.ts';
-import { getDateTimeContext, getWorkingDirectoryContext } from '../../prompts/system.ts';
+import { formatProjectContextForPrompt, getDateTimeContext, getWorkingDirectoryContext } from '../../prompts/system.ts';
 import { getSessionPlansPath, getSessionDataPath, getSessionPath } from '../../sessions/storage.ts';
 import type {
   PromptBuilderConfig,
@@ -131,7 +131,7 @@ export class PromptBuilder {
    * Pure and idempotent: holds no one-shot state, so it is safe to call any
    * number of times per turn.
    */
-  buildStableContextParts(): string[] {
+  buildStableContextParts(options?: { includeProjectContext?: boolean }): string[] {
     const parts: string[] = [];
 
     // Workspace capabilities
@@ -143,7 +143,17 @@ export class PromptBuilder {
       parts.push(workingDirContext);
     }
 
+    if (options?.includeProjectContext !== false) {
+      const projectContext = this.getProjectPromptContext();
+      if (projectContext) parts.push(formatProjectContextForPrompt(projectContext));
+    }
+
     return parts;
+  }
+
+  /** Resolve the latest authorized Project snapshot for the next model call. */
+  getProjectPromptContext() {
+    return this.config.getProjectPromptContext?.() ?? null;
   }
 
   /**

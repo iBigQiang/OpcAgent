@@ -201,6 +201,9 @@ export function sessionMatchesCurrentFilter(
     case 'archived':
       return session.isArchived === true
 
+    case 'label':
+      return (session.labels ?? []).some((entry) => entry === currentFilter.labelId || entry.startsWith(`${currentFilter.labelId}::`))
+
     default:
       const _exhaustive: never = currentFilter
       return true

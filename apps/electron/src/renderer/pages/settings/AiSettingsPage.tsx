@@ -226,7 +226,7 @@ function ConnectionRow({ connection, isLastConnection, onRenameClick, onDelete, 
     if (validationState === 'success') return t("settings.ai.connectionValid")
     if (validationState === 'error') return validationError || t("settings.ai.validationFailed")
 
-    const platformDescription = getPlatformConnectionDescription(connection.platformProfile)
+    const platformDescription = getPlatformConnectionDescription(connection.platformProfile, t)
     if (platformDescription) return platformDescription
 
     const parts: string[] = []
@@ -239,15 +239,15 @@ function ConnectionRow({ connection, isLastConnection, onRenameClick, onDelete, 
         const piLabel = connection.piAuthProvider
           ? PI_AUTH_PROVIDER_LABELS[connection.piAuthProvider]
           : null
-        parts.push(piLabel ?? 'Pi Backend')
+        parts.push(piLabel ?? t('settings.ai.piBackend'))
         break
       }
       case 'pi_compat':
         parts.push(connection.baseUrl?.toLowerCase().includes('manifest.build')
           ? 'Manifest'
-          : 'Pi Backend Compatible')
+          : t('settings.ai.piBackendCompatible'))
         break
-      default: parts.push(provider || 'Unknown')
+      default: parts.push(provider || t('common.unknown'))
     }
 
     // Base URL for API key connections (show custom endpoint or provider default)
@@ -367,10 +367,10 @@ interface WorkspaceOverrideCardProps {
   onSettingsChange: () => void
 }
 
-const WORKSPACE_SETTING_LABELS: Partial<Record<keyof WorkspaceSettings, string>> = {
-  defaultLlmConnection: 'workspace connection override',
-  model: 'workspace model override',
-  thinkingLevel: 'workspace thinking override',
+const WORKSPACE_SETTING_LABEL_KEYS: Partial<Record<keyof WorkspaceSettings, string>> = {
+  defaultLlmConnection: 'settings.ai.workspaceSetting.connectionOverride',
+  model: 'settings.ai.workspaceSetting.modelOverride',
+  thinkingLevel: 'settings.ai.workspaceSetting.thinkingOverride',
 }
 
 function WorkspaceOverrideCard({ workspace, llmConnections, onSettingsChange }: WorkspaceOverrideCardProps) {
@@ -415,14 +415,15 @@ function WorkspaceOverrideCard({ workspace, llmConnections, onSettingsChange }: 
       // Roll back only the changed key
       setSettings(prev => prev ? { ...prev, [key]: previousValue } : prev)
 
-      const message = error instanceof Error ? error.message : 'Unknown error'
-      const settingLabel = WORKSPACE_SETTING_LABELS[key] ?? String(key)
+      const message = error instanceof Error ? error.message : t('common.unknownError')
+      const settingLabelKey = WORKSPACE_SETTING_LABEL_KEYS[key]
+      const settingLabel = settingLabelKey ? t(settingLabelKey) : String(key)
       console.error(`Failed to save ${String(key)}:`, error)
       toast.error(t("toast.failedToSaveSetting", { setting: settingLabel }), {
         description: message,
       })
     }
-  }, [workspace.id, onSettingsChange, settings])
+  }, [workspace.id, onSettingsChange, settings, t])
 
   const handleConnectionChange = useCallback((slug: string) => {
     // 'global' means use app default (clear workspace override)
@@ -531,8 +532,8 @@ function WorkspaceOverrideCard({ workspace, llmConnections, onSettingsChange }: 
                   ...llmConnections.map((conn) => ({
                     value: conn.slug,
                     label: conn.name,
-                    description: conn.providerType === 'pi' ? 'Pi Backend' :
-                                 conn.providerType || 'Unknown',
+                    description: conn.providerType === 'pi' ? t('settings.ai.piBackend') :
+                                 conn.providerType || t('common.unknown'),
                   })),
                 ]}
               />
@@ -997,10 +998,10 @@ export default function AiSettingsPage() {
                     options={llmConnections.map((conn) => ({
                       value: conn.slug,
                       label: conn.name,
-                      description: getPlatformConnectionDescription(conn.platformProfile)
-                                   ?? (conn.providerType === 'pi' ? 'Pi Backend' :
-                                   conn.providerType === 'pi_compat' ? (conn.baseUrl?.toLowerCase().includes('manifest.build') ? 'Manifest' : 'Pi Backend Compatible') :
-                                   conn.providerType || 'Unknown'),
+                      description: getPlatformConnectionDescription(conn.platformProfile, t)
+                                   ?? (conn.providerType === 'pi' ? t('settings.ai.piBackend') :
+                                   conn.providerType === 'pi_compat' ? (conn.baseUrl?.toLowerCase().includes('manifest.build') ? 'Manifest' : t('settings.ai.piBackendCompatible')) :
+                                   conn.providerType || t('common.unknown')),
                     }))}
                   />
                   <SettingsMenuSelectRow

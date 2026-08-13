@@ -166,6 +166,9 @@ export interface CoreBackendConfig {
   /** System prompt preset ('default' | 'mini' | custom string) */
   systemPromptPreset?: 'default' | 'mini' | string;
 
+  /** Re-resolves authorized project context immediately before a model call. */
+  getProjectPromptContext?: () => import('../../projects/types.ts').ProjectPromptContext | null;
+
   /**
    * Per-session environment variable overrides for the SDK subprocess.
    * Spread after process.env in backend-specific option builders.

@@ -26,6 +26,8 @@ export interface SessionMeta {
   lastMessageAt?: number
   isProcessing?: boolean
   isFlagged?: boolean
+  labels?: string[]
+  projectId?: string
   lastReadMessageId?: string
   workingDirectory?: string
   enabledSourceSlugs?: string[]

@@ -3,11 +3,16 @@ import { RPC_CHANNELS } from '@mkagent/shared/protocol'
 import { CHANNEL_MAP } from '../../../electron/src/transport/channel-map'
 
 describe('WebUI Client API contract', () => {
-  it('maps the retained session, Skill, settings, and Browser surfaces', () => {
+  it('maps retained and restored product surfaces', () => {
     expect(CHANNEL_MAP.getSessions.channel).toBe(RPC_CHANNELS.sessions.GET)
     expect(CHANNEL_MAP.getSkills.channel).toBe(RPC_CHANNELS.skills.GET)
     expect(CHANNEL_MAP.setupLlmConnection.channel).toBe(RPC_CHANNELS.settings.SETUP_LLM_CONNECTION)
     expect(CHANNEL_MAP['browserPane.create'].channel).toBe(RPC_CHANNELS.browserPane.CREATE)
+    expect(CHANNEL_MAP.getProjects.channel).toBe(RPC_CHANNELS.projects.GET)
+    expect(CHANNEL_MAP.listLabels.channel).toBe(RPC_CHANNELS.labels.LIST)
+    expect(CHANNEL_MAP.getAutomations.channel).toBe(RPC_CHANNELS.automations.GET)
+    expect(CHANNEL_MAP.getMessagingRuntime.channel).toBe(RPC_CHANNELS.messaging.GET_RUNTIME)
+    expect(CHANNEL_MAP.onMessagingPendingChanged.channel).toBe(RPC_CHANNELS.messaging.PENDING_CHANGED)
   })
 
   it('contains only channels that exist in the shared protocol', () => {

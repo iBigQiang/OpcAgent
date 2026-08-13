@@ -1,12 +1,17 @@
 import type { LlmPlatformProfile } from '@config/llm-connections'
 
-const PLATFORM_CONNECTION_DESCRIPTIONS: Readonly<Record<LlmPlatformProfile, string>> = {
-  anyrouter: 'AnyRouter-CC · Claude Code CLI',
-  anyrouter_pi: 'AnyRouter-Pi',
-  agentrouter: 'AgentRouter · Pi Backend Compatible',
+type Translate = (key: string) => string
+
+const PLATFORM_CONNECTION_DESCRIPTION_KEYS: Readonly<Record<LlmPlatformProfile, string>> = {
+  anyrouter: 'settings.ai.platform.anyrouter',
+  anyrouter_pi: 'settings.ai.platform.anyrouterPi',
+  agentrouter: 'settings.ai.platform.agentrouter',
 }
 
 /** Returns the fixed runtime label for branded endpoint profiles. */
-export function getPlatformConnectionDescription(platformProfile?: LlmPlatformProfile): string | undefined {
-  return platformProfile ? PLATFORM_CONNECTION_DESCRIPTIONS[platformProfile] : undefined
+export function getPlatformConnectionDescription(
+  platformProfile: LlmPlatformProfile | undefined,
+  t: Translate,
+): string | undefined {
+  return platformProfile ? t(PLATFORM_CONNECTION_DESCRIPTION_KEYS[platformProfile]) : undefined
 }

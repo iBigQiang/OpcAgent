@@ -20,12 +20,16 @@ import type {
 } from '@mkagent/shared/protocol'
 import type { DispatchMode, SessionBundle } from '@mkagent/shared/sessions'
 import type { EventSink } from '../transport'
+import type { ExecutePromptAutomationInput } from '../sessions/SessionManager'
 
 /** Host-neutral contract used by Desktop, WebUI, CLI and headless server handlers. */
 export interface ISessionManager {
   waitForInit(): Promise<void>
   initialize(): Promise<void>
   cleanup(): void
+  enableAutomationRuntime(workspaceId: string): boolean
+  disableAutomationRuntime(workspaceId: string): void
+  executePromptAutomation(input: ExecutePromptAutomationInput): Promise<{ sessionId: string }>
   setEventSink(sink: EventSink): void
   flushAllSessions(): Promise<void>
 
@@ -38,6 +42,7 @@ export interface ISessionManager {
   ): Promise<Session>
   getSessionWorkingDirectory(sessionId: string): string | undefined
   deleteSession(sessionId: string): Promise<void>
+  unbindProjectFromLoadedSessions(workspaceId: string, projectId: string): Promise<number>
 
   flagSession(sessionId: string): Promise<void>
   unflagSession(sessionId: string): Promise<void>
@@ -54,6 +59,7 @@ export interface ISessionManager {
   setSessionThinkingLevel(sessionId: string, level: ThinkingLevel): void
   updateWorkingDirectory(sessionId: string, path: string): void
   setSessionSources(sessionId: string, sourceSlugs: string[]): Promise<void>
+  setSessionLabels(sessionId: string, labels: string[]): Promise<void>
   setSessionConnection(sessionId: string, connectionSlug: string): Promise<void>
   updateSessionModel(
     sessionId: string,

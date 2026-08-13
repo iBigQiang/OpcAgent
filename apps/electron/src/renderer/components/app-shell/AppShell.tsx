@@ -15,6 +15,11 @@ import {
   DatabaseZap,
   Globe,
   FolderOpen,
+  FolderKanban,
+  ListTodo,
+  Clock,
+  Radio,
+  Bot,
 } from "lucide-react"
 import { TopBar } from "./TopBar"
 import { SquarePenRounded } from "../icons/SquarePenRounded"
@@ -62,6 +67,8 @@ import {
   isSettingsNavigation,
   isSourcesNavigation,
   isSkillsNavigation,
+  isAutomationsNavigation,
+  isProjectsNavigation,
 } from "@/contexts/NavigationContext"
 import type { SettingsSubpage } from "../../../shared/types"
 import { SkillsListPanel } from "./SkillsListPanel"
@@ -72,6 +79,13 @@ import { PanelHeader } from "./PanelHeader"
 import { FabNewChat } from "./FabNewChat"
 import { EditPopover, getEditConfig, type EditContextKey } from "@/components/ui/EditPopover"
 import SettingsNavigator from "@/pages/settings/SettingsNavigator"
+import { AutomationsListPanel } from "../automations/AutomationsListPanel"
+import { AUTOMATION_TYPE_TO_FILTER_KIND, matchesAutomationFilter } from "../automations/types"
+import { ProjectsListPanel } from "./ProjectsListPanel"
+import { CreateProjectDialog } from "../projects/CreateProjectDialog"
+import { useAutomations } from "@/hooks/useAutomations"
+import { useProjects } from "@/hooks/useProjects"
+import { useLabels } from "@/hooks/useLabels"
 import {
   PANEL_GAP,
   PANEL_EDGE_INSET,
@@ -250,6 +264,19 @@ function AppShellContent({
 
   const sessionFilter = sessionsContext?.filter ?? null
   const sourceFilter = isSourcesNavigation(navState) ? (navState.filter ?? null) : null
+  const automationFilter = isAutomationsNavigation(navState) ? navState.filter ?? null : null
+  const { projects } = useProjects(activeWorkspaceId)
+  const {
+    automations,
+    automationTestResults,
+    handleTestAutomation,
+    handleToggleAutomation,
+    handleDuplicateAutomation,
+    handleDeleteAutomation,
+    getAutomationHistory,
+    handleReplayAutomation,
+  } = useAutomations(activeWorkspaceId)
+  const { labels } = useLabels(activeWorkspaceId)
 
   // Search state for session list
   const [searchActive, setSearchActive] = React.useState(false)
@@ -731,6 +758,16 @@ function AppShellContent({
     return counts
   }, [sources])
 
+  const automationTypeCounts = useMemo(() => {
+    const counts = { scheduled: 0, event: 0, agentic: 0 }
+    for (const automation of automations) {
+      if (matchesAutomationFilter(automation.event, { kind: 'scheduled' })) counts.scheduled += 1
+      else if (matchesAutomationFilter(automation.event, { kind: 'app' })) counts.event += 1
+      else if (matchesAutomationFilter(automation.event, { kind: 'agent' })) counts.agentic += 1
+    }
+    return counts
+  }, [automations])
+
   // Filter session metadata by the retained built-in views.
   const filteredSessionMetas = useMemo(() => {
     if (!sessionFilter) return []
@@ -769,22 +806,28 @@ function AppShellContent({
     }
   }, [])
 
+  const handleSessionLabelsChange = React.useCallback((sessionId: string, nextLabels: string[]) => {
+    contextValue.onSessionLabelsChange?.(sessionId, nextLabels)
+  }, [contextValue])
+
   // Extend the Craft context with retained MkAgent capabilities only.
   const appShellContextValue = React.useMemo<AppShellContextType>(() => ({
     ...contextValue,
     onDeleteSession: handleDeleteSession,
     enabledSources: sources,
     skills,
+    labels,
     activeSessionWorkingDirectory,
     enabledModes,
     onSessionSourcesChange: handleSessionSourcesChange,
+    onSessionLabelsChange: handleSessionLabelsChange,
     rightSidebarButton: null,
     isCompactMode: isAutoCompact,
     sessionListSearchQuery: searchActive ? searchQuery : undefined,
     isSearchModeActive: searchActive,
     chatDisplayRef,
     onChatMatchInfoChange: handleChatMatchInfoChange,
-  }), [contextValue, handleDeleteSession, sources, skills, activeSessionWorkingDirectory, enabledModes, handleSessionSourcesChange, isAutoCompact, searchActive, searchQuery, handleChatMatchInfoChange])
+  }), [contextValue, handleDeleteSession, sources, skills, labels, activeSessionWorkingDirectory, enabledModes, handleSessionSourcesChange, handleSessionLabelsChange, isAutoCompact, searchActive, searchQuery, handleChatMatchInfoChange])
 
   // Persist sidebar visibility to localStorage
   React.useEffect(() => {
@@ -849,6 +892,34 @@ function AppShellContent({
   const handleSkillsClick = useCallback(() => {
     navigate(routes.view.skills())
   }, [])
+
+  const handleProjectsClick = useCallback(() => {
+    navigate(routes.view.projects())
+  }, [])
+
+  const handleAutomationsClick = useCallback(() => {
+    navigate(routes.view.automations())
+  }, [])
+
+  const handleAutomationsScheduledClick = useCallback(() => {
+    navigate(routes.view.automations({ type: 'scheduled' }))
+  }, [])
+
+  const handleAutomationsEventClick = useCallback(() => {
+    navigate(routes.view.automations({ type: 'event' }))
+  }, [])
+
+  const handleAutomationsAgenticClick = useCallback(() => {
+    navigate(routes.view.automations({ type: 'agentic' }))
+  }, [])
+
+  const [createProjectDialogOpen, setCreateProjectDialogOpen] = useState(false)
+  const handleCreateProject = useCallback(async (name: string) => {
+    if (!activeWorkspace) return
+    const project = await window.electronAPI.createProject(activeWorkspace.id, { name })
+    setCreateProjectDialogOpen(false)
+    navigate(routes.view.projects(project.config.slug))
+  }, [activeWorkspace])
 
   // Handler for settings view. With no arg → bare `settings` route (navigator-only
   // in compact mode, App fallback on desktop). With an arg → `settings/<subpage>`.
@@ -978,9 +1049,14 @@ function AppShellContent({
     { id: 'nav:archived', type: 'nav', action: handleArchivedClick },
     { id: 'nav:sources', type: 'nav', action: handleSourcesClick },
     { id: 'nav:skills', type: 'nav', action: handleSkillsClick },
+    { id: 'nav:projects', type: 'nav', action: handleProjectsClick },
+    { id: 'nav:automations', type: 'nav', action: handleAutomationsClick },
+    { id: 'nav:automations:scheduled', type: 'nav', action: handleAutomationsScheduledClick },
+    { id: 'nav:automations:event', type: 'nav', action: handleAutomationsEventClick },
+    { id: 'nav:automations:agentic', type: 'nav', action: handleAutomationsAgenticClick },
     { id: 'nav:settings', type: 'nav', action: () => handleSettingsClick() },
     { id: 'nav:whats-new', type: 'nav', action: handleWhatsNewClick },
-  ], [handleAllSessionsClick, handleFlaggedClick, handleArchivedClick, handleSourcesClick, handleSkillsClick, handleSettingsClick, handleWhatsNewClick])
+  ], [handleAllSessionsClick, handleFlaggedClick, handleArchivedClick, handleSourcesClick, handleSkillsClick, handleProjectsClick, handleAutomationsClick, handleAutomationsScheduledClick, handleAutomationsEventClick, handleAutomationsAgenticClick, handleSettingsClick, handleWhatsNewClick])
 
   // Get props for any sidebar item (unified roving tabindex pattern)
   const getSidebarItemProps = React.useCallback((id: string) => ({
@@ -1078,6 +1154,13 @@ function AppShellContent({
   const listTitle = React.useMemo(() => {
     if (isSourcesNavigation(navState)) return t('sidebar.sources')
     if (isSkillsNavigation(navState)) return t('sidebar.allSkills')
+    if (isProjectsNavigation(navState)) return t('sidebar.allProjects')
+    if (isAutomationsNavigation(navState)) {
+      if (!automationFilter) return t('sidebar.allAutomations')
+      if (automationFilter.automationType === 'scheduled') return t('sidebar.scheduled')
+      if (automationFilter.automationType === 'event') return t('sidebar.eventBased')
+      return t('sidebar.agentic')
+    }
     if (isSettingsNavigation(navState)) return t('sidebar.settings')
     if (sessionFilter?.kind === 'flagged') return t('sidebar.flagged')
     if (sessionFilter?.kind === 'archived') return t('sidebar.archived')
@@ -1263,6 +1346,51 @@ function AppShellContent({
                       onClick: handleSkillsClick,
                       contextMenu: { type: 'skills', onAddSkill: openAddSkill },
                     },
+                    {
+                      id: 'nav:projects',
+                      title: t('sidebar.allProjects'),
+                      label: String(projects.length),
+                      icon: FolderKanban,
+                      variant: isProjectsNavigation(navState) ? 'default' : 'ghost',
+                      onClick: handleProjectsClick,
+                    },
+                    {
+                      id: 'nav:automations',
+                      title: t('sidebar.automations'),
+                      label: String(automations.length),
+                      icon: ListTodo,
+                      variant: isAutomationsNavigation(navState) && !automationFilter ? 'default' : 'ghost',
+                      onClick: handleAutomationsClick,
+                      expandable: true,
+                      expanded: isExpanded('nav:automations'),
+                      onToggle: () => toggleExpanded('nav:automations'),
+                      items: [
+                        {
+                          id: 'nav:automations:scheduled',
+                          title: t('sidebar.scheduled'),
+                          label: String(automationTypeCounts.scheduled),
+                          icon: Clock,
+                          variant: automationFilter?.automationType === 'scheduled' ? 'default' : 'ghost',
+                          onClick: handleAutomationsScheduledClick,
+                        },
+                        {
+                          id: 'nav:automations:event',
+                          title: t('sidebar.eventBased'),
+                          label: String(automationTypeCounts.event),
+                          icon: Radio,
+                          variant: automationFilter?.automationType === 'event' ? 'default' : 'ghost',
+                          onClick: handleAutomationsEventClick,
+                        },
+                        {
+                          id: 'nav:automations:agentic',
+                          title: t('sidebar.agentic'),
+                          label: String(automationTypeCounts.agentic),
+                          icon: Bot,
+                          variant: automationFilter?.automationType === 'agentic' ? 'default' : 'ghost',
+                          onClick: handleAutomationsAgenticClick,
+                        },
+                      ],
+                    },
                     { id: 'separator:skills-settings', type: 'separator' },
                     {
                       id: 'nav:settings',
@@ -1328,6 +1456,9 @@ function AppShellContent({
                       {...getEditConfig('add-skill', activeWorkspace.rootPath)}
                     />
                   )}
+                  {isProjectsNavigation(navState) && activeWorkspace && (
+                    <HeaderIconButton icon={<Plus className="h-4 w-4" />} tooltip={t('projectsList.addProject')} onClick={() => setCreateProjectDialogOpen(true)} />
+                  )}
                 </>
               }
             />
@@ -1354,6 +1485,12 @@ function AppShellContent({
                 onDeleteSkill={handleDeleteSkill}
                 selectedSkillSlug={isSkillsNavigation(navState) && navState.details?.type === 'skill' ? navState.details.skillSlug : null}
               />
+            )}
+            {isProjectsNavigation(navState) && activeWorkspaceId && (
+              <ProjectsListPanel projects={projects} workspaceId={activeWorkspaceId} onProjectClick={(slug) => navigate(routes.view.projects(slug))} onAddProject={() => setCreateProjectDialogOpen(true)} selectedProjectSlug={navState.details?.projectSlug ?? null} />
+            )}
+            {isAutomationsNavigation(navState) && (
+              <AutomationsListPanel automations={automations} automationFilter={automationFilter ? { kind: AUTOMATION_TYPE_TO_FILTER_KIND[automationFilter.automationType] } : null} onAutomationClick={(id) => navigate(routes.view.automations({ automationId: id, type: automationFilter?.automationType }))} onTestAutomation={handleTestAutomation} onToggleAutomation={handleToggleAutomation} onDuplicateAutomation={handleDuplicateAutomation} onDeleteAutomation={handleDeleteAutomation} selectedAutomationId={navState.details?.automationId ?? null} workspaceRootPath={activeWorkspace?.rootPath} />
             )}
             {isSettingsNavigation(navState) && (
               /* Settings Navigator */
@@ -1523,6 +1660,8 @@ function AppShellContent({
           {...getEditConfig('add-skill', activeWorkspace.rootPath)}
         />
       )}
+
+      <CreateProjectDialog open={createProjectDialogOpen} onCancel={() => setCreateProjectDialogOpen(false)} onSubmit={(name) => { void handleCreateProject(name) }} />
 
       {/* What's New overlay */}
       <DocumentFormattedMarkdownOverlay

@@ -14,7 +14,9 @@ export type DocFeature =
   | 'app-settings'
   | 'preferences'
   | 'browser'
-  | 'documents';
+  | 'documents'
+  | 'automations'
+  | 'labels';
 
 export interface DocInfo {
   path: string;
@@ -86,6 +88,16 @@ export const DOCS: Record<DocFeature, DocInfo> = {
     path: '/document-tools',
     title: 'Document Tools',
     summary: 'Read, convert, compare, and render supported document formats.',
+  },
+  automations: {
+    path: '/automations',
+    title: 'Automations',
+    summary: 'Run prompts or webhooks from schedules and workspace events.',
+  },
+  labels: {
+    path: '/labels',
+    title: 'Labels',
+    summary: 'Organize sessions with hierarchical workspace labels.',
   },
 };
 

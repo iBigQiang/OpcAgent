@@ -59,6 +59,7 @@ import type {
   NavigationState,
   SessionFilter,
   SourceFilter,
+  AutomationFilter,
   RightSidebarPanel,
   ContentBadge,
 } from '../../shared/types'
@@ -67,6 +68,8 @@ import {
   isSourcesNavigation,
   isSettingsNavigation,
   isSkillsNavigation,
+  isAutomationsNavigation,
+  isProjectsNavigation,
   DEFAULT_NAVIGATION_STATE,
 } from '../../shared/types'
 import { sessionMetaMapAtom, type SessionMeta } from '@/atoms/sessions'
@@ -89,7 +92,7 @@ export type { Route }
 
 // Re-export navigation state types for consumers
 export type { NavigationState, SessionFilter }
-export { isSessionsNavigation, isSourcesNavigation, isSettingsNavigation, isSkillsNavigation }
+export { isSessionsNavigation, isSourcesNavigation, isSettingsNavigation, isSkillsNavigation, isAutomationsNavigation, isProjectsNavigation }
 
 // =============================================================================
 // Context
@@ -1154,6 +1157,9 @@ export function NavigationProvider({
         break
       case 'archived':
         navigate(routes.view.archived(sessionId))
+        break
+      case 'label':
+        navigate(routes.view.label(filter.labelId, sessionId))
         break
       default:
         navigate(routes.view.allSessions(sessionId))

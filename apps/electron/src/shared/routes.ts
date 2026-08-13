@@ -43,7 +43,7 @@ export const routes = {
      * @param name - Optional session name
      * @param send - If true and input is provided, immediately sends the message
      */
-    newSession: (params?: { input?: string; name?: string; send?: boolean }) =>
+    newSession: (params?: { input?: string; name?: string; send?: boolean; label?: string; project?: string }) =>
       `action/new-session${toQueryString(params ? { ...params, send: params.send ? 'true' : undefined } : undefined)}` as const,
 
     /** Rename a session */
@@ -121,6 +121,17 @@ export const routes = {
       if (!skillSlug) return 'skills' as const
       return `skills/skill/${skillSlug}` as const
     },
+
+    automations: (params?: { automationId?: string; type?: 'scheduled' | 'event' | 'agentic' }) => {
+      const base = params?.type ? `automations/${params.type}` : 'automations'
+      return params?.automationId ? `${base}/automation/${params.automationId}` as const : base
+    },
+
+    projects: (projectSlug?: string) =>
+      projectSlug ? `projects/project/${projectSlug}` as const : 'projects' as const,
+
+    label: (labelId: string, sessionId?: string) =>
+      sessionId ? `label/${encodeURIComponent(labelId)}/session/${sessionId}` as const : `label/${encodeURIComponent(labelId)}` as const,
 
     /** Settings view (settings navigator) - uses SettingsSubpage from registry */
     settings: (subpage?: SettingsSubpage) =>

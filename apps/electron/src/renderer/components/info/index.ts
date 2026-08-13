@@ -40,3 +40,5 @@ export type { PermissionRow, PermissionAccess, PermissionType } from './Permissi
 
 export { ToolsDataTable } from './ToolsDataTable'
 export type { ToolRow, ToolPermission } from './ToolsDataTable'
+
+export { LabelsDataTable } from './LabelsDataTable'

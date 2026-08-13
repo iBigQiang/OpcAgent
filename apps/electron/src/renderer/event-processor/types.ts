@@ -136,6 +136,18 @@ export interface SourcesChangedEvent {
   enabledSourceSlugs: string[]
 }
 
+export interface LabelsChangedEvent {
+  type: 'labels_changed'
+  sessionId: string
+  labels: string[]
+}
+
+export interface ProjectIdChangedEvent {
+  type: 'project_id_changed'
+  sessionId: string
+  projectId: string | null
+}
+
 /**
  * Session flagged/unflagged events (external metadata change)
  */
@@ -458,6 +470,8 @@ export type AgentEvent =
   | PermissionRequestEvent
   | CredentialRequestEvent
   | SourcesChangedEvent
+  | LabelsChangedEvent
+  | ProjectIdChangedEvent
   | SessionFlaggedEvent
   | SessionUnflaggedEvent
   | SessionArchivedEvent

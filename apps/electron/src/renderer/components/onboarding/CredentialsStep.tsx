@@ -116,7 +116,7 @@ export function CredentialsStep({
   return (
     <StepFormLayout
       title={t("onboarding.credentials.apiConfiguration")}
-      description="Select a provider preset and enter its API key, or configure an Ollama/custom compatible endpoint."
+      description={t("onboarding.credentials.apiConfigurationDesc")}
       actions={(
         <>
           <BackButton onClick={onBack} disabled={status === 'validating'} />

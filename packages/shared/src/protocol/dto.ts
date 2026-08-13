@@ -58,7 +58,10 @@ export interface Session {
   isArchived?: boolean;
   archivedAt?: number;
   supportsBranching?: boolean;
+  labels?: string[];
+  projectId?: string;
   parentSessionId?: string;
+  triggeredBy?: { automationName?: string; event?: string; timestamp?: number };
 }
 
 export interface CreateSessionOptions {
@@ -75,6 +78,8 @@ export interface CreateSessionOptions {
   branchFromMessageId?: string;
   branchFromSessionId?: string;
   parentSessionId?: string;
+  labels?: string[];
+  projectId?: string;
 }
 
 export interface PermissionModeState {
@@ -106,6 +111,8 @@ export type SessionEvent =
   | { type: 'permission_mode_changed'; sessionId: string; permissionMode: PermissionMode; previousPermissionMode?: PermissionMode; transitionDisplay?: string; modeVersion?: number; changedAt?: string; changedBy?: PermissionModeState['changedBy'] }
   | { type: 'plan_submitted'; sessionId: string; message: Message }
   | { type: 'sources_changed'; sessionId: string; enabledSourceSlugs: string[] }
+  | { type: 'labels_changed'; sessionId: string; labels: string[] }
+  | { type: 'project_id_changed'; sessionId: string; projectId: string | null }
   | { type: 'connection_changed'; sessionId: string; connectionSlug: string; supportsBranching?: boolean }
   | { type: 'task_backgrounded'; sessionId: string; toolUseId: string; taskId: string; intent?: string; turnId?: string; kind?: 'workflow'; workflowId?: string }
   | { type: 'workflow_agent_completed'; sessionId: string; workflowId: string; agentId: string; turnId?: string }
@@ -149,6 +156,7 @@ export type SessionCommand =
   | { type: 'setThinkingLevel'; level: ThinkingLevel }
   | { type: 'updateWorkingDirectory'; dir: string }
   | { type: 'setSources'; sourceSlugs: string[] }
+  | { type: 'setLabels'; labels: string[] }
   | { type: 'showInFinder' }
   | { type: 'copyPath' }
   | { type: 'refreshTitle' }
@@ -272,6 +280,15 @@ export interface SessionSearchMatch { sessionId: string; lineNumber: number; sni
 export interface SessionSearchResult { sessionId: string; matchCount: number; matches: SessionSearchMatch[] }
 export interface UnreadSummary { totalUnreadSessions: number; byWorkspace: Record<string, number>; hasUnreadByWorkspace: Record<string, boolean> }
 export interface RefreshTitleResult { success: boolean; title?: string; error?: string }
+
+export type TestAutomationAction =
+  | { type: 'prompt'; prompt: string; llmConnection?: string; model?: string; thinkingLevel?: ThinkingLevel }
+  | { type: 'webhook'; url: string; method?: string; headers?: Record<string, string>; bodyFormat?: 'json' | 'form' | 'raw'; body?: unknown; captureResponse?: boolean; auth?: { type: 'basic'; username: string; password: string } | { type: 'bearer'; token: string } }
+export interface TestAutomationPayload { workspaceId: string; automationId?: string; automationName?: string; actions: TestAutomationAction[]; permissionMode?: PermissionMode; labels?: string[]; telegramTopic?: string }
+export type TestAutomationActionResult =
+  | { type: 'prompt'; success: boolean; stderr?: string; sessionId?: string; duration: number }
+  | { type: 'webhook'; success: boolean; url: string; statusCode: number; error?: string; duration: number }
+export interface TestAutomationResult { actions: TestAutomationActionResult[] }
 
 export interface PlanStep { id: string; description: string; tools?: string[]; status?: 'pending' | 'in_progress' | 'completed' | 'failed' | 'skipped' }
 export interface Plan { id: string; title: string; summary?: string; steps: PlanStep[]; questions?: string[]; state?: 'creating' | 'refining' | 'ready' | 'executing' | 'completed' | 'cancelled'; createdAt?: number; updatedAt?: number }
