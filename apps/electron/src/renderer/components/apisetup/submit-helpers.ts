@@ -47,9 +47,17 @@ export function resolvePresetStateForBaseUrlChange(params: {
   matchedPreset: PresetKey
   activePreset: PresetKey
   activePresetHasEmptyUrl: boolean
+  preserveActivePreset?: boolean
   lastNonCustomPreset: PresetKey | null
 }): { activePreset: PresetKey; lastNonCustomPreset: PresetKey | null } {
-  const { matchedPreset, activePreset, activePresetHasEmptyUrl, lastNonCustomPreset } = params
+  const { matchedPreset, activePreset, activePresetHasEmptyUrl, preserveActivePreset, lastNonCustomPreset } = params
+
+  if (preserveActivePreset) {
+    return {
+      activePreset,
+      lastNonCustomPreset,
+    }
+  }
 
   if (matchedPreset !== 'custom') {
     return {

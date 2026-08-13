@@ -2024,7 +2024,9 @@ export function FreeFormInput({
                   <React.Fragment key={providerName}>
                     {/* Provider group label */}
                     <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground uppercase tracking-wide select-none">
-                      {providerName}
+                      {providerName === 'Pi Backend'
+                        ? t('settings.ai.piBackend')
+                        : t('onboarding.localModel.title')}
                     </div>
                     {connections.map((conn) => {
                       const isCurrentConnection = effectiveConnection === conn.slug

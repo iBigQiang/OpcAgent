@@ -6,6 +6,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import * as Icons from 'lucide-react'
 import { Spinner } from '@mkagent/ui'
@@ -46,6 +47,7 @@ export function BrowserTabStrip({
   instancesOverride,
   maxVisibleBadges = DEFAULT_MAX_VISIBLE_BADGES,
 }: BrowserTabStripProps) {
+  const { t } = useTranslation()
   // Filter the badge strip to the local workspace currently in focus.
   const { activeWorkspaceId } = useAppShellContext()
   const allInstances = useAtomValue(browserInstancesAtom)
@@ -219,8 +221,8 @@ export function BrowserTabStrip({
     const targetSessionId = instance.boundSessionId ?? instance.ownerSessionId
     const canOpenSession = !!targetSessionId
     const openSessionLabel = instance.agentControlActive
-      ? 'Open Session Using this Window'
-      : 'Open Session Which Used this Window'
+      ? t('browser.openSessionUsingWindow')
+      : t('browser.openSessionWhichUsedWindow')
 
     return (
       <>
@@ -229,7 +231,7 @@ export function BrowserTabStrip({
           onSelect={() => focusBrowserWindow(instance)}
         >
           <Icons.Monitor className="h-3.5 w-3.5" />
-          Show Browser Window
+          {t('browser.showWindow')}
         </StyledDropdownMenuItem>
 
         <StyledDropdownMenuItem
@@ -248,11 +250,11 @@ export function BrowserTabStrip({
           onSelect={() => terminateBrowserWindow(instance)}
         >
           <Icons.XCircle className="h-3.5 w-3.5" />
-          Terminate Browser
+          {t('browser.terminate')}
         </StyledDropdownMenuItem>
       </>
     )
-  }, [instancesOverride, focusBrowserWindow, openSessionUsingWindow, terminateBrowserWindow])
+  }, [instancesOverride, focusBrowserWindow, openSessionUsingWindow, terminateBrowserWindow, t])
 
   if (orderedInstances.length === 0) return null
 
@@ -288,8 +290,11 @@ export function BrowserTabStrip({
           </DropdownMenuTrigger>
           <StyledDropdownMenuContent align="end" minWidth="min-w-64">
             {overflow.map((instance) => {
-              const hostname = getHostname(instance.url)
-              const displayLabel = instance.title.trim() || hostname || 'Local File'
+              const hostname = getHostname(instance.url, t('browser.newTab'), t('browser.localFile'))
+              const rawTitle = instance.title.trim()
+              const displayLabel = rawTitle === 'New Tab'
+                ? t('browser.newTab')
+                : rawTitle || hostname || t('browser.localFile')
               return (
                 <DropdownMenuSub key={instance.id}>
                   <StyledDropdownMenuSubTrigger>

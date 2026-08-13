@@ -237,7 +237,9 @@ export function CompactModelSelector({
             connectionsByProvider.map(([providerName, connections]) => (
               <React.Fragment key={providerName}>
                 <div className="px-3 pt-3 pb-1 text-xs font-medium text-foreground/60 uppercase tracking-wide select-none">
-                  {providerName}
+                  {providerName === 'Pi Backend'
+                    ? t('settings.ai.piBackend')
+                    : t('onboarding.localModel.title')}
                 </div>
                 {connections.map(conn => {
                   const isCurrentConnection = effectiveConnection === conn.slug

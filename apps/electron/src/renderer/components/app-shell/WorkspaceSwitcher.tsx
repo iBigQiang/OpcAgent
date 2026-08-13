@@ -83,7 +83,7 @@ export function WorkspaceSwitcher({
       toast.success(t('toast.removedWorkspace', { name: workspace.name }))
       onWorkspaceRemoved?.()
     }
-  }, [activeWorkspaceId, onWorkspaceRemoved])
+  }, [activeWorkspaceId, onWorkspaceRemoved, t])
 
   const handleCloseCreationScreen = useCallback(() => {
     setShowCreationScreen(false)
@@ -118,7 +118,7 @@ export function WorkspaceSwitcher({
                 className="h-4 w-4 mr-1.5 rounded-full ring-1 ring-border/50"
                 fallbackClassName="rounded-full"
               />
-              <span className="truncate min-w-0 flex-1 text-left">{selectedWorkspace?.name || 'Workspace'}</span>
+              <span className="truncate min-w-0 flex-1 text-left">{selectedWorkspace?.name || t('settings.workspace.title')}</span>
               <ChevronDown data-slot="chevron" className="h-3 w-3 opacity-60 shrink-0" />
               {hasUnreadInOtherWorkspaces && <span className="h-2 w-2 rounded-full bg-accent shrink-0" />}
             </button>
@@ -142,7 +142,7 @@ export function WorkspaceSwitcher({
               {!isCollapsed && (
                 <>
                   <FadingText className="ml-1 font-sans min-w-0 text-sm" fadeWidth={36}>
-                    {selectedWorkspace?.name || 'Select workspace'}
+                    {selectedWorkspace?.name || t('workspace.selectWorkspace')}
                   </FadingText>
                   <ChevronDown className="h-3 w-3 opacity-50 shrink-0" />
                 </>

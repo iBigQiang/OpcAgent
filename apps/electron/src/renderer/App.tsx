@@ -770,7 +770,7 @@ export default function App() {
           description: t('toast.vcRedistNotFoundDesc'),
           duration: Infinity,
           action: {
-            label: 'Install',
+            label: t('common.install'),
             onClick: () => window.electronAPI.openUrl(warnings.downloadUrl ?? 'https://aka.ms/vs/17/release/vc_redist.x64.exe'),
           },
         })
@@ -792,7 +792,7 @@ export default function App() {
     })
     // Load app-level theme
     window.electronAPI.getAppTheme().then(setAppTheme)
-  }, [appState, loadSessionsFromServer, resolveDefaultConnectionSlug])
+  }, [appState, loadSessionsFromServer, resolveDefaultConnectionSlug, t])
 
   // Subscribe to theme change events (live updates when theme.json changes)
   useEffect(() => {
@@ -1301,7 +1301,7 @@ export default function App() {
             messages: [...s.messages, {
               id: generateMessageId(),
               role: 'warning' as const,
-              content: `Warning: ${failedCount} attachment(s) could not be stored and will not be sent: ${failedNames}`,
+              content: t('chat.attachmentsStoreFailed', { count: failedCount, names: failedNames }),
               timestamp: Date.now()
             }]
           }))
@@ -1349,7 +1349,7 @@ export default function App() {
         const commandText = commandMatch[0].trimEnd() // "/compact" without trailing space
         badges.unshift({
           type: 'command',
-          label: 'Compact',
+          label: t('chat.compactCommand'),
           rawText: commandText,
           start: 0,
           end: commandText.length,
@@ -1416,13 +1416,15 @@ export default function App() {
           {
             id: generateMessageId(),
             role: 'error' as const,
-            content: `Failed to send message: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            content: t('chat.failedToSendMessage', {
+              error: error instanceof Error ? error.message : t('toast.unknownError'),
+            }),
             timestamp: Date.now()
           }
         ]
       }))
     }
-  }, [sessionOptions, updateSessionById, skills, sources, windowWorkspaceId, windowWorkspaceSlug])
+  }, [sessionOptions, updateSessionById, skills, sources, windowWorkspaceId, windowWorkspaceSlug, t])
 
   /**
    * Unified handler for all session option changes.
@@ -1653,7 +1655,7 @@ export default function App() {
       try {
         await window.electronAPI.openFile(path)
       } catch (error) {
-        const message = error instanceof Error ? error.message : 'Unknown error'
+        const message = error instanceof Error ? error.message : t('toast.unknownError')
         console.error('Failed to open file:', error)
         toast.error(t('toast.failedToOpenFile'), {
           description: message,
@@ -1664,14 +1666,14 @@ export default function App() {
       try {
         await window.electronAPI.openUrl(url)
       } catch (error) {
-        const message = error instanceof Error ? error.message : 'Unknown error'
+        const message = error instanceof Error ? error.message : t('toast.unknownError')
         console.error('Failed to open URL:', error)
         // The blocked-URL classifier already explains WHY and (for file:)
         // points the user at preview blocks. Don't append the generic
         // "use Open File instead" hint when the message already carries
         // that guidance.
         const hasRichGuidance = /URL blocked/.test(message)
-        const tail = hasRichGuidance ? '' : '. If this is a local path, use Open File instead.'
+        const tail = hasRichGuidance ? '' : t('toast.localPathHint')
         toast.error(t('toast.failedToOpenLink'), {
           description: `${message}${tail}`,
         })
@@ -1681,7 +1683,7 @@ export default function App() {
       try {
         await window.electronAPI.showInFolder(path)
       } catch (error) {
-        const message = error instanceof Error ? error.message : 'Unknown error'
+        const message = error instanceof Error ? error.message : t('toast.unknownError')
         console.error('Failed to show in folder:', error)
         toast.error(t("toast.failedToReveal", { fileManager: getFileManagerName() }), {
           description: message,
@@ -1698,10 +1700,10 @@ export default function App() {
 
   const handleReconnectTransport = useCallback(() => {
     void window.electronAPI.reconnectTransport().catch((error) => {
-      const message = error instanceof Error ? error.message : 'Unknown error'
+      const message = error instanceof Error ? error.message : t('toast.unknownError')
       toast.error(t('toast.reconnectFailed'), { description: message })
     })
-  }, [])
+  }, [t])
 
   const handleOpenFile = linkInterceptor.handleOpenFile
   const handleOpenUrl = linkInterceptor.handleOpenUrl

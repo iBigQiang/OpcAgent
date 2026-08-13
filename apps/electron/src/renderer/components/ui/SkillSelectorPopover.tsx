@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { Check } from 'lucide-react'
 import { FilterableSelectPopover } from '@mkagent/ui'
 
@@ -33,6 +34,7 @@ export function SkillSelectorPopover({
   onToggleSlug,
   workspaceId,
 }: SkillSelectorPopoverProps) {
+  const { t } = useTranslation()
   return (
     <FilterableSelectPopover
       open={open}
@@ -43,15 +45,15 @@ export function SkillSelectorPopover({
       getLabel={(skill) => skill.metadata.name}
       isSelected={(skill) => selectedSlugs.includes(skill.slug)}
       onToggle={(skill) => onToggleSlug(skill.slug)}
-      filterPlaceholder="Search skills..."
+      filterPlaceholder={t('skills.search')}
       emptyState={(
         <>
-          No skills configured.
+          {t('skills.noneConfigured')}
           <br />
-          Add skills in Settings.
+          {t('skills.addInSettings')}
         </>
       )}
-      noResultsState="No matching skills."
+      noResultsState={t('skills.noMatching')}
       minWidth={200}
       maxWidth={320}
       renderItem={(skill, state) => (

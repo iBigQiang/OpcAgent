@@ -133,7 +133,7 @@ function getMatchScore(text: string, filter: string): number {
   return 0
 }
 
-function filterSections(sections: MentionSection[], filter: string): MentionSection[] {
+function filterSections(sections: MentionSection[], filter: string, resultsLabel = 'Results'): MentionSection[] {
   if (!filter) return sections
   const lowerFilter = filter.trimEnd().toLowerCase()
   if (!lowerFilter) return sections
@@ -164,7 +164,7 @@ function filterSections(sections: MentionSection[], filter: string): MentionSect
 
   // Return as flat list in a single virtual section (headers hidden when filtering)
   if (matchingItems.length === 0) return []
-  return [{ id: 'results', label: 'Results', items: matchingItems }]
+  return [{ id: 'results', label: resultsLabel, items: matchingItems }]
 }
 
 function flattenItems(sections: MentionSection[]): MentionItem[] {
@@ -214,7 +214,7 @@ export function InlineMentionMenu({
   const menuRef = React.useRef<HTMLDivElement>(null)
   const listRef = React.useRef<HTMLDivElement>(null)
   const [selectedIndex, setSelectedIndex] = React.useState(0)
-  const filteredSections = filterSections(sections, filter)
+  const filteredSections = filterSections(sections, filter, t('mention.results'))
   const flatItems = flattenItems(filteredSections)
 
   // Reset selection when filter changes
@@ -477,6 +477,7 @@ export function useInlineMention({
   onSelect,
   workspaceId,
 }: UseInlineMentionOptions): UseInlineMentionReturn {
+  const { t } = useTranslation()
   const [isOpen, setIsOpen] = React.useState(false)
   const [filter, setFilter] = React.useState('')
   // committedFilter: only updates when IPC returns (or immediately when no IPC needed).
@@ -511,7 +512,7 @@ export function useInlineMention({
     if (skills.length > 0) {
       result.push({
         id: 'skills',
-        label: 'Skills',
+        label: t('mention.skills'),
         items: skills.map(skill => ({
           id: skill.slug,
           type: 'skill' as const,
@@ -526,7 +527,7 @@ export function useInlineMention({
     if (sources.length > 0) {
       result.push({
         id: 'sources',
-        label: 'Sources',
+        label: t('mention.sources'),
         items: sources
           .filter(source => source.config.slug && source.config.name)
           .map(source => ({
@@ -543,13 +544,13 @@ export function useInlineMention({
     if (fileResults.length > 0) {
       result.push({
         id: 'files',
-        label: 'Files',
+        label: t('mention.files'),
         items: fileResults,
       })
     }
 
     return result
-  }, [skills, sources, fileResults])
+  }, [skills, sources, fileResults, t])
 
   const handleInputChange = React.useCallback((value: string, cursorPosition: number) => {
     // Store current state for handleSelect

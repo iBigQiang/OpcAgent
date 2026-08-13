@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { Check, DatabaseZap } from 'lucide-react'
 import { FilterableSelectPopover } from '@mkagent/ui'
 
@@ -23,6 +24,7 @@ export function SourceSelectorPopover({
   selectedSlugs,
   onToggleSlug,
 }: SourceSelectorPopoverProps) {
+  const { t } = useTranslation()
   return (
     <FilterableSelectPopover
       open={open}
@@ -33,15 +35,15 @@ export function SourceSelectorPopover({
       getLabel={(source) => source.config.name}
       isSelected={(source) => selectedSlugs.includes(source.config.slug)}
       onToggle={(source) => onToggleSlug(source.config.slug)}
-      filterPlaceholder="Search sources..."
+      filterPlaceholder={t('sources.search')}
       emptyState={(
         <>
-          No sources configured.
+          {t('sources.noneConfigured')}
           <br />
-          Add sources in Settings.
+          {t('sources.addInSettings')}
         </>
       )}
-      noResultsState="No matching sources."
+      noResultsState={t('sources.noMatching')}
       minWidth={200}
       maxWidth={320}
       renderItem={(source, state, index) => (

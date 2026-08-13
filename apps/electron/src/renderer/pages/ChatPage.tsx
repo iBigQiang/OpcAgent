@@ -114,7 +114,7 @@ const ChatPage = React.memo(function ChatPage({ sessionId }: ChatPageProps) {
     setMessagesRetrying(false)
 
     if (shouldForceInitialMessagesReload && autoForcedReloadSessionRef.current === sessionId) {
-      setMessagesLoadError('Session messages are not available')
+      setMessagesLoadError(t('chat.sessionMessagesUnavailable'))
       return () => {
         cancelled = true
       }
@@ -132,19 +132,19 @@ const ChatPage = React.memo(function ChatPage({ sessionId }: ChatPageProps) {
     loadPromise
       .then((loadedSession) => {
         if (!cancelled && !loadedSession) {
-          setMessagesLoadError('Session messages are not available')
+          setMessagesLoadError(t('chat.sessionMessagesUnavailable'))
         }
       })
       .catch((error: unknown) => {
         if (!cancelled) {
-          setMessagesLoadError(formatSessionLoadFailure(error))
+          setMessagesLoadError(formatSessionLoadFailure(error, t('toast.unknownError')))
         }
       })
 
     return () => {
       cancelled = true
     }
-  }, [sessionId, ensureMessagesLoaded, forceMessagesReload, shouldForceInitialMessagesReload])
+  }, [sessionId, ensureMessagesLoaded, forceMessagesReload, shouldForceInitialMessagesReload, t])
 
   const handleRetryMessagesLoad = React.useCallback(async () => {
     setMessagesLoadError(null)
@@ -153,14 +153,14 @@ const ChatPage = React.memo(function ChatPage({ sessionId }: ChatPageProps) {
     try {
       const loadedSession = await forceMessagesReload(sessionId)
       if (!loadedSession) {
-        setMessagesLoadError('Session messages are not available')
+        setMessagesLoadError(t('chat.sessionMessagesUnavailable'))
       }
     } catch (error) {
-      setMessagesLoadError(formatSessionLoadFailure(error))
+      setMessagesLoadError(formatSessionLoadFailure(error, t('toast.unknownError')))
     } finally {
       setMessagesRetrying(false)
     }
-  }, [forceMessagesReload, sessionId])
+  }, [forceMessagesReload, sessionId, t])
 
   const messageLoadState = React.useMemo(() => deriveSessionMessagesLoadState({
     session,
@@ -368,7 +368,7 @@ const ChatPage = React.memo(function ChatPage({ sessionId }: ChatPageProps) {
 
       onOpenFile(resolved)
     },
-    [onOpenFile, workingDirectory, activeWorkspace?.rootPath]
+    [onOpenFile, workingDirectory, activeWorkspace?.rootPath, t]
   )
 
   const handleOpenUrl = React.useCallback(
@@ -473,7 +473,7 @@ const ChatPage = React.memo(function ChatPage({ sessionId }: ChatPageProps) {
         )}
       />
     )
-  }, [isCompactMode, sessionId, session?.sessionFolderPath, sessionMeta])
+  }, [isCompactMode, sessionId, session?.sessionFolderPath, sessionMeta, t])
 
   const headerActions = compactInfoButton
 

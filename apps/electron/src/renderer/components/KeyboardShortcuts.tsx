@@ -1,12 +1,14 @@
-import { actionsByCategory, useActionLabel, type ActionId } from '@/actions'
+import { useTranslation } from 'react-i18next'
+import { ACTION_CATEGORY_KEYS, actionsByCategory, useActionLabel, type ActionId } from '@/actions'
 
 export function KeyboardShortcuts() {
+  const { t } = useTranslation()
   return (
     <div className="space-y-6">
       {Object.entries(actionsByCategory).map(([category, actions]) => (
         <section key={category}>
           <h3 className="text-sm font-medium text-muted-foreground mb-2">
-            {category}
+            {t(ACTION_CATEGORY_KEYS[category as keyof typeof ACTION_CATEGORY_KEYS])}
           </h3>
           <div className="space-y-1">
             {actions.map(action => (

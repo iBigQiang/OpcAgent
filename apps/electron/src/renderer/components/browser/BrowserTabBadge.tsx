@@ -6,6 +6,7 @@
  */
 
 import { forwardRef, useEffect, useState, type ButtonHTMLAttributes } from 'react'
+import { useTranslation } from 'react-i18next'
 import * as Icons from 'lucide-react'
 import { Spinner } from '@mkagent/ui'
 import type { BrowserInstanceInfo } from '../../../shared/types'
@@ -20,8 +21,12 @@ export const BrowserTabBadge = forwardRef<HTMLButtonElement, BrowserTabBadgeProp
   { instance, isActive: _isActive, className, style, ...buttonProps },
   ref
 ) {
-  const hostname = getHostname(instance.url)
-  const displayLabel = instance.title.trim() || hostname || 'Local File'
+  const { t } = useTranslation()
+  const hostname = getHostname(instance.url, t('browser.newTab'), t('browser.localFile'))
+  const rawTitle = instance.title.trim()
+  const displayLabel = rawTitle === 'New Tab'
+    ? t('browser.newTab')
+    : rawTitle || hostname || t('browser.localFile')
   const themedBackground = instance.themeColor || undefined
 
   const themeLuminance = instance.themeColor ? getThemeLuminance(instance.themeColor) : null
@@ -56,7 +61,7 @@ export const BrowserTabBadge = forwardRef<HTMLButtonElement, BrowserTabBadgeProp
         transition: 'background-color 200ms ease, border-color 200ms ease',
         ...style,
       }}
-      aria-label={`${displayLabel} actions`}
+      aria-label={t('browser.tabActions', { title: displayLabel })}
       {...buttonProps}
     >
       <span className={`shrink-0 flex items-center justify-center ${isDarkThemeColor ? 'h-3.5 w-3.5' : 'h-3 w-3'}`}>

@@ -551,7 +551,7 @@ export const ChatDisplay = React.forwardRef<ChatDisplayHandle, ChatDisplayProps>
       navigate(routes.view.allSessions(child.id))
     } catch (error) {
       toast.error(t('toast.couldNotCreateSession'), {
-        description: error instanceof Error ? error.message : 'Unknown error',
+        description: error instanceof Error ? error.message : t('common.unknownError'),
       })
     }
   }, [appShellContext, navigate, session, t])
@@ -1056,9 +1056,9 @@ export const ChatDisplay = React.forwardRef<ChatDisplayHandle, ChatDisplayProps>
     setOverlayState({
       type: 'markdown',
       content: message.content,
-      title: 'Message Preview',
+      title: t('chat.messagePreview'),
     })
-  }, [session])
+  }, [session, t])
 
   // Ref to track total turn count for scroll handler
   const totalTurnCountRef = React.useRef(0)
@@ -1299,7 +1299,7 @@ export const ChatDisplay = React.forwardRef<ChatDisplayHandle, ChatDisplayProps>
 
     if (isInputDisabled || disableSend || connectionUnavailable) {
       toast.error(t('toast.cannotSendRightNow'), {
-        description: 'Sending is currently disabled for this session.',
+        description: t('chat.sendingDisabledDescription'),
       })
       return
     }
@@ -1310,7 +1310,7 @@ export const ChatDisplay = React.forwardRef<ChatDisplayHandle, ChatDisplayProps>
         detail: { sessionId: session.id },
       }))
     }, 0)
-  }, [session, isInputDisabled, disableSend, connectionUnavailable])
+  }, [session, isInputDisabled, disableSend, connectionUnavailable, t])
 
   // Handle stop request from InputContainer
   // silent=true when redirecting (sending new message), silent=false when user clicks Stop button
@@ -1387,7 +1387,7 @@ export const ChatDisplay = React.forwardRef<ChatDisplayHandle, ChatDisplayProps>
         return {
           type: 'admin_approval',
           data: {
-            appName: pendingPermission.appName || pendingPermission.toolName || 'System action',
+            appName: pendingPermission.appName || pendingPermission.toolName || t('chat.systemAction'),
             reason: pendingPermission.reason || pendingPermission.description,
             impact: pendingPermission.impact,
             command: pendingPermission.command || '',
@@ -1402,7 +1402,7 @@ export const ChatDisplay = React.forwardRef<ChatDisplayHandle, ChatDisplayProps>
       return { type: 'credential', data: pendingCredential }
     }
     return undefined
-  }, [pendingPermission, pendingCredential])
+  }, [pendingPermission, pendingCredential, t])
 
   // Memoize turn grouping - avoids O(n) iteration on every render/keystroke
   const allTurns = React.useMemo(() => {
@@ -1762,7 +1762,7 @@ export const ChatDisplay = React.forwardRef<ChatDisplayHandle, ChatDisplayProps>
                               {
                                 branchFromMessageId: messageId,
                                 branchFromSessionId: session.id,
-                                name: `Branch of ${session.name || 'Untitled'}`,
+                                name: t('chat.branchOf', { name: session.name || t('chat.titlePlaceholder') }),
                                 // Keep branch on the same backend/provider by inheriting parent session settings.
                                 llmConnection: session.llmConnection,
                                 model: session.model,
@@ -1773,10 +1773,10 @@ export const ChatDisplay = React.forwardRef<ChatDisplayHandle, ChatDisplayProps>
                             )
                             navigate(routes.view.allSessions(child.id), { newPanel: resolveBranchNewPanelOption(options) })
                           } catch (error) {
-                            const rawMessage = error instanceof Error ? error.message : 'Failed to create branch'
+                            const rawMessage = error instanceof Error ? error.message : t('chat.failedToCreateBranch')
                             const message = rawMessage.includes('source and target providers must match')
                               || rawMessage.includes('same provider/backend')
-                              ? 'Branching is only supported within the same provider/backend. Switch this panel connection and try again.'
+                              ? t('chat.branchProviderMismatch')
                               : rawMessage
                             toast.error(t('toast.couldNotCreateBranch'), { description: message })
                           }
@@ -1791,7 +1791,7 @@ export const ChatDisplay = React.forwardRef<ChatDisplayHandle, ChatDisplayProps>
                             })
                           } catch (error) {
                             toast.error(t('toast.couldNotSaveHighlight'), {
-                              description: error instanceof Error ? error.message : 'Unknown error',
+                              description: error instanceof Error ? error.message : t('common.unknownError'),
                             })
                             throw error
                           }
@@ -1806,7 +1806,7 @@ export const ChatDisplay = React.forwardRef<ChatDisplayHandle, ChatDisplayProps>
                             })
                           } catch (error) {
                             toast.error(t('toast.couldNotRemoveHighlight'), {
-                              description: error instanceof Error ? error.message : 'Unknown error',
+                              description: error instanceof Error ? error.message : t('common.unknownError'),
                             })
                           }
                         }}
@@ -1821,7 +1821,7 @@ export const ChatDisplay = React.forwardRef<ChatDisplayHandle, ChatDisplayProps>
                             })
                           } catch (error) {
                             toast.error(t('toast.couldNotUpdateHighlight'), {
-                              description: error instanceof Error ? error.message : 'Unknown error',
+                              description: error instanceof Error ? error.message : t('common.unknownError'),
                             })
                             throw error
                           }
@@ -1858,7 +1858,7 @@ export const ChatDisplay = React.forwardRef<ChatDisplayHandle, ChatDisplayProps>
                           setOverlayState({
                             type: 'markdown',
                             content: text,
-                            title: 'Response Preview',
+                            title: t('chat.responsePreview'),
                             forceCodeView: true,
                           })
                         }}
@@ -1868,7 +1868,7 @@ export const ChatDisplay = React.forwardRef<ChatDisplayHandle, ChatDisplayProps>
                           setOverlayState({
                             type: 'markdown',
                             content: markdown,
-                            title: 'Turn Details',
+                            title: t('chat.turnDetails'),
                           })
                         }}
                         onOpenActivityDetails={(activity) => {
@@ -2007,7 +2007,7 @@ export const ChatDisplay = React.forwardRef<ChatDisplayHandle, ChatDisplayProps>
           isOpen={true}
           onClose={handleCloseOverlay}
           cards={overlayCards}
-          title={overlayState.activity.displayName || overlayState.activity.toolName || 'Activity'}
+          title={overlayState.activity.displayName || overlayState.activity.toolName || t('chat.activity')}
           theme={isDark ? 'dark' : 'light'}
           onOpenUrl={onOpenUrl}
           onOpenFile={onOpenFile}
@@ -2075,7 +2075,7 @@ export const ChatDisplay = React.forwardRef<ChatDisplayHandle, ChatDisplayProps>
             onOpenFile={onOpenFile}
             typeBadge={{
               icon: Info,
-              label: overlayState.activity.displayName || overlayState.activity.toolName || 'Activity',
+              label: overlayState.activity.displayName || overlayState.activity.toolName || t('chat.activity'),
               variant: 'blue',
             }}
             error={activityOutputOverlayData.error}
@@ -2253,7 +2253,7 @@ function ErrorMessage({ message, onOpenUrl, sessionId, onRetry, onContinueInNewS
                   <div key={i}>{detail}</div>
                 ))}
                 {message.errorOriginal && !message.errorDetails?.some(d => d.includes('Raw error:')) && (
-                  <div className="mt-1">Raw: {message.errorOriginal.slice(0, 200)}{message.errorOriginal.length > 200 ? '...' : ''}</div>
+                  <div className="mt-1">{t('chat.rawError')} {message.errorOriginal.slice(0, 200)}{message.errorOriginal.length > 200 ? '...' : ''}</div>
                 )}
               </div>
             </AnimatedCollapsibleContent>
@@ -2365,7 +2365,7 @@ function MessageBubble({
         <div className="flex items-center gap-3 my-12 px-3">
           <div className="flex-1 h-px bg-border" />
           <span className="text-sm text-muted-foreground/70 select-none">
-            Conversation Compacted
+            {t('chat.conversationCompacted')}
           </span>
           <div className="flex-1 h-px bg-border" />
         </div>
@@ -2397,7 +2397,7 @@ function MessageBubble({
       <div className="flex justify-start">
         <div className="max-w-[80%] bg-info/10 rounded-[8px] pl-5 pr-4 pt-2 pb-2.5 break-words select-none">
           <div className="text-xs text-info/50 mb-0.5 font-semibold">
-            Warning
+            {t('chat.warning')}
           </div>
           <p className="text-sm text-info">{message.content}</p>
         </div>

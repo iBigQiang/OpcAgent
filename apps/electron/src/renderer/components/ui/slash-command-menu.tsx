@@ -90,12 +90,16 @@ const permissionModeCommands: SlashCommand[] = PERMISSION_MODE_ORDER.map(mode =>
   }
 })
 
-const compactCommand: SlashCommand = {
-  id: 'compact',
-  label: 'Compact Context',
-  description: 'Summarize conversation context to free up token budget',
-  icon: <Minimize2 className={MENU_ICON_SIZE} />,
+function getCompactCommand(t: (key: string) => string): SlashCommand {
+  return {
+    id: 'compact',
+    label: t('slashCommand.compactContext'),
+    description: t('slashCommand.compactContextDescription'),
+    icon: <Minimize2 className={MENU_ICON_SIZE} />,
+  }
 }
+
+const compactCommand: SlashCommand = getCompactCommand(key => key)
 
 export const DEFAULT_SLASH_COMMANDS: SlashCommand[] = [
   ...permissionModeCommands,
@@ -286,7 +290,7 @@ export function SlashCommandMenu({
       <CommandPrimitive.List className={MENU_LIST_STYLE}>
         {allFilteredCommands.length === 0 ? (
           <CommandPrimitive.Empty className="py-4 text-center text-sm text-muted-foreground">
-            No commands found
+            {t('slashCommand.noCommandsFound')}
           </CommandPrimitive.Empty>
         ) : filteredGroups ? (
           // Group-based rendering with smart separators
@@ -557,6 +561,7 @@ export function useInlineSlashCommand({
   recentFolders = [],
   homeDir,
 }: UseInlineSlashCommandOptions): UseInlineSlashCommandReturn {
+  const { t } = useTranslation()
   const [isOpen, setIsOpen] = React.useState(false)
   const [filter, setFilter] = React.useState('')
   const [position, setPosition] = React.useState({ x: 0, y: 0 })
@@ -571,15 +576,15 @@ export function useInlineSlashCommand({
     // Modes section
     result.push({
       id: 'modes',
-      label: 'Modes',
+      label: t('slashCommand.modes'),
       items: permissionModeCommands,
     })
 
     // Commands section
     result.push({
       id: 'commands',
-      label: 'Commands',
-      items: [compactCommand],
+      label: t('slashCommand.commands'),
+      items: [getCompactCommand(t)],
     })
 
     // Recent folders section - sorted alphabetically by folder name, show all
@@ -593,7 +598,7 @@ export function useInlineSlashCommand({
 
       result.push({
         id: 'folders',
-        label: 'Recent Working Directories',
+        label: t('slashCommand.recentWorkingDirectories'),
         items: sortedFolders.map(path => ({
           id: path,
           type: 'folder' as const,
@@ -605,7 +610,7 @@ export function useInlineSlashCommand({
     }
 
     return result
-  }, [recentFolders, homeDir])
+  }, [recentFolders, homeDir, t])
 
   const handleInputChange = React.useCallback((value: string, cursorPosition: number) => {
     // Store current state for handleSelect

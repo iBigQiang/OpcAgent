@@ -1,7 +1,7 @@
 /**
  * InlineColorPickerRow — inline color picker for tight UI (e.g. Project settings).
  *
- * Layout:  [dashed indicator] │ [presets...] [🌈]  Clear
+ * Layout:  [dashed indicator] | [presets...] [custom color] Clear
  *
  * - The dashed indicator on the left is the always-visible "current value" display.
  *   Its checkmark is drawn in the selected color. Empty when no value is set.
@@ -12,6 +12,7 @@
  */
 
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { ColorPicker } from '@/components/ui/color-picker'
 
@@ -28,12 +29,13 @@ const RAINBOW_GRADIENT =
   'linear-gradient(135deg, #ef4444 0%, #f59e0b 20%, #eab308 40%, #22c55e 60%, #3b82f6 80%, #a855f7 100%)'
 
 function CurrentValueIndicator({ value }: { value: string }) {
+  const { t } = useTranslation()
   return (
     <svg
       viewBox="0 0 20 20"
       className="h-5 w-5 shrink-0 text-foreground/40"
       role="img"
-      aria-label={value ? `Selected color ${value}` : 'No color selected'}
+      aria-label={value ? t('color.selected', { color: value }) : t('color.noneSelected')}
     >
       <circle
         cx="10"

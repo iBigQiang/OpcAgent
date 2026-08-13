@@ -44,7 +44,7 @@ export function SearchableModelInput({
   value,
   onChange,
   onBlur,
-  placeholder = 'e.g., claude-sonnet-4-6',
+  placeholder,
   models,
   isLoading,
   onFetchModels,
@@ -52,6 +52,7 @@ export function SearchableModelInput({
   className,
 }: SearchableModelInputProps) {
   const { t } = useTranslation()
+  const effectivePlaceholder = placeholder ?? t("apiSetup.modelPlaceholder")
   const [isOpen, setIsOpen] = React.useState(false)
   const [searchQuery, setSearchQuery] = React.useState('')
   const searchInputRef = React.useRef<HTMLInputElement>(null)
@@ -96,7 +97,7 @@ export function SearchableModelInput({
   return (
     <div className={cn('relative', className)}>
       <Input
-        placeholder={placeholder}
+        placeholder={effectivePlaceholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onBlur={onBlur}
@@ -143,7 +144,7 @@ export function SearchableModelInput({
             <div className="max-h-64 overflow-auto space-y-0.5">
               {filteredModels.length === 0 ? (
                 <div className="px-2.5 py-3 text-sm text-muted-foreground text-center">
-                  No models found
+                  {t("apiSetup.noModelsFound")}
                 </div>
               ) : (
                 filteredModels.map((model) => (

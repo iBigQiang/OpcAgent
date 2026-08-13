@@ -70,7 +70,7 @@ function BrowserToolbarApp() {
   const { t } = useTranslation()
   const [state, setState] = useState<ToolbarState>({
     url: 'about:blank',
-    title: 'New Tab',
+    title: t('browser.newTab'),
     isLoading: false,
     canGoBack: false,
     canGoForward: false,
@@ -80,6 +80,10 @@ function BrowserToolbarApp() {
   const menuContentRef = useRef<HTMLDivElement | null>(null)
 
   const api = window.browserToolbar
+
+  useEffect(() => {
+    document.title = state.title === 'New Tab' ? t('browser.newTab') : state.title
+  }, [state.title, t])
 
   useEffect(() => {
     if (!api) return

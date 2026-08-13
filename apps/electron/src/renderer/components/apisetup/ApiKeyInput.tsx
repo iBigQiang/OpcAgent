@@ -86,9 +86,10 @@ export interface ApiKeyInputProps {
 interface Preset {
   key: PresetKey
   label: string
+  labelKey?: string
   url: string
   placeholder?: string
-  description?: string
+  descriptionKey?: string
 }
 
 // Provider presets routed through the Pi SDK.
@@ -99,24 +100,26 @@ const PI_PROVIDER_PRESETS: Preset[] = [
   { key: 'openai-us', label: 'OpenAI US', url: 'https://us.api.openai.com/v1', placeholder: 'sk-...' },
   { key: 'google', label: 'Google AI Studio', url: 'https://generativelanguage.googleapis.com/v1beta', placeholder: 'AIza...' },
   { key: 'openrouter', label: 'OpenRouter', url: 'https://openrouter.ai/api/v1', placeholder: 'sk-or-...' },
-  { key: 'azure-openai-responses', label: 'Azure OpenAI', url: '', placeholder: 'Paste your key here...' },
+  { key: 'azure-openai-responses', label: 'Azure OpenAI', url: '' },
   { key: 'groq', label: 'Groq', url: 'https://api.groq.com/openai/v1', placeholder: 'gsk_...' },
-  { key: 'mistral', label: 'Mistral', url: 'https://api.mistral.ai/v1', placeholder: 'Paste your key here...' },
+  { key: 'mistral', label: 'Mistral', url: 'https://api.mistral.ai/v1' },
   { key: 'deepseek', label: 'DeepSeek', url: 'https://api.deepseek.com', placeholder: 'sk-...' },
   { key: 'xai', label: 'xAI (Grok)', url: 'https://api.x.ai/v1', placeholder: 'xai-...' },
   { key: 'cerebras', label: 'Cerebras', url: 'https://api.cerebras.ai/v1', placeholder: 'csk-...' },
-  { key: 'zai', label: 'z.ai (GLM)', url: 'https://api.z.ai/api/coding/paas/v4', placeholder: 'Paste your key here...' },
+  { key: 'zai', label: 'z.ai (GLM)', url: 'https://api.z.ai/api/coding/paas/v4' },
   { key: 'huggingface', label: 'Hugging Face', url: 'https://router.huggingface.co/v1', placeholder: 'hf_...' },
-  { key: 'minimax-global', label: 'Minimax Global', url: 'https://api.minimax.io/anthropic', placeholder: 'Paste your key here...' },
-  { key: 'minimax-cn', label: 'Minimax CN', url: 'https://api.minimaxi.com/anthropic', placeholder: 'Paste your key here...' },
+  { key: 'minimax-global', label: 'Minimax Global', url: 'https://api.minimax.io/anthropic' },
+  { key: 'minimax-cn', label: 'Minimax CN', url: 'https://api.minimaxi.com/anthropic' },
   { key: 'kimi-coding', label: 'Kimi (Coding)', url: 'https://api.kimi.com/coding', placeholder: 'sk-kimi-...' },
-  { key: 'vercel-ai-gateway', label: 'Vercel AI Gateway', url: 'https://ai-gateway.vercel.sh', placeholder: 'Paste your key here...' },
+  { key: 'vercel-ai-gateway', label: 'Vercel AI Gateway', url: 'https://ai-gateway.vercel.sh' },
   { key: 'manifest', label: 'Manifest', url: 'https://app.manifest.build/v1', placeholder: 'mnfst_...' },
-  { key: 'agentrouter', label: 'AgentRouter', url: 'https://agentrouter.org', placeholder: 'Paste your key here...' },
-  { key: 'anyrouter', label: 'AnyRouter-CC', url: 'https://anyrouter.top', placeholder: 'Paste your key here...' },
-  { key: 'anyrouter_pi', label: 'AnyRouter-Pi', url: 'https://anyrouter.top', placeholder: 'Paste your key here...', description: 'Experimental Pi backend profile.' },
-  { key: 'custom', label: 'Custom', url: '', placeholder: 'Paste your key here...' },
+  { key: 'agentrouter', label: 'AgentRouter', url: 'https://agentrouter.org' },
+  { key: 'anyrouter', label: 'AnyRouter-CC', url: 'https://anyrouter.top' },
+  { key: 'anyrouter_pi', label: 'AnyRouter-Pi', url: 'https://anyrouter.top', descriptionKey: 'apiSetup.experimentalPiProfile' },
+  { key: 'custom', label: '', labelKey: 'apiSetup.custom', url: '' },
 ]
+
+const DEFAULT_ENDPOINT_PROVIDERS = new Set(['anthropic', 'openai', 'pi', 'google'])
 
 /**
  * Presets without a Pi SDK provider entry that nonetheless expose a known
@@ -195,14 +198,13 @@ export function ApiKeyInput({
   const isDisabled = disabled || status === 'validating'
 
   // Hide endpoint/model fields for providers with well-known endpoints handled by the SDK
-  const DEFAULT_ENDPOINT_PROVIDERS = new Set(['anthropic', 'openai', 'pi', 'google'])
   const isDefaultProviderPreset = DEFAULT_ENDPOINT_PROVIDERS.has(activePreset)
   const isPlatformProfilePreset = Boolean(PLATFORM_PROFILE_BY_PRESET[activePreset])
   const shouldShowClaudeCli = shouldShowClaudeCliControls(activePreset)
 
   // Provider-specific placeholders from the active preset
   const activePresetObj = presets.find(p => p.key === activePreset)
-  const apiKeyPlaceholder = activePresetObj?.placeholder ?? 'Paste your key here...'
+  const apiKeyPlaceholder = activePresetObj?.placeholder ?? t('apiSetup.apiKeyPlaceholder')
 
   // Fetch Pi SDK models when a provider is selected in pi_api_key flow.
   // Returns all models sorted by cost (expensive-first) for the searchable tier dropdowns.
@@ -242,11 +244,11 @@ export function ApiKeyInput({
       setClaudeCliStatus(await window.electronAPI.checkClaudeCli())
     } catch (error) {
       setClaudeCliStatus(null)
-      setClaudeCliError(error instanceof Error ? error.message : 'Failed to check Claude Code CLI.')
+      setClaudeCliError(error instanceof Error ? error.message : t('apiSetup.claudeCli.checkFailed'))
     } finally {
       setIsCheckingClaudeCli(false)
     }
-  }, [])
+  }, [t])
 
   useEffect(() => {
     if (shouldShowClaudeCli) {
@@ -266,12 +268,12 @@ export function ApiKeyInput({
 
       const result = await window.electronAPI.setClaudeCliPath(path)
       if (!result.success) {
-        setClaudeCliError(result.error || 'Failed to save the Claude Code CLI path.')
+        setClaudeCliError(result.error || t('apiSetup.claudeCli.savePathFailed'))
         return
       }
       await checkClaudeCli()
     } catch (error) {
-      setClaudeCliError(error instanceof Error ? error.message : 'Failed to select Claude Code CLI.')
+      setClaudeCliError(error instanceof Error ? error.message : t('apiSetup.claudeCli.selectFailed'))
     } finally {
       setIsUpdatingClaudeCliPath(false)
     }
@@ -283,12 +285,12 @@ export function ApiKeyInput({
     try {
       const result = await window.electronAPI.clearClaudeCliPath()
       if (!result.success) {
-        setClaudeCliError(result.error || 'Failed to restore automatic Claude Code CLI detection.')
+        setClaudeCliError(result.error || t('apiSetup.claudeCli.restoreFailed'))
         return
       }
       setClaudeCliStatus(result)
     } catch (error) {
-      setClaudeCliError(error instanceof Error ? error.message : 'Failed to restore automatic Claude Code CLI detection.')
+      setClaudeCliError(error instanceof Error ? error.message : t('apiSetup.claudeCli.restoreFailed'))
     } finally {
       setIsUpdatingClaudeCliPath(false)
     }
@@ -339,6 +341,7 @@ export function ApiKeyInput({
       matchedPreset: presetKey,
       activePreset,
       activePresetHasEmptyUrl: currentPresetObj?.url === '',
+      preserveActivePreset: isPlatformProfilePreset,
       lastNonCustomPreset,
     })
     setActivePreset(nextPresetState.activePreset)
@@ -371,7 +374,7 @@ export function ApiKeyInput({
     // Pi API key flow with tier dropdowns — submit selected models
     if (hasPiModels) {
       if (!bestModel || !defaultModel || !cheapModel) {
-        setModelError('Please select a model for each tier.')
+        setModelError(t('apiSetup.selectEachTier'))
         return
       }
       const models: string[] = [bestModel, defaultModel, cheapModel]
@@ -393,7 +396,7 @@ export function ApiKeyInput({
     const isUsingDefaultEndpoint = isDefaultProviderPreset || !effectiveBaseUrl
     const requiresModel = !isDefaultProviderPreset && !!effectiveBaseUrl
     if (requiresModel && parsedModels.length === 0) {
-      setModelError('Default model is required for custom endpoints.')
+      setModelError(t('apiSetup.defaultModelRequired'))
       return
     }
 
@@ -421,11 +424,11 @@ export function ApiKeyInput({
   }
 
   const tierConfigs = [
-    { label: 'Best', desc: 'most capable', value: bestModel, onChange: setBestModel },
-    { label: 'Balanced', desc: 'good for everyday use', value: defaultModel, onChange: setDefaultModel },
-    { label: 'Fast', desc: 'summarization & utility', value: cheapModel, onChange: setCheapModel },
+    { id: 'best', label: t('apiSetup.tiers.best'), desc: t('apiSetup.tiers.bestDesc'), value: bestModel, onChange: setBestModel },
+    { id: 'balanced', label: t('apiSetup.tiers.balanced'), desc: t('apiSetup.tiers.balancedDesc'), value: defaultModel, onChange: setDefaultModel },
+    { id: 'fast', label: t('apiSetup.tiers.fast'), desc: t('apiSetup.tiers.fastDesc'), value: cheapModel, onChange: setCheapModel },
   ]
-  const activeTierConfig = openTier ? tierConfigs.find(t => t.label === openTier) : null
+  const activeTierConfig = openTier ? tierConfigs.find(tier => tier.id === openTier) : null
 
   return (
     <form id={formId} onSubmit={handleSubmit} className="space-y-6">
@@ -474,7 +477,10 @@ export function ApiKeyInput({
               disabled={isDisabled}
               className="flex h-6 items-center gap-1 rounded-[6px] bg-background shadow-minimal pl-2.5 pr-2 text-[12px] font-medium text-foreground/50 hover:bg-foreground/5 hover:text-foreground focus:outline-none"
             >
-              {presets.find(p => p.key === activePreset)?.label}
+              {(() => {
+                const preset = presets.find(p => p.key === activePreset)
+                return preset?.labelKey ? t(preset.labelKey) : preset?.label
+              })()}
               <ChevronDown className="size-2.5 opacity-50" />
             </DropdownMenuTrigger>
             <StyledDropdownMenuContent align="end" className="z-floating-menu">
@@ -485,9 +491,9 @@ export function ApiKeyInput({
                   className="justify-between"
                 >
                   <span className="flex min-w-0 flex-col">
-                    <span>{preset.label}</span>
-                    {preset.description && (
-                      <span className="text-[10px] font-normal text-foreground/40">{preset.description}</span>
+                    <span>{preset.labelKey ? t(preset.labelKey) : preset.label}</span>
+                    {preset.descriptionKey && (
+                      <span className="text-[10px] font-normal text-foreground/40">{t(preset.descriptionKey)}</span>
                     )}
                   </span>
                   <Check className={cn("size-3", activePreset === preset.key ? "opacity-100" : "opacity-0")} />
@@ -507,9 +513,9 @@ export function ApiKeyInput({
               type="text"
               value={baseUrl}
               onChange={(e) => handleBaseUrlChange(e.target.value)}
-              placeholder="https://your-api-endpoint.com"
+              placeholder={t('apiSetup.endpointPlaceholder')}
               className="border-0 bg-transparent shadow-none"
-              disabled={isDisabled || isPlatformProfilePreset}
+              disabled={isDisabled}
             />
           </div>
         )}
@@ -525,7 +531,7 @@ export function ApiKeyInput({
                 'mt-1 text-xs',
                 claudeCliError || (claudeCliStatus && !claudeCliStatus.found) ? 'text-destructive' : 'text-foreground/50',
               )}>
-                {getClaudeCliStatusMessage(claudeCliStatus, claudeCliError)}
+                {getClaudeCliStatusMessage(claudeCliStatus, t, claudeCliError)}
               </p>
             </div>
             <button
@@ -535,13 +541,15 @@ export function ApiKeyInput({
               className="inline-flex shrink-0 items-center gap-1.5 rounded-[6px] bg-background px-2.5 py-1.5 text-xs font-medium text-foreground shadow-minimal hover:bg-foreground/5 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <RefreshCw className={cn('size-3', isCheckingClaudeCli && 'animate-spin')} />
-              Recheck
+              {t('apiSetup.claudeCli.recheck')}
             </button>
           </div>
 
           {claudeCliStatus?.path && (
             <p className="break-all text-xs text-foreground/50">
-              {hasSavedClaudeCliPath(claudeCliStatus) ? 'Saved path: ' : 'Detected path: '}
+              {hasSavedClaudeCliPath(claudeCliStatus)
+                ? t('apiSetup.claudeCli.savedPath')
+                : t('apiSetup.claudeCli.detectedPath')}{' '}
               {claudeCliStatus.path}
             </p>
           )}
@@ -554,7 +562,7 @@ export function ApiKeyInput({
               className="inline-flex items-center gap-1.5 rounded-[6px] bg-background px-2.5 py-1.5 text-xs font-medium text-foreground shadow-minimal hover:bg-foreground/5 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <FolderOpen className="size-3" />
-              Browse...
+              {t('common.browse')}
             </button>
             {hasSavedClaudeCliPath(claudeCliStatus) && (
               <button
@@ -564,7 +572,7 @@ export function ApiKeyInput({
                 className="inline-flex items-center gap-1.5 rounded-[6px] bg-background px-2.5 py-1.5 text-xs font-medium text-foreground shadow-minimal hover:bg-foreground/5 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <RotateCcw className="size-3" />
-                Restore automatic detection
+                {t('apiSetup.claudeCli.restoreAutomatic')}
               </button>
             )}
           </div>
@@ -581,8 +589,8 @@ export function ApiKeyInput({
             isDisabled && "opacity-50 pointer-events-none"
           )}>
             {([
-              { value: 'openai-completions' as const, label: 'OpenAI Compatible' },
-              { value: 'anthropic-messages' as const, label: 'Anthropic Compatible' },
+              { value: 'openai-completions' as const, label: t('apiSetup.openAiCompatible') },
+              { value: 'anthropic-messages' as const, label: t('apiSetup.anthropicCompatible') },
             ]).map(({ value, label }) => (
               <button
                 key={value}
@@ -601,7 +609,7 @@ export function ApiKeyInput({
             ))}
           </div>
           <p className="text-xs text-foreground/30">
-            Most third-party APIs (Ollama, vLLM, DashScope) use OpenAI Compatible.
+            {t('apiSetup.protocolHelper')}
           </p>
         </div>
       )}
@@ -616,8 +624,8 @@ export function ApiKeyInput({
             </div>
           ) : (
             <>
-              {tierConfigs.map(({ label, desc, value }) => (
-                <div key={label} className="space-y-1.5">
+              {tierConfigs.map(({ id, label, desc, value }) => (
+                <div key={id} className="space-y-1.5">
                   <Label className="text-muted-foreground font-normal text-xs">
                     {label}{' '}
                     <span className="text-foreground/30">· {desc}</span>
@@ -626,13 +634,13 @@ export function ApiKeyInput({
                     type="button"
                     disabled={isDisabled}
                     onClick={(e) => {
-                      if (openTier === label) {
+                      if (openTier === id) {
                         setOpenTier(null)
                         setTierFilter('')
                       } else {
                         const rect = e.currentTarget.getBoundingClientRect()
                         setTierDropdownPosition({ top: rect.bottom + 4, left: rect.left, width: rect.width })
-                        setOpenTier(label)
+                        setOpenTier(id)
                         setTierFilter('')
                         setTimeout(() => tierFilterInputRef.current?.focus(), 0)
                       }
@@ -645,7 +653,7 @@ export function ApiKeyInput({
                     )}
                   >
                     <span className="truncate text-foreground">
-                      {piModels.find(m => m.id === value)?.name ?? 'Select model...'}
+                      {piModels.find(m => m.id === value)?.name ?? t('apiSetup.selectModel')}
                     </span>
                     <ChevronDown className="size-3 opacity-50 shrink-0" />
                   </button>
@@ -699,7 +707,7 @@ export function ApiKeyInput({
                               <div className="flex items-center gap-2 min-w-0">
                                 <span className="truncate">{model.name}</span>
                                 {model.reasoning && (
-                                  <span className="text-[10px] text-foreground/30 shrink-0">reasoning</span>
+                                  <span className="text-[10px] text-foreground/30 shrink-0">{t('apiSetup.reasoning')}</span>
                                 )}
                               </div>
                               <Check className={cn("size-3 shrink-0", activeTierConfig.value === model.id ? "opacity-100" : "opacity-0")} />
@@ -719,9 +727,9 @@ export function ApiKeyInput({
       ) : !isDefaultProviderPreset && (
         <div className="space-y-2">
           <Label htmlFor="connection-default-model" className="text-muted-foreground font-normal">
-            Default Model{' '}
+            {t('apiSetup.defaultModel')}{' '}
             <span className="text-foreground/30">
-              · {baseUrl.trim() ? 'required' : 'optional'}
+              · {baseUrl.trim() ? t('apiSetup.required') : t('apiSetup.optional')}
             </span>
           </Label>
           <div className={cn(
@@ -737,7 +745,7 @@ export function ApiKeyInput({
                 setConnectionDefaultModel(e.target.value)
                 setModelError(null)
               }}
-              placeholder="e.g. claude-opus-4-8, claude-opus-4-7, claude-sonnet-4-6, claude-haiku-4-5"
+              placeholder={t('apiSetup.modelListPlaceholder')}
               className="border-0 bg-transparent shadow-none"
               disabled={isDisabled}
             />
@@ -746,11 +754,11 @@ export function ApiKeyInput({
             <p className="text-xs text-destructive">{modelError}</p>
           )}
           <p className="text-xs text-foreground/30">
-            Comma-separated list. The first model is the default. The last is used for summarization.
+            {t('apiSetup.modelListHelper')}
           </p>
           {(activePreset === 'custom' || !activePreset) && (
             <p className="text-xs text-foreground/30">
-              Required for custom endpoints. Use the provider-specific model ID.
+              {t('apiSetup.customModelHelper')}
             </p>
           )}
         </div>

@@ -206,4 +206,30 @@ describe('resolveCustomEndpointPayload', () => {
       platformProfile: 'anyrouter_pi',
     })
   })
+
+  it('keeps a branded platform profile selected while its endpoint is edited', () => {
+    expect(resolvePresetStateForBaseUrlChange({
+      matchedPreset: 'custom',
+      activePreset: 'anyrouter_pi',
+      activePresetHasEmptyUrl: false,
+      preserveActivePreset: true,
+      lastNonCustomPreset: 'anyrouter_pi',
+    })).toEqual({
+      activePreset: 'anyrouter_pi',
+      lastNonCustomPreset: 'anyrouter_pi',
+    })
+  })
+
+  it('does not switch a branded platform profile when its endpoint matches another preset', () => {
+    expect(resolvePresetStateForBaseUrlChange({
+      matchedPreset: 'openrouter',
+      activePreset: 'agentrouter',
+      activePresetHasEmptyUrl: false,
+      preserveActivePreset: true,
+      lastNonCustomPreset: 'agentrouter',
+    })).toEqual({
+      activePreset: 'agentrouter',
+      lastNonCustomPreset: 'agentrouter',
+    })
+  })
 })

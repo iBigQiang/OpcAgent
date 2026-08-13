@@ -65,12 +65,12 @@ export function ServerDirectoryBrowser({
       setListing(result)
       setPathInput(result.currentPath)
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to list directory'
+      const message = err instanceof Error ? err.message : t('serverDirectory.failedToList')
       setError(message)
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [t])
 
   // Load initial directory when opened
   useEffect(() => {
@@ -119,7 +119,7 @@ export function ServerDirectoryBrowser({
             }
           }
         } catch (err) {
-          setError(err instanceof Error ? err.message : 'Failed to list directory')
+          setError(err instanceof Error ? err.message : t('serverDirectory.failedToList'))
         } finally {
           setLoading(false)
         }
@@ -130,7 +130,7 @@ export function ServerDirectoryBrowser({
       }
     }
     void init()
-  }, [open, mode, initialPath, navigateTo])
+  }, [open, mode, initialPath, navigateTo, t])
 
   // Handle path input submission (Enter key or navigate button)
   const handlePathSubmit = useCallback(() => {
@@ -139,7 +139,7 @@ export function ServerDirectoryBrowser({
 
     // Client-side rejection of wrong-platform paths (avoids round-trip)
     if (isWrongPlatformPath(trimmed, serverHomePath)) {
-      setError('This looks like a path from a different OS. Enter a path that exists on the server.')
+      setError(t('serverDirectory.wrongPlatformPath'))
       return
     }
 
@@ -149,7 +149,7 @@ export function ServerDirectoryBrowser({
       // Manual mode — just select the path
       onSelect(trimmed)
     }
-  }, [pathInput, mode, navigateTo, onSelect, serverHomePath])
+  }, [pathInput, mode, navigateTo, onSelect, serverHomePath, t])
 
   // Handle selecting the current directory (or highlighted entry)
   const handleSelect = useCallback(() => {
@@ -193,7 +193,7 @@ export function ServerDirectoryBrowser({
           className="flex-1 font-mono text-xs"
         />
         <Button variant="outline" size="sm" onClick={handlePathSubmit} disabled={loading}>
-          Go
+          {t('common.go')}
         </Button>
       </div>
 
@@ -221,7 +221,7 @@ export function ServerDirectoryBrowser({
           {loading && (
             <div className="flex items-center justify-center gap-2 py-8 text-muted-foreground">
               <Spinner className="text-sm" />
-              Loading...
+              {t('common.loading')}
             </div>
           )}
 
@@ -233,13 +233,13 @@ export function ServerDirectoryBrowser({
 
           {!loading && !error && listing?.truncated && (
             <div className="border-b border-foreground/10 px-3 py-2 text-xs text-muted-foreground">
-              Showing the first {listing.entries.length} folders out of {listing.totalEntries}. Narrow the path if the folder you want is missing.
+              {t('serverDirectory.truncated', { shown: listing.entries.length, total: listing.totalEntries })}
             </div>
           )}
 
           {!loading && !error && listing && listing.entries.length === 0 && (
             <div className="px-3 py-4 text-sm text-muted-foreground">
-              No subdirectories. Use the path input above to navigate.
+              {t('serverDirectory.noSubdirectories')}
             </div>
           )}
 
@@ -259,7 +259,7 @@ export function ServerDirectoryBrowser({
               }
               <span className="truncate">{entry.name}</span>
               {entry.isSymlink && (
-                <span className="text-xs text-muted-foreground/60 shrink-0">symlink</span>
+                <span className="text-xs text-muted-foreground/60 shrink-0">{t('serverDirectory.symlink')}</span>
               )}
             </button>
           ))}
@@ -272,7 +272,7 @@ export function ServerDirectoryBrowser({
   const renderManualMode = () => (
     <>
       <p className="text-sm text-muted-foreground">
-        Enter the full path on the server:
+        {t('serverDirectory.enterFullPath')}
       </p>
       <Input
         ref={inputRef}
@@ -301,13 +301,13 @@ export function ServerDirectoryBrowser({
 
         <DialogFooter>
           <Button variant="outline" onClick={onCancel}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button
             onClick={handleSelect}
             disabled={mode === 'manual' ? !pathInput.trim() : (!listing && !pathInput.trim())}
           >
-            Select
+            {t('common.select')}
           </Button>
         </DialogFooter>
       </DialogContent>

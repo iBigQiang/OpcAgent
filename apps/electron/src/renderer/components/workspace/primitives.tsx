@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils"
 import { Button, type ButtonProps } from "@/components/ui/button"
 import { Spinner } from "@mkagent/ui"
+import { useTranslation } from "react-i18next"
 
 /* =============================================================================
    ADD WORKSPACE PRIMITIVES
@@ -95,13 +96,15 @@ interface AddWorkspacePrimaryButtonProps extends Omit<ButtonProps, 'variant' | '
  * Includes loading state with spinner.
  */
 export function AddWorkspacePrimaryButton({
-  children = 'Continue',
+  children,
   loading,
   loadingText,
   className,
   disabled,
   ...props
 }: AddWorkspacePrimaryButtonProps) {
+  const { t } = useTranslation()
+  const content = children ?? t('common.continue')
   return (
     <Button
       className={cn("w-full", className)}
@@ -111,10 +114,10 @@ export function AddWorkspacePrimaryButton({
       {loading ? (
         <>
           <Spinner className="mr-2" />
-          {loadingText || children}
+          {loadingText || content}
         </>
       ) : (
-        children
+        content
       )}
     </Button>
   )

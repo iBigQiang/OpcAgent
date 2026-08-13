@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/dialog"
 import { useRegisterModal } from "@/context/ModalContext"
 import { isMac } from "@/lib/platform"
-import { actionsByCategory, useActionLabel, type ActionId } from "@/actions"
+import { ACTION_CATEGORY_KEYS, actionsByCategory, useActionLabel, type ActionId } from "@/actions"
 
 interface KeyboardShortcutsDialogProps {
   open: boolean
@@ -103,11 +103,12 @@ function ActionShortcutRow({ actionId }: { actionId: ActionId }) {
 /**
  * Renders a section of shortcuts from the registry
  */
-function RegistrySection({ category, actionIds }: { category: string; actionIds: ActionId[] }) {
+function RegistrySection({ category, actionIds }: { category: keyof typeof ACTION_CATEGORY_KEYS; actionIds: ActionId[] }) {
+  const { t } = useTranslation()
   return (
     <div>
       <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
-        {category}
+        {t(ACTION_CATEGORY_KEYS[category])}
       </h3>
       <div className="space-y-1.5">
         {actionIds.map(actionId => (
@@ -161,7 +162,7 @@ export function KeyboardShortcutsDialog({ open, onOpenChange }: KeyboardShortcut
           {Object.entries(actionsByCategory).map(([category, actions]) => (
             <RegistrySection
               key={category}
-              category={category}
+              category={category as keyof typeof ACTION_CATEGORY_KEYS}
               actionIds={actions.map(a => a.id as ActionId)}
             />
           ))}

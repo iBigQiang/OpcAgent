@@ -12,7 +12,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { HeaderMenu } from '@/components/ui/HeaderMenu'
 import { routes } from '@/lib/navigate'
 import { isMac } from '@/lib/platform'
-import { actionsByCategory, useActionLabel, type ActionId } from '@/actions'
+import { ACTION_CATEGORY_KEYS, ACTION_LABEL_KEYS, actionsByCategory, useActionLabel, type ActionId } from '@/actions'
 
 interface ShortcutItem {
   keys: string[]
@@ -74,6 +74,7 @@ function Kbd({ children, className }: { children: React.ReactNode; className?: s
  * Renders a shortcut row for an action from the registry
  */
 function ActionShortcutRow({ actionId }: { actionId: ActionId }) {
+  const { t } = useTranslation()
   const { label, hotkey } = useActionLabel(actionId)
 
   if (!hotkey) return null
@@ -87,7 +88,7 @@ function ActionShortcutRow({ actionId }: { actionId: ActionId }) {
 
   return (
     <div className="group flex items-center justify-between py-1.5">
-      <span className="text-sm">{label}</span>
+      <span className="text-sm">{t(ACTION_LABEL_KEYS[actionId], { defaultValue: label })}</span>
       <div className="flex-1 mx-3 h-px bg-[repeating-linear-gradient(90deg,currentColor_0_2px,transparent_2px_8px)] opacity-0 group-hover:opacity-15" />
       <div className="flex items-center gap-1">
         {keys.map((key, keyIndex) => (
@@ -113,7 +114,7 @@ export default function ShortcutsPage() {
             {Object.entries(actionsByCategory).map(([category, actions]) => (
               <div key={category}>
                 <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2 pb-1.5 border-b border-border/50">
-                  {category}
+                  {t(ACTION_CATEGORY_KEYS[category as keyof typeof ACTION_CATEGORY_KEYS])}
                 </h3>
                 <div className="space-y-0.5">
                   {actions.map(action => (
