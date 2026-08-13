@@ -18,7 +18,14 @@ function git(args: string[], root = repoRoot): string { const result = Bun.spawn
 function tree(commit: string, root = repoRoot): Set<string> { return new Set(git(['ls-tree', '-r', '--name-only', '-z', commit], root).split('\0').filter(Boolean)) }
 function list(dir: string): string[] { return readdirSync(resolve(repoRoot, dir), { withFileTypes: true }).flatMap(entry => { const path = `${dir}/${entry.name}`; return entry.isDirectory() ? list(path) : [path] }) }
 function restoredUi(path: string): boolean { return restored.features.some(feature => feature.testAnchors.includes(path) || feature.sourcePrefixes.some(prefix => path === prefix || path.startsWith(prefix))) }
-function sha256(path: string): string { return createHash('sha256').update(readFileSync(resolve(repoRoot, path))).digest('hex') }
+function sha256(path: string): string {
+  const content = readFileSync(resolve(repoRoot, path))
+  const text = content.toString('utf8')
+  const normalized = !content.includes(0) && Buffer.from(text, 'utf8').equals(content)
+    ? Buffer.from(text.replaceAll('\r\n', '\n'), 'utf8')
+    : content
+  return createHash('sha256').update(normalized).digest('hex')
+}
 
 const source = tree(restored.restoredSource, craftSourceRoot)
 const product = tree(restored.productBaseline)

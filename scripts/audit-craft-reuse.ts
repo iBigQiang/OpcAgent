@@ -35,7 +35,12 @@ function tree(commit: string, root = repoRoot): Set<string> { return new Set(git
 function worktree(): string[] { return git(['ls-files', '--cached', '--others', '--exclude-standard', '-z']).split('\0').filter(Boolean) }
 function objectText(commit: string, path: string): string { return git(['show', `${commit}:${path}`], craftSourceRoot) }
 function fileSha256(path: string): string {
-  return createHash('sha256').update(readFileSync(resolve(repoRoot, path))).digest('hex')
+  const content = readFileSync(resolve(repoRoot, path))
+  const text = content.toString('utf8')
+  const normalized = !content.includes(0) && Buffer.from(text, 'utf8').equals(content)
+    ? Buffer.from(text.replaceAll('\r\n', '\n'), 'utf8')
+    : content
+  return createHash('sha256').update(normalized).digest('hex')
 }
 function isRestored(path: string): boolean {
   return restored.features.some(feature =>

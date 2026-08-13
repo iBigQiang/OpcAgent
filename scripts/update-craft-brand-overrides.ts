@@ -43,8 +43,13 @@ function git(args: string[]): string {
 }
 
 function sha256(path: string): string {
+  const content = readFileSync(resolve(repoRoot, path));
+  const text = content.toString("utf8");
+  const normalized = !content.includes(0) && Buffer.from(text, "utf8").equals(content)
+    ? Buffer.from(text.replaceAll("\r\n", "\n"), "utf8")
+    : content;
   return createHash("sha256")
-    .update(readFileSync(resolve(repoRoot, path)))
+    .update(normalized)
     .digest("hex");
 }
 

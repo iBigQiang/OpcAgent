@@ -71,8 +71,13 @@ function updateLineageManifest(paths: string[]): void {
   };
   for (const absolutePath of paths) {
     const relativePath = absolutePath.slice(root.length + 1);
+    const content = readFileSync(absolutePath);
+    const text = content.toString("utf8");
+    const normalized = !content.includes(0) && Buffer.from(text, "utf8").equals(content)
+      ? Buffer.from(text.replaceAll("\r\n", "\n"), "utf8")
+      : content;
     const sha256 = createHash("sha256")
-      .update(readFileSync(absolutePath))
+      .update(normalized)
       .digest("hex");
     const existing =
       manifest.modified[relativePath] ?? manifest.mkOnly[relativePath];
