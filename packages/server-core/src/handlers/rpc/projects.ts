@@ -1,7 +1,7 @@
-import { RPC_CHANNELS } from '@mkagent/shared/protocol'
-import { getWorkspaceByNameOrId } from '@mkagent/shared/config'
-import { isValidProjectId, isValidProjectSlug } from '@mkagent/shared/projects'
-import { pushTyped, type RpcServer } from '@mkagent/server-core/transport'
+import { RPC_CHANNELS } from '@opcagent/shared/protocol'
+import { getWorkspaceByNameOrId } from '@opcagent/shared/config'
+import { isValidProjectId, isValidProjectSlug } from '@opcagent/shared/projects'
+import { pushTyped, type RpcServer } from '@opcagent/server-core/transport'
 import type { HandlerDeps } from '../handler-deps'
 
 export const HANDLED_CHANNELS = [
@@ -29,7 +29,7 @@ export function registerProjectsHandlers(server: RpcServer, deps: HandlerDeps): 
   }
 
   async function broadcastChanged(workspaceId: string, workspaceRootPath: string): Promise<void> {
-    const { loadWorkspaceProjects } = await import('@mkagent/shared/projects')
+    const { loadWorkspaceProjects } = await import('@opcagent/shared/projects')
     const projects = loadWorkspaceProjects(workspaceRootPath)
     pushTyped(server, RPC_CHANNELS.projects.CHANGED, { to: 'workspace', workspaceId }, workspaceId, projects)
   }
@@ -42,7 +42,7 @@ export function registerProjectsHandlers(server: RpcServer, deps: HandlerDeps): 
       log.error(`PROJECTS_GET: Workspace not found: ${workspaceId}`)
       return []
     }
-    const { loadWorkspaceProjects } = await import('@mkagent/shared/projects')
+    const { loadWorkspaceProjects } = await import('@opcagent/shared/projects')
     return loadWorkspaceProjects(workspace.rootPath)
   })
 
@@ -51,18 +51,18 @@ export function registerProjectsHandlers(server: RpcServer, deps: HandlerDeps): 
     requireWorkspaceContext(ctx.workspaceId, workspaceId)
     const workspace = getWorkspaceByNameOrId(workspaceId)
     if (!workspace) return null
-    const { loadProject, loadProjectById } = await import('@mkagent/shared/projects')
+    const { loadProject, loadProjectById } = await import('@opcagent/shared/projects')
     if (isValidProjectSlug(projectIdOrSlug)) return loadProject(workspace.rootPath, projectIdOrSlug)
     if (isValidProjectId(projectIdOrSlug)) return loadProjectById(workspace.rootPath, projectIdOrSlug)
     throw new Error('Invalid project identifier')
   })
 
   // Create a new project
-  server.handle(RPC_CHANNELS.projects.CREATE, async (ctx, workspaceId: string, input: import('@mkagent/shared/projects').CreateProjectInput) => {
+  server.handle(RPC_CHANNELS.projects.CREATE, async (ctx, workspaceId: string, input: import('@opcagent/shared/projects').CreateProjectInput) => {
     requireWorkspaceContext(ctx.workspaceId, workspaceId)
     const workspace = getWorkspaceByNameOrId(workspaceId)
     if (!workspace) throw new Error(`Workspace not found: ${workspaceId}`)
-    const { createProject } = await import('@mkagent/shared/projects')
+    const { createProject } = await import('@opcagent/shared/projects')
     const project = createProject(workspace.rootPath, {
       name: input.name?.trim() || 'New Project',
       description: input.description,
@@ -80,13 +80,13 @@ export function registerProjectsHandlers(server: RpcServer, deps: HandlerDeps): 
     ctx,
     workspaceId: string,
     projectSlug: string,
-    patch: Partial<Omit<import('@mkagent/shared/projects').ProjectConfig, 'id' | 'slug' | 'createdAt'>>,
+    patch: Partial<Omit<import('@opcagent/shared/projects').ProjectConfig, 'id' | 'slug' | 'createdAt'>>,
   ) => {
     requireWorkspaceContext(ctx.workspaceId, workspaceId)
     requireProjectSlug(projectSlug)
     const workspace = getWorkspaceByNameOrId(workspaceId)
     if (!workspace) throw new Error(`Workspace not found: ${workspaceId}`)
-    const { updateProject } = await import('@mkagent/shared/projects')
+    const { updateProject } = await import('@opcagent/shared/projects')
     const updated = updateProject(workspace.rootPath, projectSlug, patch)
     await broadcastChanged(workspaceId, workspace.rootPath)
     return updated
@@ -99,14 +99,14 @@ export function registerProjectsHandlers(server: RpcServer, deps: HandlerDeps): 
     const workspace = getWorkspaceByNameOrId(workspaceId)
     if (!workspace) throw new Error(`Workspace not found: ${workspaceId}`)
 
-    const { loadProject, deleteProject } = await import('@mkagent/shared/projects')
+    const { loadProject, deleteProject } = await import('@opcagent/shared/projects')
     const project = loadProject(workspace.rootPath, projectSlug)
     if (!project) {
       log.warn(`PROJECTS_DELETE: project ${projectSlug} not found`)
       return
     }
 
-    const { unbindProjectFromSessions } = await import('@mkagent/shared/sessions')
+    const { unbindProjectFromSessions } = await import('@opcagent/shared/sessions')
     const touched = await unbindProjectFromSessions(workspace.rootPath, project.config.id)
     const loadedTouched = await deps.sessionManager.unbindProjectFromLoadedSessions(workspace.id, project.config.id)
     deleteProject(workspace.rootPath, projectSlug)
@@ -120,7 +120,7 @@ export function registerProjectsHandlers(server: RpcServer, deps: HandlerDeps): 
     requireProjectSlug(projectSlug)
     const workspace = getWorkspaceByNameOrId(workspaceId)
     if (!workspace) return []
-    const { listProjectAssets } = await import('@mkagent/shared/projects')
+    const { listProjectAssets } = await import('@opcagent/shared/projects')
     return listProjectAssets(workspace.rootPath, projectSlug)
   })
 
@@ -129,13 +129,13 @@ export function registerProjectsHandlers(server: RpcServer, deps: HandlerDeps): 
     ctx,
     workspaceId: string,
     projectSlug: string,
-    input: import('@mkagent/shared/projects').UploadProjectAssetInput,
+    input: import('@opcagent/shared/projects').UploadProjectAssetInput,
   ) => {
     requireWorkspaceContext(ctx.workspaceId, workspaceId)
     requireProjectSlug(projectSlug)
     const workspace = getWorkspaceByNameOrId(workspaceId)
     if (!workspace) throw new Error(`Workspace not found: ${workspaceId}`)
-    const { uploadProjectAsset } = await import('@mkagent/shared/projects')
+    const { uploadProjectAsset } = await import('@opcagent/shared/projects')
     const asset = uploadProjectAsset(workspace.rootPath, projectSlug, input)
     await broadcastChanged(workspaceId, workspace.rootPath)
     log.info(`Uploaded asset ${asset.filename} to project ${projectSlug}`)
@@ -153,7 +153,7 @@ export function registerProjectsHandlers(server: RpcServer, deps: HandlerDeps): 
     requireProjectSlug(projectSlug)
     const workspace = getWorkspaceByNameOrId(workspaceId)
     if (!workspace) throw new Error(`Workspace not found: ${workspaceId}`)
-    const { deleteProjectAsset } = await import('@mkagent/shared/projects')
+    const { deleteProjectAsset } = await import('@opcagent/shared/projects')
     deleteProjectAsset(workspace.rootPath, projectSlug, filename)
     await broadcastChanged(workspaceId, workspace.rootPath)
   })

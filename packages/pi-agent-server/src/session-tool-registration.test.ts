@@ -138,7 +138,7 @@ describe('Pi SDK 0.70.0 CreateAgentSessionOptions contract', () => {
 describe('Pi runtime settings', () => {
   it('bridges the persisted Windows shell path into Pi settings', () => {
     const source = readFileSync(join(import.meta.dir, 'index.ts'), 'utf8');
-    expect(source).toContain('process.env.MKAGENT_GIT_BASH_PATH');
+    expect(source).toContain('process.env.OPCAGENT_GIT_BASH_PATH');
     expect(source).toContain('settingsManager.applyOverrides({ shellPath })');
     expect(source).toContain('sessionOptions.settingsManager = settingsManager');
   });

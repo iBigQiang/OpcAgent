@@ -46,27 +46,27 @@ export default [
       '@typescript-eslint': tsPlugin,
       react: reactPlugin,
       'react-hooks': reactHooksPlugin,
-      // Custom plugin for MkAgent rules
-      'mkagent': {
+      // Custom plugin for OPC Agent rules
+      'opcagent': {
         rules: {
           'no-direct-navigation-state': noDirectNavigationState,
           'no-localstorage': noLocalStorage,
         },
       },
       // Custom plugin for platform detection rules
-      'mkagent-platform': {
+      'opcagent-platform': {
         rules: {
           'no-direct-platform-check': noDirectPlatformCheck,
         },
       },
       // Custom plugin for cross-platform path rules
-      'mkagent-paths': {
+      'opcagent-paths': {
         rules: {
           'no-hardcoded-path-separator': noHardcodedPathSeparator,
         },
       },
       // Custom plugin for link interceptor enforcement
-      'mkagent-links': {
+      'opcagent-links': {
         rules: {
           'no-direct-file-open': noDirectFileOpen,
         },
@@ -78,7 +78,7 @@ export default [
         },
       },
       // Custom style rules
-      'mkagent-styles': {
+      'opcagent-styles': {
         rules: {
           'no-hardcoded-z-index': noHardcodedZIndex,
           'no-nonstandard-shadows': noNonstandardShadows,
@@ -95,24 +95,24 @@ export default [
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
 
-      // Custom MkAgent rules
-      'mkagent/no-direct-navigation-state': 'error',
-      'mkagent/no-localstorage': 'warn',
+      // Custom OPCAgent rules
+      'opcagent/no-direct-navigation-state': 'error',
+      'opcagent/no-localstorage': 'warn',
 
       // Custom platform detection rule
-      'mkagent-platform/no-direct-platform-check': 'error',
+      'opcagent-platform/no-direct-platform-check': 'error',
 
       // Custom cross-platform path rule
-      'mkagent-paths/no-hardcoded-path-separator': 'warn',
+      'opcagent-paths/no-hardcoded-path-separator': 'warn',
 
       // Custom link interceptor rule — prevents bypassing in-app file preview
-      'mkagent-links/no-direct-file-open': 'error',
+      'opcagent-links/no-direct-file-open': 'error',
 
       // Custom style rule — use z-index token scale instead of hardcoded literals
-      'mkagent-styles/no-hardcoded-z-index': 'error',
+      'opcagent-styles/no-hardcoded-z-index': 'error',
 
       // Custom style rule — enforce approved shadow classes/tokens only
-      'mkagent-styles/no-nonstandard-shadows': ['error', {
+      'opcagent-styles/no-nonstandard-shadows': ['error', {
         allowedClasses: [
           'shadow-none',
           'shadow-xs',
@@ -142,14 +142,14 @@ export default [
   },
 
   // The renderer is source-synced from Craft and validated by the upstream
-  // source-drift check. Do not rewrite it to satisfy MkAgent-only style rules.
+  // source-drift check. Do not rewrite it to satisfy OPC Agent-only style rules.
   {
     files: ['src/renderer/**/*.{ts,tsx}'],
     rules: {
-      'mkagent/no-localstorage': 'off',
-      'mkagent-links/no-direct-file-open': 'off',
+      'opcagent/no-localstorage': 'off',
+      'opcagent-links/no-direct-file-open': 'off',
       'craft-links/no-direct-file-open': 'off',
-      'mkagent-styles/no-nonstandard-shadows': 'off',
+      'opcagent-styles/no-nonstandard-shadows': 'off',
     },
   },
 
@@ -162,7 +162,7 @@ export default [
       'src/renderer/playground/**/*.{ts,tsx}',
     ],
     rules: {
-      'mkagent-styles/no-nonstandard-shadows': 'off',
+      'opcagent-styles/no-nonstandard-shadows': 'off',
     },
   },
 
@@ -173,12 +173,12 @@ export default [
       'no-restricted-imports': ['error', {
         paths: [
           {
-            name: '@mkagent/shared/codex',
-            message: 'Use provider-agnostic APIs from @mkagent/shared/agent/backend instead.',
+            name: '@opcagent/shared/codex',
+            message: 'Use provider-agnostic APIs from @opcagent/shared/agent/backend instead.',
           },
           {
-            name: '@mkagent/shared/agent/pi-agent',
-            message: 'Provider backends must stay behind @mkagent/shared/agent/backend.',
+            name: '@opcagent/shared/agent/pi-agent',
+            message: 'Provider backends must stay behind @opcagent/shared/agent/backend.',
           },
         ],
       }],
@@ -192,7 +192,7 @@ export default [
       'no-restricted-syntax': ['error',
         {
           selector: "CallExpression[callee.name='fetch']",
-          message: 'Do not call provider APIs directly in Electron model fetchers. Delegate to fetchBackendModels() from @mkagent/shared/agent/backend.',
+          message: 'Do not call provider APIs directly in Electron model fetchers. Delegate to fetchBackendModels() from @opcagent/shared/agent/backend.',
         },
         {
           selector: "ImportDeclaration[source.value='@earendil-works/pi-ai']",

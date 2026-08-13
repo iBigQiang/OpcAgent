@@ -1,5 +1,5 @@
 import * as React from 'react'
-import type { AnnotationV1 } from '@mkagent/core'
+import type { AnnotationV1 } from '@opcagent/core'
 import {
   annotationInteractionActions,
   annotationInteractionReducer,

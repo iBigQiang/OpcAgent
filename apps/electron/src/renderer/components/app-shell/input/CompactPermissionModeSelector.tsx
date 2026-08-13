@@ -14,7 +14,7 @@ import {
   PERMISSION_MODE_CONFIG,
   PERMISSION_MODE_ORDER,
   type PermissionMode,
-} from '@mkagent/shared/agent/modes'
+} from '@opcagent/shared/agent/modes'
 
 // ============================================================================
 // Mode Icon (same SVG pattern as ActiveOptionBadges.PermissionModeIcon)

@@ -8,7 +8,7 @@ import {
   type SlashCommandId,
 } from '@/components/ui/slash-command-menu'
 import { ChevronDown, Info } from 'lucide-react'
-import { PERMISSION_MODE_CONFIG, type PermissionMode } from '@mkagent/shared/agent/modes'
+import { PERMISSION_MODE_CONFIG, type PermissionMode } from '@opcagent/shared/agent/modes'
 import { ActiveTasksBar, type BackgroundTask } from './ActiveTasksBar'
 import type { TerminalOverlayData } from './TaskActionMenu'
 import { SessionInfoPopover } from './SessionInfoPopover'

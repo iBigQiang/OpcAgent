@@ -13,7 +13,7 @@ Desktop supports file selection, paste, drag/drop, persistence, and recovery. We
 | WebUI upload | `POST /api/attachments` on the headless server |
 | CLI | `send <session-id> --attachment <path>` |
 
-All paths converge on the same attachment validator in `@mkagent/shared/agent/attachments`.
+All paths converge on the same attachment validator in `@opcagent/shared/agent/attachments`.
 
 ## Validation
 
@@ -23,7 +23,7 @@ All paths converge on the same attachment validator in `@mkagent/shared/agent/at
 | Total session attachments | unbounded but session JSONL events truncate over 1 MB single events |
 | File name | `/^[A-Za-z0-9._-]+$/` after Unicode normalization; path traversal segments are rejected |
 | MIME sniffing | the first 1 KB is sniffed; the declared MIME is overridden if mismatch is suspicious |
-| Storage root | forced inside `~/.mkagent/workspaces/<slug>/sessions/<id>/attachments/` |
+| Storage root | forced inside `~/.opcagent/workspaces/<slug>/sessions/<id>/attachments/` |
 
 A failed validation posts a `permission_denied` / `validation_failed` event to the JSONL stream and a same-text toast in the renderer.
 
@@ -46,7 +46,7 @@ Pi receives the descriptor for each tool call it makes; the actual file content 
 
 ## Image attachments
 
-Images can be attached, previewed, and rendered in Markdown. The renderer uses `sharp` for re-encoding, and Shiki/KaTeX for code and math rendering. MkAgent **does not** include an image-generation model or `gen_image` tool.
+Images can be attached, previewed, and rendered in Markdown. The renderer uses `sharp` for re-encoding, and Shiki/KaTeX for code and math rendering. OPC Agent **does not** include an image-generation model or `gen_image` tool.
 
 ## Persistence
 
@@ -56,7 +56,7 @@ Attachments persist with the session. Deleting a session purges its attachments 
 
 - Path canonicalization rejects `..` segments before storage.
 - Symlinks are resolved at upload; `O_NOFOLLOW`-equivalent semantics on POSIX.
-- Symlink-attack staging paths (`/tmp/mkagent-*`) cannot escape the workspace root.
+- Symlink-attack staging paths (`/tmp/opcagent-*`) cannot escape the workspace root.
 - WebUI cookie-based sessions; the upload endpoint reads the same JWT used for RPC.
 - Sentry breadcrumbs redact attachment filenames containing credential-looking substrings; they are not uploaded.
 

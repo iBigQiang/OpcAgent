@@ -3,7 +3,7 @@
  *
  * Handles checking for updates, downloading, and installing via the standard
  * electron-updater library. Updates are published as GitHub Releases in
- * MkThingsHQ/mkagent and configured by electron-builder's app-update.yml.
+ * iBigQiang/OpcAgent and configured by electron-builder's app-update.yml.
  *
  * Platform behavior:
  * - macOS: Downloads zip, extracts and swaps app bundle atomically
@@ -20,21 +20,21 @@ import { platform } from 'os'
 import * as path from 'path'
 import * as fs from 'fs'
 import { mainLog, autoUpdateLog } from './logger'
-import { getAppVersion } from '@mkagent/shared/version'
+import { getAppVersion } from '@opcagent/shared/version'
 import {
   getDismissedUpdateVersion,
   clearDismissedUpdateVersion,
-} from '@mkagent/shared/config'
-import { readJsonFileSync } from '@mkagent/shared/utils/files'
+} from '@opcagent/shared/config'
+import { readJsonFileSync } from '@opcagent/shared/utils/files'
 import { RPC_CHANNELS, type UpdateInfo } from '../shared/types'
-import type { EventSink } from '@mkagent/server-core/transport'
+import type { EventSink } from '@opcagent/server-core/transport'
 
 // Platform detection
 const PLATFORM = platform()
 const IS_MAC = PLATFORM === 'darwin'
 const IS_WINDOWS = PLATFORM === 'win32'
-const AUTO_UPDATE_ENABLED = process.env.MKAGENT_AUTO_UPDATE_ENABLED !== 'false'
-const AUTO_UPDATE_DISABLED_MESSAGE = 'Automatic updates are unavailable for unsigned macOS builds. Download the latest release from https://github.com/MkThingsHQ/mkagent/releases/latest.'
+const AUTO_UPDATE_ENABLED = process.env.OPCAGENT_AUTO_UPDATE_ENABLED !== 'false'
+const AUTO_UPDATE_DISABLED_MESSAGE = 'Automatic updates are unavailable for unsigned macOS builds. Download the latest release from https://github.com/iBigQiang/OpcAgent/releases/latest.'
 
 function assertAutoUpdateEnabled(): void {
   if (!AUTO_UPDATE_ENABLED) throw new Error(AUTO_UPDATE_DISABLED_MESSAGE)

@@ -19,10 +19,10 @@
     "noUnusedParameters": false,
     "baseUrl": ".",
     "paths": {
-      "@mkagent/shared": ["../../packages/shared/src/index.ts"],
-      "@mkagent/shared/*": ["../../packages/shared/src/*"],
-      "@mkagent/server-core": ["../../packages/server-core/src/index.ts"],
-      "@mkagent/server-core/*": ["../../packages/server-core/src/*"]
+      "@opcagent/shared": ["../../packages/shared/src/index.ts"],
+      "@opcagent/shared/*": ["../../packages/shared/src/*"],
+      "@opcagent/server-core": ["../../packages/server-core/src/index.ts"],
+      "@opcagent/server-core/*": ["../../packages/server-core/src/*"]
     }
   },
   "include": ["src/**/*", "../../packages/shared/src/**/*.d.ts"],

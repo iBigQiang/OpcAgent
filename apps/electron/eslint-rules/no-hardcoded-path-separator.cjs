@@ -9,7 +9,7 @@
  *   path.startsWith(prefix + '/')
  *
  * Good:
- *   import { pathStartsWith } from '@mkagent/core/utils'
+ *   import { pathStartsWith } from '@opcagent/core/utils'
  *   pathStartsWith(filePath, dir)
  *
  * Or in Node.js main process:
@@ -29,7 +29,7 @@ module.exports = {
     messages: {
       hardcodedSeparator:
         "Avoid hardcoded '/' or '\\\\' in path operations - this breaks on Windows/Unix. " +
-        "Use pathStartsWith() from @mkagent/core/utils, or path.sep in Node.js code.",
+        "Use pathStartsWith() from @opcagent/core/utils, or path.sep in Node.js code.",
     },
     schema: [],
   },

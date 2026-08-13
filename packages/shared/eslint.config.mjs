@@ -33,7 +33,7 @@ export default [
     plugins: {
       '@typescript-eslint': tsPlugin,
       // Custom plugin for shared package rules
-      'mkagent-shared': {
+      'opcagent-shared': {
         rules: {
           'no-direct-open-import': noDirectOpenImport,
         },
@@ -41,7 +41,7 @@ export default [
     },
     rules: {
       // Prevent direct imports of 'open' package — use openUrl() from utils instead
-      'mkagent-shared/no-direct-open-import': 'error',
+      'opcagent-shared/no-direct-open-import': 'error',
     },
   },
 ]

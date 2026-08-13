@@ -2,19 +2,19 @@ import { resolve } from 'path'
 import { join } from 'path'
 import { homedir } from 'os'
 import { execSync } from 'child_process'
-import { RPC_CHANNELS } from '@mkagent/shared/protocol'
-import { getGitBashPath, setGitBashPath, clearGitBashPath } from '@mkagent/shared/config'
-import { classifyExternalUrl, formatBlockedUrlError } from '@mkagent/shared/utils/url-safety'
-import { deriveGitBashPathsFromGitPaths, isUsableGitBashPath, validateGitBashPath } from '@mkagent/server-core/services'
-import { validateFilePath, getWorkspaceAllowedDirs } from '@mkagent/server-core/handlers'
-import type { RpcServer } from '@mkagent/server-core/transport'
+import { RPC_CHANNELS } from '@opcagent/shared/protocol'
+import { getGitBashPath, setGitBashPath, clearGitBashPath } from '@opcagent/shared/config'
+import { classifyExternalUrl, formatBlockedUrlError } from '@opcagent/shared/utils/url-safety'
+import { deriveGitBashPathsFromGitPaths, isUsableGitBashPath, validateGitBashPath } from '@opcagent/server-core/services'
+import { validateFilePath, getWorkspaceAllowedDirs } from '@opcagent/server-core/handlers'
+import type { RpcServer } from '@opcagent/server-core/transport'
 import type { HandlerDeps } from './handler-deps'
 import {
   requestClientOpenExternal,
   requestClientOpenPath,
   requestClientShowInFolder,
   requestClientOpenFileDialog,
-} from '@mkagent/server-core/transport'
+} from '@opcagent/server-core/transport'
 
 export const CORE_HANDLED_CHANNELS = [
   RPC_CHANNELS.theme.GET_SYSTEM_PREFERENCE,
@@ -95,12 +95,12 @@ export function registerSystemCoreHandlers(server: RpcServer, deps: HandlerDeps)
 
   // Release notes
   server.handle(RPC_CHANNELS.releaseNotes.GET, async () => {
-    const { getCombinedReleaseNotes } = require('@mkagent/shared/release-notes') as typeof import('@mkagent/shared/release-notes')
+    const { getCombinedReleaseNotes } = require('@opcagent/shared/release-notes') as typeof import('@opcagent/shared/release-notes')
     return getCombinedReleaseNotes()
   })
 
   server.handle(RPC_CHANNELS.releaseNotes.GET_LATEST_VERSION, async () => {
-    const { getLatestReleaseVersion } = require('@mkagent/shared/release-notes') as typeof import('@mkagent/shared/release-notes')
+    const { getLatestReleaseVersion } = require('@opcagent/shared/release-notes') as typeof import('@opcagent/shared/release-notes')
     return getLatestReleaseVersion()
   })
 
@@ -137,7 +137,7 @@ export function registerSystemCoreHandlers(server: RpcServer, deps: HandlerDeps)
     const persistedPath = getGitBashPath()
     if (persistedPath) {
       if (await isUsableGitBashPath(persistedPath)) {
-        process.env.MKAGENT_GIT_BASH_PATH = persistedPath.trim()
+        process.env.OPCAGENT_GIT_BASH_PATH = persistedPath.trim()
         return { found: true, path: persistedPath, platform }
       }
       clearGitBashPath()
@@ -145,7 +145,7 @@ export function registerSystemCoreHandlers(server: RpcServer, deps: HandlerDeps)
 
     for (const bashPath of commonPaths) {
       if (await isUsableGitBashPath(bashPath)) {
-        process.env.MKAGENT_GIT_BASH_PATH = bashPath
+        process.env.OPCAGENT_GIT_BASH_PATH = bashPath
         setGitBashPath(bashPath)
         return { found: true, path: bashPath, platform }
       }
@@ -159,7 +159,7 @@ export function registerSystemCoreHandlers(server: RpcServer, deps: HandlerDeps)
       })
       for (const bashPath of deriveGitBashPathsFromGitPaths(gitPaths)) {
         if (await isUsableGitBashPath(bashPath)) {
-          process.env.MKAGENT_GIT_BASH_PATH = bashPath
+          process.env.OPCAGENT_GIT_BASH_PATH = bashPath
           setGitBashPath(bashPath)
           return { found: true, path: bashPath, platform }
         }
@@ -176,7 +176,7 @@ export function registerSystemCoreHandlers(server: RpcServer, deps: HandlerDeps)
       }).trim()
       const firstPath = result.split('\n')[0]?.trim()
       if (firstPath && firstPath.toLowerCase().includes('git') && await isUsableGitBashPath(firstPath)) {
-        process.env.MKAGENT_GIT_BASH_PATH = firstPath
+        process.env.OPCAGENT_GIT_BASH_PATH = firstPath
         setGitBashPath(firstPath)
         return { found: true, path: firstPath, platform }
       }
@@ -184,7 +184,7 @@ export function registerSystemCoreHandlers(server: RpcServer, deps: HandlerDeps)
       // where command failed
     }
 
-    delete process.env.MKAGENT_GIT_BASH_PATH
+    delete process.env.OPCAGENT_GIT_BASH_PATH
     return { found: false, path: null, platform }
   })
 
@@ -210,7 +210,7 @@ export function registerSystemCoreHandlers(server: RpcServer, deps: HandlerDeps)
     }
 
     setGitBashPath(validation.path)
-    process.env.MKAGENT_GIT_BASH_PATH = validation.path
+    process.env.OPCAGENT_GIT_BASH_PATH = validation.path
     return { success: true }
   })
 
@@ -219,7 +219,7 @@ export function registerSystemCoreHandlers(server: RpcServer, deps: HandlerDeps)
     deps.platform.logger.info('[renderer]', ...args)
   })
 
-  // Shell operations - open URL in external browser (or handle mkagent:// internally)
+  // Shell operations - open URL in external browser (or handle opcagent:// internally)
   server.handle(RPC_CHANNELS.shell.OPEN_URL, async (ctx, url: string) => {
     deps.platform.logger.info('[OPEN_URL] Received request:', url)
     try {
@@ -228,7 +228,7 @@ export function registerSystemCoreHandlers(server: RpcServer, deps: HandlerDeps)
         throw new Error(formatBlockedUrlError(classification))
       }
 
-      // Handle mkagent:// URLs internally via deep link handler (GUI only)
+      // Handle opcagent:// URLs internally via deep link handler (GUI only)
       if (classification.kind === 'internal-deeplink') {
         if (!windowManager) return
         deps.platform.logger.info('[OPEN_URL] Handling as deep link')
@@ -302,12 +302,12 @@ export function registerSystemGuiHandlers(server: RpcServer, deps: HandlerDeps):
   })
 
   server.handle(RPC_CHANNELS.update.DISMISS, async (_ctx, version: string) => {
-    const { setDismissedUpdateVersion } = await import('@mkagent/shared/config')
+    const { setDismissedUpdateVersion } = await import('@opcagent/shared/config')
     setDismissedUpdateVersion(version)
   })
 
   server.handle(RPC_CHANNELS.update.GET_DISMISSED, async () => {
-    const { getDismissedUpdateVersion } = await import('@mkagent/shared/config')
+    const { getDismissedUpdateVersion } = await import('@opcagent/shared/config')
     return getDismissedUpdateVersion()
   })
 
@@ -415,12 +415,12 @@ export function registerSystemGuiHandlers(server: RpcServer, deps: HandlerDeps):
   })
 
   server.handle(RPC_CHANNELS.notification.GET_ENABLED, async () => {
-    const { getNotificationsEnabled } = await import('@mkagent/shared/config/storage')
+    const { getNotificationsEnabled } = await import('@opcagent/shared/config/storage')
     return getNotificationsEnabled()
   })
 
   server.handle(RPC_CHANNELS.notification.SET_ENABLED, async (_ctx, enabled: boolean) => {
-    const { setNotificationsEnabled } = await import('@mkagent/shared/config/storage')
+    const { setNotificationsEnabled } = await import('@opcagent/shared/config/storage')
     setNotificationsEnabled(enabled)
 
     if (enabled) {

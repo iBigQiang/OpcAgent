@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test'
-import type { LlmConnection } from '@mkagent/shared/config'
-import type { FileAttachment } from '@mkagent/shared/protocol'
+import type { LlmConnection } from '@opcagent/shared/config'
+import type { FileAttachment } from '@opcagent/shared/protocol'
 import { buildBackendRuntimeSignature, filterAttachmentsForModelInput } from './runtime-config'
 
 const baseCompat: LlmConnection = {

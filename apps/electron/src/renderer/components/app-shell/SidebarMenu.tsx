@@ -1,7 +1,7 @@
 /**
  * SidebarMenu - retained Lite context-menu actions from Craft.
  *
- * MkAgent keeps only session and Skill navigation. Product menus for Sources,
+ * OPC Agent keeps only session and Skill navigation. Product menus for Sources,
  * labels, user statuses, Projects, Automations, and custom Views are removed.
  */
 
@@ -24,7 +24,7 @@ export function SidebarMenu({ type, onMarkAllRead, onAddSkill }: SidebarMenuProp
 
   if (type === 'newSession') {
     return (
-      <MenuItem onClick={() => window.electronAPI.openUrl('mkagent://action/new-session?window=focused')}>
+      <MenuItem onClick={() => window.electronAPI.openUrl('opcagent://action/new-session?window=focused')}>
         <AppWindow className="h-3.5 w-3.5" />
         <span className="flex-1">{t('sidebarMenu.openInNewWindow')}</span>
       </MenuItem>

@@ -1,4 +1,4 @@
-# @mkagent/server-core
+# @opcagent/server-core
 
 Reusable WS/headless server infrastructure extracted from `apps/electron`.
 

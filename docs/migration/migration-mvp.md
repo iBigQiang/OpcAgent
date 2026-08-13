@@ -1,19 +1,19 @@
-# mkagent MVP 开发计划
+# opcagent MVP 开发计划
 
 > 2026-07-30 边界修订：本文保留最初 MVP 决策的历史记录。当前实现已恢复 ChatGPT Plus 与 Claude Pro/Max 两种 Craft LLM OAuth 流程，但 agent backend 仍仅注册 Pi；Claude Agent SDK、GitHub Copilot 与 Sources/MCP 继续排除。当前边界以 [`README.md`](./README.md) 与 [`migration-features.md`](./migration-features.md) 为准。
 
 > 状态：第三版，产品边界已确认，可按阶段进入实施
 > 上游基线：`craft-agents-oss` `v0.11.2` / `a60ebc1a5a7c`
-> 产品域名：`mkagent.app`
+> 产品主页：`https://github.com/iBigQiang/OpcAgent`（当前未配置独立产品域名）
 
 ## 1. 目标与实施原则
 
-mkagent 是一个从新 Git 仓库开始建设的跨平台本地 Agent 产品。它复用 craft 已验证的技术栈、分层架构、代码风格、UI 组件和桌面交互，但不继承其产品身份、线上服务和历史运行数据。
+opcagent 是一个从新 Git 仓库开始建设的跨平台本地 Agent 产品。它复用 craft 已验证的技术栈、分层架构、代码风格、UI 组件和桌面交互，但不继承其产品身份、线上服务和历史运行数据。
 
 本计划采用“固定基线迁移 + 明确保留闭包 + 明确删除闭包”的方式：
 
 1. 使用 Bun monorepo、Electron、React/Vite/Tailwind、WebSocket RPC、共享 renderer、headless server、CLI、Pi 子进程、JSONL 会话和 `electron-builder`，整体分层与 craft 对齐。
-2. 建立全新的 Git 历史、`@mkagent/*` 包名、`MKAGENT_*` 环境变量、`mkagent://` 协议、应用标识和 `~/.mkagent` 数据目录；保留 Apache-2.0 许可证及 NOTICE 归属。
+2. 建立全新的 Git 历史、`@opcagent/*` 包名、`OPCAGENT_*` 环境变量、`opcagent://` 协议、应用标识和 `~/.opcagent` 数据目录；保留 Apache-2.0 许可证及 NOTICE 归属。
 3. Agent backend 保留可插拔接口、注册表和 factory，但首版注册项只有 Pi Agent。以后增加 backend 时不需要重写 SessionManager、RPC 或 UI。
 4. Desktop、WebUI、CLI 使用同一个 `server-core + protocol + SessionManager + Pi` 内核；Desktop 与 WebUI 复用同一个 React renderer。
 5. 保留 craft 的主要 Agent 工作台能力。真正删除的是 Claude backend、订阅/OAuth、外部 Messaging、产品 Automations、labels、用户自定义 status、projects、kanban、sources、MCP、Viewer/公开分享/远程 workspace、图片生成。
@@ -31,7 +31,7 @@ mkagent 是一个从新 Git 仓库开始建设的跨平台本地 Agent 产品。
 | craft | `a60ebc1a5a7c` / `v0.11.2` | 唯一架构、技术栈、UI 和功能实现基线 |
 | echo | `fc38d0d49166` | 参考在主架构上增加产品模块的方式；Connectors 不进入 MVP |
 | xagent | `59d1fdf20b16` | 参考物理删除 Claude/Messaging/MCP、品牌替换、图标生成、默认 workspace 修复 |
-| mkagent | 新目录 | 新 Git 历史和实现落点 |
+| opcagent | 新目录 | 新 Git 历史和实现落点 |
 
 参考仓库只读。craft、echo 当前已有用户修改，后续不得修改、清理或覆盖。
 
@@ -52,7 +52,7 @@ mkagent 是一个从新 Git 仓库开始建设的跨平台本地 Agent 产品。
 - Claude 物理删除参考 `3243af6c`、`d194ee47`、`a00108d4`：必须同时处理 driver、factory、runtime、OAuth、UI、测试、依赖和打包资源。
 - Messaging 删除参考 `9376eae8`；session MCP 删除参考 `7ca00320`。
 - 品牌图标参考 `7e9767f52` 的图标源文件、生成脚本和全平台图标集合；仅复用这些图标相关内容，不复制 xagent 的其他图片、文档、代码或产品资源。
-- 品牌路径修复参考 `fec718151`、`0f0d97e85`、`347fbfd54`、`bbf7eb01b`。mkagent 必须先集中路径常量，再批量替换和扫描，避免多轮补漏。
+- 品牌路径修复参考 `fec718151`、`0f0d97e85`、`347fbfd54`、`bbf7eb01b`。opcagent 必须先集中路径常量，再批量替换和扫描，避免多轮补漏。
 - 默认 workspace 参考 `0e8e0b618`、`e57300a2f`、`bf3bb841d`，同时覆盖 desktop、headless server、窗口恢复和测试。
 
 ## 3. MVP 产品范围
@@ -70,9 +70,9 @@ mkagent 是一个从新 Git 仓库开始建设的跨平台本地 Agent 产品。
 - Agent UI：三栏、可调宽度、亮暗主题、模型选择、附件、计划审核、annotations、工具和富结果渲染。
 - Browser：保留右上角 Browser 入口、browser pane/toolbar 及其运行管理。
 - 工具：基础文件/终端工具、`web_search`、`web_fetch`、Browser、session tools 和文档工具。
-- 设置：整体沿用 craft 的设置导航、页面、RPC 和组件。MkAgent 保留功能在 craft 中已有设置入口时同步保留，对应至少包括 Connections、模型、权限、网络代理、Workspace、外观、语言、更新及必要的高级设置；删除功能的设置入口同步删除。
+- 设置：整体沿用 craft 的设置导航、页面、RPC 和组件。OPC Agent 保留功能在 craft 中已有设置入口时同步保留，对应至少包括 Connections、模型、权限、网络代理、Workspace、外观、语言、更新及必要的高级设置；删除功能的设置入口同步删除。
 - i18n：首版只维护英文和简体中文，两种语言必须覆盖核心流程。
-- 工程质量：对齐 craft 的 lint、typecheck、单元测试、协议测试、文档工具 smoke test、构建测试和跨平台 CI，并补充 mkagent 特有的裁剪/品牌测试。
+- 工程质量：对齐 craft 的 lint、typecheck、单元测试、协议测试、文档工具 smoke test、构建测试和跨平台 CI，并补充 opcagent 特有的裁剪/品牌测试。
 
 ### 3.2 明确删除
 
@@ -105,12 +105,12 @@ craft 的 Views 是“可保存的动态会话筛选器”，不是新的页面�
 - `isProcessing == true`：正在运行；
 - `permissionMode == "safe"`：探索/只读权限。
 
-它也能按 labels/status 过滤，但并不依赖它们。mkagent 保留 Views 的共享类型、存储、表达式校验和 evaluator，只允许使用仍存在的字段；删除 labels/status 条件和默认项。MVP 不在左栏增加 Views 菜单，也不开放自定义 View 的创建/编辑，只在中间会话列表顶部提供“未读、待审核计划、运行中、已归档”等内置筛选。底层 schema 保留，方便后续再开放自定义能力。
+它也能按 labels/status 过滤，但并不依赖它们。opcagent 保留 Views 的共享类型、存储、表达式校验和 evaluator，只允许使用仍存在的字段；删除 labels/status 条件和默认项。MVP 不在左栏增加 Views 菜单，也不开放自定义 View 的创建/编辑，只在中间会话列表顶部提供“未读、待审核计划、运行中、已归档”等内置筛选。底层 schema 保留，方便后续再开放自定义能力。
 
 ## 5. 目标 monorepo
 
 ```text
-mkagent/
+opcagent/
 ├── apps/
 │   ├── electron/              # Desktop 主进程、preload、共享 renderer
 │   ├── webui/                 # 浏览器启动壳和 API adapter
@@ -141,7 +141,7 @@ mkagent/
 
 ```mermaid
 flowchart LR
-  Desktop["Electron Desktop"] --> ClientAPI["统一 MkAgent Client API"]
+  Desktop["Electron Desktop"] --> ClientAPI["统一 OPC Agent Client API"]
   WebUI["WebUI"] --> Adapter["Browser API Adapter"] --> ClientAPI
   CLI["CLI"] --> RpcClient["WebSocket RPC Client"]
   ClientAPI --> RpcClient
@@ -175,17 +175,17 @@ flowchart LR
 首版命令与 craft 对齐后按删除项收口，至少包括：
 
 ```text
-mkagent run <prompt>
-mkagent workspaces ...
-mkagent sessions [--search] [--archived]
-mkagent session create|messages|rename|delete|flag|archive
-mkagent session export|import|branch
-mkagent send <session-id> <message>
-mkagent cancel <session-id>
-mkagent connections
-mkagent config validate
-mkagent ping
-mkagent health
+opcagent run <prompt>
+opcagent workspaces ...
+opcagent sessions [--search] [--archived]
+opcagent session create|messages|rename|delete|flag|archive
+opcagent session export|import|branch
+opcagent send <session-id> <message>
+opcagent cancel <session-id>
+opcagent connections
+opcagent config validate
+opcagent ping
+opcagent health
 ```
 
 - `run` 可临时启动本地 server；`--url/--token` 可连接已运行的本地 server。
@@ -225,7 +225,7 @@ mkagent health
 ### 7.4 Pi 子进程
 
 - 保留 `init/prompt/abort/set_model/set_thinking_level/permission_response/event` 等子进程协议。
-- 每个 mkagent session 在自身目录维护 `.pi-sessions`，支持重启续聊。
+- 每个 opcagent session 在自身目录维护 `.pi-sessions`，支持重启续聊。
 - 工具同时加入 `customTools` 实例和 `tools` 名称 allowlist，并用回归测试锁定这一契约。
 - 保留 mini model、`mini_completion`、标题、摘要和 Skills mini chat 所需的内部模型调用。
 
@@ -244,7 +244,7 @@ mkagent health
 保留该 package 作为 Claude/Pi 无关的单一工具定义和 handler 层，并按能力拆分：
 
 - 保留：`submit_plan`、`skill_validate`、`mermaid_validate`、裁剪后的 `config_validate`、`call_llm`、`update_preferences`、`transform_data`、`script_sandbox`、Browser tool、`get_session_info`、`list_sessions`，以及分支/后台会话流程实际需要的会话工具。
-- 保留但去品牌：所有描述、错误、Git trailer 默认值和示例改成 mkagent。
+- 保留但去品牌：所有描述、错误、Git trailer 默认值和示例改成 opcagent。
 - 删除：`source_test`、所有 Source OAuth/credential handler、`render_template` 的 Source 模板实现、`set_session_labels`、`set_session_status`、外部 Messaging channel 工具。
 - Projects/Kanban 对应的 `create_task` 删除；若分支或后台 session 需要 spawn 能力，建立不含 project/source/label 参数的轻量 session spawn schema。
 - `config_validate` 只校验仍存在的 config、preferences、permissions、workspace、views 和 tool-icons，不再接受 sources/statuses/automations target。
@@ -281,7 +281,7 @@ mkagent health
 所有路径通过一个共享模块生成，禁止散落硬编码：
 
 ```text
-~/.mkagent/
+~/.opcagent/
 ├── config.json
 ├── credentials.enc
 ├── preferences.json
@@ -301,7 +301,7 @@ mkagent health
             └── .pi-sessions/
 ```
 
-- 默认覆盖变量为 `CONFIG_DIR`；文档 CLI 使用 `MKAGENT_UV`、`MKAGENT_SCRIPTS` 等统一前缀。
+- 默认覆盖变量为 `CONFIG_DIR`；文档 CLI 使用 `OPCAGENT_UV`、`OPCAGENT_SCRIPTS` 等统一前缀。
 - 不读取或迁移 `~/.craft-agent`、`~/.xagent`，避免污染已有应用数据。
 - 默认 workspace 的稳定 slug 是 `default`，显示名默认 `Default`/`默认`；Desktop 和 Server 首次启动都调用同一 `ensureDefaultWorkspace()`。
 - 默认 workspace 必须在 config 不存在、索引损坏、无 workspace、headless 启动和多窗口恢复场景都有测试。
@@ -383,27 +383,27 @@ mkagent health
 
 沿用 craft/xagent 已有的共享 `branding.ts`、config path 模块和构建配置，集中维护：
 
-- `productName`: `mkagent` / `MkAgent`；
-- npm scope: `@mkagent/*`；
-- domain: `mkagent.app`；
-- URL scheme: `mkagent://`；
-- environment prefix: `MKAGENT_`；
-- config directory: `.mkagent`；
+- `productName`: `opcagent` / `OPC Agent`；
+- npm scope: `@opcagent/*`；
+- homepage: `https://github.com/iBigQiang/OpcAgent`；
+- URL scheme: `opcagent://`；
+- environment prefix: `OPCAGENT_`；
+- config directory: `.opcagent`；
 - executable/CLI name、Electron appId、desktop file、协议 handler；
 - 图标源文件和生成目标。
 
-不新增一套与上游平行的产品 manifest 或同义抽象。未来基于 mkagent 派生产品时，按固定的品牌提交序列修改已有 branding/path/build 文件，并执行一次性残留检查。
+不新增一套与上游平行的产品 manifest 或同义抽象。未来基于 opcagent 派生产品时，按固定的品牌提交序列修改已有 branding/path/build 文件，并执行一次性残留检查。
 
 ### 11.2 固定的品牌提交序列
 
 品牌迁移必须拆成连续、可 cherry-pick、可审查的提交：
 
 1. `chore: initialize upstream baseline and notices`：新 Git、LICENSE、NOTICE、上游记录。
-2. `chore: establish mkagent branding and paths`：在既有 branding/path 模块集中产品常量。
-3. `chore: rename package scope protocols and environment`：包名、CLI、协议、`MKAGENT_*`。
-4. `chore: migrate data roots to ~/.mkagent`：路径模块、wrapper、日志、测试；一次性完成且不提供旧目录双读。
-5. `feat: install mkagent brand assets`：基于 xagent logo 源和生成脚本生成 Electron/WebUI 全平台图标。
-6. `chore: configure mkagent.app metadata and links`：homepage、帮助、更新和发布 metadata。
+2. `chore: establish opcagent branding and paths`：在既有 branding/path 模块集中产品常量。
+3. `chore: rename package scope protocols and environment`：包名、CLI、协议、`OPCAGENT_*`。
+4. `chore: migrate data roots to ~/.opcagent`：路径模块、wrapper、日志、测试；一次性完成且不提供旧目录双读。
+5. `feat: install opcagent brand assets`：基于 xagent logo 源和生成脚本生成 Electron/WebUI 全平台图标。
+6. `chore: configure GitHub repository metadata and links`：homepage、帮助、更新和发布 metadata。
 7. `chore: create default workspace`：统一 `default` workspace bootstrap 和测试。
 8. `chore: complete one-time rebrand cleanup`：执行一次性源码与产物检查并记录结果，不加入长期 CI。
 
@@ -438,9 +438,9 @@ bun run validate:ci
 ### 12.2 自动更新
 
 - 保留 craft 的 `electron-updater` 状态机、检查/下载/进度/安装/退出恢复和多窗口快照逻辑。
-- 源码与 release 产物统一存放在 public `MkThingsHQ/mkagent`。
+- 源码与 release 产物统一存放在 public `iBigQiang/OpcAgent`。
 - private 仓库的 GitHub Actions 构建签名后的安装包、`latest*.yml`/blockmap/checksum，再使用最小权限 secret 发布到 public 仓库。
-- Electron updater 使用 GitHub provider，owner 为 `MkThingsHQ`、repo 为 `mkagent`；客户端不包含 PAT、`GITHUB_TOKEN` 或其他长期令牌。
+- Electron updater 使用 GitHub provider，owner 为 `MkThingsHQ`、repo 为 `opcagent`；客户端不包含 PAT、`GITHUB_TOKEN` 或其他长期令牌。
 - 客户端只接受匹配平台/架构、签名和 channel 的产物；更新失败不影响正常启动。
 - 不使用 `agents.craft.do` 或任何上游更新地址。
 
@@ -448,11 +448,11 @@ bun run validate:ci
 
 craft 确实接入了 Sentry：Electron main 读取 `SENTRY_ELECTRON_INGEST_URL` 作为 DSN，renderer 也初始化 Sentry；未设置该变量时禁用。错误实际上传到该 DSN 所属的 Sentry 项目。仓库中没有固定 DSN，因此仅从代码无法确定 craft 的具体账号或服务器。
 
-mkagent 与 craft 的接入方式保持一致：
+opcagent 与 craft 的接入方式保持一致：
 
 - 保留 Electron main、renderer 的 Sentry 初始化、release/environment 信息和 source map 配置能力。
 - 继续由 `SENTRY_ELECTRON_INGEST_URL` 控制：未设置 DSN 时禁用，设置后上传到该 DSN 所属项目。
-- 只允许配置 mkagent 自有 DSN，不复用任何 craft endpoint/account。
+- 只允许配置 opcagent 自有 DSN，不复用任何 craft endpoint/account。
 - 上报前按 craft 现有机制做 API key、Authorization、代理凭证和 credential 字段脱敏；不额外新增 Sentry 设置页开关。
 - CI 的 source map 上传只读取发布 secret，fork/普通 PR 不上传。
 
@@ -464,7 +464,7 @@ mkagent 与 craft 的接入方式保持一致：
 - 新增：`docs/upstream-sync.md`、`docs/rebrand.md`、`docs/featues.md`、`docs/testing.md`。
 - 删除：Claude、订阅/OAuth、Messaging、Automations、Sources/MCP、Projects/Kanban、Viewer/公开分享、远程 workspace 的用户文档。
 - 文档中的命令、截图、路径、域名和 UI 名称必须能由测试或当前实现验证；不复制与现状不符的宣传内容。
-- README 可明确说明项目源自 craft 架构并保留许可证归属；普通功能文档使用 mkagent 自身术语。
+- README 可明确说明项目源自 craft 架构并保留许可证归属；普通功能文档使用 opcagent 自身术语。
 
 ## 14. 上游自动跟踪与同步
 
@@ -474,7 +474,7 @@ mkagent 与 craft 的接入方式保持一致：
 2. GitHub Action 定期检查上游新 tag/main 提交，生成差异报告和候选同步 PR。
 3. 差异按模块分类：构建依赖、协议/server、Pi/provider、UI、Skills/mini chat、Browser/Web tools、文档工具、跨平台打包、测试、安全修复。
 4. 明确拒绝的功能目录进入 denylist；同步脚本不自动带回 Claude、订阅、Messaging、Automations、Sources/MCP 等闭包。
-5. 每类改动独立提交，先更新适配层和测试，再同步 UI；不得用整仓 merge 覆盖 mkagent 产品边界。
+5. 每类改动独立提交，先更新适配层和测试，再同步 UI；不得用整仓 merge 覆盖 opcagent 产品边界。
 6. 每次同步运行完整的现有工程测试和安装包 smoke test；同步审查中按实际差异检查是否重新带回已删除功能，不建立永久关键词扫描。
 
 这样既能持续跟随上游，又保持新 Git 历史和可审查的产品差异。
@@ -487,7 +487,7 @@ mkagent 与 craft 的接入方式保持一致：
 - 建立 upstream remote、同步记录和只读参考约束。
 - 完成第 11.2 节前两个品牌提交。
 
-验收：历史从 mkagent 根提交开始；来源和许可证明确；参考仓库无改动。
+验收：历史从 opcagent 根提交开始；来源和许可证明确；参考仓库无改动。
 
 ### Phase 1：Bun monorepo 与品牌/路径
 
@@ -495,7 +495,7 @@ mkagent 与 craft 的接入方式保持一致：
 - 建立 apps/packages 骨架、既有 branding/path 模块和 `default` workspace。
 - 完成品牌提交序列 3—8。
 
-验收：`bun install` 可复现；空骨架可 typecheck/test；`~/.mkagent` 和 `default` 测试通过；一次性品牌检查无非文档残留。
+验收：`bun install` 可复现；空骨架可 typecheck/test；`~/.opcagent` 和 `default` 测试通过；一次性品牌检查无非文档残留。
 
 ### Phase 2：Core protocol、RPC 与本地 Workspace
 
@@ -549,7 +549,7 @@ mkagent 与 craft 的接入方式保持一致：
 ### Phase 8：打包、更新、发布与文档
 
 - 迁移并验证三平台打包、签名、公证/安装、更新状态机和 GitHub Releases workflow。
-- 按上游方式接入 Sentry；没有 mkagent DSN 的构建自动禁用，配置 DSN 的发布构建完成脱敏和 source map 验证。
+- 按上游方式接入 Sentry；没有 opcagent DSN 的构建自动禁用，配置 DSN 的发布构建完成脱敏和 source map 验证。
 - 完成所有用户/开发/架构文档。
 
 验收：三平台 CI 构建；至少各一次安装启动 smoke；更新清单有效；解包资源完整且无拒绝功能/品牌残留。
@@ -601,9 +601,9 @@ CI 至少包含：
 ## 17. 最终确认的实施决策
 
 1. Views 的 MVP 只提供内置筛选，不开放用户自定义编辑；保留底层 schema/evaluator。
-2. GitHub 源码、公开安装包与更新 manifest 统一放在 public `MkThingsHQ/mkagent`；客户端不内嵌 GitHub token。
-3. Sentry 功能保留并与 craft 接入方式对齐；只有配置 mkagent 自有 DSN 时启用。
-4. Electron appId/macOS bundle identifier 暂用 `app.mkagent.desktop`，版权主体和签名账号使用明确标记的中性占位值，正式发布前再替换。
+2. GitHub 源码、公开安装包与更新 manifest 统一放在 public `iBigQiang/OpcAgent`；客户端不内嵌 GitHub token。
+3. Sentry 功能保留并与 craft 接入方式对齐；只有配置 opcagent 自有 DSN 时启用。
+4. Electron appId/macOS bundle identifier 暂用 `app.opcagent.desktop`，版权主体和签名账号使用明确标记的中性占位值，正式发布前再替换。
 5. 保留分支/后台会话需要的本地 `send_agent_message` 和 spawn session 工具，裁掉 Projects、Sources、labels/status 和外部 Messaging 耦合。
 6. Subscription/OAuth 相关逻辑、类型、RPC、UI、deep link、token refresh、依赖、资源和兼容迁移全部物理删除，不允许残留不可达代码。
 7. 第 18 节的全部风险控制措施都是必须执行的质量门禁，不是可选建议。

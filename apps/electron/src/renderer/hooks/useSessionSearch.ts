@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useRef, useMemo } from "react"
 import { isToday, isYesterday, format, startOfDay } from "date-fns"
 
 import { searchLog } from "@/lib/logger"
-import { fuzzyScore } from "@mkagent/shared/search"
+import { fuzzyScore } from "@opcagent/shared/search"
 import { getSessionTitle } from "@/utils/session"
 import type { SessionMeta } from "@/atoms/sessions"
 import type { SessionFilter } from "@/contexts/NavigationContext"

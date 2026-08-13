@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Markdown } from '../markdown'
-import type { AnnotationV1 } from '@mkagent/core'
+import type { AnnotationV1 } from '@opcagent/core'
 import { type IslandTransitionConfig } from '../ui'
 import { AnnotationIslandMenu } from '../annotations/AnnotationIslandMenu'
 import {

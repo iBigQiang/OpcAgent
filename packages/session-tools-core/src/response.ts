@@ -2,7 +2,7 @@
  * Session Tools Core - Response Helpers
  *
  * Helper functions for creating standardized tool responses.
- * Used by the Pi backend and all MkAgent client surfaces.
+ * Used by the Pi backend and all OPCAgent client surfaces.
  */
 
 import type { ToolResult, TextContent } from './types.ts';

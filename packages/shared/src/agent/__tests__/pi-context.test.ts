@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from 'bun:test'
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
-import { handleConfigValidate } from '@mkagent/session-tools-core'
+import { handleConfigValidate } from '@opcagent/session-tools-core'
 import { createPiContext } from '../pi-context.ts'
 
 describe('createPiContext', () => {
@@ -13,7 +13,7 @@ describe('createPiContext', () => {
   })
 
   it('uses the retained full permissions validator for config_validate', async () => {
-    const workspacePath = mkdtempSync(join(tmpdir(), 'mkagent-pi-context-'))
+    const workspacePath = mkdtempSync(join(tmpdir(), 'opcagent-pi-context-'))
     roots.push(workspacePath)
     writeFileSync(
       join(workspacePath, 'permissions.json'),

@@ -7,7 +7,7 @@ Browser 面板出现在桌面聊天界面与会话工具中。每个会话分配
 | 入口 | 位置 |
 |---|---|
 | 桌面聊天 | 聊天头部的右上 Browser 按钮 |
-| 会话工具 | `mcp__session__browser` 在 `@mkagent/session-tools-core` 注册 |
+| 会话工具 | `mcp__session__browser` 在 `@opcagent/session-tools-core` 注册 |
 | 设置 | workspace 设置中的 Browser 工具开关(`browserToolEnabled`) |
 | WebUI | Browser 面板 host-delegated;不创建远程 Browser 面板 |
 
@@ -28,7 +28,7 @@ BrowserPaneManager
 
 ## `web_search` 与 `web_fetch`
 
-除了 Browser 面板,MkAgent 还提供两个非交互的检索工具:
+除了 Browser 面板,OPC Agent 还提供两个非交互的检索工具:
 
 | 工具 | 用途 | 实现 |
 |---|---|---|

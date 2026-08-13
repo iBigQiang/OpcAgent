@@ -3,8 +3,8 @@ import { CliRpcClient } from './client.ts'
 import {
   serializeEnvelope,
   deserializeEnvelope,
-} from '@mkagent/server-core/transport'
-import type { MessageEnvelope } from '@mkagent/shared/protocol'
+} from '@opcagent/server-core/transport'
+import type { MessageEnvelope } from '@opcagent/shared/protocol'
 
 // ---------------------------------------------------------------------------
 // Mock WS server helpers

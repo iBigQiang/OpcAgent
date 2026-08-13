@@ -23,10 +23,10 @@
     "noPropertyAccessFromIndexSignature": false,
     "baseUrl": ".",
     "paths": {
-      "@mkagent/core": ["../core/src/index.ts"],
-      "@mkagent/core/*": ["../core/src/*"],
-      "@mkagent/shared": ["./src/index.ts"],
-      "@mkagent/shared/*": ["./src/*"]
+      "@opcagent/core": ["../core/src/index.ts"],
+      "@opcagent/core/*": ["../core/src/*"],
+      "@opcagent/shared": ["./src/index.ts"],
+      "@opcagent/shared/*": ["./src/*"]
     }
   },
   "include": ["src/**/*"],

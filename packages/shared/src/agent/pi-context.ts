@@ -11,7 +11,7 @@ import {
   type SourceConfig,
   type StdioMcpConfig,
   type StdioValidationResult,
-} from '@mkagent/session-tools-core';
+} from '@opcagent/session-tools-core';
 import {
   validateAll,
   validateAllSources,

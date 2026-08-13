@@ -1,6 +1,6 @@
 # 权限
 
-Pi 工具调用都经过统一的权限引擎。这里没有 Source / MCP 专属规则——那些产品不属于 MkAgent。
+Pi 工具调用都经过统一的权限引擎。这里没有 Source / MCP 专属规则——那些产品不属于 OPC Agent。
 
 ## Mode
 
@@ -18,7 +18,7 @@ workspace 的设置控制默认 mode 与可循环列表(`cyclablePermissionModes
                   Pi 工具调用 (read/write/bash/edit/web_search/...)
                                   │
                                   ▼
-            共享权限引擎 (@mkagent/shared/agent/permissions-config)
+            共享权限引擎 (@opcagent/shared/agent/permissions-config)
                                   │
        ┌──────────────────┬───────┴────────┬────────────────────────┐
        ▼                  ▼                ▼                        ▼
@@ -37,7 +37,7 @@ Electron 与 headless server 共享这套引擎。renderer 是唯一决定要不
 | 工具 | `safe` 允许 | `safe` 拦截 |
 |---|---|---|
 | 文件读(`read`) | 相对路径 + 白名单内的绝对路径 | 网络路径、`workingDirectory` 之外 |
-| 文件写(`write`、`edit`) | workspace `workingDirectory` 与 `/tmp/mkagent-*` | 其他一切 |
+| 文件写(`write`、`edit`) | workspace `workingDirectory` 与 `/tmp/opcagent-*` | 其他一切 |
 | Bash | 明确的白名单命令 | 其他 |
 | Browser 操作 | 同源 + 明确允许的跨域列表 | cookie 写入、下载、任意脚本 |
 | 网络 | 配置的代理 + `localhost` | 配置允许名单之外的端口 |
@@ -54,11 +54,11 @@ Source、MCP 与 Source OAuth 允许名单不会被加载——对应 schema 字
 
 ## Workspace 覆盖
 
-`~/.mkagent/workspaces/<slug>/permissions/` 下放覆盖文件,优先级高于内置策略。覆盖改动只对新工具调用生效;飞行中的 turn 仍使用 turn 开始时的策略。
+`~/.opcagent/workspaces/<slug>/permissions/` 下放覆盖文件,优先级高于内置策略。覆盖改动只对新工具调用生效;飞行中的 turn 仍使用 turn 开始时的策略。
 
 ## CLI 覆盖
 
-`mkagent run --mode <mode>` 为临时会话设定初始 mode。`send` 与实时 CLI 默认继承 workspace 默认 mode,除非显式传入 `--mode`。
+`opcagent run --mode <mode>` 为临时会话设定初始 mode。`send` 与实时 CLI 默认继承 workspace 默认 mode,除非显式传入 `--mode`。
 
 ## 审计权限决策
 

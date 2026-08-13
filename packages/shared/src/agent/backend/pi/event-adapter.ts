@@ -2,14 +2,14 @@
  * Pi SDK Event Adapter
  *
  * Maps Pi Agent Core events (AgentEvent / AgentSessionEvent) to
- * MkAgent's AgentEvent format for UI compatibility.
+ * OPCAgent's AgentEvent format for UI compatibility.
  *
  * Pi emits fine-grained lifecycle events. We translate them into
  * the same event vocabulary the renderer already understands from
  * Pi backend.
  */
 
-import type { AgentEvent as CraftAgentEvent } from '@mkagent/core/types';
+import type { AgentEvent as CraftAgentEvent } from '@opcagent/core/types';
 import type {
   AgentEvent as PiAgentEvent,
 } from '@earendil-works/pi-agent-core';
@@ -47,7 +47,7 @@ const OVERFLOW_FALLBACK_TIMEOUT_MS = 5_000;
 type PiEvent = PiAgentEvent | AgentSessionEvent;
 
 /**
- * Maps Pi SDK events to MkAgentEvents for UI compatibility.
+ * Maps Pi SDK events to OPCAgentEvents for UI compatibility.
  *
  * Event mapping:
  * - message_update (text_delta in assistantMessageEvent) → text_delta
@@ -215,7 +215,7 @@ export class PiEventAdapter extends BaseEventAdapter {
   }
 
   /**
-   * Adapt a Pi SDK event to zero or more MkAgentEvents.
+   * Adapt a Pi SDK event to zero or more OPCAgentEvents.
    */
   *adaptEvent(event: PiEvent): Generator<CraftAgentEvent> {
     // App-injected event from pi-agent-server (not part of the Pi SDK).

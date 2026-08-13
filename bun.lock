@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "mkagent",
+      "name": "opcagent",
       "dependencies": {
         "@anthropic-ai/claude-agent-sdk": "0.3.197",
         "@earendil-works/pi-ai": "0.80.6",
@@ -110,14 +110,14 @@
       },
     },
     "apps/cli": {
-      "name": "@mkagent/cli",
-      "version": "0.1.0",
+      "name": "@opcagent/cli",
+      "version": "0.1.1",
       "bin": {
-        "mkagent": "dist/mkagent",
+        "opcagent": "dist/opcagent",
       },
       "dependencies": {
-        "@mkagent/server-core": "workspace:*",
-        "@mkagent/shared": "workspace:*",
+        "@opcagent/server-core": "workspace:*",
+        "@opcagent/shared": "workspace:*",
       },
       "devDependencies": {
         "@types/bun": "latest",
@@ -126,14 +126,14 @@
       },
     },
     "apps/electron": {
-      "name": "@mkagent/electron",
-      "version": "0.1.0",
+      "name": "@opcagent/electron",
+      "version": "0.1.1",
       "devDependencies": {
-        "@mkagent/core": "workspace:*",
-        "@mkagent/messaging-gateway": "workspace:*",
-        "@mkagent/server-core": "workspace:*",
-        "@mkagent/shared": "workspace:*",
-        "@mkagent/ui": "workspace:*",
+        "@opcagent/core": "workspace:*",
+        "@opcagent/messaging-gateway": "workspace:*",
+        "@opcagent/server-core": "workspace:*",
+        "@opcagent/shared": "workspace:*",
+        "@opcagent/ui": "workspace:*",
         "@paper-design/shaders-react": "^0.0.69",
         "@pierre/diffs": "^1.0.4",
         "@radix-ui/react-context-menu": "^2.2.16",
@@ -171,11 +171,11 @@
       },
     },
     "apps/webui": {
-      "name": "@mkagent/webui",
-      "version": "0.1.0",
+      "name": "@opcagent/webui",
+      "version": "0.1.1",
       "dependencies": {
-        "@mkagent/shared": "workspace:*",
-        "@mkagent/ui": "workspace:*",
+        "@opcagent/shared": "workspace:*",
+        "@opcagent/ui": "workspace:*",
         "i18next": "^26.0.3",
         "i18next-browser-languagedetector": "^8.2.1",
         "jotai": "^2.16.0",
@@ -186,20 +186,20 @@
       },
     },
     "packages/core": {
-      "name": "@mkagent/core",
-      "version": "0.1.0",
+      "name": "@opcagent/core",
+      "version": "0.1.1",
       "devDependencies": {
         "@types/uuid": "^11.0.0",
       },
     },
     "packages/messaging-gateway": {
-      "name": "@mkagent/messaging-gateway",
-      "version": "0.1.0",
+      "name": "@opcagent/messaging-gateway",
+      "version": "0.1.1",
       "dependencies": {
         "@larksuiteoapi/node-sdk": "^1.62.1",
-        "@mkagent/messaging-whatsapp-worker": "workspace:*",
-        "@mkagent/server-core": "workspace:*",
-        "@mkagent/shared": "workspace:*",
+        "@opcagent/messaging-whatsapp-worker": "workspace:*",
+        "@opcagent/server-core": "workspace:*",
+        "@opcagent/shared": "workspace:*",
         "grammy": "^1.35.0",
       },
       "devDependencies": {
@@ -208,8 +208,8 @@
       },
     },
     "packages/messaging-whatsapp-worker": {
-      "name": "@mkagent/messaging-whatsapp-worker",
-      "version": "0.1.0",
+      "name": "@opcagent/messaging-whatsapp-worker",
+      "version": "0.1.1",
       "dependencies": {
         "@whiskeysockets/baileys": "^6.7.0",
       },
@@ -219,8 +219,8 @@
       },
     },
     "packages/pi-agent-server": {
-      "name": "@mkagent/pi-agent-server",
-      "version": "0.1.0",
+      "name": "@opcagent/pi-agent-server",
+      "version": "0.1.1",
       "bin": {
         "pi-agent-server": "./dist/index.js",
       },
@@ -239,15 +239,15 @@
       },
     },
     "packages/server": {
-      "name": "@mkagent/server",
-      "version": "0.1.0",
+      "name": "@opcagent/server",
+      "version": "0.1.1",
       "bin": {
-        "mkagent-server": "src/index.ts",
+        "opcagent-server": "src/index.ts",
       },
       "dependencies": {
-        "@mkagent/core": "workspace:*",
-        "@mkagent/server-core": "workspace:*",
-        "@mkagent/shared": "workspace:*",
+        "@opcagent/core": "workspace:*",
+        "@opcagent/server-core": "workspace:*",
+        "@opcagent/shared": "workspace:*",
       },
       "devDependencies": {
         "@types/node": "^22.0.0",
@@ -256,12 +256,12 @@
       },
     },
     "packages/server-core": {
-      "name": "@mkagent/server-core",
-      "version": "0.1.0",
+      "name": "@opcagent/server-core",
+      "version": "0.1.1",
       "dependencies": {
         "@earendil-works/pi-ai": "0.80.6",
-        "@mkagent/core": "workspace:*",
-        "@mkagent/shared": "workspace:*",
+        "@opcagent/core": "workspace:*",
+        "@opcagent/shared": "workspace:*",
         "jose": "^6.0.0",
         "sharp": "0.34.5",
         "ws": "^8.19.0",
@@ -272,8 +272,8 @@
       },
     },
     "packages/session-tools-core": {
-      "name": "@mkagent/session-tools-core",
-      "version": "0.1.0",
+      "name": "@opcagent/session-tools-core",
+      "version": "0.1.1",
       "dependencies": {
         "beautiful-mermaid": "*",
         "gray-matter": "^4.0.3",
@@ -285,16 +285,16 @@
       },
     },
     "packages/shared": {
-      "name": "@mkagent/shared",
-      "version": "0.1.0",
+      "name": "@opcagent/shared",
+      "version": "0.1.1",
       "dependencies": {
         "@earendil-works/pi-agent-core": "0.80.6",
         "@earendil-works/pi-ai": "0.80.6",
         "@earendil-works/pi-coding-agent": "0.80.6",
         "@isaacs/ttlcache": "^2.1.4",
         "@leeoniya/ufuzzy": "^1.0.19",
-        "@mkagent/core": "workspace:*",
-        "@mkagent/session-tools-core": "workspace:*",
+        "@opcagent/core": "workspace:*",
+        "@opcagent/session-tools-core": "workspace:*",
         "bash-parser": "^0.5.0",
         "date-fns": "^4.1.0",
         "filtrex": "^3.1.0",
@@ -315,11 +315,11 @@
       },
     },
     "packages/ui": {
-      "name": "@mkagent/ui",
-      "version": "0.1.0",
+      "name": "@opcagent/ui",
+      "version": "0.1.1",
       "dependencies": {
-        "@mkagent/core": "workspace:*",
-        "@mkagent/shared": "workspace:*",
+        "@opcagent/core": "workspace:*",
+        "@opcagent/shared": "workspace:*",
         "@paper-design/shaders-react": "^0.0.69",
         "@types/mdast": "^4.0.0",
         "@uiw/react-json-view": "^2.0.0-alpha.40",
@@ -775,30 +775,6 @@
 
     "@mixmark-io/domino": ["@mixmark-io/domino@2.2.0", "https://repo.huaweicloud.com/repository/npm/@mixmark-io/domino/-/domino-2.2.0.tgz", {}, "sha512-Y28PR25bHXUg88kCV7nivXrP2Nj2RueZ3/l/jdx6J9f8J4nsEGcgX0Qe6lt7Pa+J79+kPiJU3LguR6O/6zrLOw=="],
 
-    "@mkagent/cli": ["@mkagent/cli@workspace:apps/cli"],
-
-    "@mkagent/core": ["@mkagent/core@workspace:packages/core"],
-
-    "@mkagent/electron": ["@mkagent/electron@workspace:apps/electron"],
-
-    "@mkagent/messaging-gateway": ["@mkagent/messaging-gateway@workspace:packages/messaging-gateway"],
-
-    "@mkagent/messaging-whatsapp-worker": ["@mkagent/messaging-whatsapp-worker@workspace:packages/messaging-whatsapp-worker"],
-
-    "@mkagent/pi-agent-server": ["@mkagent/pi-agent-server@workspace:packages/pi-agent-server"],
-
-    "@mkagent/server": ["@mkagent/server@workspace:packages/server"],
-
-    "@mkagent/server-core": ["@mkagent/server-core@workspace:packages/server-core"],
-
-    "@mkagent/session-tools-core": ["@mkagent/session-tools-core@workspace:packages/session-tools-core"],
-
-    "@mkagent/shared": ["@mkagent/shared@workspace:packages/shared"],
-
-    "@mkagent/ui": ["@mkagent/ui@workspace:packages/ui"],
-
-    "@mkagent/webui": ["@mkagent/webui@workspace:apps/webui"],
-
     "@modelcontextprotocol/sdk": ["@modelcontextprotocol/sdk@1.29.0", "https://repo.huaweicloud.com/repository/npm/@modelcontextprotocol/sdk/-/sdk-1.29.0.tgz", { "dependencies": { "@hono/node-server": "^1.19.9", "ajv": "^8.17.1", "ajv-formats": "^3.0.1", "content-type": "^1.0.5", "cors": "^2.8.5", "cross-spawn": "^7.0.5", "eventsource": "^3.0.2", "eventsource-parser": "^3.0.0", "express": "^5.2.1", "express-rate-limit": "^8.2.1", "hono": "^4.11.4", "jose": "^6.1.3", "json-schema-typed": "^8.0.2", "pkce-challenge": "^5.0.0", "raw-body": "^3.0.0", "zod": "^3.25 || ^4.0", "zod-to-json-schema": "^3.25.1" }, "peerDependencies": { "@cfworker/json-schema": "^4.1.1" }, "optionalPeers": ["@cfworker/json-schema"] }, "sha512-zo37mZA9hJWpULgkRpowewez1y6ML5GsXJPY8FI0tBBCd77HEvza4jDqRKOXgHNn867PVGCyTdzqpz0izu5ZjQ=="],
 
     "@napi-rs/canvas": ["@napi-rs/canvas@0.1.88", "https://repo.huaweicloud.com/repository/npm/@napi-rs/canvas/-/canvas-0.1.88.tgz", { "optionalDependencies": { "@napi-rs/canvas-android-arm64": "0.1.88", "@napi-rs/canvas-darwin-arm64": "0.1.88", "@napi-rs/canvas-darwin-x64": "0.1.88", "@napi-rs/canvas-linux-arm-gnueabihf": "0.1.88", "@napi-rs/canvas-linux-arm64-gnu": "0.1.88", "@napi-rs/canvas-linux-arm64-musl": "0.1.88", "@napi-rs/canvas-linux-riscv64-gnu": "0.1.88", "@napi-rs/canvas-linux-x64-gnu": "0.1.88", "@napi-rs/canvas-linux-x64-musl": "0.1.88", "@napi-rs/canvas-win32-arm64-msvc": "0.1.88", "@napi-rs/canvas-win32-x64-msvc": "0.1.88" } }, "sha512-/p08f93LEbsL5mDZFQ3DBxcPv/I4QG9EDYRRq1WNlCOXVfAHBTHMSVMwxlqG/AtnSfUr9+vgfN7MKiyDo0+Weg=="],
@@ -830,6 +806,30 @@
     "@npmcli/agent": ["@npmcli/agent@3.0.0", "https://repo.huaweicloud.com/repository/npm/@npmcli/agent/-/agent-3.0.0.tgz", { "dependencies": { "agent-base": "^7.1.0", "http-proxy-agent": "^7.0.0", "https-proxy-agent": "^7.0.1", "lru-cache": "^10.0.1", "socks-proxy-agent": "^8.0.3" } }, "sha512-S79NdEgDQd/NGCay6TCoVzXSj74skRZIKJcpJjC5lOq34SZzyI6MqtiiWoiVWoVrTcGjNeC4ipbh1VIHlpfF5Q=="],
 
     "@npmcli/fs": ["@npmcli/fs@4.0.0", "https://repo.huaweicloud.com/repository/npm/@npmcli/fs/-/fs-4.0.0.tgz", { "dependencies": { "semver": "^7.3.5" } }, "sha512-/xGlezI6xfGO9NwuJlnwz/K14qD1kCSAGtacBHnGzeAIuJGazcp45KP5NuyARXoKb7cwulAGWVsbeSxdG/cb0Q=="],
+
+    "@opcagent/cli": ["@opcagent/cli@workspace:apps/cli"],
+
+    "@opcagent/core": ["@opcagent/core@workspace:packages/core"],
+
+    "@opcagent/electron": ["@opcagent/electron@workspace:apps/electron"],
+
+    "@opcagent/messaging-gateway": ["@opcagent/messaging-gateway@workspace:packages/messaging-gateway"],
+
+    "@opcagent/messaging-whatsapp-worker": ["@opcagent/messaging-whatsapp-worker@workspace:packages/messaging-whatsapp-worker"],
+
+    "@opcagent/pi-agent-server": ["@opcagent/pi-agent-server@workspace:packages/pi-agent-server"],
+
+    "@opcagent/server": ["@opcagent/server@workspace:packages/server"],
+
+    "@opcagent/server-core": ["@opcagent/server-core@workspace:packages/server-core"],
+
+    "@opcagent/session-tools-core": ["@opcagent/session-tools-core@workspace:packages/session-tools-core"],
+
+    "@opcagent/shared": ["@opcagent/shared@workspace:packages/shared"],
+
+    "@opcagent/ui": ["@opcagent/ui@workspace:packages/ui"],
+
+    "@opcagent/webui": ["@opcagent/webui@workspace:apps/webui"],
 
     "@opentelemetry/api": ["@opentelemetry/api@1.9.0", "https://repo.huaweicloud.com/repository/npm/@opentelemetry/api/-/api-1.9.0.tgz", {}, "sha512-3giAOQvZiH5F9bMlMiv8+GSPMeqg0dbaeo58/0SlA9sxSqZhnUtxzX9/2FzyhS9sWQf5S0GJE0AKBrFqjpeYcg=="],
 
@@ -3475,23 +3475,23 @@
 
     "@mistralai/mistralai/zod": ["zod@4.3.6", "https://repo.huaweicloud.com/repository/npm/zod/-/zod-4.3.6.tgz", {}, "sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg=="],
 
-    "@mkagent/cli/@types/bun": ["@types/bun@1.3.14", "https://repo.huaweicloud.com/repository/npm/@types/bun/-/bun-1.3.14.tgz", { "dependencies": { "bun-types": "1.3.14" } }, "sha512-h1hFqFVcvAvD9j9K7ZW7vd82aSA+rTdznZa+5bwvCwqSB1jmmfLcbIWhOLx1/+boy/xmjgCs/OMUL8hRJSmnPw=="],
-
-    "@mkagent/cli/@types/node": ["@types/node@22.19.6", "https://repo.huaweicloud.com/repository/npm/@types/node/-/node-22.19.6.tgz", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-qm+G8HuG6hOHQigsi7VGuLjUVu6TtBo/F05zvX04Mw2uCg9Dv0Qxy3Qw7j41SidlTcl5D/5yg0SEZqOB+EqZnQ=="],
-
-    "@mkagent/pi-agent-server/@types/node": ["@types/node@22.19.6", "https://repo.huaweicloud.com/repository/npm/@types/node/-/node-22.19.6.tgz", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-qm+G8HuG6hOHQigsi7VGuLjUVu6TtBo/F05zvX04Mw2uCg9Dv0Qxy3Qw7j41SidlTcl5D/5yg0SEZqOB+EqZnQ=="],
-
-    "@mkagent/server/@types/node": ["@types/node@22.19.6", "https://repo.huaweicloud.com/repository/npm/@types/node/-/node-22.19.6.tgz", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-qm+G8HuG6hOHQigsi7VGuLjUVu6TtBo/F05zvX04Mw2uCg9Dv0Qxy3Qw7j41SidlTcl5D/5yg0SEZqOB+EqZnQ=="],
-
-    "@mkagent/server-core/@types/node": ["@types/node@22.19.6", "https://repo.huaweicloud.com/repository/npm/@types/node/-/node-22.19.6.tgz", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-qm+G8HuG6hOHQigsi7VGuLjUVu6TtBo/F05zvX04Mw2uCg9Dv0Qxy3Qw7j41SidlTcl5D/5yg0SEZqOB+EqZnQ=="],
-
-    "@mkagent/session-tools-core/zod": ["zod@3.25.76", "https://repo.huaweicloud.com/repository/npm/zod/-/zod-3.25.76.tgz", {}, "sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ=="],
-
     "@modelcontextprotocol/sdk/ajv": ["ajv@8.17.1", "https://repo.huaweicloud.com/repository/npm/ajv/-/ajv-8.17.1.tgz", { "dependencies": { "fast-deep-equal": "^3.1.3", "fast-uri": "^3.0.1", "json-schema-traverse": "^1.0.0", "require-from-string": "^2.0.2" } }, "sha512-B/gBuNg5SiMTrPkC+A2+cW0RszwxYmn6VYxB/inlBStS5nx6xHIt/ehKRhIMhqusl7a8LjQoZnjCs5vhwxOQ1g=="],
 
     "@modelcontextprotocol/sdk/zod": ["zod@4.3.6", "https://repo.huaweicloud.com/repository/npm/zod/-/zod-4.3.6.tgz", {}, "sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg=="],
 
     "@npmcli/agent/lru-cache": ["lru-cache@10.4.3", "https://repo.huaweicloud.com/repository/npm/lru-cache/-/lru-cache-10.4.3.tgz", {}, "sha512-JNAzZcXrCt42VGLuYz0zfAzDfAvJWW6AfYlDBQyDV5DClI2m5sAmK+OIO7s59XfsRsWHp02jAJrRadPRGTt6SQ=="],
+
+    "@opcagent/cli/@types/bun": ["@types/bun@1.3.14", "https://repo.huaweicloud.com/repository/npm/@types/bun/-/bun-1.3.14.tgz", { "dependencies": { "bun-types": "1.3.14" } }, "sha512-h1hFqFVcvAvD9j9K7ZW7vd82aSA+rTdznZa+5bwvCwqSB1jmmfLcbIWhOLx1/+boy/xmjgCs/OMUL8hRJSmnPw=="],
+
+    "@opcagent/cli/@types/node": ["@types/node@22.19.6", "https://repo.huaweicloud.com/repository/npm/@types/node/-/node-22.19.6.tgz", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-qm+G8HuG6hOHQigsi7VGuLjUVu6TtBo/F05zvX04Mw2uCg9Dv0Qxy3Qw7j41SidlTcl5D/5yg0SEZqOB+EqZnQ=="],
+
+    "@opcagent/pi-agent-server/@types/node": ["@types/node@22.19.6", "https://repo.huaweicloud.com/repository/npm/@types/node/-/node-22.19.6.tgz", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-qm+G8HuG6hOHQigsi7VGuLjUVu6TtBo/F05zvX04Mw2uCg9Dv0Qxy3Qw7j41SidlTcl5D/5yg0SEZqOB+EqZnQ=="],
+
+    "@opcagent/server/@types/node": ["@types/node@22.19.6", "https://repo.huaweicloud.com/repository/npm/@types/node/-/node-22.19.6.tgz", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-qm+G8HuG6hOHQigsi7VGuLjUVu6TtBo/F05zvX04Mw2uCg9Dv0Qxy3Qw7j41SidlTcl5D/5yg0SEZqOB+EqZnQ=="],
+
+    "@opcagent/server-core/@types/node": ["@types/node@22.19.6", "https://repo.huaweicloud.com/repository/npm/@types/node/-/node-22.19.6.tgz", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-qm+G8HuG6hOHQigsi7VGuLjUVu6TtBo/F05zvX04Mw2uCg9Dv0Qxy3Qw7j41SidlTcl5D/5yg0SEZqOB+EqZnQ=="],
+
+    "@opcagent/session-tools-core/zod": ["zod@3.25.76", "https://repo.huaweicloud.com/repository/npm/zod/-/zod-3.25.76.tgz", {}, "sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ=="],
 
     "@opentelemetry/core/@opentelemetry/semantic-conventions": ["@opentelemetry/semantic-conventions@1.39.0", "https://repo.huaweicloud.com/repository/npm/@opentelemetry/semantic-conventions/-/semantic-conventions-1.39.0.tgz", {}, "sha512-R5R9tb2AXs2IRLNKLBJDynhkfmx7mX0vi8NkhZb3gUkPWHn6HXk5J8iQ/dql0U3ApfWym4kXXmBDRGO+oeOfjg=="],
 
@@ -3905,17 +3905,17 @@
 
     "@larksuiteoapi/node-sdk/axios/proxy-from-env": ["proxy-from-env@2.1.0", "", {}, "sha512-cJ+oHTW1VAEa8cJslgmUZrc+sjRKgAKl3Zyse6+PV38hZe/V6Z14TbCuXcan9F9ghlz4QrFr2c92TNF82UkYHA=="],
 
-    "@mkagent/cli/@types/bun/bun-types": ["bun-types@1.3.14", "https://repo.huaweicloud.com/repository/npm/bun-types/-/bun-types-1.3.14.tgz", { "dependencies": { "@types/node": "*" } }, "sha512-4N0ig0fEomHt5R0KCFWjovxow98rIoRwKolrYdCcknNwMekCXRnWEUvgu5soYV8QXtVsrUD8B95MBOZGPvr6KQ=="],
-
-    "@mkagent/cli/@types/node/undici-types": ["undici-types@6.21.0", "https://repo.huaweicloud.com/repository/npm/undici-types/-/undici-types-6.21.0.tgz", {}, "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ=="],
-
-    "@mkagent/pi-agent-server/@types/node/undici-types": ["undici-types@6.21.0", "https://repo.huaweicloud.com/repository/npm/undici-types/-/undici-types-6.21.0.tgz", {}, "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ=="],
-
-    "@mkagent/server-core/@types/node/undici-types": ["undici-types@6.21.0", "https://repo.huaweicloud.com/repository/npm/undici-types/-/undici-types-6.21.0.tgz", {}, "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ=="],
-
-    "@mkagent/server/@types/node/undici-types": ["undici-types@6.21.0", "https://repo.huaweicloud.com/repository/npm/undici-types/-/undici-types-6.21.0.tgz", {}, "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ=="],
-
     "@modelcontextprotocol/sdk/ajv/json-schema-traverse": ["json-schema-traverse@1.0.0", "https://repo.huaweicloud.com/repository/npm/json-schema-traverse/-/json-schema-traverse-1.0.0.tgz", {}, "sha512-NM8/P9n3XjXhIZn1lLhkFaACTOURQXjWhV4BA/RnOv8xvgqtqpAX9IO4mRQxSx1Rlo4tqzeqb0sOlruaOy3dug=="],
+
+    "@opcagent/cli/@types/bun/bun-types": ["bun-types@1.3.14", "https://repo.huaweicloud.com/repository/npm/bun-types/-/bun-types-1.3.14.tgz", { "dependencies": { "@types/node": "*" } }, "sha512-4N0ig0fEomHt5R0KCFWjovxow98rIoRwKolrYdCcknNwMekCXRnWEUvgu5soYV8QXtVsrUD8B95MBOZGPvr6KQ=="],
+
+    "@opcagent/cli/@types/node/undici-types": ["undici-types@6.21.0", "https://repo.huaweicloud.com/repository/npm/undici-types/-/undici-types-6.21.0.tgz", {}, "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ=="],
+
+    "@opcagent/pi-agent-server/@types/node/undici-types": ["undici-types@6.21.0", "https://repo.huaweicloud.com/repository/npm/undici-types/-/undici-types-6.21.0.tgz", {}, "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ=="],
+
+    "@opcagent/server-core/@types/node/undici-types": ["undici-types@6.21.0", "https://repo.huaweicloud.com/repository/npm/undici-types/-/undici-types-6.21.0.tgz", {}, "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ=="],
+
+    "@opcagent/server/@types/node/undici-types": ["undici-types@6.21.0", "https://repo.huaweicloud.com/repository/npm/undici-types/-/undici-types-6.21.0.tgz", {}, "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ=="],
 
     "@prisma/instrumentation/@opentelemetry/instrumentation/@opentelemetry/api-logs": ["@opentelemetry/api-logs@0.207.0", "https://repo.huaweicloud.com/repository/npm/@opentelemetry/api-logs/-/api-logs-0.207.0.tgz", { "dependencies": { "@opentelemetry/api": "^1.3.0" } }, "sha512-lAb0jQRVyleQQGiuuvCOTDVspc14nx6XJjP4FspJ1sNARo3Regq4ZZbrc3rN4b1TYSuUCvgH+UXUPug4SLOqEQ=="],
 
@@ -4111,7 +4111,7 @@
 
     "@larksuiteoapi/node-sdk/axios/https-proxy-agent/agent-base": ["agent-base@6.0.2", "https://repo.huaweicloud.com/repository/npm/agent-base/-/agent-base-6.0.2.tgz", { "dependencies": { "debug": "4" } }, "sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ=="],
 
-    "@mkagent/cli/@types/bun/bun-types/@types/node": ["@types/node@25.0.8", "https://repo.huaweicloud.com/repository/npm/@types/node/-/node-25.0.8.tgz", { "dependencies": { "undici-types": "~7.16.0" } }, "sha512-powIePYMmC3ibL0UJ2i2s0WIbq6cg6UyVFQxSCpaPxxzAaziRfimGivjdF943sSGV6RADVbk0Nvlm5P/FB44Zg=="],
+    "@opcagent/cli/@types/bun/bun-types/@types/node": ["@types/node@25.0.8", "https://repo.huaweicloud.com/repository/npm/@types/node/-/node-25.0.8.tgz", { "dependencies": { "undici-types": "~7.16.0" } }, "sha512-powIePYMmC3ibL0UJ2i2s0WIbq6cg6UyVFQxSCpaPxxzAaziRfimGivjdF943sSGV6RADVbk0Nvlm5P/FB44Zg=="],
 
     "@sentry/bundler-plugin-core/glob/minimatch/brace-expansion": ["brace-expansion@2.0.2", "https://repo.huaweicloud.com/repository/npm/brace-expansion/-/brace-expansion-2.0.2.tgz", { "dependencies": { "balanced-match": "^1.0.0" } }, "sha512-Jt0vHyM+jmUBqojB7E1NIYadt0vI0Qxjxd2TErW94wDz+E2LAm5vKMXXwg6ZZBTHPuUlDgQHKXvjGBdfcF1ZDQ=="],
 

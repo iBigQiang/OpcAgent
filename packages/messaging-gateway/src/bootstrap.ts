@@ -1,4 +1,4 @@
-import type { PushTarget } from '@mkagent/shared/protocol'
+import type { PushTarget } from '@opcagent/shared/protocol'
 import { createFanOutSink } from './event-fanout'
 import { MessagingGatewayRegistry, type MessagingGatewayRegistryOptions } from './registry'
 

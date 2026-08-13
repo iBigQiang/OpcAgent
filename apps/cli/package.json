@@ -1,25 +1,25 @@
 {
-  "name": "@mkagent/cli",
-  "version": "0.1.0",
+  "name": "@opcagent/cli",
+  "version": "0.1.1",
   "license": "Apache-2.0",
-  "description": "Terminal client for MkAgent server",
+  "description": "Terminal client for OPC Agent server",
   "type": "module",
-  "main": "dist/mkagent",
+  "main": "dist/opcagent",
   "files": [
-    "dist/mkagent"
+    "dist/opcagent"
   ],
   "bin": {
-    "mkagent": "dist/mkagent"
+    "opcagent": "dist/opcagent"
   },
   "scripts": {
-    "build": "mkdir -p dist && bun build src/index.ts --target=bun --outfile=dist/mkagent",
+    "build": "mkdir -p dist && bun build src/index.ts --target=bun --outfile=dist/opcagent",
     "start": "bun run src/index.ts",
     "typecheck": "tsc --noEmit",
     "test": "bun test src/"
   },
   "dependencies": {
-    "@mkagent/shared": "workspace:*",
-    "@mkagent/server-core": "workspace:*"
+    "@opcagent/shared": "workspace:*",
+    "@opcagent/server-core": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.8.2",

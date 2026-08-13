@@ -2,10 +2,10 @@ import { afterEach, describe, expect, mock, spyOn, test } from 'bun:test'
 import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import * as config from '@mkagent/shared/config'
-import { createProject } from '@mkagent/shared/projects'
-import { RPC_CHANNELS } from '@mkagent/shared/protocol'
-import type { HandlerFn, RequestContext, RpcServer } from '@mkagent/server-core/transport'
+import * as config from '@opcagent/shared/config'
+import { createProject } from '@opcagent/shared/projects'
+import { RPC_CHANNELS } from '@opcagent/shared/protocol'
+import type { HandlerFn, RequestContext, RpcServer } from '@opcagent/server-core/transport'
 import type { HandlerDeps } from '../handler-deps'
 import { registerProjectsHandlers } from './projects'
 
@@ -18,7 +18,7 @@ afterEach(() => {
 })
 
 test('project deletion also unbinds matching loaded session metadata', async () => {
-  const root = mkdtempSync(join(tmpdir(), 'mkagent-project-handler-'))
+  const root = mkdtempSync(join(tmpdir(), 'opcagent-project-handler-'))
   roots.push(root)
   const project = createProject(root, { name: 'Project One' })
   const handlers = new Map<string, HandlerFn>()

@@ -96,7 +96,7 @@ describe('piDriver.testConnection custom Anthropic endpoint auth', () => {
           nodeRuntimePath: '/usr/bin/node',
         },
         hostRuntime: {
-          appRootPath: '/tmp/mkagent',
+          appRootPath: '/tmp/opcagent',
           isPackaged: false,
         },
       });
@@ -140,7 +140,7 @@ describe('piDriver.testConnection custom Anthropic endpoint auth', () => {
           interceptorBundlePath: '/tmp/interceptor.cjs',
           nodeRuntimePath: '/usr/bin/node',
         },
-        hostRuntime: { appRootPath: '/tmp/mkagent', isPackaged: false },
+        hostRuntime: { appRootPath: '/tmp/opcagent', isPackaged: false },
       });
 
       expect(result).toEqual({ success: true });
@@ -179,7 +179,7 @@ describe('piDriver.testConnection custom Anthropic endpoint auth', () => {
           interceptorBundlePath: '/tmp/interceptor.cjs',
           nodeRuntimePath: '/usr/bin/node',
         },
-        hostRuntime: { appRootPath: '/tmp/mkagent', isPackaged: false },
+        hostRuntime: { appRootPath: '/tmp/opcagent', isPackaged: false },
       });
 
       expect(result).toEqual({ success: false, error: 'Rate limit reached' });

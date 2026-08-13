@@ -1,6 +1,6 @@
 import type { HandlerDeps } from './handler-deps'
-import type { RpcServer } from '@mkagent/server-core/transport'
-import { registerCoreRpcHandlers, type ServerHandlerContext } from '@mkagent/server-core/handlers/rpc'
+import type { RpcServer } from '@opcagent/server-core/transport'
+import { registerCoreRpcHandlers, type ServerHandlerContext } from '@opcagent/server-core/handlers/rpc'
 export { registerCoreRpcHandlers }
 
 // GUI-only handlers remain local (Electron-specific imports)

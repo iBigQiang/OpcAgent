@@ -10,13 +10,13 @@ const SESSION_MANAGER_URL = pathToFileURL(
 
 describe('session branch rollback on preflight failure', () => {
   it('deletes the child session when Pi branch preflight fails', () => {
-    const configDir = mkdtempSync(join(tmpdir(), 'mkagent-branch-rollback-'))
+    const configDir = mkdtempSync(join(tmpdir(), 'opcagent-branch-rollback-'))
     try {
       const script = `
         import { mkdirSync, writeFileSync } from 'node:fs';
         import { join } from 'node:path';
         import { SessionManager } from ${JSON.stringify(SESSION_MANAGER_URL)};
-        import { createSession, listSessions, loadSession, saveSession } from '@mkagent/shared/sessions';
+        import { createSession, listSessions, loadSession, saveSession } from '@opcagent/shared/sessions';
 
         const configDir = process.env.CONFIG_DIR;
         const workspaceRoot = join(configDir, 'workspaces', 'default');

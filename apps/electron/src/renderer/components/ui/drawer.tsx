@@ -1,5 +1,5 @@
 /**
- * Drawer — re-export from @mkagent/ui.
+ * Drawer — re-export from @opcagent/ui.
  *
  * The implementation moved to packages/ui so it can be used by shared chat
  * components (e.g. the compact Accept-Plan drawer in TurnCard). Existing
@@ -16,4 +16,4 @@ export {
   DrawerFooter,
   DrawerTitle,
   DrawerDescription,
-} from '@mkagent/ui/ui/drawer'
+} from '@opcagent/ui/ui/drawer'

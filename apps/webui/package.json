@@ -1,6 +1,6 @@
 {
-  "name": "@mkagent/webui",
-  "version": "0.1.0",
+  "name": "@opcagent/webui",
+  "version": "0.1.1",
   "license": "Apache-2.0",
   "private": true,
   "type": "module",
@@ -11,8 +11,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@mkagent/shared": "workspace:*",
-    "@mkagent/ui": "workspace:*",
+    "@opcagent/shared": "workspace:*",
+    "@opcagent/ui": "workspace:*",
     "i18next": "^26.0.3",
     "i18next-browser-languagedetector": "^8.2.1",
     "jotai": "^2.16.0",

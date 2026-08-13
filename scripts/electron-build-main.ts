@@ -44,8 +44,8 @@ function loadEnvFile(): void {
 function getBuildDefines(): string[] {
   const definedVars = [
     "SENTRY_ELECTRON_INGEST_URL",
-    "MKAGENT_DEV_RUNTIME",
-    "MKAGENT_AUTO_UPDATE_ENABLED",
+    "OPCAGENT_DEV_RUNTIME",
+    "OPCAGENT_AUTO_UPDATE_ENABLED",
   ];
 
   return definedVars.map((varName) => {

@@ -1,14 +1,14 @@
-const MKAGENT_DISPLAY_NAME_KEY = '_displayName';
-const MKAGENT_INTENT_KEY = '_intent';
+const OPCAGENT_DISPLAY_NAME_KEY = '_displayName';
+const OPCAGENT_INTENT_KEY = '_intent';
 
-const MKAGENT_DISPLAY_NAME_SCHEMA = {
+const OPCAGENT_DISPLAY_NAME_SCHEMA = {
   type: 'string',
-  description: 'MkAgent UI metadata: human-friendly action name for display only.',
+  description: 'OPCAgent UI metadata: human-friendly action name for display only.',
 };
 
-const MKAGENT_INTENT_SCHEMA = {
+const OPCAGENT_INTENT_SCHEMA = {
   type: 'string',
-  description: 'MkAgent UI metadata: concise tool-call intent for display only.',
+  description: 'OPCAgent UI metadata: concise tool-call intent for display only.',
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -22,15 +22,15 @@ function cloneWithDescriptors<T extends object>(value: T): T {
 }
 
 /**
- * Return a Pi tool schema that accepts MkAgent's root-level metadata fields.
+ * Return a Pi tool schema that accepts OPCAgent's root-level metadata fields.
  *
- * Pi validates tool arguments before MkAgent's pre-tool-use hook can strip
+ * Pi validates tool arguments before OPCAgent's pre-tool-use hook can strip
  * `_displayName` / `_intent`. Built-in Pi tools often use strict schemas with
  * `additionalProperties: false`, so we add those fields as optional root
  * properties at the adapter boundary. Unknown schema shapes are returned
  * unchanged, and upstream-defined metadata properties win if Pi adds them later.
  */
-export function allowMkAgentMetadataProperties<T>(schema: T): T {
+export function allowOPCAgentMetadataProperties<T>(schema: T): T {
   if (!isRecord(schema)) return schema;
 
   const properties = schema.properties;
@@ -39,11 +39,11 @@ export function allowMkAgentMetadataProperties<T>(schema: T): T {
   const nextSchema = cloneWithDescriptors(schema);
   const nextProperties = cloneWithDescriptors(properties);
 
-  if (!(MKAGENT_DISPLAY_NAME_KEY in nextProperties)) {
-    nextProperties[MKAGENT_DISPLAY_NAME_KEY] = MKAGENT_DISPLAY_NAME_SCHEMA;
+  if (!(OPCAGENT_DISPLAY_NAME_KEY in nextProperties)) {
+    nextProperties[OPCAGENT_DISPLAY_NAME_KEY] = OPCAGENT_DISPLAY_NAME_SCHEMA;
   }
-  if (!(MKAGENT_INTENT_KEY in nextProperties)) {
-    nextProperties[MKAGENT_INTENT_KEY] = MKAGENT_INTENT_SCHEMA;
+  if (!(OPCAGENT_INTENT_KEY in nextProperties)) {
+    nextProperties[OPCAGENT_INTENT_KEY] = OPCAGENT_INTENT_SCHEMA;
   }
 
   Object.defineProperty(nextSchema, 'properties', {
@@ -55,14 +55,14 @@ export function allowMkAgentMetadataProperties<T>(schema: T): T {
   return nextSchema as T;
 }
 
-/** Strip MkAgent-only metadata before invoking the upstream Pi tool implementation. */
-export function stripMkAgentMetadata<T>(input: T): T {
+/** Strip OPCAgent-only metadata before invoking the upstream Pi tool implementation. */
+export function stripOPCAgentMetadata<T>(input: T): T {
   if (!isRecord(input)) return input;
-  if (!(MKAGENT_DISPLAY_NAME_KEY in input) && !(MKAGENT_INTENT_KEY in input)) return input;
+  if (!(OPCAGENT_DISPLAY_NAME_KEY in input) && !(OPCAGENT_INTENT_KEY in input)) return input;
 
   const cleanInput = { ...input };
-  delete cleanInput[MKAGENT_DISPLAY_NAME_KEY];
-  delete cleanInput[MKAGENT_INTENT_KEY];
+  delete cleanInput[OPCAGENT_DISPLAY_NAME_KEY];
+  delete cleanInput[OPCAGENT_INTENT_KEY];
 
   return cleanInput as T;
 }

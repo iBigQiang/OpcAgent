@@ -5,7 +5,7 @@
  * Time formatting shared by AutomationsListPanel and AutomationEventTimeline.
  */
 
-import { isValidCron, matchesCron } from '@mkagent/shared/automations/cron-matcher'
+import { isValidCron, matchesCron } from '@opcagent/shared/automations/cron-matcher'
 
 /**
  * Format a timestamp as a compact relative time string (e.g. "3m", "2h", "5d").

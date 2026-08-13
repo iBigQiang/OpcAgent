@@ -23,7 +23,7 @@ export function resolvePiModel(
   preferCustomEndpoint?: boolean,
   customEndpointProviderId = 'custom-endpoint',
 ): PiModel | undefined {
-  // Strip MkAgent's pi/ prefix — Pi SDK uses bare model IDs.
+  // Strip OPCAgent's pi/ prefix — Pi SDK uses bare model IDs.
   const bareId = modelId.startsWith('pi/') ? modelId.slice(3) : modelId;
 
   // Custom-endpoint takes precedence when configured

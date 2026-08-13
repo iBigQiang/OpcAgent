@@ -24,7 +24,7 @@ function parseBooleanEnv(value: string | undefined): boolean | undefined {
  */
 export function isDevRuntime(): boolean {
   const nodeEnv = (getEnv('NODE_ENV') || '').toLowerCase();
-  return nodeEnv === 'development' || nodeEnv === 'dev' || getEnv('MKAGENT_DEBUG') === '1';
+  return nodeEnv === 'development' || nodeEnv === 'dev' || getEnv('OPCAGENT_DEBUG') === '1';
 }
 
 /**
@@ -32,18 +32,18 @@ export function isDevRuntime(): boolean {
  * Explicit env override has precedence over dev-runtime defaults.
  */
 export function isDeveloperFeedbackEnabled(): boolean {
-  const override = parseBooleanEnv(getEnv('MKAGENT_FEATURE_DEVELOPER_FEEDBACK'));
+  const override = parseBooleanEnv(getEnv('OPCAGENT_FEATURE_DEVELOPER_FEEDBACK'));
   if (override !== undefined) return override;
   return isDevRuntime();
 }
 
 /**
- * Runtime-evaluated check for mkagent-cli integration.
+ * Runtime-evaluated check for opcagent-cli integration.
  *
- * Defaults to disabled. Override with MKAGENT_FEATURE_CLI=1|0.
+ * Defaults to disabled. Override with OPCAGENT_FEATURE_CLI=1|0.
  */
-export function isMkAgentCliEnabled(): boolean {
-  const override = parseBooleanEnv(getEnv('MKAGENT_FEATURE_CLI'));
+export function isOPCAgentCliEnabled(): boolean {
+  const override = parseBooleanEnv(getEnv('OPCAGENT_FEATURE_CLI'));
   if (override !== undefined) return override;
   return false;
 }
@@ -51,10 +51,10 @@ export function isMkAgentCliEnabled(): boolean {
 /**
  * Runtime-evaluated check for embedded server settings page.
  *
- * Defaults to disabled. Override with MKAGENT_FEATURE_EMBEDDED_SERVER=1|0.
+ * Defaults to disabled. Override with OPCAGENT_FEATURE_EMBEDDED_SERVER=1|0.
  */
 export function isEmbeddedServerEnabled(): boolean {
-  const override = parseBooleanEnv(getEnv('MKAGENT_FEATURE_EMBEDDED_SERVER'));
+  const override = parseBooleanEnv(getEnv('OPCAGENT_FEATURE_EMBEDDED_SERVER'));
   if (override !== undefined) return override;
   return false;
 }
@@ -66,23 +66,23 @@ export const FEATURE_FLAGS = {
    * Enable agent developer feedback tool.
    *
    * Defaults to enabled in explicit development runtimes; disabled otherwise.
-   * Override with MKAGENT_FEATURE_DEVELOPER_FEEDBACK=1|0.
+   * Override with OPCAGENT_FEATURE_DEVELOPER_FEEDBACK=1|0.
    */
   get developerFeedback(): boolean {
     return isDeveloperFeedbackEnabled();
   },
   /**
-   * Enable mkagent CLI guidance and guardrails.
+   * Enable opcagent CLI guidance and guardrails.
    *
-   * Defaults to disabled. Override with MKAGENT_FEATURE_CLI=1|0.
+   * Defaults to disabled. Override with OPCAGENT_FEATURE_CLI=1|0.
    */
-  get mkagentCli(): boolean {
-    return isMkAgentCliEnabled();
+  get opcagentCli(): boolean {
+    return isOPCAgentCliEnabled();
   },
   /**
    * Enable embedded server settings page.
    *
-   * Defaults to disabled. Override with MKAGENT_FEATURE_EMBEDDED_SERVER=1|0.
+   * Defaults to disabled. Override with OPCAGENT_FEATURE_EMBEDDED_SERVER=1|0.
    */
   get embeddedServer(): boolean {
     return isEmbeddedServerEnabled();

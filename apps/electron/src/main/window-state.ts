@@ -1,7 +1,7 @@
 import { writeFileSync, existsSync, mkdirSync } from 'fs'
 import { join } from 'path'
-import { CONFIG_DIR } from '@mkagent/shared/config'
-import { readJsonFileSync } from '@mkagent/shared/utils/files'
+import { CONFIG_DIR } from '@opcagent/shared/config'
+import { readJsonFileSync } from '@opcagent/shared/utils/files'
 import { mainLog } from './logger'
 
 export interface WindowBounds {

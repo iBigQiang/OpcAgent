@@ -52,15 +52,15 @@ describe('LLM subscription OAuth', () => {
     })
   })
 
-  it('uses MkAgent branding on the retained callback page', () => {
+  it('uses OPCAgent branding on the retained callback page', () => {
     const html = generateCallbackPage({
       title: 'Authorization Complete',
       isSuccess: true,
       appType: 'electron',
-      deeplinkUrl: 'mkagent://auth-complete',
+      deeplinkUrl: 'opcagent://auth-complete',
     })
-    expect(html).toContain('<title>MkAgent - Authorization Complete</title>')
-    expect(html).toContain('>MkAgent</a>')
+    expect(html).toContain('<title>OPC Agent - Authorization Complete</title>')
+    expect(html).toContain('>OPC Agent</a>')
     expect(html).toContain('<img class="logo"')
     expect(html).toContain('src="data:image/png;base64,')
     expect(html).not.toContain('<pre class="logo">')

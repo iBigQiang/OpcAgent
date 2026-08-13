@@ -8,7 +8,7 @@ import { PrerequisiteManager } from '../prerequisite-manager.ts';
 
 let mockExistsPaths = new Set<string>();
 const WORKSPACE_ROOT = '/test/workspace';
-const BROWSER_DOC_PATH = resolve(join(homedir(), '.mkagent', 'docs', 'browser-tools.md'));
+const BROWSER_DOC_PATH = resolve(join(homedir(), '.opcagent', 'docs', 'browser-tools.md'));
 const sourceGuidePath = (slug: string) => resolve(WORKSPACE_ROOT, 'sources', slug, 'guide.md');
 
 describe('PrerequisiteManager', () => {

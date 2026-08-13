@@ -3,17 +3,17 @@
  *
  * Handles workspace setup and configuration persistence.
  */
-import { getLlmConnections, setSetupDeferred } from '@mkagent/shared/config'
-import { RPC_CHANNELS } from '@mkagent/shared/protocol'
-import type { RpcServer } from '@mkagent/server-core/transport'
+import { getLlmConnections, setSetupDeferred } from '@opcagent/shared/config'
+import { RPC_CHANNELS } from '@opcagent/shared/protocol'
+import type { RpcServer } from '@opcagent/server-core/transport'
 import type { HandlerDeps } from '../handler-deps'
 import {
   clearOAuthState,
   exchangeClaudeCode,
   hasValidOAuthState,
   prepareClaudeOAuth,
-} from '@mkagent/shared/auth'
-import { getCredentialManager } from '@mkagent/shared/credentials'
+} from '@opcagent/shared/auth'
+import { getCredentialManager } from '@opcagent/shared/credentials'
 
 // ============================================
 // IPC Handlers

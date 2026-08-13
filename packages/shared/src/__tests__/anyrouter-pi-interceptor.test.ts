@@ -18,17 +18,17 @@ beforeAll(async () => {
     };
     return new Response('', { status: 200, headers: { 'content-type': 'application/json' } });
   }) as typeof globalThis.fetch;
-  delete process.env.MKAGENT_INTERCEPTOR_DISABLE_AUTO_INSTALL;
+  delete process.env.OPCAGENT_INTERCEPTOR_DISABLE_AUTO_INSTALL;
   ({ createAnyRouterPiSseProcessor, isAnyRouterPiMessagesUrl } = await import('../unified-network-interceptor.ts'));
 });
 
 afterAll(() => {
   globalThis.fetch = originalFetch;
-  delete process.env.MKAGENT_INTERCEPTOR_DISABLE_AUTO_INSTALL;
-  delete process.env.MKAGENT_PLATFORM_PROFILE;
-  delete process.env.MKAGENT_PI_MODEL_API;
-  delete process.env.MKAGENT_PI_MODEL_PROVIDER;
-  delete process.env.MKAGENT_PI_MODEL_BASE_URL;
+  delete process.env.OPCAGENT_INTERCEPTOR_DISABLE_AUTO_INSTALL;
+  delete process.env.OPCAGENT_PLATFORM_PROFILE;
+  delete process.env.OPCAGENT_PI_MODEL_API;
+  delete process.env.OPCAGENT_PI_MODEL_PROVIDER;
+  delete process.env.OPCAGENT_PI_MODEL_BASE_URL;
 });
 
 describe('AnyRouter Pi interceptor SSE', () => {
@@ -41,10 +41,10 @@ describe('AnyRouter Pi interceptor SSE', () => {
   });
 
   it('does not apply the AnyRouter-Pi wire to AgentRouter requests', async () => {
-    process.env.MKAGENT_PLATFORM_PROFILE = 'agentrouter';
-    delete process.env.MKAGENT_PI_MODEL_API;
-    delete process.env.MKAGENT_PI_MODEL_PROVIDER;
-    delete process.env.MKAGENT_PI_MODEL_BASE_URL;
+    process.env.OPCAGENT_PLATFORM_PROFILE = 'agentrouter';
+    delete process.env.OPCAGENT_PI_MODEL_API;
+    delete process.env.OPCAGENT_PI_MODEL_PROVIDER;
+    delete process.env.OPCAGENT_PI_MODEL_BASE_URL;
     observedRequest = undefined;
 
     await globalThis.fetch('https://anyrouter.top/v1/messages', {

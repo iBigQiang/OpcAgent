@@ -40,7 +40,7 @@ export interface UnifiedDiffViewerProps {
   /** Theme mode */
   theme?: 'light' | 'dark'
   /** Shiki theme name (e.g., 'dracula', 'github-dark'). When provided, uses the matching
-   *  Shiki theme natively. Falls back to mkagent-dark/mkagent-light (transparent bg) if not set. */
+   *  Shiki theme natively. Falls back to opcagent-dark/opcagent-light (transparent bg) if not set. */
   shikiTheme?: string
   /** Disable background highlighting on changed lines */
   disableBackground?: boolean
@@ -113,8 +113,8 @@ export function UnifiedDiffViewer({
   }, [unifiedDiff, filePath])
 
   // Diff options - use the app's Shiki theme if available, otherwise fall back
-  // to mkagent-dark/mkagent-light which have transparent bg for CSS variable theming
-  const resolvedThemeName = shikiTheme || (theme === 'dark' ? 'mkagent-dark' : 'mkagent-light')
+  // to opcagent-dark/opcagent-light which have transparent bg for CSS variable theming
+  const resolvedThemeName = shikiTheme || (theme === 'dark' ? 'opcagent-dark' : 'opcagent-light')
 
   // When onFileHeaderClick is provided, inject CSS to make the header look clickable
   const unsafeCSS = onFileHeaderClick
@@ -168,7 +168,7 @@ export function UnifiedDiffViewer({
       }
       header.addEventListener('click', handleClick)
       // Store cleanup ref so we can remove listener
-      ;(header as any).__mkagentClickCleanup = () => header.removeEventListener('click', handleClick)
+      ;(header as any).__opcagentClickCleanup = () => header.removeEventListener('click', handleClick)
     }, 150)
 
     return () => {
@@ -176,7 +176,7 @@ export function UnifiedDiffViewer({
       const diffsContainer = containerRef.current?.querySelector(DIFFS_TAG_NAME)
       const header = diffsContainer?.shadowRoot?.querySelector('[data-diffs-header]')
       if (header) {
-        ;(header as any).__mkagentClickCleanup?.()
+        ;(header as any).__opcagentClickCleanup?.()
       }
     }
   }, [filePath, disableFileHeader, onFileHeaderClick])

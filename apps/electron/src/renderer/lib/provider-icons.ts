@@ -19,7 +19,7 @@ import openrouterIcon from '@/assets/provider-icons/openrouter.svg'
 import piIcon from '@/assets/provider-icons/pi.svg'
 import vercelIcon from '@/assets/provider-icons/vercel.svg'
 
-import type { LlmProviderType } from '@mkagent/shared/config/llm-connections'
+import type { LlmProviderType } from '@opcagent/shared/config/llm-connections'
 
 /**
  * Icon URLs for each provider

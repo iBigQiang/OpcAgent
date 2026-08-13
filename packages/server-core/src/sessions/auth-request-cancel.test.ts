@@ -7,7 +7,7 @@ describe('SessionManager.respondToCredential auth cancellation', () => {
     const workspace = {
       id: 'ws_auth_cancel',
       name: 'Auth Cancel',
-      rootPath: '/tmp/mkagent-auth-cancel',
+      rootPath: '/tmp/opcagent-auth-cancel',
       createdAt: Date.now(),
     }
     const managed = createManagedSession({ id: 'session_auth_cancel' }, workspace as never, { messagesLoaded: true })

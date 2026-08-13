@@ -51,12 +51,12 @@ export function applySystemPromptOverride(session: AgentSession, prompt: string)
 }
 
 /**
- * Keep Pi's generated system prompt and append MkAgent's instructions.
+ * Keep Pi's generated system prompt and append OPCAgent's instructions.
  *
  * Some Anthropic-compatible gateways validate the calling client from the
  * request body. Preserving Pi's default prompt keeps that identity intact,
  * while the wrapper around `_rebuildSystemPrompt` ensures tool/resource
- * refreshes retain the latest MkAgent instructions without duplicating them.
+ * refreshes retain the latest OPCAgent instructions without duplicating them.
  */
 export function applySystemPromptAppend(session: AgentSession, prompt: string): void {
   const mutable = session as unknown as MutableAgentSession;

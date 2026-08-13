@@ -51,7 +51,7 @@ describe('resolveMidStreamBehavior', () => {
 const STORAGE_MODULE_PATH = pathToFileURL(join(import.meta.dir, '..', 'storage.ts')).href
 
 function setupConfig(llmConnections: LlmConnection[]) {
-  const configDir = mkdtempSync(join(tmpdir(), 'mkagent-midstream-'))
+  const configDir = mkdtempSync(join(tmpdir(), 'opcagent-midstream-'))
   const workspaceRoot = join(configDir, 'workspaces', 'my-workspace')
   mkdirSync(workspaceRoot, { recursive: true })
 

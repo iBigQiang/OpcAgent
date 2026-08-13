@@ -1,4 +1,4 @@
-import type { SessionEvent } from '@mkagent/shared/protocol'
+import type { SessionEvent } from '@opcagent/shared/protocol'
 import type { PlanTokenRegistry } from './plan-tokens'
 import type {
   ChannelBinding,

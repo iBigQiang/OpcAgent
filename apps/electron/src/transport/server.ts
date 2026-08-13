@@ -1,1 +1,1 @@
-export { WsRpcServer, type WsRpcServerOptions } from '@mkagent/server-core/transport'
+export { WsRpcServer, type WsRpcServerOptions } from '@opcagent/server-core/transport'

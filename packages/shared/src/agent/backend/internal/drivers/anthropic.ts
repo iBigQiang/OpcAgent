@@ -20,7 +20,7 @@ export const anthropicDriver: ProviderDriver = {
   },
   validateStoredConnection: async ({ slug, credentialManager, resolvedPaths }) => {
     if (!resolvedPaths.claudeExecutablePath) {
-      return { success: false, error: 'Native Claude Code claude.exe was not found or failed its --version check. Upgrade Claude Code, select bin\\claude.exe in MkAgent settings, or add it to PATH.' };
+      return { success: false, error: 'Native Claude Code claude.exe was not found or failed its --version check. Upgrade Claude Code, select bin\\claude.exe in OPCAgent settings, or add it to PATH.' };
     }
     const credential = await credentialManager.getLlmApiKey(slug);
     return credential

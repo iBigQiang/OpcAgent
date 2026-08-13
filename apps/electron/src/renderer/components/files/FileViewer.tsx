@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { FileText } from 'lucide-react'
-import { Spinner } from '@mkagent/ui'
+import { Spinner } from '@opcagent/ui'
 
 interface FileViewerProps {
   path: string | null

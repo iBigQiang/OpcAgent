@@ -2,9 +2,9 @@ import { afterEach, describe, expect, mock, spyOn, test } from 'bun:test'
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import * as config from '@mkagent/shared/config'
-import { RPC_CHANNELS } from '@mkagent/shared/protocol'
-import type { HandlerFn, RequestContext, RpcServer } from '@mkagent/server-core/transport'
+import * as config from '@opcagent/shared/config'
+import { RPC_CHANNELS } from '@opcagent/shared/protocol'
+import type { HandlerFn, RequestContext, RpcServer } from '@opcagent/server-core/transport'
 import type { HandlerDeps } from '../handler-deps'
 import { registerAutomationsHandlers } from './automations'
 
@@ -36,7 +36,7 @@ function createHarness(root: string) {
 }
 
 function seedAutomations() {
-  const root = mkdtempSync(join(tmpdir(), 'mkagent-automations-changed-'))
+  const root = mkdtempSync(join(tmpdir(), 'opcagent-automations-changed-'))
   roots.push(root)
   mkdirSync(root, { recursive: true })
   writeFileSync(join(root, 'automations.json'), JSON.stringify({

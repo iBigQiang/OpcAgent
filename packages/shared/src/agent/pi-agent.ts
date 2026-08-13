@@ -15,7 +15,7 @@
 
 import { spawn, type ChildProcess } from 'node:child_process';
 import { createInterface, type Interface as ReadlineInterface } from 'node:readline';
-import type { AgentEvent } from '@mkagent/core/types';
+import type { AgentEvent } from '@opcagent/core/types';
 import type { FileAttachment } from '../utils/files.ts';
 import { getProxyEnvVars } from '../config/proxy-env.ts';
 
@@ -44,7 +44,7 @@ import { EventQueue } from './backend/event-queue.ts';
 import { SourceActivationDrainController } from './source-activation-drain.ts';
 import type { McpClientPool } from '../mcp/mcp-pool.ts';
 
-// System prompt for MkAgent context
+// System prompt for OPCAgent context
 import { getSystemPrompt } from '../prompts/system.ts';
 import { getCoAuthorPreference } from '../config/preferences.ts';
 
@@ -68,8 +68,8 @@ import {
   SESSION_BACKEND_TOOL_NAMES,
   SESSION_TOOL_REGISTRY,
   type ToolResult as SessionToolResult,
-} from '@mkagent/session-tools-core';
-import type { SessionToolContext } from '@mkagent/session-tools-core';
+} from '@opcagent/session-tools-core';
+import type { SessionToolContext } from '@opcagent/session-tools-core';
 import { createPiContext } from './pi-context.ts';
 import { getPermissionModeDiagnostics } from './mode-manager.ts';
 
@@ -122,7 +122,7 @@ function mapBrowserToolErrorCode(code: string): string | null {
     case 'BROWSER_NO_CAPABLE_CLIENT':
     case 'CAPABILITY_UNAVAILABLE':
       return 'No connected desktop client supports browser tools, or no client is currently connected. ' +
-        'Ask the user to open this workspace from the MkAgent desktop app.';
+        'Ask the user to open this workspace from the OPCAgent desktop app.';
     case 'CLIENT_DISCONNECTED':
       return 'The desktop client that owned this browser session disconnected. ' +
         'Ask the user to reconnect and retry.';
@@ -150,7 +150,7 @@ function mapBrowserToolErrorCode(code: string): string | null {
  * planning heuristics, config watching, usage tracking).
  */
 export class PiAgent extends BaseAgent {
-  protected backendName = 'MkAgent Backend';
+  protected backendName = 'OPCAgent Backend';
 
   // ============================================================
   // Subprocess State
@@ -190,7 +190,7 @@ export class PiAgent extends BaseAgent {
     this.subprocessErrorRepeatCount = 0;
   }
 
-  // Ring buffer of recent subprocess stderr. Always on (independent of MKAGENT_DEBUG)
+  // Ring buffer of recent subprocess stderr. Always on (independent of OPCAGENT_DEBUG)
   // so that connection-test and other failures can surface what the subprocess
   // actually said, instead of a bare "timed out" with no context.
   private stderrBuffer: string[] = [];
@@ -427,9 +427,9 @@ export class PiAgent extends BaseAgent {
         ...getProxyEnvVars(),
         ...this.config.envOverrides,
         // Pass session dir for cross-process toolMetadataStore
-        ...(sessionDir ? { MKAGENT_SESSION_DIR: sessionDir } : {}),
+        ...(sessionDir ? { OPCAGENT_SESSION_DIR: sessionDir } : {}),
         // Propagate debug mode
-        MKAGENT_DEBUG: (process.argv.includes('--debug') || process.env.MKAGENT_DEBUG === '1') ? '1' : '0',
+        OPCAGENT_DEBUG: (process.argv.includes('--debug') || process.env.OPCAGENT_DEBUG === '1') ? '1' : '0',
       },
     });
 
@@ -447,7 +447,7 @@ export class PiAgent extends BaseAgent {
 
     // Always capture stderr into a bounded ring buffer so callers (e.g. the
     // connection-test timeout path in factory.ts) can surface it on failure.
-    // Keep the MKAGENT_DEBUG-gated log for interactive dev work.
+    // Keep the OPCAGENT_DEBUG-gated log for interactive dev work.
     child.stderr?.on('data', (data: Buffer) => {
       const text = data.toString();
       this.recordStderr(text);
@@ -877,7 +877,7 @@ export class PiAgent extends BaseAgent {
    */
   private handleSubprocessEvent(event: Record<string, unknown>): void {
     // The subprocess sends Pi SDK AgentSessionEvent objects serialized as JSON.
-    // Feed them through PiEventAdapter to convert to MkAgentEvents.
+    // Feed them through PiEventAdapter to convert to OPCAgentEvents.
 
     // Detect session MCP tool completions (same pattern as in-process version)
     const eventType = event.type as string;
@@ -1273,7 +1273,7 @@ export class PiAgent extends BaseAgent {
 
   /**
    * Execute a session-scoped tool by name.
-   * Uses the canonical registry from @mkagent/session-tools-core.
+   * Uses the canonical registry from @opcagent/session-tools-core.
    */
   private async executeSessionTool(
     toolName: string,
@@ -1807,7 +1807,7 @@ export class PiAgent extends BaseAgent {
         this.config.workspace.rootPath,
         this.config.session?.workingDirectory,
         this.config.systemPromptPreset,
-        'MkAgent Backend', // backendName
+        'OPCAgent Backend', // backendName
         getCoAuthorPreference(),
         this.promptBuilder.getProjectPromptContext(),
       );

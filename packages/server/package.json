@@ -1,11 +1,11 @@
 {
-  "name": "@mkagent/server",
-  "version": "0.1.0",
-  "description": "Standalone headless MkAgent server (Bun runtime)",
+  "name": "@opcagent/server",
+  "version": "0.1.1",
+  "description": "Standalone headless OPC Agent server (Bun runtime)",
   "type": "module",
   "main": "src/index.ts",
   "bin": {
-    "mkagent-server": "src/index.ts"
+    "opcagent-server": "src/index.ts"
   },
   "files": [
     "src/"
@@ -13,21 +13,18 @@
   "engines": {
     "bun": ">=1.0.0"
   },
-  "author": {
-    "name": "MkAgent contributors",
-    "email": "support@mkagent.app"
-  },
+  "author": "OPC Agent contributors",
   "license": "Apache-2.0",
-  "homepage": "https://mkagent.app",
+  "homepage": "https://github.com/iBigQiang/OpcAgent",
   "scripts": {
     "start": "bun run src/index.ts",
     "generate-token": "bun run src/index.ts --generate-token",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@mkagent/core": "workspace:*",
-    "@mkagent/server-core": "workspace:*",
-    "@mkagent/shared": "workspace:*"
+    "@opcagent/core": "workspace:*",
+    "@opcagent/server-core": "workspace:*",
+    "@opcagent/shared": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.8.2",

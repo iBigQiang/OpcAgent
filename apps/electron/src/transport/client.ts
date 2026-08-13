@@ -1,5 +1,5 @@
 /**
- * Re-export WsRpcClient from @mkagent/server-core.
+ * Re-export WsRpcClient from @opcagent/server-core.
  *
  * The implementation was extracted to server-core so any package
  * (subprocesses, services, bridges) can use it without depending
@@ -14,4 +14,4 @@ export {
   type TransportConnectionError,
   type TransportCloseInfo,
   type TransportConnectionState,
-} from '@mkagent/server-core/transport'
+} from '@opcagent/server-core/transport'

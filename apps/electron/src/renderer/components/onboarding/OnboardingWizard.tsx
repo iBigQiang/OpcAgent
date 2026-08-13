@@ -77,7 +77,7 @@ interface OnboardingWizardProps {
 /**
  * OnboardingWizard - Full-screen onboarding flow container
  *
- * Manages the step-by-step flow for setting up MkAgent:
+ * Manages the step-by-step flow for setting up OPCAgent:
  * 1. Welcome
  * 2. Provider Select (subscriptions, API key, or local/custom endpoint)
  * 3. Credentials or local model

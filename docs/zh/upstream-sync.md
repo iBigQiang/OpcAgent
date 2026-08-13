@@ -1,6 +1,6 @@
 # 上游同步
 
-MkAgent 的架构、UI 与运行时继承自 [Craft Agents OSS](https://github.com/craft-ai-agents/craft-agents-oss)。本文定义在 Lite 边界内吸收新 Craft 变更的工作流。
+OPC Agent 的架构、UI 与运行时继承自 [Craft Agents OSS](https://github.com/craft-ai-agents/craft-agents-oss)。本文定义在 Lite 边界内吸收新 Craft 变更的工作流。
 
 ## 当前基线
 
@@ -16,7 +16,7 @@ MkAgent 的架构、UI 与运行时继承自 [Craft Agents OSS](https://github.c
 2. 把 commit 加到本文件的 "当前基线" 表中。
 3. 用新 commit 重新跑下面的步骤。
 
-MkAgent 工作期间,参考 checkout(`../craft-agents-oss`、`../echo`、`../xagent`)保持只读。
+OPC Agent 工作期间,参考 checkout(`../craft-agents-oss`、`../echo`、`../xagent`)保持只读。
 
 ## 同步流程
 
@@ -36,12 +36,12 @@ MkAgent 工作期间,参考 checkout(`../craft-agents-oss`、`../echo`、`../xag
   │    每个改动 same-path 文件的 upstream commit:                     │
   │      classify:  STRICT_REUSE  |  LITE_SEAM  |  REMOVED_FEATURE    │
   │      STRICT_REUSE:   原样取文件,刷新哈希                          │
-  │      LITE_SEAM:      手工合并,保留 MkAgent 定制缝                  │
+  │      LITE_SEAM:      手工合并,保留 OPC Agent 定制缝                  │
   │      REMOVED_FEATURE: 不要导入,在 seam 里写明原因                 │
   │                                                                  │
   │ 4. 评估仅上游存在的新功能                                          │
-  │      适配 MkAgent 范围 → mkagent migration-review issue           │
-  │      不在范围       → 保持 MkAgent Lite                            │
+  │      适配 OPC Agent 范围 → opcagent migration-review issue           │
+  │      不在范围       → 保持 OPC Agent Lite                            │
   │                                                                  │
   │ 5. 校验                                                            │
   │    bun run typecheck:all                                          │
@@ -55,7 +55,7 @@ MkAgent 工作期间,参考 checkout(`../craft-agents-oss`、`../echo`、`../xag
   │    bun run server:build:subprocess                                │
   │                                                                  │
   │ 6. 对全新 config dir 做 GUI smoke                                  │
-  │    rm -rf /tmp/mkagent-smoke && CONFIG_DIR=/tmp/mkagent-smoke \│
+  │    rm -rf /tmp/opcagent-smoke && CONFIG_DIR=/tmp/opcagent-smoke \│
   │       bun run electron:dist:dev:mac                              │
   │    + headless smoke: bun run server:dev:webui                     │
   └──────────────────────────────────────────────────────────────────┘
@@ -66,14 +66,14 @@ MkAgent 工作期间,参考 checkout(`../craft-agents-oss`、`../echo`、`../xag
 | 类别 | 规则 | 校验方式 |
 |---|---|---|
 | `STRICT_REUSE` | 同相对路径,只有机械差异(scope、URL 协议、配置根、品牌字符串) | `audit:craft-reuse` 归一化后逐字一致 |
-| `LITE_SEAM` | 同相对路径,但已删除对应排除功能的分支,或接到 MkAgent 专用接口 | 人工语义审 + 定向 unit/integration 测试 + typecheck |
-| `REMOVED_FEATURE` | 因对应的产品能力已删除,整个文件从 MkAgent 中移除 | 路径、call site、build closure 与 `lint:craft-test-coverage` 标签 |
+| `LITE_SEAM` | 同相对路径,但已删除对应排除功能的分支,或接到 OPC Agent 专用接口 | 人工语义审 + 定向 unit/integration 测试 + typecheck |
+| `REMOVED_FEATURE` | 因对应的产品能力已删除,整个文件从 OPC Agent 中移除 | 路径、call site、build closure 与 `lint:craft-test-coverage` 标签 |
 
 接入上游独有功能时,先过一遍 Lite 问题;只挑选适配 Lite 边界的功能。
 
 ## 覆盖清单
 
-两份源真值文件记录哪些 MkAgent 文件相对 Craft 偏离:
+两份源真值文件记录哪些 OPC Agent 文件相对 Craft 偏离:
 
 - `scripts/craft-source-overrides.json`(跟踪所有 `apps/`、`packages/` 源文件)
 - `scripts/craft-ui-overrides.json`(renderer 范围内的子集,386 条)
@@ -102,4 +102,4 @@ MkAgent 工作期间,参考 checkout(`../craft-agents-oss`、`../echo`、`../xag
 | `lint:craft-test-coverage` 出现 "missing" 标签 | 上游 test 移动 / 新增但没归类 | 在 `scripts/check-craft-test-coverage.ts` 中更新 seam 分类 |
 | 同步后 `apps/electron/src/main` 单独报类型错 | 上游引入了新的环境变量或平台辅助 | 确认它能跨过 Lite seam,在提交前记录在文档中 |
 | 打包后 renderer asset 404 | 新增上游 asset 但没更新 `scripts/copy-assets.ts` | 把 asset 加到 copy list 并重新构建 |
-| `electron:build` 成功,但 `MkAgent Helper` 缺少某个 plugin | 确认 `appId` 是 `app.mkagent.desktop` 且 `extraResources` 只用 `@mkagent/*` 域 | 检查 `apps/electron/electron-builder.yml` |
+| `electron:build` 成功,但 `OPC Agent Helper` 缺少某个 plugin | 确认 `appId` 是 `app.opcagent.desktop` 且 `extraResources` 只用 `@opcagent/*` 域 | 检查 `apps/electron/electron-builder.yml` |

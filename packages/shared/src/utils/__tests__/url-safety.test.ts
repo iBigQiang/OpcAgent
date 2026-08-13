@@ -40,12 +40,12 @@ describe('classifyExternalUrl — safe external (custom app schemes)', () => {
 })
 
 describe('classifyExternalUrl — internal deep links', () => {
-  it('classifies mkagent:// as internal-deeplink', () => {
-    expect(classifyExternalUrl('mkagent://settings').kind).toBe('internal-deeplink')
+  it('classifies opcagent:// as internal-deeplink', () => {
+    expect(classifyExternalUrl('opcagent://settings').kind).toBe('internal-deeplink')
   })
 
   it('is case-insensitive for the scheme', () => {
-    expect(classifyExternalUrl('MKAGENT://settings').kind).toBe('internal-deeplink')
+    expect(classifyExternalUrl('OPCAGENT://settings').kind).toBe('internal-deeplink')
   })
 })
 
@@ -128,7 +128,7 @@ describe('formatBlockedUrlError', () => {
 
   it('returns an empty string for non-dangerous classifications', () => {
     expect(formatBlockedUrlError(classifyExternalUrl('https://example.com'))).toBe('')
-    expect(formatBlockedUrlError(classifyExternalUrl('mkagent://settings'))).toBe('')
+    expect(formatBlockedUrlError(classifyExternalUrl('opcagent://settings'))).toBe('')
   })
 })
 
@@ -144,7 +144,7 @@ describe('isSafeExternalUrl', () => {
   })
 
   it('returns false for internal deep links', () => {
-    expect(isSafeExternalUrl('mkagent://settings')).toBe(false)
+    expect(isSafeExternalUrl('opcagent://settings')).toBe(false)
   })
 
   it('returns false for dangerous schemes', () => {

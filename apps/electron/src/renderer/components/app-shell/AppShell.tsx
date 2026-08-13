@@ -27,7 +27,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { HeaderIconButton } from "@/components/ui/HeaderIconButton"
 import { Separator } from "@/components/ui/separator"
-import { Tooltip, TooltipTrigger, TooltipContent, DocumentFormattedMarkdownOverlay } from "@mkagent/ui"
+import { Tooltip, TooltipTrigger, TooltipContent, DocumentFormattedMarkdownOverlay } from "@opcagent/ui"
 import {
   ContextMenu,
   ContextMenuTrigger,
@@ -811,7 +811,7 @@ function AppShellContent({
     contextValue.onSessionLabelsChange?.(sessionId, nextLabels)
   }, [contextValue])
 
-  // Extend the Craft context with retained MkAgent capabilities only.
+  // Extend the Craft context with retained OPCAgent capabilities only.
   const appShellContextValue = React.useMemo<AppShellContextType>(() => ({
     ...contextValue,
     onDeleteSession: handleDeleteSession,

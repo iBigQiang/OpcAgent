@@ -31,7 +31,7 @@
  *     `shouldFireBeforeEvent()` before yielding each event.
  */
 
-import type { AgentEvent } from '@mkagent/core/types';
+import type { AgentEvent } from '@opcagent/core/types';
 
 export interface PendingActivationRestart {
   sourceSlug: string;

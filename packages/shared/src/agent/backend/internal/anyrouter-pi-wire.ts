@@ -78,7 +78,7 @@ function claudeCodeTools(tools: unknown): Array<Record<string, unknown>> {
     if (source) return { ...source, name };
     return {
       name,
-      description: `${name} is unavailable in this MkAgent session. Do not call it.`,
+      description: `${name} is unavailable in this OPCAgent session. Do not call it.`,
       input_schema: { type: 'object', properties: {} },
     };
   });

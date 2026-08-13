@@ -1,6 +1,6 @@
 # Releases, updates, and telemetry
 
-Tagged releases in the open-source repository build macOS DMG/ZIP, Windows NSIS, Linux AppImage, the headless server for each platform, and the Bun-based CLI bundle. Source code and downloadable artifacts live together in [MkThingsHQ/mkagent](https://github.com/MkThingsHQ/mkagent/releases/latest). Signing credentials are optional: a zero-secret release produces ad-hoc-signed macOS packages and unsigned Windows installers, while complete platform credentials automatically enable Apple Developer ID signing/notarization or Windows Authenticode. The workflow publishes with the repository-scoped GitHub Actions token.
+Tagged releases in the open-source repository build macOS DMG/ZIP, Windows NSIS, Linux AppImage, the headless server for each platform, and the Bun-based CLI bundle. Source code and downloadable artifacts live together in [iBigQiang/OpcAgent](https://github.com/iBigQiang/OpcAgent/releases/latest). Signing credentials are optional: a zero-secret release produces ad-hoc-signed macOS packages and unsigned Windows installers, while complete platform credentials automatically enable Apple Developer ID signing/notarization or Windows Authenticode. The workflow publishes with the repository-scoped GitHub Actions token.
 
 ## Release pipeline
 
@@ -16,7 +16,7 @@ Tagged releases in the open-source repository build macOS DMG/ZIP, Windows NSIS,
                                                        │
                                                        ▼
                   upload installers + manifests + blockmaps + checksums
-                          to MkThingsHQ/mkagent GitHub Releases
+                          to iBigQiang/OpcAgent GitHub Releases
                                                        │
                                                        ▼
                          electron-updater reads the same repository
@@ -28,7 +28,7 @@ Pull requests and pushes to `main` run the unsigned packaging matrix for macOS a
 
 ## Version and changelog policy
 
-MkAgent uses semantic versions and `v<major>.<minor>.<patch>` Git tags. [`CHANGELOG.md`](../CHANGELOG.md) is the canonical cumulative changelog; `apps/electron/resources/release-notes/<version>.md` is the user-facing note bundled into the app and copied verbatim to the public GitHub Release.
+OPC Agent uses semantic versions and `v<major>.<minor>.<patch>` Git tags. [`CHANGELOG.md`](../CHANGELOG.md) is the canonical cumulative changelog; `apps/electron/resources/release-notes/<version>.md` is the user-facing note bundled into the app and copied verbatim to the public GitHub Release.
 
 Prepare a release only from a clean `main` branch:
 
@@ -40,7 +40,7 @@ git diff --check
 git add CHANGELOG.md package.json bun.lock apps/*/package.json packages/*/package.json \
   apps/electron/resources/release-notes/0.2.0.md scripts/craft-source-overrides.json
 git commit -m "chore(release): prepare v0.2.0"
-git tag -a v0.2.0 -m "MkAgent v0.2.0"
+git tag -a v0.2.0 -m "OPC Agent v0.2.0"
 git push origin main v0.2.0
 ```
 
@@ -50,24 +50,24 @@ git push origin main v0.2.0
 
 | Platform                   | Build                    | Naming                             | Signing                               | Notes                                                                                  |
 | -------------------------- | ------------------------ | ---------------------------------- | ------------------------------------- | -------------------------------------------------------------------------------------- |
-| macOS arm64                | DMG + ZIP                | `MkAgent-0.1.0-arm64.{dmg,zip}`    | ad-hoc or Developer ID + notarization  | no-certificate builds disable Hardened Runtime and require manual updates              |
-| macOS x64                  | DMG + ZIP                | `MkAgent-0.1.0-x64.{dmg,zip}`      | same                                    | for Intel Macs                                                                         |
-| Windows x64                | NSIS                     | `MkAgent-0.1.0-x64.exe`            | unsigned or Authenticode                | unsigned builds may trigger SmartScreen; per-user install under `%LOCALAPPDATA%\Programs\` |
-| Linux x64                  | AppImage                 | `MkAgent-0.1.0-x64.AppImage`       | none                                  | desktop category: Utility                                                              |
-| Headless server (per-arch) | `bun build --compile`    | `mkagent-server-<platform>-<arch>` | none                                  | consumed by WebUI and external CLI users                                               |
-| CLI                        | `bun build --target=bun` | `MkAgent-cli-bun.tar.gz`           | none                                  | JavaScript bundle; requires Bun on the user's machine                                  |
+| macOS arm64                | DMG + ZIP                | `OPC Agent-0.1.0-arm64.{dmg,zip}`    | ad-hoc or Developer ID + notarization  | no-certificate builds disable Hardened Runtime and require manual updates              |
+| macOS x64                  | DMG + ZIP                | `OPC Agent-0.1.0-x64.{dmg,zip}`      | same                                    | for Intel Macs                                                                         |
+| Windows x64                | NSIS                     | `OPC Agent-0.1.0-x64.exe`            | unsigned or Authenticode                | unsigned builds may trigger SmartScreen; per-user install under `%LOCALAPPDATA%\Programs\` |
+| Linux x64                  | AppImage                 | `OPC Agent-0.1.0-x64.AppImage`       | none                                  | desktop category: Utility                                                              |
+| Headless server (per-arch) | `bun build --compile`    | `opcagent-server-<platform>-<arch>` | none                                  | consumed by WebUI and external CLI users                                               |
+| CLI                        | `bun build --target=bun` | `OPC Agent-cli-bun.tar.gz`           | none                                  | JavaScript bundle; requires Bun on the user's machine                                  |
 
 `bun run electron:dist:dev:mac` produces a local ad-hoc-signed build and disables automatic updates. Release jobs also set `CSC_IDENTITY_AUTO_DISCOVERY=false`, `mac.identity=-`, and `hardenedRuntime=false` explicitly when Apple credentials are absent. Ad-hoc signing satisfies Apple Silicon code-integrity requirements but does not establish a trusted developer identity, so Gatekeeper warnings remain.
 
 ## Updates
 
-The Electron app uses `electron-updater` against the GitHub Releases API on `MkThingsHQ/mkagent`. The public repository and its update manifests require no client-side GitHub token.
+The Electron app uses `electron-updater` against the GitHub Releases API on `iBigQiang/OpcAgent`. The public repository and its update manifests require no client-side GitHub token.
 
 | Field        | Where it is set                                              |
 | ------------ | ------------------------------------------------------------ |
-| `appId`      | `apps/electron/electron-builder.yml` → `app.mkagent.desktop` |
+| `appId`      | `apps/electron/electron-builder.yml` → `app.opcagent.desktop` |
 | Provider     | `github`                                                     |
-| Owner / repo | `MkThingsHQ` / `mkagent`                                     |
+| Owner / repo | `MkThingsHQ` / `opcagent`                                     |
 | Manifest     | auto-generated by electron-builder at release time           |
 
 When a downgrade is required, the user must install an older build manually; auto-update only moves forward.
@@ -88,7 +88,7 @@ Always-redacted breadcrumb/request header fields: `authorization`, `cookie`, `x-
 
 ## Cross-builder reproducibility
 
-The `electron-builder.yml` `files` / `extraResources` blocks are first-class artifacts of the Lite boundary. They are what give MkAgent its smaller installer footprint; see [`comparison-with-craft.md`](./comparison-with-craft.md) for the concrete numbers. Any release-time change to either block must update both that document and `appId` / `productName` / `copyright` at the top of the same file.
+The `electron-builder.yml` `files` / `extraResources` blocks are first-class artifacts of the Lite boundary. They are what give OPC Agent its smaller installer footprint; see [`comparison-with-craft.md`](./comparison-with-craft.md) for the concrete numbers. Any release-time change to either block must update both that document and `appId` / `productName` / `copyright` at the top of the same file.
 
 ## GitHub release environment
 

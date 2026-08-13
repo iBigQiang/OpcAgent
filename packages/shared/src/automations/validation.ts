@@ -163,7 +163,7 @@ function runMatcherSemanticValidations(
               path: `automations.${event}[${i}].actions[${j}].url`,
               message: 'Webhook URL contains variable templates — will be validated at runtime after expansion',
               severity: 'warning',
-              suggestion: 'Ensure the referenced MKAGENT_WH_* variables are set in your shell profile',
+              suggestion: 'Ensure the referenced OPCAGENT_WH_* variables are set in your shell profile',
             });
           }
         }

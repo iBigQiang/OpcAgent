@@ -8,9 +8,9 @@
  * Imports groupMessagesByTurn (pure function) from turn-utils.
  */
 import { describe, it, expect, beforeEach } from 'bun:test'
-import { groupMessagesByTurn, type AssistantTurn } from '@mkagent/ui/chat/turn-utils'
-import { messageToStored, storedToMessage } from '@mkagent/core'
-import type { Message, MessageRole } from '@mkagent/core'
+import { groupMessagesByTurn, type AssistantTurn } from '@opcagent/ui/chat/turn-utils'
+import { messageToStored, storedToMessage } from '@opcagent/core'
+import type { Message, MessageRole } from '@opcagent/core'
 
 // ============================================================================
 // Mirror: persistence pipeline (two-stage filter)

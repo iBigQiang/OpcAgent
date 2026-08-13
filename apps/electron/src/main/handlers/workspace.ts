@@ -1,5 +1,5 @@
-import { RPC_CHANNELS } from '@mkagent/shared/protocol'
-import type { RpcServer } from '@mkagent/server-core/transport'
+import { RPC_CHANNELS } from '@opcagent/shared/protocol'
+import type { RpcServer } from '@opcagent/server-core/transport'
 import type { HandlerDeps } from './handler-deps'
 
 export const GUI_HANDLED_CHANNELS = [
@@ -15,7 +15,7 @@ export function registerWorkspaceGuiHandlers(server: RpcServer, deps: HandlerDep
   const manager = deps.windowManager
   server.handle(RPC_CHANNELS.window.OPEN_WORKSPACE, async (_ctx, workspaceId: string) => manager?.focusOrCreateWindow(workspaceId))
   server.handle(RPC_CHANNELS.window.OPEN_SESSION_IN_NEW_WINDOW, async (_ctx, workspaceId: string, sessionId: string) => {
-    manager?.createWindow({ workspaceId, focused: true, initialDeepLink: `mkagent://allSessions/session/${sessionId}` })
+    manager?.createWindow({ workspaceId, focused: true, initialDeepLink: `opcagent://allSessions/session/${sessionId}` })
   })
   server.handle(RPC_CHANNELS.window.CLOSE, ctx => manager?.closeWindow(ctx.webContentsId!))
   server.handle(RPC_CHANNELS.window.CONFIRM_CLOSE, ctx => manager?.forceCloseWindow(ctx.webContentsId!))

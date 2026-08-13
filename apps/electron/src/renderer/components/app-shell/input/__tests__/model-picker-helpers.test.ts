@@ -6,7 +6,7 @@
  */
 
 import { describe, test, expect } from 'bun:test'
-import type { LlmConnection } from '@mkagent/shared/config/llm-connections'
+import type { LlmConnection } from '@opcagent/shared/config/llm-connections'
 import {
   formatTokenCount,
   groupConnectionsByProvider,

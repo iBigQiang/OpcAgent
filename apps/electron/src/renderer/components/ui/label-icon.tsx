@@ -5,15 +5,15 @@
  * with the icon size variant for consistent inline display.
  */
 
-import type { IconSize } from '@mkagent/shared/icons'
-import type { EntityColor } from '@mkagent/shared/colors/types'
+import type { IconSize } from '@opcagent/shared/icons'
+import type { EntityColor } from '@opcagent/shared/colors/types'
 import { useTheme } from '@/context/ThemeContext'
 import { cn } from '@/lib/utils'
 import { Hash, CalendarDays, Type, Link } from 'lucide-react'
-import type { LabelConfig } from '@mkagent/shared/labels'
+import type { LabelConfig } from '@opcagent/shared/labels'
 
 interface LabelIconProps {
-  /** Label configuration (matches LabelConfig from @mkagent/shared/labels) */
+  /** Label configuration (matches LabelConfig from @opcagent/shared/labels) */
   label: {
     id: string
     /** EntityColor: system color string or custom color object */

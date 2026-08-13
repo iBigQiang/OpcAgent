@@ -10,7 +10,7 @@ const MODE_MANAGER_URL = pathToFileURL(join(import.meta.dir, '..', '..', 'mode-m
 
 describe('CONFIG_DIR path handling', () => {
   it('recognizes configuration and workspace paths under a custom data directory', () => {
-    const configDir = mkdtempSync(join(tmpdir(), 'mkagent-config-dir-'))
+    const configDir = mkdtempSync(join(tmpdir(), 'opcagent-config-dir-'))
 
     try {
       const script = `

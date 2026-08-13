@@ -1,10 +1,10 @@
-# MkAgent 对齐审核流程与历史经验
+# OPC Agent 对齐审核流程与历史经验
 
 ## 1. 文档目的
 
-本文定义 MkAgent 对 Craft Agent 进行完整代码审核、修复和验收时必须遵循的流程，并记录历次迁移与本轮复审暴露的问题。
+本文定义 OPC Agent 对 Craft Agent 进行完整代码审核、修复和验收时必须遵循的流程，并记录历次迁移与本轮复审暴露的问题。
 
-MkAgent 是 Craft Agent 的 Lite 发行版。审核目标不是证明两者“整体相似”，而是逐文件证明：
+OPC Agent 是 Craft Agent 的 Lite 发行版。审核目标不是证明两者“整体相似”，而是逐文件证明：
 
 1. 保留功能直接复用 Craft 的源码、架构、UI 和测试。
 2. 差异仅来自品牌替换、Pi-only 后端或明确的 Lite 产品裁剪。
@@ -24,7 +24,7 @@ MkAgent 是 Craft Agent 的 Lite 发行版。审核目标不是证明两者“�
 
 | 项目 | 值 |
 |---|---|
-| MkAgent | `/Volumes/SAMSUNG/workspace/github/mkagent` |
+| OPC Agent | `/Volumes/SAMSUNG/workspace/github/opcagent` |
 | Craft Agent | `/Volumes/SAMSUNG/workspace/agents/craft-agents-oss` |
 | Craft 版本 | `v0.11.2` |
 | Craft commit | `a60ebc1a5a7cb0a6af7a77d5eed0512c5fc07658` |
@@ -66,7 +66,7 @@ MkAgent 是 Craft Agent 的 Lite 发行版。审核目标不是证明两者“�
 
 ### 3.3 测试文件存在，不代表测试覆盖仍与 Craft 一致
 
-同路径测试可能删除了大量 case；少量 MkAgent 新测试也可能掩盖上游测试缺失。
+同路径测试可能删除了大量 case；少量 OPC Agent 新测试也可能掩盖上游测试缺失。
 
 改进：除了检查测试文件路径，还要统计同路径文件的测试 case 数。case 减少必须逐文件登记；替代测试必须指明被替代的 Craft 测试；随功能删除的测试必须写明对应产品边界。
 
@@ -80,7 +80,7 @@ MkAgent 是 Craft Agent 的 Lite 发行版。审核目标不是证明两者“�
 
 ### 3.5 旧进程和缓存会制造假差异
 
-Electron 冒烟一度显示旧的 `Craft menu`，但源码和最新构建产物已经是 `MkAgent menu`。原因是 CDP 连接到了先前启动的旧实例。
+Electron 冒烟一度显示旧的 `Craft menu`，但源码和最新构建产物已经是 `OPC Agent menu`。原因是 CDP 连接到了先前启动的旧实例。
 
 改进：
 
@@ -99,7 +99,7 @@ Electron 冒烟一度显示旧的 `Craft menu`，但源码和最新构建产物�
 
 ### 4.1 阶段 A：冻结现场
 
-1. 记录 MkAgent 当前分支、commit 和工作区状态。
+1. 记录 OPC Agent 当前分支、commit 和工作区状态。
 2. 记录 Craft tag、commit 和工作区状态。
 3. 阅读四份 migration 文档，确认保留/删除功能矩阵。
 4. 不修改 Craft，不自动格式化全仓，不覆盖无关未提交修改。
@@ -159,7 +159,7 @@ git -C "$CRAFT_AGENT_SOURCE" ls-tree -r --name-only -z HEAD
 |---|---|
 | 归一化后完全一致 | 自动逐字节比较，不需要人工豁免 |
 | Craft 派生差异 | 逐文件记录 SHA256 和具体差异理由 |
-| MkAgent 独有 | 证明其为品牌、Pi-only、headless/CLI 或审计门禁所必需 |
+| OPC Agent 独有 | 证明其为品牌、Pi-only、headless/CLI 或审计门禁所必需 |
 | Craft 中已删除 | 逐文件说明对应的 Lite 删除边界 |
 
 归一化仅允许机械替换，例如包 scope、协议、配置目录和品牌名。不得把结构、逻辑或 UI 差异加入归一化规则，否则会掩盖真实偏离。
@@ -197,7 +197,7 @@ CRAFT_AGENT_SOURCE=/Volumes/SAMSUNG/workspace/agents/craft-agents-oss \
 每个差异都问五个问题：
 
 1. Craft 原实现是什么？
-2. MkAgent 为什么不能直接复用？
+2. OPC Agent 为什么不能直接复用？
 3. 差异是否只服务于 Lite 边界？
 4. 是否能通过删除代码或外围 adapter 缩小 diff？
 5. 是否有对应测试覆盖？
@@ -205,7 +205,7 @@ CRAFT_AGENT_SOURCE=/Volumes/SAMSUNG/workspace/agents/craft-agents-oss \
 典型处理规则：
 
 - Craft 保留功能缺失：优先复制 Craft 原文件或原逻辑。
-- MkAgent 自有平行实现：能删除就删除，改为复用 Craft。
+- OPC Agent 自有平行实现：能删除就删除，改为复用 Craft。
 - 删除功能残留：沿完整依赖闭包物理删除。
 - Host 差异：保留在 Electron、WebUI/headless 或 CLI 的宿主边界，不污染共享 core。
 - 注释、日志和抽象：没有必要性证明就不新增。
@@ -225,7 +225,7 @@ CRAFT_AGENT_SOURCE=/Volumes/SAMSUNG/workspace/agents/craft-agents-oss \
 
 - Renderer 每个差异文件单独登记，不允许目录级 allowlist。
 - 保留页面的组件树、状态、样式、图标、文案和交互以 Craft 为源。
-- MkAgent 只删除排除入口或适配 Pi/Lite 接口。
+- OPC Agent 只删除排除入口或适配 Pi/Lite 接口。
 - 不创建“看起来像 Craft”的替代组件。
 
 运行时至少覆盖：
@@ -313,7 +313,7 @@ macOS 本地构建通过不能替代 Windows/Linux 安装包的实际验证。�
 4. 扫描新增行中的 API key、token 和私有路径。
 5. 确认 Craft 工作区未被修改。
 6. 暂存后运行 `git diff --cached --check` 并复核 staged stat。
-7. 提交后确认 MkAgent 工作区干净，并记录 commit。
+7. 提交后确认 OPC Agent 工作区干净，并记录 commit。
 
 提交应该按目的拆分：明确问题修复与全面审核修复分开，品牌机械替换与功能修改分开，避免不可审查的大杂烩。
 
@@ -329,11 +329,11 @@ eac5792 fix: enforce file-level Craft parity
 
 | 指标 | 结果 |
 |---|---:|
-| MkAgent 审核文件 | 1,299 |
+| OPC Agent 审核文件 | 1,299 |
 | 与 Craft 同相对路径 | 1,238（95.3%） |
 | 品牌归一后完全一致 | 764（58.8%） |
 | Craft 派生差异文件 | 474 |
-| MkAgent 独有文件 | 61 |
+| OPC Agent 独有文件 | 61 |
 | 已审核 Craft-only 删除 | 627 |
 
 ### 5.2 Renderer
@@ -387,7 +387,7 @@ eac5792 fix: enforce file-level Craft parity
 只有同时满足以下条件，才能宣称本轮审核完成：
 
 - [ ] 已记录 Craft 固定 commit，Craft 工作区未被修改。
-- [ ] MkAgent 所有准备提交的文件都进入血缘审计。
+- [ ] OPC Agent 所有准备提交的文件都进入血缘审计。
 - [ ] 没有目录级宽泛豁免。
 - [ ] 每个差异、独有和删除文件都有逐文件原因。
 - [ ] 保留 UI 的源码检查和真实交互检查都通过。
@@ -414,13 +414,13 @@ eac5792 fix: enforce file-level Craft parity
 
 ## 9. 2026-07-30 LLM 订阅 OAuth 恢复审核
 
-本轮在 `dev/llm_oauth` 分支恢复 ChatGPT Plus 与 Claude Pro/Max 订阅登录，继续保持唯一 Agent backend 为 Pi。实现直接复用 Craft 的 ChatGPT/Claude OAuth、PKCE、callback 页面、onboarding 和凭据结构，只在 MkAgent 品牌、宿主边界以及 Pi OAuth 凭据刷新回写处做必要定制。未恢复 Claude Agent SDK、GitHub Copilot、Sources、MCP 或通用 OAuth。
+本轮在 `dev/llm_oauth` 分支恢复 ChatGPT Plus 与 Claude Pro/Max 订阅登录，继续保持唯一 Agent backend 为 Pi。实现直接复用 Craft 的 ChatGPT/Claude OAuth、PKCE、callback 页面、onboarding 和凭据结构，只在 OPC Agent 品牌、宿主边界以及 Pi OAuth 凭据刷新回写处做必要定制。未恢复 Claude Agent SDK、GitHub Copilot、Sources、MCP 或通用 OAuth。
 
 ### 9.1 依赖闭包检查
 
 - Desktop：恢复 Craft 的 Claude code flow 与 ChatGPT localhost callback；OAuth 凭据按 LLM connection slug 安全存储。
 - WebUI：可使用服务器已有的 OAuth connection；新的 ChatGPT localhost 登录仍明确限制在 Desktop，Claude 保留手工 code flow。
-- Pi：父进程向子进程传递完整 OAuth credential；Pi 刷新 access token 后回写 MkAgent 凭据存储，并在后续 prompt、mini query 和 query 前同步最新值。
+- Pi：父进程向子进程传递完整 OAuth credential；Pi 刷新 access token 后回写 OPC Agent 凭据存储，并在后续 prompt、mini query 和 query 前同步最新值。
 - 产品边界：内置 connection 只有 Claude、ChatGPT 和 Pi API key；没有 Copilot、Sources/MCP 或 Claude SDK backend。
 
 ### 9.2 自动化结果
@@ -430,7 +430,7 @@ eac5792 fix: enforce file-level Craft parity
 | 普通测试 | 3,176 pass，11 个 Windows-only skip，0 fail |
 | isolated tests | 37 pass，0 fail |
 | `typecheck:all` / `validate:ci` | 通过 |
-| Craft 文件血缘 | 1,332 个 MkAgent 文件；1,246 个同路径；770 个归一化一致；476 个登记差异；86 个 MkAgent-only；619 个审核删除 |
+| Craft 文件血缘 | 1,332 个 OPC Agent 文件；1,246 个同路径；770 个归一化一致；476 个登记差异；86 个 OPC-Agent-only；619 个审核删除 |
 | Craft UI 血缘 | 283 个归一化一致，101 个逐文件登记差异，384 个 Renderer 文件 |
 | Craft 测试覆盖 | 373 个 Craft 测试全部分类；246 同路径、5 替代、122 随删除能力排除；31 个 case 减少已审核 |
 | lint | 0 error；70 个既有 React Hook warning |

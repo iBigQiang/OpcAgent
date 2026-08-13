@@ -20,7 +20,7 @@ import { DIFFS_TAG_NAME } from '@pierre/diffs'
 import { cn } from '../../lib/utils'
 import { CodeBlock } from './CodeBlock'
 import { ensureUnifiedDiffFormat } from './diff-normalize'
-import { registerMkAgentShikiThemes } from '../code-viewer/registerShikiThemes'
+import { registerOPCAgentShikiThemes } from '../code-viewer/registerShikiThemes'
 
 // ── Custom element + theme registration (same as ShikiDiffViewer) ──────────
 // Idempotent: safe to run even if ShikiDiffViewer already registered these.
@@ -37,7 +37,7 @@ if (typeof HTMLElement !== 'undefined' && !customElements.get(DIFFS_TAG_NAME)) {
 }
 
 // Register custom themes once per runtime.
-registerMkAgentShikiThemes()
+registerOPCAgentShikiThemes()
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -90,7 +90,7 @@ export interface MarkdownDiffBlockProps {
 
 export function MarkdownDiffBlock({ code, className }: MarkdownDiffBlockProps) {
   const dark = isDarkMode()
-  const themeName = dark ? 'mkagent-dark' : 'mkagent-light'
+  const themeName = dark ? 'opcagent-dark' : 'opcagent-light'
 
   // Build the same options used in ShikiDiffViewer for visual consistency
   const options: PatchDiffProps<undefined>['options'] = React.useMemo(() => ({

@@ -28,20 +28,20 @@ const CONFIG_FILE_PATTERNS: { pattern: RegExp; type: ConfigFileType }[] = [
 ];
 
 /**
- * MkAgent specific config files that have known schemas.
+ * OPCAgent specific config files that have known schemas.
  */
-const MKAGENT_AGENT_CONFIG_PATTERNS = [
+const OPCAGENT_AGENT_CONFIG_PATTERNS = [
   // Main config
-  /\.mkagent\/config\.json$/,
+  /\.opcagent\/config\.json$/,
   // Preferences
-  /\.mkagent\/preferences\.json$/,
+  /\.opcagent\/preferences\.json$/,
   // Permissions
-  /\.mkagent\/workspaces\/[^/]+\/permissions\.json$/,
-  /\.mkagent\/permissions\/[^/]+\.json$/,
+  /\.opcagent\/workspaces\/[^/]+\/permissions\.json$/,
+  /\.opcagent\/permissions\/[^/]+\.json$/,
   // Theme
-  /\.mkagent\/workspaces\/[^/]+\/theme\.json$/,
+  /\.opcagent\/workspaces\/[^/]+\/theme\.json$/,
   // Tool icons
-  /\.mkagent\/tool-icons\/tool-icons\.json$/,
+  /\.opcagent\/tool-icons\/tool-icons\.json$/,
 ];
 
 function normalizeConfigPathForMatch(filePath: string): string {
@@ -49,7 +49,7 @@ function normalizeConfigPathForMatch(filePath: string): string {
   return process.platform === 'win32' ? normalized.toLowerCase() : normalized;
 }
 
-function isMkAgentConfigPath(filePath: string): boolean {
+function isOPCAgentConfigPath(filePath: string): boolean {
   const normalized = normalizeConfigPathForMatch(filePath);
   const configRoot = normalizeConfigPathForMatch(CONFIG_DIR).replace(/\/+$/, '');
   if (!normalized.startsWith(`${configRoot}/`)) return false;
@@ -114,14 +114,14 @@ export class ConfigValidator {
   }
 
   /**
-   * Check if a file path is a MkAgent config file.
+   * Check if a file path is a OPCAgent config file.
    *
    * @param filePath - Path to check
-   * @returns true if this is a MkAgent config
+   * @returns true if this is a OPCAgent config
    */
   isCraftAgentConfig(filePath: string): boolean {
     const normalizedPath = normalizeConfigPathForMatch(filePath);
-    return isMkAgentConfigPath(normalizedPath) || MKAGENT_AGENT_CONFIG_PATTERNS.some((pattern) => pattern.test(normalizedPath));
+    return isOPCAgentConfigPath(normalizedPath) || OPCAGENT_AGENT_CONFIG_PATTERNS.some((pattern) => pattern.test(normalizedPath));
   }
 
   // ============================================================

@@ -9,11 +9,13 @@ const repoRoot = resolve(import.meta.dir, '..')
 const rendererRoot = 'apps/electron/src/renderer'
 const restored = JSON.parse(readFileSync(resolve(import.meta.dir, 'craft-restored-sources.json'), 'utf8')) as { liteBaseline: string; productBaseline: string; restoredSource: string; integrationReview: Record<string, string>; features: Array<{ name: string; sourcePrefixes: string[]; requiredCurrent: string[]; testAnchors: string[] }> }
 const manifest = JSON.parse(readFileSync(resolve(import.meta.dir, 'craft-ui-overrides.json'), 'utf8')) as { version: number; files: Record<string, { sha256: string; reason: string }> }
+const sourceOverrides = JSON.parse(readFileSync(resolve(import.meta.dir, 'craft-source-overrides.json'), 'utf8')) as { modified: Record<string, { sha256: string; reason: string }>; mkOnly: Record<string, { sha256: string; reason: string }> }
 if (manifest.version !== 2) throw new Error('Unsupported Craft UI override manifest version')
 function git(args: string[]): string { const result = Bun.spawnSync(['git', '-C', repoRoot, ...args], { stdout: 'pipe', stderr: 'pipe' }); if (result.exitCode !== 0) throw new Error(result.stderr.toString()); return result.stdout.toString() }
 function tree(commit: string): Set<string> { return new Set(git(['ls-tree', '-r', '--name-only', '-z', commit]).split('\0').filter(Boolean)) }
 function list(dir: string): string[] { return readdirSync(resolve(repoRoot, dir), { withFileTypes: true }).flatMap(entry => { const path = `${dir}/${entry.name}`; return entry.isDirectory() ? list(path) : [path] }) }
 function restoredUi(path: string): boolean { return restored.features.some(feature => feature.testAnchors.includes(path) || feature.sourcePrefixes.some(prefix => path === prefix || path.startsWith(prefix))) }
+function sha256(path: string): string { return createHash('sha256').update(readFileSync(resolve(repoRoot, path))).digest('hex') }
 
 const source = tree(restored.restoredSource)
 const product = tree(restored.productBaseline)
@@ -31,8 +33,9 @@ for (const feature of restored.features) {
 for (const path of files) {
   if (restoredUi(path)) continue
   if (!changedFromProduct.has(path) && product.has(path)) continue
-  const reason = restored.integrationReview[path]
-  if (!reason?.trim()) errors.push(`unreviewed product-baseline renderer change: ${path}`)
+  const review = sourceOverrides.modified[path] ?? sourceOverrides.mkOnly[path]
+  if (!review?.reason.trim()) errors.push(`unreviewed product-baseline renderer change: ${path}`)
+  else if (sha256(path) !== review.sha256) errors.push(`reviewed renderer hash mismatch: ${path}`)
 }
 for (const [path, review] of Object.entries(restored.integrationReview)) {
   if (!path.startsWith(`${rendererRoot}/`)) continue

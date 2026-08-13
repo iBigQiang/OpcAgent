@@ -1,5 +1,5 @@
 import * as React from 'react'
-import type { AnnotationV1 } from '@mkagent/core'
+import type { AnnotationV1 } from '@opcagent/core'
 import { Tooltip, TooltipContent, TooltipTrigger } from '../tooltip'
 import { cn } from '../../lib/utils'
 import { getAnnotationRectVisual, getAnnotationChipVisual } from './annotation-style-tokens'

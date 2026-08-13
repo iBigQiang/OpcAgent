@@ -296,7 +296,7 @@ export interface SystemPromptOptions {
 
 /**
  * System prompt preset types for different agent contexts.
- * - 'default': Full MkAgent system prompt
+ * - 'default': Full OPCAgent system prompt
  * - 'mini': Focused prompt for quick configuration edits
  */
 export type SystemPromptPreset = 'default' | 'mini';
@@ -312,7 +312,7 @@ export function getMiniAgentSystemPrompt(workspaceRootPath?: string): string {
     ? `\n## Workspace\nConfig files are in: \`${workspaceRootPath}\`\n- Skills: \`skills/{slug}/SKILL.md\`\n- Permissions: \`permissions.json\`\n`
     : '';
 
-  return `You are a focused assistant for quick configuration edits in MkAgent.
+  return `You are a focused assistant for quick configuration edits in OPCAgent.
 
 ## Your Role
 You help users make targeted changes to configuration files. Be concise and efficient.
@@ -375,7 +375,7 @@ export function getSystemPrompt(
   // Note: Date/time context is now added to user messages instead of system prompt
   // to enable prompt caching. The system prompt stays static and cacheable.
   // Safe Mode context is also in user messages for the same reason.
-  const basePrompt = getMkAgentAssistantPrompt(workspaceRootPath, backendName, resolvedIncludeCoAuthoredBy);
+  const basePrompt = getOPCAgentAssistantPrompt(workspaceRootPath, backendName, resolvedIncludeCoAuthoredBy);
   const fullPrompt = `${basePrompt}${preferences}${projectBlock}${debugContext}${projectContextFiles}`;
 
   debug('[getSystemPrompt] full prompt length:', fullPrompt.length);
@@ -457,20 +457,20 @@ rg -n "session|auth|\"level\":\"error\"" "${logFilePath}" | tail -n 50
 }
 
 /**
- * Get the MkAgent environment marker for SDK JSONL detection.
+ * Get the OPCAgent environment marker for SDK JSONL detection.
  * This marker is embedded in the system prompt and allows us to identify
- * MkAgent sessions in exported JSONL data.
+ * OPCAgent sessions in exported JSONL data.
  */
-function getMkAgentEnvironmentMarker(): string {
+function getOPCAgentEnvironmentMarker(): string {
   const platform = process.platform; // 'darwin', 'win32', 'linux'
   const arch = process.arch; // 'arm64', 'x64'
   const osVersion = os.release(); // OS kernel version
 
-  return `<mkagent_environment version="${APP_VERSION}" platform="${platform}" arch="${arch}" os_version="${osVersion}" />`;
+  return `<opcagent_environment version="${APP_VERSION}" platform="${platform}" arch="${arch}" os_version="${osVersion}" />`;
 }
 
 /**
- * Get the MkAgent system prompt with workspace-specific paths.
+ * Get the OPCAgent system prompt with workspace-specific paths.
  *
  * This prompt is intentionally concise - detailed documentation lives in
  * ${APP_ROOT}/docs/ and is read on-demand when topics come up.
@@ -479,11 +479,11 @@ function getMkAgentEnvironmentMarker(): string {
  * @param backendName - Backend name for "powered by X" text (default: 'Claude Code')
  * @param includeCoAuthoredBy - Whether to include the Co-Authored-By git trailer instruction (default: true)
  */
-function getMkAgentAssistantPrompt(workspaceRootPath?: string, backendName: string = 'Pi', includeCoAuthoredBy: boolean = true): string {
+function getOPCAgentAssistantPrompt(workspaceRootPath?: string, backendName: string = 'Pi', includeCoAuthoredBy: boolean = true): string {
   // Default to ${APP_ROOT}/workspaces/{id} if no path provided
   const workspacePath = workspaceRootPath || `${APP_ROOT}/workspaces/{id}`;
 
-  const environmentMarker = getMkAgentEnvironmentMarker();
+  const environmentMarker = getOPCAgentEnvironmentMarker();
 
   const browserToolsSection = getBrowserToolEnabled() ? `
 ## Browser Tools
@@ -541,7 +541,7 @@ Use the browser for one-off and UI-driven tasks, or when a website has no suitab
 
   return `${environmentMarker}
 
-You are MkAgent - a desktop AI assistant powered by ${backendName}. You can reason, write and execute code, work with files and documents, browse the web, and use approved tools.
+You are OPCAgent - a desktop AI assistant powered by ${backendName}. You can reason, write and execute code, work with files and documents, browse the web, and use approved tools.
 
 ## External Sources
 
@@ -600,17 +600,17 @@ Read relevant context files using the Read tool - they contain architecture info
 | Image Preview | \`${DOC_REFS.imagePreview}\` | When displaying local image files inline |
 | Markdown Preview | \`${DOC_REFS.markdownPreview}\` | When displaying rendered .md files inline |
 | Browser Tools | \`${DOC_REFS.browserTools}\` | When using in-app browser tools (\`browser_tool\`) |
-| LLM Tool | \`${DOC_REFS.llmTool}\` | When using \`call_llm\` for subtasks |${FEATURE_FLAGS.mkagentCli ? `
-| MkAgent CLI | \`${DOC_REFS.mkagentCli}\` | When managing local workspaces and sessions |` : ''}
+| LLM Tool | \`${DOC_REFS.llmTool}\` | When using \`call_llm\` for subtasks |${FEATURE_FLAGS.opcagentCli ? `
+| OPCAgent CLI | \`${DOC_REFS.opcagentCli}\` | When managing local workspaces and sessions |` : ''}
 
-**IMPORTANT:** Always read the relevant doc file BEFORE making changes. Do NOT guess schemas - these have specific patterns that differ from standard approaches.${FEATURE_FLAGS.mkagentCli ? `
+**IMPORTANT:** Always read the relevant doc file BEFORE making changes. Do NOT guess schemas - these have specific patterns that differ from standard approaches.${FEATURE_FLAGS.opcagentCli ? `
 
-## MkAgent CLI
+## OPCAgent CLI
 
-Use \`mkagent\` for local workspace, session, connection, and configuration operations.
+Use \`opcagent\` for local workspace, session, connection, and configuration operations.
 
-- CLI help: \`mkagent --help\`
-- Canonical reference: \`${DOC_REFS.mkagentCli}\`` : ''}
+- CLI help: \`opcagent --help\`
+- Canonical reference: \`${DOC_REFS.opcagentCli}\`` : ''}
 
 ## User preferences
 
@@ -628,15 +628,12 @@ When you learn information about the user (their name, timezone, location, langu
 7. **Math Delimiters**: Use \`$$...$$\` for math expressions. Do NOT use single-dollar delimiters (\`$...$\`) in normal prose so currency values like \`$100\` or \`$2M–$4M\` stay plain text.
 8. **Approximate-Length Writing**: For pure-text creative requests such as “about N characters/words/tokens,” write directly without calling tools to count. Only when the user explicitly requires an exact count or strict limit, count at most once after drafting, preferably with an available \`transform_data\` tool. If counting fails, do not retry across multiple runtimes; deliver the result and say precise verification was unavailable.
 
-!!IMPORTANT!!. You must refer to yourself as MkAgent when asked. You can acknowledge that you are powered by ${backendName}.
+!!IMPORTANT!!. You must refer to yourself as OPCAgent when asked. You can acknowledge that you are powered by ${backendName}.
 
 ${includeCoAuthoredBy ? `## Git Conventions
 
-When creating git commits, include MkAgent as a co-author:
+When creating git commits, use the repository's configured author identity. Do not add an OPCAgent co-author unless the user explicitly provides one.
 
-\`\`\`
-Co-Authored-By: MkAgent <agents-noreply@mkagent.app>
-\`\`\`
 ` : ''}## Permission Modes
 
 | Mode | Description |
@@ -1090,7 +1087,7 @@ These help with UI feedback and result summarization.${FEATURE_FLAGS.developerFe
 
 ## Developer Feedback
 
-You have a \`send_developer_feedback\` tool — a direct line to the MkAgent development team.
+You have a \`send_developer_feedback\` tool — a direct line to the OPCAgent development team.
 
 **Share freely — issues, ideas, suggestions, anything:**
 - Tools returning wrong results, missing data, confusing behavior

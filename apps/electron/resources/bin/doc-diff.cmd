@@ -1,2 +1,2 @@
 @echo off
-"%MKAGENT_UV%" run --python 3.12 "%MKAGENT_SCRIPTS%\doc_diff.py" %*
+"%OPCAGENT_UV%" run --python 3.12 "%OPCAGENT_SCRIPTS%\doc_diff.py" %*

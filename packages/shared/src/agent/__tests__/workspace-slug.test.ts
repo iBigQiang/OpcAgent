@@ -102,11 +102,11 @@ describe('workspace slug extraction', () => {
   })
 
   it('handles Windows-style paths with backslashes', () => {
-    expect(extractWorkspaceSlug('C:\\Users\\ghalmos\\.mkagent\\workspaces\\my-workspace', fallback)).toBe('my-workspace')
+    expect(extractWorkspaceSlug('C:\\Users\\ghalmos\\.opcagent\\workspaces\\my-workspace', fallback)).toBe('my-workspace')
   })
 
   it('handles Windows paths with tilde and backslashes', () => {
-    expect(extractWorkspaceSlug('~\\.mkagent\\workspaces\\my-workspace', fallback)).toBe('my-workspace')
+    expect(extractWorkspaceSlug('~\\.opcagent\\workspaces\\my-workspace', fallback)).toBe('my-workspace')
   })
 
   it('handles hyphenated workspace names', () => {

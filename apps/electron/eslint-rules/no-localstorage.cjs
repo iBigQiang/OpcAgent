@@ -1,9 +1,9 @@
 /**
  * ESLint Rule: no-localstorage
  *
- * Warns against using localStorage in MkAgent codebase.
+ * Warns against using localStorage in OPC Agent codebase.
  * All persistent user settings should be stored in file-based configs
- * (preferences.json, workspace configs) for consistency with MkAgent
+ * (preferences.json, workspace configs) for consistency with OPCAgent
  * architecture principles.
  *
  * Bad:
@@ -34,7 +34,7 @@ module.exports = {
     },
     messages: {
       noLocalStorage:
-        "Avoid localStorage in MkAgent. Store settings in ~/.mkagent/preferences.json using window.electronAPI.readPreferences/writePreferences. See packages/shared/src/config/preferences.ts for the preferences API.",
+        "Avoid localStorage in OPC Agent. Store settings in ~/.opcagent/preferences.json using window.electronAPI.readPreferences/writePreferences. See packages/shared/src/config/preferences.ts for the preferences API.",
     },
     schema: [],
   },

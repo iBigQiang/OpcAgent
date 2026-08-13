@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'bun:test'
 import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { RPC_CHANNELS } from '@mkagent/shared/protocol'
+import { RPC_CHANNELS } from '@opcagent/shared/protocol'
 import { SessionManager, createManagedSession } from './SessionManager.ts'
 
 describe('loaded project session unbinding', () => {
@@ -10,7 +10,7 @@ describe('loaded project session unbinding', () => {
   let manager: SessionManager
 
   beforeEach(() => {
-    root = mkdtempSync(join(tmpdir(), 'mkagent-project-unbind-'))
+    root = mkdtempSync(join(tmpdir(), 'opcagent-project-unbind-'))
     manager = new SessionManager()
   })
 

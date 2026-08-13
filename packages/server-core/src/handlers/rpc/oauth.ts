@@ -1,9 +1,9 @@
 import { randomUUID } from 'node:crypto'
-import { RPC_CHANNELS } from '@mkagent/shared/protocol'
-import { getWorkspaceByNameOrId } from '@mkagent/shared/config'
-import { loadSource, loadWorkspaceSources, getSourceCredentialManager } from '@mkagent/shared/sources'
-import { createPendingFlow } from '@mkagent/shared/auth'
-import { pushTyped, type RpcServer } from '@mkagent/server-core/transport'
+import { RPC_CHANNELS } from '@opcagent/shared/protocol'
+import { getWorkspaceByNameOrId } from '@opcagent/shared/config'
+import { loadSource, loadWorkspaceSources, getSourceCredentialManager } from '@opcagent/shared/sources'
+import { createPendingFlow } from '@opcagent/shared/auth'
+import { pushTyped, type RpcServer } from '@opcagent/server-core/transport'
 import type { HandlerDeps } from '../handler-deps'
 
 export const HANDLED_CHANNELS = [

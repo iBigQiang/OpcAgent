@@ -17,7 +17,7 @@ GitHub Copilot、Craft gateway、Sources OAuth 与通用 OAuth 连接仍不支�
 
 ## 连接类型 vs 认证类型
 
-这两个字段来自 `packages/shared/src/config/llm-connections.ts` 中的 `LlmConnection`,共同决定 MkAgent 如何连上一个模型。
+这两个字段来自 `packages/shared/src/config/llm-connections.ts` 中的 `LlmConnection`,共同决定 OPC Agent 如何连上一个模型。
 
 | 字段 | 取值 | 决定 |
 |---|---|---|
@@ -108,7 +108,7 @@ Claude Pro/Max 使用相同结构，`slug` 为 `claude-max`，`piAuthProvider` �
 Settings UI / Craft OAuth flow
    │  API key 或 OAuth access + refresh + expiry
    ▼
-@mkagent/shared/credentials
+@opcagent/shared/credentials
    │  持久化到 OS keychain(Keychain / libsecret / Credential Vault)
    ▼
 连接记录(不存明文 key)
@@ -124,9 +124,9 @@ Pi 刷新:新 OAuth 凭证回传父进程并持久化
 
 ## 限制
 
-- MkAgent 不把环境变量当作凭证存储的替代,只在 CLI 的 `--api-key` 与 `LLM_API_KEY` 自包含 run 模式下读取。Desktop / WebUI 始终从凭证管理器读。
+- OPC Agent 不把环境变量当作凭证存储的替代,只在 CLI 的 `--api-key` 与 `LLM_API_KEY` 自包含 run 模式下读取。Desktop / WebUI 始终从凭证管理器读。
 - 不支持 workspace 级连接;连接注册表是全局的,workspace 只能 pin 一个 `defaultConnectionId`。
-- 配额与限流监控交给 provider;MkAgent 原样透传 provider 上报的 error。
+- 配额与限流监控交给 provider;OPC Agent 原样透传 provider 上报的 error。
 
 ## 刻意不实现的部分
 

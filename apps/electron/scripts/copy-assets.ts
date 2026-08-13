@@ -5,9 +5,9 @@ const appDir = join(import.meta.dir, '..')
 const rootDir = join(appDir, '..', '..')
 const source = join(appDir, 'resources')
 const destination = join(appDir, 'dist', 'resources')
-const targetPlatform = process.env.MKAGENT_TARGET_PLATFORM ?? process.platform
-const targetArch = process.env.MKAGENT_TARGET_ARCH ?? process.arch
-const hasExplicitTarget = Boolean(process.env.MKAGENT_TARGET_PLATFORM || process.env.MKAGENT_TARGET_ARCH)
+const targetPlatform = process.env.OPCAGENT_TARGET_PLATFORM ?? process.platform
+const targetArch = process.env.OPCAGENT_TARGET_ARCH ?? process.arch
+const hasExplicitTarget = Boolean(process.env.OPCAGENT_TARGET_PLATFORM || process.env.OPCAGENT_TARGET_ARCH)
 const platformKey = `${targetPlatform}-${targetArch}`
 
 const docNames = [

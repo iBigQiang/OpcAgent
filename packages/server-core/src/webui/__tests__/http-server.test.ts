@@ -18,7 +18,7 @@ const logger = {
 } as any
 
 function createTestWebuiDir(): string {
-  const dir = mkdtempSync(join(tmpdir(), 'mkagent-webui-test-'))
+  const dir = mkdtempSync(join(tmpdir(), 'opcagent-webui-test-'))
   TEMP_DIRS.push(dir)
   writeFileSync(join(dir, 'login.html'), '<!doctype html><html><body>login</body></html>')
   writeFileSync(join(dir, 'index.html'), '<!doctype html><html><body>app</body></html>')
@@ -81,7 +81,7 @@ describe('startWebuiHttpServer', () => {
 
     expect(authRes.status).toBe(200)
     const setCookie = authRes.headers.get('set-cookie')
-    expect(setCookie).toContain('mkagent_session=')
+    expect(setCookie).toContain('opcagent_session=')
     expect(setCookie).not.toContain('Secure')
 
     const configRes = await fetch(`${baseUrl}/api/config`, {
@@ -146,7 +146,7 @@ describe('startWebuiHttpServer', () => {
       headers: {
         'Content-Type': 'application/json',
         'X-Forwarded-Proto': 'https',
-        'X-Forwarded-Host': 'mkagent.example.com:3100',
+        'X-Forwarded-Host': 'app.example.com:3100',
       },
       body: JSON.stringify({ password: PASSWORD }),
     })
@@ -155,19 +155,19 @@ describe('startWebuiHttpServer', () => {
       headers: {
         cookie: extractSessionCookie(authRes),
         'X-Forwarded-Proto': 'https',
-        'X-Forwarded-Host': 'mkagent.example.com:3100',
+        'X-Forwarded-Host': 'app.example.com:3100',
       },
     })
 
     expect(configRes.status).toBe(200)
     expect(await configRes.json()).toEqual({
-      wsUrl: 'wss://mkagent.example.com:9100',
+      wsUrl: 'wss://app.example.com:9100',
     })
   })
 
   it('returns an explicit public websocket URL override from /api/config', async () => {
     const { baseUrl } = await createServer({
-      publicWsUrl: 'wss://mkagent.example.com/ws',
+      publicWsUrl: 'wss://app.example.com/ws',
       wsProtocol: 'wss',
       wsPort: 9100,
     })
@@ -186,7 +186,7 @@ describe('startWebuiHttpServer', () => {
 
     expect(configRes.status).toBe(200)
     expect(await configRes.json()).toEqual({
-      wsUrl: 'wss://mkagent.example.com/ws',
+      wsUrl: 'wss://app.example.com/ws',
     })
   })
 
@@ -231,7 +231,7 @@ describe('startWebuiHttpServer', () => {
     const response = await handler.fetch(new Request('http://localhost/api/attachments', {
       method: 'POST',
       headers: {
-        cookie: `mkagent_session=${token}`,
+        cookie: `opcagent_session=${token}`,
         'content-length': String(102 * 1024 * 1024),
       },
       body: new Uint8Array(),

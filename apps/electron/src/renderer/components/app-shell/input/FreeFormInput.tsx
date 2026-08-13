@@ -12,7 +12,7 @@ import {
   DatabaseZap,
   Image as ImageIcon,
 } from 'lucide-react'
-import { Icon_Home, Spinner } from '@mkagent/ui'
+import { Icon_Home, Spinner } from '@opcagent/ui'
 
 import * as storage from '@/lib/local-storage'
 import { Button } from '@/components/ui/button'
@@ -29,7 +29,7 @@ import {
 } from '@/components/ui/mention-menu'
 import { parseMentions } from '@/lib/mentions'
 import { RichTextInput, type RichTextInputHandle } from '@/components/ui/rich-text-input'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@mkagent/ui'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@opcagent/ui'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -65,8 +65,8 @@ import { ConnectionIcon } from '@/components/icons/ConnectionIcon'
 import { FreeFormInputContextBadge } from './FreeFormInputContextBadge'
 import { derivePickerMode } from './picker-mode'
 import type { FileAttachment, LoadedSource, LoadedSkill } from '../../../../shared/types'
-import type { PermissionMode } from '@mkagent/shared/agent/modes'
-import { type ThinkingLevel, THINKING_LEVELS, getThinkingLevelNameKey } from '@mkagent/shared/agent/thinking-levels'
+import type { PermissionMode } from '@opcagent/shared/agent/modes'
+import { type ThinkingLevel, THINKING_LEVELS, getThinkingLevelNameKey } from '@opcagent/shared/agent/thinking-levels'
 import { useEscapeInterrupt } from '@/context/EscapeInterruptContext'
 import { hasOpenOverlay } from '@/lib/overlay-detection'
 import { ToolbarStatusSlot } from './ToolbarStatusSlot'
@@ -87,7 +87,7 @@ import {
 } from './model-picker-helpers'
 import { useModelVisionToggle } from './useModelVisionToggle'
 import { LabelBadgeRow } from '@/components/ui/label-badge-row'
-import type { LabelConfig } from '@mkagent/shared/labels'
+import type { LabelConfig } from '@opcagent/shared/labels'
 
 function formatFollowUpChipText(text: string, fallback: string, maxLength = 50): string {
   const normalized = text.replace(/\s+/g, ' ').trim()

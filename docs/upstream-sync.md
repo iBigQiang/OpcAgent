@@ -1,6 +1,6 @@
 # Upstream synchronization
 
-MkAgent derives its architecture, UI, and runtime from [Craft Agents OSS](https://github.com/craft-ai-agents/craft-agents-oss). This document defines the workflow for absorbing new Craft changes while staying inside the Lite boundary.
+OPC Agent derives its architecture, UI, and runtime from [Craft Agents OSS](https://github.com/craft-ai-agents/craft-agents-oss). This document defines the workflow for absorbing new Craft changes while staying inside the Lite boundary.
 
 ## Baseline (current)
 
@@ -16,7 +16,7 @@ When upstream publishes a new tag worth evaluating:
 2. Add the commit to this document so the "current baseline" stays a single source of truth.
 3. Move through the steps below using the new commit.
 
-Reference checkouts (`../craft-agents-oss`, `../echo`, `../xagent`) stay read-only during MkAgent work.
+Reference checkouts (`../craft-agents-oss`, `../echo`, `../xagent`) stay read-only during OPC Agent work.
 
 ## Sync procedure
 
@@ -36,12 +36,12 @@ Reference checkouts (`../craft-agents-oss`, `../echo`, `../xagent`) stay read-on
   │    for each upstream commit touching a same-path file:           │
   │      classify:  STRICT_REUSE  |  LITE_SEAM  |  REMOVED_FEATURE    │
   │      STRICT_REUSE:  take the file as-is, regenerate hashes       │
-  │      LITE_SEAM:     merge manually, keep MkAgent seams            │
+  │      LITE_SEAM:     merge manually, keep OPC Agent seams            │
   │      REMOVED_FEATURE: do not import; document why in the seam    │
   │                                                                  │
-  │ 4. Add upstream-only features that fit MkAgent                    │
-  │      new feature scope → mkagent migration-review issue           │
-  │      outside scope     → keep MkAgent Lite                        │
+  │ 4. Add upstream-only features that fit OPC Agent                    │
+  │      new feature scope → opcagent migration-review issue           │
+  │      outside scope     → keep OPC Agent Lite                        │
   │                                                                  │
   │ 5. Validate                                                       │
   │    bun run typecheck:all                                          │
@@ -55,7 +55,7 @@ Reference checkouts (`../craft-agents-oss`, `../echo`, `../xagent`) stay read-on
   │    bun run server:build:subprocess                                │
   │                                                                  │
   │ 6. GUI smoke against a fresh config dir                           │
-  │    rm -rf /tmp/mkagent-smoke && CONFIG_DIR=/tmp/mkagent-smoke \│
+  │    rm -rf /tmp/opcagent-smoke && CONFIG_DIR=/tmp/opcagent-smoke \│
   │       bun run electron:dist:dev:mac                              │
   │    + headless smoke: bun run server:dev:webui                     │
   └──────────────────────────────────────────────────────────────────┘
@@ -66,14 +66,14 @@ Reference checkouts (`../craft-agents-oss`, `../echo`, `../xagent`) stay read-on
 | Class | Rule | Validation |
 |---|---|---|
 | `STRICT_REUSE` | Same relative path, mechanical differences only (scope, URL scheme, config root, brand strings) | `audit:craft-reuse` byte-equal after normalization |
-| `LITE_SEAM` | Same relative path with branches removed for excluded features, or wired into MkAgent-only interfaces | Manual semantic review; targeted unit/integration tests; typecheck |
-| `REMOVED_FEATURE` | File is removed entirely from MkAgent because the corresponding product area is gone | Path, call sites, build closure, and `lint:craft-test-coverage` tag |
+| `LITE_SEAM` | Same relative path with branches removed for excluded features, or wired into OPC-Agent-only interfaces | Manual semantic review; targeted unit/integration tests; typecheck |
+| `REMOVED_FEATURE` | File is removed entirely from OPC Agent because the corresponding product area is gone | Path, call sites, build closure, and `lint:craft-test-coverage` tag |
 
 Adding upstream-only features starts with the Lite question first; only features that fit the Lite boundary should be picked up.
 
 ## Override manifests
 
-Two source-of-truth files record which MkAgent files deviate from Craft:
+Two source-of-truth files record which OPC Agent files deviate from Craft:
 
 - `scripts/craft-source-overrides.json` (tracking all `apps/`, `packages/` source files)
 - `scripts/craft-ui-overrides.json` (renderer-focused subset, 386 entries)
@@ -102,4 +102,4 @@ These are recorded as Lite-boundary deletions in [`comparison-with-craft.md`](./
 | `lint:craft-test-coverage` shows a "missing" tag | A Craft test moved or was added without classification | update the seam classification in `scripts/check-craft-test-coverage.ts` |
 | Type error in `apps/electron/src/main` only after a sync | Upstream introduced a new env var or platform helper | confirm it survives the Lite seam; document before commit |
 | Renderer asset 404 in packaged build | New Craft asset added without updating `scripts/copy-assets.ts` | add the asset to the copy list and rebuild |
-| `electron:build` succeeds but `MkAgent Helper` lacks a Claude/Sources plugin | Confirm `appId` is `app.mkagent.desktop` and `@mkagent/*` is the only scope in `extraResources` | check `apps/electron/electron-builder.yml` |
+| `electron:build` succeeds but `OPC Agent Helper` lacks a Claude/Sources plugin | Confirm `appId` is `app.opcagent.desktop` and `@opcagent/*` is the only scope in `extraResources` | check `apps/electron/electron-builder.yml` |

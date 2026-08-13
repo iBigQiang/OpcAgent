@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import { RPC_CHANNELS } from '@mkagent/shared/protocol'
+import { RPC_CHANNELS } from '@opcagent/shared/protocol'
 import { CHANNEL_MAP } from '../../../electron/src/transport/channel-map'
 
 describe('WebUI Client API contract', () => {

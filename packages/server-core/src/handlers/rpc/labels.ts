@@ -1,6 +1,6 @@
-import { RPC_CHANNELS } from '@mkagent/shared/protocol'
-import { getWorkspaceByNameOrId } from '@mkagent/shared/config'
-import { pushTyped, type RpcServer } from '@mkagent/server-core/transport'
+import { RPC_CHANNELS } from '@opcagent/shared/protocol'
+import { getWorkspaceByNameOrId } from '@opcagent/shared/config'
+import { pushTyped, type RpcServer } from '@opcagent/server-core/transport'
 import type { HandlerDeps } from '../handler-deps'
 
 export const HANDLED_CHANNELS = [
@@ -25,28 +25,28 @@ export function registerLabelsHandlers(server: RpcServer, _deps: HandlerDeps): v
     const workspace = getWorkspaceByNameOrId(requestedWorkspaceId)
     if (!workspace) throw new Error('Workspace not found')
 
-    const { listLabels } = await import('@mkagent/shared/labels/storage')
+    const { listLabels } = await import('@opcagent/shared/labels/storage')
     return listLabels(workspace.rootPath)
   })
 
   // Create a new label in a workspace
-  server.handle(RPC_CHANNELS.labels.CREATE, async (ctx, requestedWorkspaceId: string, input: import('@mkagent/shared/labels').CreateLabelInput) => {
+  server.handle(RPC_CHANNELS.labels.CREATE, async (ctx, requestedWorkspaceId: string, input: import('@opcagent/shared/labels').CreateLabelInput) => {
     requireWorkspaceContext(ctx.workspaceId, requestedWorkspaceId)
     const workspace = getWorkspaceByNameOrId(requestedWorkspaceId)
     if (!workspace) throw new Error('Workspace not found')
 
-    const { createLabel } = await import('@mkagent/shared/labels/crud')
+    const { createLabel } = await import('@opcagent/shared/labels/crud')
     const label = createLabel(workspace.rootPath, input)
     pushTyped(server, RPC_CHANNELS.labels.CHANGED, { to: 'workspace', workspaceId: requestedWorkspaceId }, requestedWorkspaceId)
     return label
   })
 
-  server.handle(RPC_CHANNELS.labels.UPDATE, async (ctx, requestedWorkspaceId: string, labelId: string, updates: import('@mkagent/shared/labels').UpdateLabelInput) => {
+  server.handle(RPC_CHANNELS.labels.UPDATE, async (ctx, requestedWorkspaceId: string, labelId: string, updates: import('@opcagent/shared/labels').UpdateLabelInput) => {
     requireWorkspaceContext(ctx.workspaceId, requestedWorkspaceId)
     const workspace = getWorkspaceByNameOrId(requestedWorkspaceId)
     if (!workspace) throw new Error('Workspace not found')
 
-    const { updateLabel } = await import('@mkagent/shared/labels/crud')
+    const { updateLabel } = await import('@opcagent/shared/labels/crud')
     const label = updateLabel(workspace.rootPath, labelId, updates)
     pushTyped(server, RPC_CHANNELS.labels.CHANGED, { to: 'workspace', workspaceId: requestedWorkspaceId }, requestedWorkspaceId)
     return label
@@ -58,7 +58,7 @@ export function registerLabelsHandlers(server: RpcServer, _deps: HandlerDeps): v
     const workspace = getWorkspaceByNameOrId(requestedWorkspaceId)
     if (!workspace) throw new Error('Workspace not found')
 
-    const { deleteLabel } = await import('@mkagent/shared/labels/crud')
+    const { deleteLabel } = await import('@opcagent/shared/labels/crud')
     const result = await deleteLabel(workspace.rootPath, labelId)
     pushTyped(server, RPC_CHANNELS.labels.CHANGED, { to: 'workspace', workspaceId: requestedWorkspaceId }, requestedWorkspaceId)
     return result
@@ -69,7 +69,7 @@ export function registerLabelsHandlers(server: RpcServer, _deps: HandlerDeps): v
     const workspace = getWorkspaceByNameOrId(requestedWorkspaceId)
     if (!workspace) throw new Error('Workspace not found')
 
-    const { moveLabel } = await import('@mkagent/shared/labels/crud')
+    const { moveLabel } = await import('@opcagent/shared/labels/crud')
     moveLabel(workspace.rootPath, labelId, parentId)
     pushTyped(server, RPC_CHANNELS.labels.CHANGED, { to: 'workspace', workspaceId: requestedWorkspaceId }, requestedWorkspaceId)
   })
@@ -79,7 +79,7 @@ export function registerLabelsHandlers(server: RpcServer, _deps: HandlerDeps): v
     const workspace = getWorkspaceByNameOrId(requestedWorkspaceId)
     if (!workspace) throw new Error('Workspace not found')
 
-    const { reorderLabels } = await import('@mkagent/shared/labels/crud')
+    const { reorderLabels } = await import('@opcagent/shared/labels/crud')
     reorderLabels(workspace.rootPath, parentId, orderedIds)
     pushTyped(server, RPC_CHANNELS.labels.CHANGED, { to: 'workspace', workspaceId: requestedWorkspaceId }, requestedWorkspaceId)
   })

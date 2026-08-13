@@ -3,7 +3,7 @@ import type {
   StoredAttachment,
   StoredMessage,
   ToolStatus,
-} from '@mkagent/core/types';
+} from '@opcagent/core/types';
 import type { PermissionMode } from '../agent/mode-manager.ts';
 import type { ThinkingLevel } from '../agent/thinking-levels.ts';
 
@@ -35,7 +35,7 @@ export interface SessionTokenUsage {
   contextWindow?: number;
 }
 
-export type { StoredMessage } from '@mkagent/core/types';
+export type { StoredMessage } from '@opcagent/core/types';
 
 export interface PendingPlanExecution {
   planPath: string;

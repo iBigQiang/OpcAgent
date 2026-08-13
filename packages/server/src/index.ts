@@ -1,39 +1,39 @@
 #!/usr/bin/env bun
 /**
- * @mkagent/server — standalone headless MkAgent server.
+ * @opcagent/server — standalone headless OPCAgent server.
  *
  * Usage:
- *   MKAGENT_SERVER_TOKEN=<secret> bun run packages/server/src/index.ts
+ *   OPCAGENT_SERVER_TOKEN=<secret> bun run packages/server/src/index.ts
  *
  * Environment:
- *   MKAGENT_SERVER_TOKEN         — required bearer token for client auth
- *   MKAGENT_RPC_HOST             — bind address (default: 127.0.0.1)
- *   MKAGENT_RPC_PORT             — bind port (default: 9100)
- *   MKAGENT_RPC_TLS_CERT         — path to PEM certificate file (enables TLS/wss)
- *   MKAGENT_RPC_TLS_KEY          — path to PEM private key file (required with cert)
- *   MKAGENT_RPC_TLS_CA           — path to PEM CA chain file (optional)
- *   MKAGENT_APP_ROOT             — app root path (default: cwd)
- *   MKAGENT_RESOURCES_PATH       — resources path (default: cwd/resources)
- *   MKAGENT_IS_PACKAGED          — 'true' for production (default: false)
- *   MKAGENT_VERSION              — app version (default: 0.0.0-dev)
- *   MKAGENT_DEBUG                — 'true' for debug logging
- *   MKAGENT_WEBUI_DIR            — path to built web UI assets (enables web UI on RPC port)
- *   MKAGENT_WEBUI_PASSWORD       — optional shorter password for web login (falls back to MKAGENT_SERVER_TOKEN)
- *   MKAGENT_WEBUI_SECURE_COOKIE  — optional true/false override for the session cookie Secure flag
- *   MKAGENT_WEBUI_WS_URL         — optional browser-facing ws:// or wss:// URL returned by /api/config
+ *   OPCAGENT_SERVER_TOKEN         — required bearer token for client auth
+ *   OPCAGENT_RPC_HOST             — bind address (default: 127.0.0.1)
+ *   OPCAGENT_RPC_PORT             — bind port (default: 9100)
+ *   OPCAGENT_RPC_TLS_CERT         — path to PEM certificate file (enables TLS/wss)
+ *   OPCAGENT_RPC_TLS_KEY          — path to PEM private key file (required with cert)
+ *   OPCAGENT_RPC_TLS_CA           — path to PEM CA chain file (optional)
+ *   OPCAGENT_APP_ROOT             — app root path (default: cwd)
+ *   OPCAGENT_RESOURCES_PATH       — resources path (default: cwd/resources)
+ *   OPCAGENT_IS_PACKAGED          — 'true' for production (default: false)
+ *   OPCAGENT_VERSION              — app version (default: 0.0.0-dev)
+ *   OPCAGENT_DEBUG                — 'true' for debug logging
+ *   OPCAGENT_WEBUI_DIR            — path to built web UI assets (enables web UI on RPC port)
+ *   OPCAGENT_WEBUI_PASSWORD       — optional shorter password for web login (falls back to OPCAGENT_SERVER_TOKEN)
+ *   OPCAGENT_WEBUI_SECURE_COOKIE  — optional true/false override for the session cookie Secure flag
+ *   OPCAGENT_WEBUI_WS_URL         — optional browser-facing ws:// or wss:// URL returned by /api/config
  */
 
 import { join } from 'node:path'
 import { homedir } from 'node:os'
 import { readFileSync, existsSync } from 'node:fs'
 import { version as packageVersion } from '../package.json'
-import { enableDebug } from '@mkagent/shared/utils/debug'
-import { bootstrapServer, startHealthHttpServer, generateServerToken } from '@mkagent/server-core/bootstrap'
-import { validateSession, createWebuiHandler, nodeHttpAdapter } from '@mkagent/server-core/webui'
-import type { WebuiHandler } from '@mkagent/server-core/webui'
-import { getCredentialManager } from '@mkagent/shared/credentials'
-import { initializeBackendHostRuntime } from '@mkagent/shared/agent/backend'
-import { ensureDefaultPermissions } from '@mkagent/shared/agent/permissions-config'
+import { enableDebug } from '@opcagent/shared/utils/debug'
+import { bootstrapServer, startHealthHttpServer, generateServerToken } from '@opcagent/server-core/bootstrap'
+import { validateSession, createWebuiHandler, nodeHttpAdapter } from '@opcagent/server-core/webui'
+import type { WebuiHandler } from '@opcagent/server-core/webui'
+import { getCredentialManager } from '@opcagent/shared/credentials'
+import { initializeBackendHostRuntime } from '@opcagent/shared/agent/backend'
+import { ensureDefaultPermissions } from '@opcagent/shared/agent/permissions-config'
 import {
   addWorkspace,
   ensurePresetThemes,
@@ -42,25 +42,25 @@ import {
   getPiModelsForAuthProvider,
   getWorkspaces,
   registerPiModelResolver,
-} from '@mkagent/shared/config'
-import { initializeReleaseNotes } from '@mkagent/shared/release-notes'
-import { RPC_CHANNELS } from '@mkagent/shared/protocol'
-import { ensureDefaultWorkspace, getDefaultWorkspacesDir } from '@mkagent/shared/workspaces'
+} from '@opcagent/shared/config'
+import { initializeReleaseNotes } from '@opcagent/shared/release-notes'
+import { RPC_CHANNELS } from '@opcagent/shared/protocol'
+import { ensureDefaultWorkspace, getDefaultWorkspacesDir } from '@opcagent/shared/workspaces'
 
 // --generate-token: print a crypto-random token and exit
 if (process.argv.includes('--generate-token')) {
   console.log(generateServerToken())
   process.exit(0)
 }
-import type { WsRpcTlsOptions } from '@mkagent/server-core/transport'
-import { registerCoreRpcHandlers, cleanupSessionFileWatchForClient } from '@mkagent/server-core/handlers/rpc'
-import { SessionManager, setSessionPlatform, setSessionRuntimeHooks } from '@mkagent/server-core/sessions'
-import { initModelRefreshService, setFetcherPlatform } from '@mkagent/server-core/model-fetchers'
-import { setSearchPlatform, setImageProcessor } from '@mkagent/server-core/services'
-import type { HandlerDeps } from '@mkagent/server-core/handlers'
-import { createMessagingBootstrap } from '@mkagent/messaging-gateway'
+import type { WsRpcTlsOptions } from '@opcagent/server-core/transport'
+import { registerCoreRpcHandlers, cleanupSessionFileWatchForClient } from '@opcagent/server-core/handlers/rpc'
+import { SessionManager, setSessionPlatform, setSessionRuntimeHooks } from '@opcagent/server-core/sessions'
+import { initModelRefreshService, setFetcherPlatform } from '@opcagent/server-core/model-fetchers'
+import { setSearchPlatform, setImageProcessor } from '@opcagent/server-core/services'
+import type { HandlerDeps } from '@opcagent/server-core/handlers'
+import { createMessagingBootstrap } from '@opcagent/messaging-gateway'
 
-process.env.MKAGENT_IS_PACKAGED ??= 'false'
+process.env.OPCAGENT_IS_PACKAGED ??= 'false'
 
 // Prevent unhandled rejections from crashing the server.
 // SDK subprocess abort can reject promises that propagate up unhandled;
@@ -70,7 +70,7 @@ process.on('unhandledRejection', (reason) => {
   console.error(`[server] Unhandled rejection (caught, not crashing): ${msg}`)
 })
 
-if (process.env.MKAGENT_DEBUG === 'true' || process.env.MKAGENT_DEBUG === '1') {
+if (process.env.OPCAGENT_DEBUG === 'true' || process.env.OPCAGENT_DEBUG === '1') {
   enableDebug()
 }
 
@@ -102,41 +102,41 @@ function parseOptionalWebSocketUrl(name: string, value: string | undefined): str
 }
 
 // In dev (monorepo), bundled assets root is the repo root (4 levels up from this file).
-// In packaged mode, use MKAGENT_BUNDLED_ASSETS_ROOT env or cwd.
-const bundledAssetsRoot = process.env.MKAGENT_BUNDLED_ASSETS_ROOT
+// In packaged mode, use OPCAGENT_BUNDLED_ASSETS_ROOT env or cwd.
+const bundledAssetsRoot = process.env.OPCAGENT_BUNDLED_ASSETS_ROOT
   ?? join(import.meta.dir, '..', '..', '..', '..')
 
 registerPiModelResolver(provider => provider ? getPiModelsForAuthProvider(provider) : getAllPiModels())
 initializeBackendHostRuntime({
   hostRuntime: {
-    appRootPath: process.env.MKAGENT_APP_ROOT ?? bundledAssetsRoot,
-    resourcesPath: process.env.MKAGENT_RESOURCES_PATH ?? bundledAssetsRoot,
-    isPackaged: process.env.MKAGENT_IS_PACKAGED === 'true',
+    appRootPath: process.env.OPCAGENT_APP_ROOT ?? bundledAssetsRoot,
+    resourcesPath: process.env.OPCAGENT_RESOURCES_PATH ?? bundledAssetsRoot,
+    isPackaged: process.env.OPCAGENT_IS_PACKAGED === 'true',
   },
 })
 
 // TLS configuration — when cert + key paths are provided, server listens on wss://
 let tls: WsRpcTlsOptions | undefined
-const tlsCertPath = process.env.MKAGENT_RPC_TLS_CERT
-const tlsKeyPath = process.env.MKAGENT_RPC_TLS_KEY
+const tlsCertPath = process.env.OPCAGENT_RPC_TLS_CERT
+const tlsKeyPath = process.env.OPCAGENT_RPC_TLS_KEY
 if (tlsCertPath || tlsKeyPath) {
   if (!tlsCertPath || !tlsKeyPath) {
-    console.error('TLS requires both MKAGENT_RPC_TLS_CERT and MKAGENT_RPC_TLS_KEY.')
+    console.error('TLS requires both OPCAGENT_RPC_TLS_CERT and OPCAGENT_RPC_TLS_KEY.')
     process.exit(1)
   }
   tls = {
     cert: readFileSync(tlsCertPath),
     key: readFileSync(tlsKeyPath),
-    ...(process.env.MKAGENT_RPC_TLS_CA ? { ca: readFileSync(process.env.MKAGENT_RPC_TLS_CA) } : {}),
+    ...(process.env.OPCAGENT_RPC_TLS_CA ? { ca: readFileSync(process.env.OPCAGENT_RPC_TLS_CA) } : {}),
   }
 }
 
 // Web UI configuration
-const webuiDir = process.env.MKAGENT_WEBUI_DIR || undefined
+const webuiDir = process.env.OPCAGENT_WEBUI_DIR || undefined
 const webuiEnabled = webuiDir && existsSync(webuiDir)
-const webuiSecureCookies = parseOptionalBooleanEnv('MKAGENT_WEBUI_SECURE_COOKIE', process.env.MKAGENT_WEBUI_SECURE_COOKIE)
-const webuiWsUrl = parseOptionalWebSocketUrl('MKAGENT_WEBUI_WS_URL', process.env.MKAGENT_WEBUI_WS_URL)
-const serverToken = process.env.MKAGENT_SERVER_TOKEN
+const webuiSecureCookies = parseOptionalBooleanEnv('OPCAGENT_WEBUI_SECURE_COOKIE', process.env.OPCAGENT_WEBUI_SECURE_COOKIE)
+const webuiWsUrl = parseOptionalWebSocketUrl('OPCAGENT_WEBUI_WS_URL', process.env.OPCAGENT_WEBUI_WS_URL)
+const serverToken = process.env.OPCAGENT_SERVER_TOKEN
 
 // ---------------------------------------------------------------------------
 // Create WebUI handler early so it can be embedded in the WsRpcServer.
@@ -153,13 +153,13 @@ let messagingBootstrap: ReturnType<typeof createMessagingBootstrap> | null = nul
 let healthCheckFn: (() => { status: string }) | null = null
 
 if (webuiEnabled && serverToken) {
-  const rpcPort = parseInt(process.env.MKAGENT_RPC_PORT ?? '9100', 10)
+  const rpcPort = parseInt(process.env.OPCAGENT_RPC_PORT ?? '9100', 10)
   const rpcProtocol = tls ? 'wss' as const : 'ws' as const
 
   webuiHandler = createWebuiHandler({
     webuiDir: webuiDir!,
     secret: serverToken,
-    password: process.env.MKAGENT_WEBUI_PASSWORD || undefined,
+    password: process.env.OPCAGENT_WEBUI_PASSWORD || undefined,
     secureCookies: webuiSecureCookies,
     publicWsUrl: webuiWsUrl,
     wsProtocol: rpcProtocol,
@@ -176,7 +176,7 @@ const instance = await (async () => {
   try {
     return await bootstrapServer<SessionManager, HandlerDeps>({
       bundledAssetsRoot,
-      serverVersion: process.env.MKAGENT_VERSION ?? packageVersion,
+      serverVersion: process.env.OPCAGENT_VERSION ?? packageVersion,
       tls,
       // When web UI is enabled, accept JWT session cookies on WebSocket upgrade
       validateSessionCookie: webuiEnabled && serverToken
@@ -225,11 +225,11 @@ const instance = await (async () => {
         messagingBootstrap = createMessagingBootstrap({
           sessionManager,
           credentialManager: getCredentialManager(),
-          getMessagingDir: workspaceId => join(homedir(), '.mkagent', 'workspaces', workspaceId, 'messaging'),
+          getMessagingDir: workspaceId => join(homedir(), '.opcagent', 'workspaces', workspaceId, 'messaging'),
           whatsapp: {
-            workerEntry: process.env.MKAGENT_MESSAGING_WA_WORKER
+            workerEntry: process.env.OPCAGENT_MESSAGING_WA_WORKER
               ?? join(bundledAssetsRoot, 'packages', 'messaging-whatsapp-worker', 'dist', 'worker.cjs'),
-            nodeBin: process.env.MKAGENT_MESSAGING_NODE_BIN ?? 'node',
+            nodeBin: process.env.OPCAGENT_MESSAGING_NODE_BIN ?? 'node',
           },
         })
         sessionManager.setAutomationBinder(async input => {
@@ -245,11 +245,11 @@ const instance = await (async () => {
       registerAllRpcHandlers: (server, deps, serverCtx) => {
         registerCoreRpcHandlers(server, deps, serverCtx)
         server.handle(RPC_CHANNELS.notification.GET_ENABLED, async () => {
-          const { getNotificationsEnabled } = await import('@mkagent/shared/config/storage')
+          const { getNotificationsEnabled } = await import('@opcagent/shared/config/storage')
           return getNotificationsEnabled()
         })
         server.handle(RPC_CHANNELS.notification.SET_ENABLED, async (_ctx, enabled: boolean) => {
-          const { setNotificationsEnabled } = await import('@mkagent/shared/config/storage')
+          const { setNotificationsEnabled } = await import('@opcagent/shared/config/storage')
           setNotificationsEnabled(enabled)
         })
       },
@@ -282,13 +282,13 @@ if (messagingHandle) {
 
 // Wire up the lazy health check now that the session manager is ready
 if (webuiHandler) {
-  const { getHealthCheck } = await import('@mkagent/server-core/handlers/rpc/server')
+  const { getHealthCheck } = await import('@opcagent/server-core/handlers/rpc/server')
   const depsLike = { sessionManager: instance.sessionManager } as any
   healthCheckFn = () => getHealthCheck(depsLike)
 
-  const { getSourceCredentialManager, loadWorkspaceSources } = await import('@mkagent/shared/sources')
-  const { getWorkspaceByNameOrId } = await import('@mkagent/shared/config')
-  const { pushTyped } = await import('@mkagent/server-core/transport')
+  const { getSourceCredentialManager, loadWorkspaceSources } = await import('@opcagent/shared/sources')
+  const { getWorkspaceByNameOrId } = await import('@opcagent/shared/config')
+  const { pushTyped } = await import('@opcagent/server-core/transport')
   webuiHandler.setOAuthCallbackDeps({
     flowStore: instance.oauthFlowStore,
     credManager: getSourceCredentialManager(),
@@ -308,8 +308,8 @@ if (webuiHandler) {
 
 }
 
-// Start HTTP health endpoint if MKAGENT_HEALTH_PORT is set
-const healthPort = parseInt(process.env.MKAGENT_HEALTH_PORT ?? '0', 10)
+// Start HTTP health endpoint if OPCAGENT_HEALTH_PORT is set
+const healthPort = parseInt(process.env.OPCAGENT_HEALTH_PORT ?? '0', 10)
 const healthServer = await startHealthHttpServer({
   port: healthPort,
   deps: { sessionManager: instance.sessionManager },
@@ -318,10 +318,10 @@ const healthServer = await startHealthHttpServer({
 })
 
 const serverProto = instance.protocol === 'wss' ? 'https' : 'http'
-console.log(`MKAGENT_SERVER_URL=${instance.protocol}://${instance.host}:${instance.port}`)
-console.log(`MKAGENT_SERVER_TOKEN=${instance.token}`)
+console.log(`OPCAGENT_SERVER_URL=${instance.protocol}://${instance.host}:${instance.port}`)
+console.log(`OPCAGENT_SERVER_TOKEN=${instance.token}`)
 if (webuiHandler) {
-  console.log(`MKAGENT_WEBUI_URL=${serverProto}://0.0.0.0:${instance.port}`)
+  console.log(`OPCAGENT_WEBUI_URL=${serverProto}://0.0.0.0:${instance.port}`)
 }
 
 // Block binding to a non-localhost address without TLS — tokens would be sent in cleartext.
@@ -332,14 +332,14 @@ if (!isLocalBind && instance.protocol === 'ws') {
     console.warn(
       '\nWARNING: Server is listening on a network address without TLS.\n' +
       '   Authentication tokens will be sent in cleartext.\n' +
-      '   Set MKAGENT_RPC_TLS_CERT and MKAGENT_RPC_TLS_KEY to enable wss://.\n'
+      '   Set OPCAGENT_RPC_TLS_CERT and OPCAGENT_RPC_TLS_KEY to enable wss://.\n'
     )
   } else {
     console.error(
       '\nERROR: Refusing to bind to a network address without TLS.\n' +
       '   Authentication tokens would be sent in cleartext.\n\n' +
       '   Options:\n' +
-      '     1. Set MKAGENT_RPC_TLS_CERT and MKAGENT_RPC_TLS_KEY to enable wss://\n' +
+      '     1. Set OPCAGENT_RPC_TLS_CERT and OPCAGENT_RPC_TLS_KEY to enable wss://\n' +
       '     2. Pass --allow-insecure-bind to override (NOT recommended for production)\n'
     )
     await instance.stop()

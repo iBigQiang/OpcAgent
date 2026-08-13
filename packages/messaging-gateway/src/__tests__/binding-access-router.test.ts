@@ -7,7 +7,7 @@ import { MessageRouter } from '../router'
 import type { MessagingConfig } from '../types'
 
 test('binding key includes topic and access control denies unauthorised senders', async () => {
-  const store = new BindingStore(mkdtempSync(join(tmpdir(), 'mkagent-messaging-')))
+  const store = new BindingStore(mkdtempSync(join(tmpdir(), 'opcagent-messaging-')))
   const binding = store.bind({ workspaceId: 'one', sessionId: 's1', platform: 'telegram', channelId: 'chat', threadId: 7, config: { accessMode: 'allow-list', allowedSenderIds: ['owner'] } })
   expect(store.findByChannel('telegram', 'chat', 7)?.id).toBe(binding.id)
   expect(store.findByChannel('telegram', 'chat')).toBeUndefined()

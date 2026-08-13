@@ -5,7 +5,7 @@ Sessions are append-oriented JSONL records with Pi recovery files in the same di
 ## On-disk layout
 
 ```text
-~/.mkagent/workspaces/<slug>/
+~/.opcagent/workspaces/<slug>/
   config.json                              # workspace settings (theme, default mode, ...)
   skills/                                  # workspace-scoped Skills
   permissions/                             # default + workspace overrides
@@ -18,7 +18,7 @@ Sessions are append-oriented JSONL records with Pi recovery files in the same di
 
 `session-id` is a UUIDv4 string; the same identifier is reused on resume, branch, and import.
 
-Each JSONL line is a `SessionEvent` discriminated union defined in `@mkagent/shared/protocol/sessions`. Common variants include:
+Each JSONL line is a `SessionEvent` discriminated union defined in `@opcagent/shared/protocol/sessions`. Common variants include:
 
 | Event | Purpose |
 |---|---|
@@ -39,7 +39,7 @@ An import is accepted only when it materializes as a registered, openable sessio
 - **Cancel:** `POST session.cancel` stops the in-flight turn; Pi recovery files preserve unfinished tool calls.
 - **Search:** a built-in index supports `query`, `in:title`, `state:`, and `view:` filters (Views are explained below).
 - **Rename:** updates the `title` field on the latest `session_created` event.
-- **Delete:** archives the directory under `~/.mkagent/workspaces/<slug>/sessions/.trash/` for the retention window, then removes it.
+- **Delete:** archives the directory under `~/.opcagent/workspaces/<slug>/sessions/.trash/` for the retention window, then removes it.
 - **Flag / archive / unread:** metadata flags on the live event stream and stored in the latest `session_*` event for fast list rendering.
 - **Import / export:** a portable bundle format that wraps `session.jsonl` plus attachments. Imports are validated through `SessionBundle` before being materialized.
 - **Branch:** duplicate `session.jsonl` up to the chosen message id, assign a new session id, and rewind Pi recovery so the new branch can `Continue` from that point.
@@ -57,7 +57,7 @@ An import is accepted only when it materializes as a registered, openable sessio
 
 ## Built-in Views
 
-Views are stored as Filtrex expressions in `~/.mkagent/workspaces/<slug>/views.json`. The evaluator only allows fields that survive the Lite boundary:
+Views are stored as Filtrex expressions in `~/.opcagent/workspaces/<slug>/views.json`. The evaluator only allows fields that survive the Lite boundary:
 
 ```text
 hasUnread == true            # 未读
@@ -68,15 +68,15 @@ hasPendingPlan == true       # 待计划审核
 permissionMode == "safe"     # 当前 workspace 默认的只读
 ```
 
-The schema accepts label/status conditions for backwards compatibility, but those conditions no-op because MkAgent does not have user-defined labels or statuses. The UI exposes a fixed set of buttons (Unread, Flagged, Running, Archived, Plan review) and **does not** ship a custom-View editor.
+The schema accepts label/status conditions for backwards compatibility, but those conditions no-op because OPC Agent does not have user-defined labels or statuses. The UI exposes a fixed set of buttons (Unread, Flagged, Running, Archived, Plan review) and **does not** ship a custom-View editor.
 
 ## Pi recovery
 
-The Pi subprocess stores its own scratch state under `sessions/<id>/.pi-sessions/`. MkAgent does not parse those files; it only treats them as opaque recovery data handed back to Pi on resume. Tests that want hermetic recovery can override the recovery path through the `SessionManager` hook surface.
+The Pi subprocess stores its own scratch state under `sessions/<id>/.pi-sessions/`. OPC Agent does not parse those files; it only treats them as opaque recovery data handed back to Pi on resume. Tests that want hermetic recovery can override the recovery path through the `SessionManager` hook surface.
 
 ## Permissions inside sessions
 
-Every Pi tool call passes through the shared permission engine (`@mkagent/shared/agent/permissions-config`). A denied call returns an error event to the JSONL stream and the turn ends in `failed`; a granted call continues. See [permissions.md](./permissions.md).
+Every Pi tool call passes through the shared permission engine (`@opcagent/shared/agent/permissions-config`). A denied call returns an error event to the JSONL stream and the turn ends in `failed`; a granted call continues. See [permissions.md](./permissions.md).
 
 ## Auditing a session
 

@@ -8,7 +8,7 @@
 import { forwardRef, useEffect, useState, type ButtonHTMLAttributes } from 'react'
 import { useTranslation } from 'react-i18next'
 import * as Icons from 'lucide-react'
-import { Spinner } from '@mkagent/ui'
+import { Spinner } from '@opcagent/ui'
 import type { BrowserInstanceInfo } from '../../../shared/types'
 import { getHostname, getThemeLuminance } from './utils'
 

@@ -1,5 +1,5 @@
-/** Craft-derived test helpers, trimmed to the Pi-only MkAgent backend surface. */
-import type { AgentEvent } from '@mkagent/core/types';
+/** Craft-derived test helpers, trimmed to the Pi-only OPCAgent backend surface. */
+import type { AgentEvent } from '@opcagent/core/types';
 import type { BackendConfig, ChatOptions } from '../backend/types.ts';
 import { AbortReason } from '../backend/types.ts';
 import type { Workspace } from '../../config/storage.ts';

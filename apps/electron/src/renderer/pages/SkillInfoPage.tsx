@@ -112,7 +112,7 @@ export default function SkillInfoPage({ skillSlug, workspaceId, workingDirectory
 
   // Handle opening in new window
   const handleOpenInNewWindow = useCallback(() => {
-    window.electronAPI.openUrl(`mkagent://skills/skill/${skillSlug}?window=focused`)
+    window.electronAPI.openUrl(`opcagent://skills/skill/${skillSlug}?window=focused`)
   }, [skillSlug])
 
   // Get skill name for header

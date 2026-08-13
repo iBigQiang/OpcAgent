@@ -1,13 +1,13 @@
 import { readFile, writeFile, stat } from 'fs/promises'
 import { join } from 'path'
-import { RPC_CHANNELS, type FileAttachment, type SendMessageOptions, type SessionEvent } from '@mkagent/shared/protocol'
-import type { StoredAttachment } from '@mkagent/core/types'
-import { getWorkspaceByNameOrId } from '@mkagent/shared/config'
-import { perf } from '@mkagent/shared/utils'
-import { isValidThinkingLevel, THINKING_LEVEL_IDS } from '@mkagent/shared/agent/thinking-levels'
+import { RPC_CHANNELS, type FileAttachment, type SendMessageOptions, type SessionEvent } from '@opcagent/shared/protocol'
+import type { StoredAttachment } from '@opcagent/core/types'
+import { getWorkspaceByNameOrId } from '@opcagent/shared/config'
+import { perf } from '@opcagent/shared/utils'
+import { isValidThinkingLevel, THINKING_LEVEL_IDS } from '@opcagent/shared/agent/thinking-levels'
 
 const VALID_THINKING_LEVELS_LIST = THINKING_LEVEL_IDS.map(id => `'${id}'`).join(', ')
-import { pushTyped, type RpcServer } from '@mkagent/server-core/transport'
+import { pushTyped, type RpcServer } from '@opcagent/server-core/transport'
 import type { HandlerDeps } from '../handler-deps'
 
 interface ClientSessionWatchState {
@@ -59,10 +59,10 @@ export function cleanupSessionFileWatchForClient(clientId: string): void {
 // Recursive directory scanner for session files
 // Filters out internal files (session.jsonl) and hidden files (. prefix)
 // Returns only non-empty directories
-async function scanSessionDirectory(dirPath: string): Promise<import('@mkagent/shared/protocol').SessionFile[]> {
+async function scanSessionDirectory(dirPath: string): Promise<import('@opcagent/shared/protocol').SessionFile[]> {
   const { readdir, stat } = await import('fs/promises')
   const entries = await readdir(dirPath, { withFileTypes: true })
-  const files: import('@mkagent/shared/protocol').SessionFile[] = []
+  const files: import('@opcagent/shared/protocol').SessionFile[] = []
 
   for (const entry of entries) {
     // Skip internal and hidden files
@@ -181,7 +181,7 @@ export function registerSessionsHandlers(server: RpcServer, deps: HandlerDeps): 
   })
 
   // Create a new session
-  server.handle(RPC_CHANNELS.sessions.CREATE, async (_ctx, workspaceId: string, options?: import('@mkagent/shared/protocol').CreateSessionOptions) => {
+  server.handle(RPC_CHANNELS.sessions.CREATE, async (_ctx, workspaceId: string, options?: import('@opcagent/shared/protocol').CreateSessionOptions) => {
     const end = perf.start('rpc.createSession', { workspaceId })
     // The renderer adds the session synchronously from this return value (App.tsx handleCreateSession),
     // so suppress the broadcast to avoid a redundant hydrate round-trip.
@@ -274,7 +274,7 @@ export function registerSessionsHandlers(server: RpcServer, deps: HandlerDeps): 
     _ctx,
     sessionId: string,
     requestId: string,
-    response: import('@mkagent/shared/protocol').CredentialResponse,
+    response: import('@opcagent/shared/protocol').CredentialResponse,
   ) => {
     return sessionManager.respondToCredential(sessionId, requestId, response)
   })
@@ -287,7 +287,7 @@ export function registerSessionsHandlers(server: RpcServer, deps: HandlerDeps): 
   server.handle(RPC_CHANNELS.sessions.COMMAND, async (
     _ctx,
     sessionId: string,
-    command: import('@mkagent/shared/protocol').SessionCommand
+    command: import('@opcagent/shared/protocol').SessionCommand
   ) => {
     switch (command.type) {
       case 'flag':
@@ -393,8 +393,8 @@ export function registerSessionsHandlers(server: RpcServer, deps: HandlerDeps): 
       return []
     }
 
-    const { searchSessions } = await import('@mkagent/server-core/services')
-    const { getWorkspaceSessionsPath } = await import('@mkagent/shared/workspaces')
+    const { searchSessions } = await import('@opcagent/server-core/services')
+    const { getWorkspaceSessionsPath } = await import('@opcagent/shared/workspaces')
 
     const sessionsDir = getWorkspaceSessionsPath(workspace.rootPath)
     log.debug(`SEARCH_SESSIONS: Searching "${query}" in ${sessionsDir}`)
@@ -535,7 +535,7 @@ export function registerSessionsHandlers(server: RpcServer, deps: HandlerDeps): 
     if (!targetWorkspaceId || typeof targetWorkspaceId !== 'string') throw new Error('targetWorkspaceId is required')
     if (mode !== 'move' && mode !== 'fork') throw new Error(`Invalid dispatch mode: ${mode}`)
 
-    return sessionManager.importSession(targetWorkspaceId, bundle as import('@mkagent/shared/sessions').SessionBundle, mode)
+    return sessionManager.importSession(targetWorkspaceId, bundle as import('@opcagent/shared/sessions').SessionBundle, mode)
   }
   server.handle(RPC_CHANNELS.sessions.IMPORT, importHandler)
 }

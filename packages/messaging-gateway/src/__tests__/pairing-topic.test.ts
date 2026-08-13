@@ -34,7 +34,7 @@ test('pair codes are six digits, include supergroup kind, and consume limits are
 
 test('Router gives /pair and /new to Commands before bound message routing', async () => {
   const pairing = new PairingCodeManager()
-  const store = new BindingStore(mkdtempSync(join(tmpdir(), 'mkagent-commands-')))
+  const store = new BindingStore(mkdtempSync(join(tmpdir(), 'opcagent-commands-')))
   const sent: string[] = []
   const adapter: PlatformAdapter = {
     platform: 'telegram',
@@ -58,7 +58,7 @@ test('Router gives /pair and /new to Commands before bound message routing', asy
 
 test('supergroup codes require an existing owner in their Telegram supergroup', async () => {
   const pairing = new PairingCodeManager()
-  const store = new BindingStore(mkdtempSync(join(tmpdir(), 'mkagent-supergroup-')))
+  const store = new BindingStore(mkdtempSync(join(tmpdir(), 'opcagent-supergroup-')))
   let paired = ''
   const commands = new Commands({ workspaceId: 'one', bindingStore: store, pairing, getConfig: () => ({ version: 1, enabled: true, platforms: {}, access: { telegram: { mode: 'owner-only', ownerIds: ['owner'] } } }), onSupergroupPaired: message => { paired = message.channelId } })
   const adapter: PlatformAdapter = { platform: 'telegram', async initialize() {}, async destroy() {}, isConnected: () => true, onMessage() {}, async sendText() {} }
@@ -69,7 +69,7 @@ test('supergroup codes require an existing owner in their Telegram supergroup', 
 
 test('sensitive commands require an owner and support bind status stop and unbind', async () => {
   const pairing = new PairingCodeManager()
-  const store = new BindingStore(mkdtempSync(join(tmpdir(), 'mkagent-command-access-')))
+  const store = new BindingStore(mkdtempSync(join(tmpdir(), 'opcagent-command-access-')))
   const sent: string[] = []
   const stopped: string[] = []
   const sessions = [
@@ -104,7 +104,7 @@ test('sensitive commands require an owner and support bind status stop and unbin
 
 test('owner-only pairing seeds the first owner and rejects later strangers before consuming', async () => {
   const pairing = new PairingCodeManager()
-  const store = new BindingStore(mkdtempSync(join(tmpdir(), 'mkagent-pair-owner-')))
+  const store = new BindingStore(mkdtempSync(join(tmpdir(), 'opcagent-pair-owner-')))
   let owners: string[] = []
   const sent: string[] = []
   const commands = new Commands({

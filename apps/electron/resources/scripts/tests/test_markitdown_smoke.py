@@ -26,11 +26,11 @@ class MarkitdownSmokeTests(unittest.TestCase):
 
     def test_plain_text_passthrough(self) -> None:
         txt = self.tmpdir / "plain.txt"
-        txt.write_text("hello mkagent", encoding="utf-8")
+        txt.write_text("hello opcagent", encoding="utf-8")
 
         result = self.run_markitdown(str(txt))
         self.assertEqual(result.returncode, 0, msg=result.stderr)
-        self.assertIn("hello mkagent", result.stdout)
+        self.assertIn("hello opcagent", result.stdout)
 
     def test_docx_fallback_path(self) -> None:
         docx = self.tmpdir / "sample.docx"

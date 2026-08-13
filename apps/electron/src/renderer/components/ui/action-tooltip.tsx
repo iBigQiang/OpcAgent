@@ -1,5 +1,5 @@
 import { useActionLabel } from '@/actions'
-import { Tooltip, TooltipTrigger, TooltipContent } from '@mkagent/ui'
+import { Tooltip, TooltipTrigger, TooltipContent } from '@opcagent/ui'
 import type { ActionId } from '@/actions/definitions'
 
 interface ActionTooltipProps {

@@ -2,14 +2,14 @@ import { afterEach, beforeEach, describe, expect, it } from 'bun:test'
 import { mkdirSync, mkdtempSync, readFileSync, rmSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { tmpdir } from 'node:os'
-import { getSessionFilePath, writeSessionJsonl, type StoredSession } from '@mkagent/shared/sessions'
+import { getSessionFilePath, writeSessionJsonl, type StoredSession } from '@opcagent/shared/sessions'
 import { SessionManager, createManagedSession } from './SessionManager.ts'
 
 describe('cold-session metadata persistence', () => {
   let root: string
   let manager: SessionManager
 
-  beforeEach(() => { root = mkdtempSync(join(tmpdir(), 'mkagent-cold-meta-')); manager = new SessionManager() })
+  beforeEach(() => { root = mkdtempSync(join(tmpdir(), 'opcagent-cold-meta-')); manager = new SessionManager() })
   afterEach(() => rmSync(root, { recursive: true, force: true }))
 
   function seed(id: string) {

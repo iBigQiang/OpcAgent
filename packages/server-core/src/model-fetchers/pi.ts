@@ -4,9 +4,9 @@
  * Provider-agnostic wrapper that delegates model discovery to backend drivers.
  */
 
-import type { ModelFetcher, ModelFetchResult, ModelFetcherCredentials } from '@mkagent/shared/config'
-import type { LlmConnection } from '@mkagent/shared/config'
-import { fetchBackendModels } from '@mkagent/shared/agent/backend'
+import type { ModelFetcher, ModelFetchResult, ModelFetcherCredentials } from '@opcagent/shared/config'
+import type { LlmConnection } from '@opcagent/shared/config'
+import { fetchBackendModels } from '@opcagent/shared/agent/backend'
 import { getHostRuntime } from './runtime'
 
 export class PiModelFetcher implements ModelFetcher {

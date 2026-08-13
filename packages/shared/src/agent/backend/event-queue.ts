@@ -11,7 +11,7 @@
  *   handler calls complete()    → signals no more events
  */
 
-import type { AgentEvent } from '@mkagent/core/types';
+import type { AgentEvent } from '@opcagent/core/types';
 
 export class EventQueue {
   private queue: AgentEvent[] = [];

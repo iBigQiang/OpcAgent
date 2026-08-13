@@ -13,8 +13,8 @@
  * See docs/adr-transport-locality.md for the locality boundary definition.
  */
 
-import { CodedError } from '@mkagent/shared/protocol'
-import type { BrowserInstanceInfo } from '@mkagent/shared/protocol'
+import { CodedError } from '@opcagent/shared/protocol'
+import type { BrowserInstanceInfo } from '@opcagent/shared/protocol'
 import type {
   IBrowserPaneManager,
   BrowserScreenshotOptions,
@@ -75,7 +75,7 @@ export class RemoteBrowserPaneManager implements IBrowserPaneManager {
       throw new CodedError(
         'BROWSER_NO_CAPABLE_CLIENT',
         'No connected desktop client supports browser tools for this session. ' +
-        'Open this workspace from the MkAgent desktop app and try again.',
+        'Open this workspace from the OPCAgent desktop app and try again.',
       )
     }
     if (!this.rpcServer.hasClientCapability(clientId, CLIENT_BROWSER_INVOKE)) {

@@ -1,7 +1,7 @@
 /**
  * Secure Storage Backend
  *
- * Stores credentials in an encrypted file at ~/.mkagent/credentials.enc
+ * Stores credentials in an encrypted file at ~/.opcagent/credentials.enc
  * Uses AES-256-GCM for authenticated encryption.
  *
  * Encryption key is derived from OS-native hardware UUID using PBKDF2:
@@ -323,7 +323,7 @@ export class SecureStorageBackend implements CredentialBackend {
     // This is far more stable than hostname which can change with network/DHCP
     const stableMachineId = createHash('sha256')
       .update(getStableMachineId())
-      .update('mkagent-v2') // Bumped version for new key derivation
+      .update('opcagent-v2') // Bumped version for new key derivation
       .digest();
 
     // Derive key using PBKDF2
@@ -341,7 +341,7 @@ export class SecureStorageBackend implements CredentialBackend {
       .update(hostname())
       .update(userInfo().username)
       .update(homedir())
-      .update('mkagent-v1')
+      .update('opcagent-v1')
       .digest();
 
     return pbkdf2Sync(legacyMachineId, salt, PBKDF2_ITERATIONS, KEY_SIZE, 'sha256');

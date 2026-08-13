@@ -55,7 +55,7 @@ function resolveBundledRuntimePath(hostRuntime: BackendHostRuntimeContext): stri
   const bundled = firstExistingBunPath([
     ...(hostRuntime.resourcesPath ? [join(hostRuntime.resourcesPath, 'vendor', 'bun', binary)] : []),
     join(hostRuntime.appRootPath, 'vendor', 'bun', binary),
-    ...(!hostRuntime.isPackaged && process.env.MKAGENT_BUN ? [process.env.MKAGENT_BUN] : []),
+    ...(!hostRuntime.isPackaged && process.env.OPCAGENT_BUN ? [process.env.OPCAGENT_BUN] : []),
   ]);
   if (bundled) return bundled;
   if (hostRuntime.isPackaged) return undefined;

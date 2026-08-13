@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next"
 import { cn } from "@/lib/utils"
 import { Key, Monitor } from "lucide-react"
-import { MkAgentAppIcon } from "@/components/icons/MkAgentAppIcon"
+import { OPCAgentAppIcon } from "@/components/icons/OPCAgentAppIcon"
 import { StepFormLayout } from "./primitives"
 import claudeIcon from "@/assets/provider-icons/claude.svg"
 import openaiIcon from "@/assets/provider-icons/openai.svg"
@@ -73,7 +73,7 @@ export function ProviderSelectStep({ onSelect, onSkip }: ProviderSelectStepProps
     <StepFormLayout
       iconElement={
         <div className="flex size-16 items-center justify-center">
-          <MkAgentAppIcon className="size-10 text-accent" />
+          <OPCAgentAppIcon className="size-10 text-accent" />
         </div>
       }
       title={t("onboarding.providerSelect.title")}

@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto'
 import { appendFile, mkdir } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
-import { CONFIG_DIR } from '@mkagent/shared/config'
+import { CONFIG_DIR } from '@opcagent/shared/config'
 import type { Logger } from '../runtime/platform'
 
 export interface PrivilegedExecutionRequest {

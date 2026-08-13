@@ -7,7 +7,7 @@
  *
  * - Parses the raw code string as JSON
  * - Recursively expands stringified-JSON-within-JSON (deepParseJson)
- * - Uses MkAgent themes (transparent background and CSS variable fonts)
+ * - Uses OPCAgent themes (transparent background and CSS variable fonts)
  * - Defaults to collapsed={2} for inline chat context
  * - Falls back to CodeBlock if JSON parsing or rendering fails
  */

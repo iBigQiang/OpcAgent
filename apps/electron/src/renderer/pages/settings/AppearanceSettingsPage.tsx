@@ -7,7 +7,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { LANGUAGES, type LanguageCode } from '@mkagent/shared/i18n'
+import { LANGUAGES, type LanguageCode } from '@opcagent/shared/i18n'
 import type { ColumnDef } from '@tanstack/react-table'
 import { PanelHeader } from '@/components/app-shell/PanelHeader'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -212,7 +212,7 @@ export default function AppearanceSettingsPage() {
           window.electronAPI.getHomeDir(),
         ])
         setToolIcons(mappings)
-        setToolIconsJsonPath(`${homeDir}/.mkagent/tool-icons/tool-icons.json`)
+        setToolIconsJsonPath(`${homeDir}/.opcagent/tool-icons/tool-icons.json`)
       } catch (error) {
         console.error('Failed to load tool icon mappings:', error)
       }

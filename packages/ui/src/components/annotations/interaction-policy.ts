@@ -1,4 +1,4 @@
-import type { AnnotationV1 } from '@mkagent/core'
+import type { AnnotationV1 } from '@opcagent/core'
 import { getAnnotationFollowUpState, type AnnotationFollowUpState } from './follow-up-state'
 
 export type AnnotationChipInteraction = {

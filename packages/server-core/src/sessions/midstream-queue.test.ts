@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, mock } from 'bun:test'
 import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { resolveBackendContext } from '@mkagent/shared/agent/backend'
+import { resolveBackendContext } from '@opcagent/shared/agent/backend'
 import {
   SessionManager,
   createManagedSession,

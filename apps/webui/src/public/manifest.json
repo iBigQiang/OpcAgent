@@ -1,6 +1,6 @@
 {
-  "name": "MkAgent",
-  "short_name": "MkAgent",
+  "name": "OPC Agent",
+  "short_name": "OPC Agent",
   "description": "AI agent interface",
   "start_url": "./",
   "display": "standalone",

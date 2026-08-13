@@ -5,10 +5,10 @@ Skills 在 global、workspace、project 三个位置发现,优先级 `global < w
 ## 发现路径
 
 ```text
-1. ~/.mkagent/skills/                       (global)
-2. ~/.mkagent/workspaces/<slug>/skills/     (workspace)
-3. <workingDirectory>/.mkagent/skills/      (project)
-4. <workingDirectory>/.claude/skills/       (历史 project,等价于 .mkagent)
+1. ~/.opcagent/skills/                       (global)
+2. ~/.opcagent/workspaces/<slug>/skills/     (workspace)
+3. <workingDirectory>/.opcagent/skills/      (project)
+4. <workingDirectory>/.claude/skills/       (历史 project,等价于 .opcagent)
 ```
 
 同名 Skill 在多个位置出现时,优先级最高的胜出;其他位置会被 shadow,但不会被删除。
@@ -34,8 +34,8 @@ allowed-tools: [bash, edit, read]
 | `description` | 是 | 一句话描述,出现在 picker 与 watcher 中 |
 | `license` | 否 | 在 Skill 详情面板里展示 |
 | `allowed-tools` | 否 | Pi 的提示 hint;权限引擎仍以全局策略为准 |
-| `requiredSources` | 忽略 | 历史字段;Sources 不在 MkAgent 中 |
-| `minMkagent` | 否 | 最低版本门槛 |
+| `requiredSources` | 忽略 | 历史字段;Sources 不在 OPC Agent 中 |
+| `minOPCAgent` | 否 | 最低版本门槛 |
 
 ## 操作
 

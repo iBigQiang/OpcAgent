@@ -175,7 +175,7 @@ describe('validatePermissionsContent', () => {
 })
 
 describe('retained config detection', () => {
-  const workspace = '/tmp/mkagent-workspace'
+  const workspace = '/tmp/opcagent-workspace'
 
   it('detects Source config files and slugs', () => {
     const result = detectConfigFileType(`${workspace}/sources/github/config.json`, workspace)

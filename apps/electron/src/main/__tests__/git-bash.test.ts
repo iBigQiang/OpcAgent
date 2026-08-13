@@ -7,7 +7,7 @@ import {
   isGitBashExecutablePath,
   isUsableGitBashPath,
   validateGitBashPath,
-} from '@mkagent/server-core/services'
+} from '@opcagent/server-core/services'
 
 let tempDir: string
 

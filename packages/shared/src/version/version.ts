@@ -1,10 +1,10 @@
 import { getLatestVersion } from "./manifest";
 
-declare const MKAGENT_AGENT_CLI_VERSION: string | undefined;
+declare const OPCAGENT_AGENT_CLI_VERSION: string | undefined;
 
 export function getCurrentVersion(): string {
-  if (typeof MKAGENT_AGENT_CLI_VERSION !== 'undefined' && MKAGENT_AGENT_CLI_VERSION != null) {
-    return MKAGENT_AGENT_CLI_VERSION;
+  if (typeof OPCAGENT_AGENT_CLI_VERSION !== 'undefined' && OPCAGENT_AGENT_CLI_VERSION != null) {
+    return OPCAGENT_AGENT_CLI_VERSION;
   }
   return "0.0.1";
 }

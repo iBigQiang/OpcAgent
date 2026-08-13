@@ -2,9 +2,9 @@ import * as React from 'react'
 import { useMemo, useEffect, useRef, useCallback, useState } from 'react'
 import i18n from 'i18next'
 import { useTranslation } from 'react-i18next'
-import type { ToolDisplayMeta, AnnotationV1 } from '@mkagent/core'
-import { normalizePath, pathStartsWith, stripPathPrefix } from '@mkagent/core/utils'
-import { isParentTaskTool } from '@mkagent/shared/utils/toolNames'
+import type { ToolDisplayMeta, AnnotationV1 } from '@opcagent/core'
+import { normalizePath, pathStartsWith, stripPathPrefix } from '@opcagent/core/utils'
+import { isParentTaskTool } from '@opcagent/shared/utils/toolNames'
 import { motion, AnimatePresence } from 'motion/react'
 import {
   ChevronRight,

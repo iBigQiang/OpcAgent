@@ -1,4 +1,4 @@
-# MkAgent MVP 标准实施计划
+# OPC Agent MVP 标准实施计划
 
 > 2026-07-30 边界修订：本文主体记录原始 Lite 迁移计划。当前仅恢复 ChatGPT Plus 与 Claude Pro/Max 的 Craft OAuth 闭包，两者均由 Pi 执行；Claude Agent SDK、GitHub Copilot、Sources/MCP 不恢复。实施记录见 [`migration-features.md`](./migration-features.md)。
 
@@ -16,19 +16,19 @@
 ### 阶段 0：Git、远程仓库和产品基线
 
 - 初始化 `main` 分支的新 Git 历史。
-- 若目标不存在，使用当前 `gh` 身份创建 public `MkThingsHQ/mkagent`，配置为 `origin`。
-- 使用 public `MkThingsHQ/mkagent` 同时托管源码，并通过 GitHub Releases 存放签名安装包、更新清单和校验文件。
+- 使用现有 public `iBigQiang/OpcAgent` 作为 `origin`。
+- 使用 public `iBigQiang/OpcAgent` 同时托管源码，并通过 GitHub Releases 存放签名安装包、更新清单和校验文件。
 - 添加只读 `upstream`：`https://github.com/craft-ai-agents/craft-agents-oss.git`。
 - 首批提交建立 `LICENSE`、`NOTICE`、README、产品边界、上游基线记录和功能矩阵。
 - 创建 `product.manifest.json`，集中声明：
-  - 产品名 `mkagent` / `MkAgent`
-  - npm scope `@mkagent/*`
-  - 域名 `mkagent.app`
-  -协议 `mkagent://`
-  - 环境变量前缀 `MKAGENT_`
-  - 数据目录 `~/.mkagent`
-  - appId/bundle id `app.mkagent.desktop`
-  - 暂定版权 `Copyright © 2026 MkAgent contributors`
+  - 产品名 `opcagent` / `OPC Agent`
+  - npm scope `@opcagent/*`
+  - 域名 `opcagent.app`
+  -协议 `opcagent://`
+  - 环境变量前缀 `OPCAGENT_`
+  - 数据目录 `~/.opcagent`
+  - appId/bundle id `app.opcagent.desktop`
+  - 暂定版权 `Copyright © 2026 OPC Agent contributors`
 
 ### 阶段 1：Monorepo、品牌和默认 Workspace
 
@@ -142,10 +142,10 @@
   - 各平台 headless server
   - Bun CLI package/bin
 - 打包包含 Pi server、Bun runtime、ripgrep、Browser、文档工具、uv、权限、主题、文档、图标和许可证。
-- `MkThingsHQ/mkagent` 的 Release workflow 构建并签名产物，再使用仓库范围的 `GITHUB_TOKEN` 发布到当前仓库的 GitHub Releases。
+- `iBigQiang/OpcAgent` 的 Release workflow 构建并签名产物，再使用仓库范围的 `GITHUB_TOKEN` 发布到当前仓库的 GitHub Releases。
 - Electron updater 配置 public GitHub provider：
   - owner：`open-fox`
-  - repo：`mkagent`
+  - repo：`opcagent`
   - 客户端不包含 GitHub token
   - 发布清单、blockmap 和校验文件与安装包同版本
 - Sentry严格按 craft 当前机制迁移：
@@ -165,7 +165,7 @@
 - 自定义模型协议限定为 `openai-completions | anthropic-messages`。
 - Session header 保留连接、模型、权限、token usage、resume、flag、archive、unread、技术状态和分支关系。
 - RPC channel 按保留能力重建 allowlist；删除功能的 channel 不保留兼容空实现。
-- 数据根目录固定为 `~/.mkagent`，仅允许通过 `CONFIG_DIR` 覆盖；不读取或迁移旧产品目录。
+- 数据根目录固定为 `~/.opcagent`，仅允许通过 `CONFIG_DIR` 覆盖；不读取或迁移旧产品目录。
 - Skills 来源优先级固定为 global < workspace < project；`requiredSources` 不生效并给出兼容提示。
 - 会话导出不得包含连接密钥、代理凭证、Sentry 信息或其他加密数据。
 
@@ -194,12 +194,12 @@
 ## 5. 已锁定默认值
 
 - 新 Git 历史，不迁移已有产品数据。
-- public 源码仓库：`MkThingsHQ/mkagent`，缺失时自动创建。
-- public 源码与更新仓库：`MkThingsHQ/mkagent`；不再自动创建额外的 release-only 仓库。
+- public 源码仓库：`iBigQiang/OpcAgent`。
+- public 源码与更新仓库：`iBigQiang/OpcAgent`；不再自动创建额外的 release-only 仓库。
 - 上游基线：craft `v0.11.2` / `a60ebc1a5a7c`。
 - 默认 workspace：`default`。
-- appId/bundle id：`app.mkagent.desktop`。
-- 产品域名：`mkagent.app`。
+- appId/bundle id：`app.opcagent.desktop`。
+- 产品域名：`opcagent.app`。
 - 只有 Pi backend；无任何订阅或 OAuth。
 - Sentry 对齐 craft 当前实现，不增加设置开关和 source map 上传。
 - 暂无正式签名凭证时允许生成开发/测试包，但公开 stable Release 必须等待对应平台签名、公证凭证配置完成。

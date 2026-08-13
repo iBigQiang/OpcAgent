@@ -1,15 +1,15 @@
 /**
- * @mkagent/shared
+ * @opcagent/shared
  *
- * Shared business logic for MkAgent.
+ * Shared business logic for OPCAgent.
  * Used by the Electron app.
  *
  * Import specific modules via subpath exports:
- *   import { PiAgent } from '@mkagent/shared/agent';
- *   import { loadStoredConfig } from '@mkagent/shared/config';
- *   import { getCredentialManager } from '@mkagent/shared/credentials';
- *   import { debug } from '@mkagent/shared/utils';
- *   import { createWorkspace, loadWorkspace } from '@mkagent/shared/workspaces';
+ *   import { PiAgent } from '@opcagent/shared/agent';
+ *   import { loadStoredConfig } from '@opcagent/shared/config';
+ *   import { getCredentialManager } from '@opcagent/shared/credentials';
+ *   import { debug } from '@opcagent/shared/utils';
+ *   import { createWorkspace, loadWorkspace } from '@opcagent/shared/workspaces';
  *
  * Available modules:
  *   - agent: Pi agent runtime and plan tools

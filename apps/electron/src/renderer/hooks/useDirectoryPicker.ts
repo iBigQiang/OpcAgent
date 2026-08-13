@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { RPC_CHANNELS } from '@mkagent/shared/protocol'
+import { RPC_CHANNELS } from '@opcagent/shared/protocol'
 import { useTransportConnectionState } from './useTransportConnectionState'
 import { toast } from 'sonner'
 

@@ -1,4 +1,4 @@
-import type { SessionToolContext } from '@mkagent/session-tools-core';
+import type { SessionToolContext } from '@opcagent/session-tools-core';
 import { getSessionScopedToolCallbacks } from './session-scoped-tool-callback-registry.ts';
 
 export function attachSessionSelfManagementBindings(

@@ -10,7 +10,7 @@ Push-Location $RootDir
 try {
     bun install --frozen-lockfile
     $BunDownload = "bun-windows-x64-baseline"
-    $TempDir = Join-Path $env:TEMP "mkagent-runtime-$(Get-Random)"
+    $TempDir = Join-Path $env:TEMP "opcagent-runtime-$(Get-Random)"
     New-Item -ItemType Directory -Force -Path $TempDir | Out-Null
     try {
         Remove-Item -Recurse -Force "$ElectronDir/vendor/bun" -ErrorAction SilentlyContinue
@@ -44,8 +44,8 @@ try {
     } finally {
         Remove-Item -Recurse -Force $TempDir -ErrorAction SilentlyContinue
     }
-    $env:MKAGENT_TARGET_PLATFORM = "win32"
-    $env:MKAGENT_TARGET_ARCH = "x64"
+    $env:OPCAGENT_TARGET_PLATFORM = "win32"
+    $env:OPCAGENT_TARGET_ARCH = "x64"
     bun run electron:build
     Push-Location "apps/electron"
     try {

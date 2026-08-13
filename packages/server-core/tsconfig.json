@@ -19,8 +19,8 @@
     "noUnusedParameters": false,
     "baseUrl": ".",
     "paths": {
-      "@mkagent/shared": ["../shared/src/index.ts"],
-      "@mkagent/shared/*": ["../shared/src/*"]
+      "@opcagent/shared": ["../shared/src/index.ts"],
+      "@opcagent/shared/*": ["../shared/src/*"]
     }
   },
   "include": ["src/**/*", "../shared/src/agent/bash-parser.d.ts"],

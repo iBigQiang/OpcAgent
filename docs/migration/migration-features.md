@@ -1,4 +1,4 @@
-# MkAgent Craft Lite 功能迁移执行记录
+# OPC Agent Craft Lite 功能迁移执行记录
 
 > 历史记录：本文记录 2026-07-30 的迁移闭包与验证结果。它保留当时的数字和提交背景；当前状态请以 `docs/architecture.md`、`docs/connections.md`、`docs/testing.md` 和现行 CI 为准。
 
@@ -6,7 +6,7 @@
 
 本轮边界只恢复 ChatGPT Plus 与 Claude Pro/Max，不恢复 GitHub Copilot 或 Sources/MCP。实现遵循以下闭包：
 
-- OAuth 登录、PKCE、callback page/server、provider 配置和订阅 UI 直接复用 Craft 同路径源码；仅替换 MkAgent 品牌与宿主接线。
+- OAuth 登录、PKCE、callback page/server、provider 配置和订阅 UI 直接复用 Craft 同路径源码；仅替换 OPC Agent 品牌与宿主接线。
 - 两种连接的 `providerType` 都是 `pi`。ChatGPT 使用 `piAuthProvider: openai-codex`，Claude 使用 `piAuthProvider: anthropic`；仓库不新增 `@anthropic-ai/claude-agent-sdk`。
 - 安全存储保留 access token、refresh token、expiry 与可选 ID token。父进程把完整 OAuth credential 传给 Pi；Pi 自动刷新后通过子进程协议回传，父进程按 connection slug 串行写回。
 - Desktop 负责 ChatGPT localhost callback；Claude 继续使用 Craft 的手工 authorization-code 流程。WebUI 可以复用已存储凭证，但不发起 ChatGPT localhost 登录。
@@ -16,17 +16,17 @@
 
 ## 1. 文档目的
 
-本文记录 MkAgent 从“Craft Agent 的 MVP/Lite 实现”到“代码、功能、UI、架构均以 Craft 源码为基础做减法”的完整执行过程，说明本轮如何清理被隐藏但未删除的功能、验证源码继承关系、补齐会话运行时，以及建立与 Craft 对齐的测试和验收边界。
+本文记录 OPC Agent 从“Craft Agent 的 MVP/Lite 实现”到“代码、功能、UI、架构均以 Craft 源码为基础做减法”的完整执行过程，说明本轮如何清理被隐藏但未删除的功能、验证源码继承关系、补齐会话运行时，以及建立与 Craft 对齐的测试和验收边界。
 
 本轮使用的规划文档如下：
 
 - [`migration-mvp.md`](./migration-mvp.md)：产品定位、保留/删除范围和 MVP 架构。
-- [`migration-plan.md`](./migration-plan.md)：从 Craft 源码实施 MkAgent 的迁移计划。
+- [`migration-plan.md`](./migration-plan.md)：从 Craft 源码实施 OPC Agent 的迁移计划。
 - [`migration-ui.md`](./migration-ui.md)：UI 对齐复盘、源码复用原则和验收规范。
 
 核心原则始终是：
 
-> MkAgent 是 Craft Agent 的 Lite 发行版。保留能力直接复用 Craft 的代码、架构、功能和 UI；排除能力从所有层级物理删除；只在品牌、Pi-only 后端和 Lite 产品边界上做少量定制。
+> OPC Agent 是 Craft Agent 的 Lite 发行版。保留能力直接复用 Craft 的代码、架构、功能和 UI；排除能力从所有层级物理删除；只在品牌、Pi-only 后端和 Lite 产品边界上做少量定制。
 
 ## 2. 迁移前状态
 
@@ -35,7 +35,7 @@
 1. 一部分明确排除的功能只从界面入口隐藏，组件、Hook、类型、RPC、配置、权限、文案、测试或依赖仍然存在。
 2. 保留能力虽然可以编译，但缺少对 Craft 源码继承关系和真实会话链路的系统验证，无法排除局部重新实现、空实现或未接线的风险。
 
-因此，本轮没有继续做局部视觉修补，而是同时审查 MkAgent 与同级 Craft 源码，从产品边界、源码血缘、运行时和测试四个维度重新收敛。
+因此，本轮没有继续做局部视觉修补，而是同时审查 OPC Agent 与同级 Craft 源码，从产品边界、源码血缘、运行时和测试四个维度重新收敛。
 
 ## 3. 执行方法
 
@@ -126,28 +126,28 @@
 
 ## 6. Craft 源码复用验证
 
-`bun run audit:craft-reuse` 对 MkAgent 和同级 Craft checkout 的 tracked source 做同路径比较，只归一化包 scope、URL scheme、配置目录和品牌字符串。
+`bun run audit:craft-reuse` 对 OPC Agent 和同级 Craft checkout 的 tracked source 做同路径比较，只归一化包 scope、URL scheme、配置目录和品牌字符串。
 
 最终结果：
 
 | 指标 | 结果 |
 |---|---:|
-| MkAgent 源码文件 | 1,163 |
+| OPC Agent 源码文件 | 1,163 |
 | 与 Craft 同相对路径 | 1,116（96.0%） |
 | 归一化后逐字一致 | 686（59.0%） |
 | Craft 派生并经过 Lite 修改 | 430 |
-| MkAgent 独有源码 | 47 |
-| Craft 有而 MkAgent 无 | 606 |
+| OPC Agent 独有源码 | 47 |
+| Craft 有而 OPC Agent 无 | 606 |
 
-96.0% 的同路径率证明 MkAgent 沿用了 Craft 的模块布局和架构。59.0% 是最严格的逐字一致下界；其余同路径文件主要包含删除分支、品牌替换、Pi-only 接线和恢复的测试，并不代表重新实现。
+96.0% 的同路径率证明 OPC Agent 沿用了 Craft 的模块布局和架构。59.0% 是最严格的逐字一致下界；其余同路径文件主要包含删除分支、品牌替换、Pi-only 接线和恢复的测试，并不代表重新实现。
 
-Renderer 另有更严格的边界守卫：386 个现存文件中，170 个必须与 Craft 归一化后完全一致，211 个是显式登记的 Lite 定制缝，5 个是 MkAgent 品牌资产。
+Renderer 另有更严格的边界守卫：386 个现存文件中，170 个必须与 Craft 归一化后完全一致，211 个是显式登记的 Lite 定制缝，5 个是 OPC Agent 品牌资产。
 
 ## 7. 测试对齐方法
 
 新增 `lint:craft-test-coverage`，逐一检查 Craft 的 tracked test。每个 Craft 测试必须满足以下条件之一：
 
-1. MkAgent 同路径保留；
+1. OPC Agent 同路径保留；
 2. 因品牌或 Lite schema 使用明确的替代测试；
 3. 对应产品功能已被物理删除，并登记具体排除原因。
 
@@ -156,7 +156,7 @@ Renderer 另有更严格的边界守卫：386 个现存文件中，170 个必须
 | 分类 | 数量 |
 |---|---:|
 | Craft 测试总数 | 373 |
-| MkAgent 同路径保留 | 246 |
+| OPC Agent 同路径保留 | 246 |
 | 品牌/Lite 替代 | 6 |
 | 随删除功能排除 | 121 |
 | 无解释缺失 | 0 |
@@ -201,7 +201,7 @@ Renderer 另有更严格的边界守卫：386 个现存文件中，170 个必须
 | `bun run audit:craft-reuse` | 通过 |
 | Electron build | main、preload、renderer、resources、assets 全部通过 |
 | WebUI build | 通过 |
-| CLI build | 通过，入口为 `dist/mkagent` |
+| CLI build | 通过，入口为 `dist/opcagent` |
 | Pi subprocess build | 通过，3,655 modules bundled |
 
 从 UI 对齐基线开始，两阶段累计涉及 389 个文件，增加 6,315 行、删除 56,761 行。新增内容主要是恢复的 Craft 测试、运行时接线和审计工具；删除内容主要是完整产品功能面。
@@ -225,7 +225,7 @@ Renderer 另有更严格的边界守卫：386 个现存文件中，170 个必须
 2. 先运行 Lite 边界和 Craft test coverage 检查。
 3. 对严格复用区直接同步上游实现。
 4. 对 Lite 定制缝逐文件做语义合并，不全量覆盖。
-5. 新增上游功能先判断是否在 MkAgent 产品范围内；排除功能不得带回不可达代码。
+5. 新增上游功能先判断是否在 OPC Agent 产品范围内；排除功能不得带回不可达代码。
 6. 运行源码复用审计、全套测试、CI 校验和四条构建链。
 7. 发布前使用全新用户目录和真实外部 provider 凭证执行一次 GUI smoke。
 

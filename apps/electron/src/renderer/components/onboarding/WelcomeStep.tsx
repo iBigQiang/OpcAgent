@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next"
-import { MkAgentAppIcon } from "@/components/icons/MkAgentAppIcon"
+import { OPCAgentAppIcon } from "@/components/icons/OPCAgentAppIcon"
 import { StepFormLayout, ContinueButton } from "./primitives"
 
 interface WelcomeStepProps {
@@ -14,7 +14,7 @@ interface WelcomeStepProps {
  * WelcomeStep - Initial welcome screen for onboarding
  *
  * Shows different messaging for new vs existing users:
- * - New users: Welcome to MkAgent
+ * - New users: Welcome to OPC Agent
  * - Existing users: Update your API connection settings
  */
 export function WelcomeStep({
@@ -28,7 +28,7 @@ export function WelcomeStep({
     <StepFormLayout
       iconElement={
         <div className="flex size-16 items-center justify-center">
-          <MkAgentAppIcon className="size-10" size={40} />
+          <OPCAgentAppIcon className="size-10" size={40} />
         </div>
       }
       title={isExistingUser ? t("onboarding.welcome.updateTitle") : t("onboarding.welcome.title")}

@@ -1,10 +1,10 @@
 /**
- * @mkagent/ui - Shared Tailwind CSS v4 theme
+ * @opcagent/ui - Shared Tailwind CSS v4 theme
  *
- * This file provides the base theme configuration for all MkAgent UIs.
+ * This file provides the base theme configuration for all OPCAgent UIs.
  * Import this in your app's main CSS file:
  *
- *   @import "@mkagent/ui/styles";
+ *   @import "@opcagent/ui/styles";
  *
  * The consuming app can then add its own source directive:
  *

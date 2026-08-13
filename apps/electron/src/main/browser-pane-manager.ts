@@ -8,7 +8,7 @@
 
 import { join, parse as parsePath } from 'path'
 import { existsSync, mkdirSync } from 'fs'
-import { validateFilePath, getWorkspaceAllowedDirs } from '@mkagent/server-core/handlers'
+import { validateFilePath, getWorkspaceAllowedDirs } from '@opcagent/server-core/handlers'
 import { BrowserView, BrowserWindow, app, ipcMain, nativeTheme, session, shell, type Session as ElectronSession } from 'electron'
 import { mainLog } from './logger'
 import type { WindowManager } from './window-manager'
@@ -18,17 +18,17 @@ import {
   type BrowserEmptyStateLaunchResult,
   type BrowserInstanceInfo,
 } from '../shared/types'
-import { DEFAULT_THEME, loadAppTheme } from '@mkagent/shared/config'
-import { CodedError } from '@mkagent/shared/protocol'
+import { DEFAULT_THEME, loadAppTheme } from '@opcagent/shared/config'
+import { CodedError } from '@opcagent/shared/protocol'
 import { getBrowserLiveFxCornerRadii } from '../shared/browser-live-fx'
 import type {
   IBrowserPaneManager,
   BrowserInstanceSnapshot,
-} from '@mkagent/server-core/handlers'
+} from '@opcagent/server-core/handlers'
 import type {
   BrowserCapabilityRequest,
   ScreenshotResultWire,
-} from '@mkagent/server-core/transport'
+} from '@opcagent/server-core/transport'
 
 export type { BrowserInstanceInfo }
 
@@ -46,12 +46,12 @@ const SCREENSHOT_RETRY_DELAY_MS = 120
 const SCREENSHOT_RESCUE_PAINT_DELAY_MS = 180
 const SCREENSHOT_NETWORK_IDLE_TIMEOUT_MS = 1_000
 const SCREENSHOT_NETWORK_IDLE_MS = 300
-const THEME_COLOR_SIGNAL_PREFIX = '__mkagent_theme_color__:'
+const THEME_COLOR_SIGNAL_PREFIX = '__opcagent_theme_color__:'
 const THEME_COLOR_NULL_SENTINEL = '__NULL__'
 const THEME_OBSERVER_MIN_INTERVAL_MS = 120
 const EARLY_THEME_EXTRACTION_DELAY_MS = 100
 const BROWSER_EMPTY_STATE_PAGE = 'browser-empty-state.html'
-const MKAGENT_DEEPLINK_SCHEME_PREFIX = `${process.env.MKAGENT_DEEPLINK_SCHEME || 'mkagent'}://`
+const OPCAGENT_DEEPLINK_SCHEME_PREFIX = `${process.env.OPCAGENT_DEEPLINK_SCHEME || 'opcagent'}://`
 
 const THEME_COLOR_EXTRACTOR_FN = String.raw`
 () => {
@@ -402,7 +402,7 @@ export class BrowserPaneManager implements IBrowserPaneManager {
 
     if (!pageWebContents.isDestroyed() && this.isBrowserEmptyStateUrl(pageWebContents.getURL())) {
       void pageWebContents.executeJavaScript(
-        `window.__MKAGENT_APPLY_BROWSER_THEME__?.(${JSON.stringify(this.themeMode)})`,
+        `window.__OPCAGENT_APPLY_BROWSER_THEME__?.(${JSON.stringify(this.themeMode)})`,
       ).catch(() => {})
     }
   }
@@ -702,7 +702,7 @@ export class BrowserPaneManager implements IBrowserPaneManager {
       normalizedPath = `workspace/${encodeURIComponent(workspaceId)}/${normalizedPath}`
     }
 
-    return `${MKAGENT_DEEPLINK_SCHEME_PREFIX}${normalizedPath}${routeQuery ? `?${routeQuery}` : ''}`
+    return `${OPCAGENT_DEEPLINK_SCHEME_PREFIX}${normalizedPath}${routeQuery ? `?${routeQuery}` : ''}`
   }
 
   private async triggerEmptyStateRouteLaunch(
@@ -1654,7 +1654,7 @@ export class BrowserPaneManager implements IBrowserPaneManager {
     return instance.downloads.slice(-limit)
   }
 
-  // validateUploadFilePath removed — uses shared validateFilePath from @mkagent/server-core/handlers
+  // validateUploadFilePath removed — uses shared validateFilePath from @opcagent/server-core/handlers
 
   async uploadFile(id: string, ref: string, filePaths: string[]): Promise<ElementGeometry> {
     const instance = this.requireAliveInstance(id)
@@ -2224,7 +2224,7 @@ export class BrowserPaneManager implements IBrowserPaneManager {
   }
 
   private async handleDeepLinkUrl(url: string): Promise<void> {
-    if (!url.startsWith(MKAGENT_DEEPLINK_SCHEME_PREFIX)) return
+    if (!url.startsWith(OPCAGENT_DEEPLINK_SCHEME_PREFIX)) return
 
     try {
       if (!this.windowManager) {
@@ -2945,7 +2945,7 @@ export class BrowserPaneManager implements IBrowserPaneManager {
         const extractThemeColor = ${THEME_COLOR_EXTRACTOR_FN};
 
         const w = window;
-        const previousCleanup = w.__MKAGENT_THEME_OBSERVER_CLEANUP__;
+        const previousCleanup = w.__OPCAGENT_THEME_OBSERVER_CLEANUP__;
         if (typeof previousCleanup === 'function') {
           try { previousCleanup(); } catch {}
         }
@@ -3031,7 +3031,7 @@ export class BrowserPaneManager implements IBrowserPaneManager {
         if (typeof mql.addEventListener === 'function') mql.addEventListener('change', onSchemeChange);
         else if (typeof mql.addListener === 'function') mql.addListener(onSchemeChange);
 
-        w.__MKAGENT_THEME_OBSERVER_CLEANUP__ = () => {
+        w.__OPCAGENT_THEME_OBSERVER_CLEANUP__ = () => {
           headObserver.disconnect();
           rootObserver.disconnect();
           w.removeEventListener('scroll', onScroll);
@@ -3553,7 +3553,7 @@ export class BrowserPaneManager implements IBrowserPaneManager {
     })
 
     pageWc.on('will-navigate', (event, url) => {
-      if (url.startsWith(MKAGENT_DEEPLINK_SCHEME_PREFIX)) {
+      if (url.startsWith(OPCAGENT_DEEPLINK_SCHEME_PREFIX)) {
         event.preventDefault()
         void this.handleDeepLinkUrl(url)
       }
@@ -3569,7 +3569,7 @@ export class BrowserPaneManager implements IBrowserPaneManager {
         `[browser-pane] window-open requested id=${instance.id} url=${details.url} disposition=${details.disposition ?? 'unknown'} frameName=${details.frameName || 'none'}`,
       )
 
-      if (details.url.startsWith(MKAGENT_DEEPLINK_SCHEME_PREFIX)) {
+      if (details.url.startsWith(OPCAGENT_DEEPLINK_SCHEME_PREFIX)) {
         void this.handleDeepLinkUrl(details.url)
         return { action: 'deny' }
       }

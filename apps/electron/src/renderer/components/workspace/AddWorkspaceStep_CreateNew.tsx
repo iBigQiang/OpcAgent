@@ -23,7 +23,7 @@ interface AddWorkspaceStep_CreateNewProps {
  *
  * Fields:
  * - Workspace name (required)
- * - Location: Default (~/.mkagent/workspaces/) or Custom
+ * - Location: Default (~/.opcagent/workspaces/) or Custom
  */
 export function AddWorkspaceStep_CreateNew({
   onBack,
@@ -44,7 +44,7 @@ export function AddWorkspaceStep_CreateNew({
   }, [])
 
   const slug = slugify(name)
-  const defaultBasePath = homeDir ? `${homeDir}/.mkagent/workspaces` : null
+  const defaultBasePath = homeDir ? `${homeDir}/.opcagent/workspaces` : null
   const finalPath = locationOption === 'default'
     ? (defaultBasePath && slug ? `${defaultBasePath}/${slug}` : null)
     : customPath && slug

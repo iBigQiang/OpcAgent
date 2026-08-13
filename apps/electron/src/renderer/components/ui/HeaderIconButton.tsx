@@ -7,7 +7,7 @@
 
 import * as React from 'react'
 import { forwardRef } from 'react'
-import { Tooltip, TooltipTrigger, TooltipContent } from '@mkagent/ui'
+import { Tooltip, TooltipTrigger, TooltipContent } from '@opcagent/ui'
 import { cn } from '@/lib/utils'
 
 interface HeaderIconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {

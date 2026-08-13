@@ -245,7 +245,7 @@ describe('PromptHandler', () => {
       const onPromptsReady = jest.fn();
       const configProvider = createMockConfigProvider({
         LabelAdd: [{
-          actions: [{ type: 'prompt', prompt: 'Label $MKAGENT_LABEL was added' }],
+          actions: [{ type: 'prompt', prompt: 'Label $OPCAGENT_LABEL was added' }],
         }],
       });
 
@@ -269,7 +269,7 @@ describe('PromptHandler', () => {
       const onPromptsReady = jest.fn();
       const configProvider = createMockConfigProvider({
         LabelAdd: [{
-          actions: [{ type: 'prompt', prompt: 'Label ${MKAGENT_LABEL} was added to ${MKAGENT_WORKSPACE_ID}' }],
+          actions: [{ type: 'prompt', prompt: 'Label ${OPCAGENT_LABEL} was added to ${OPCAGENT_WORKSPACE_ID}' }],
         }],
       });
 

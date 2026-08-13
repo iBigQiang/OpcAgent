@@ -17,7 +17,7 @@ GitHub Copilot, Craft gateway, Sources OAuth, and generic OAuth connections are 
 
 ## Connection type vs authentication type
 
-These two fields come from `LlmConnection` in `packages/shared/src/config/llm-connections.ts` and together describe how MkAgent reaches a model.
+These two fields come from `LlmConnection` in `packages/shared/src/config/llm-connections.ts` and together describe how OPC Agent reaches a model.
 
 | Field | Code values | Decides |
 |---|---|---|
@@ -108,7 +108,7 @@ A custom endpoint does not fall back to a key from another connection. Use the t
 Settings UI / Craft OAuth flow
    │  API key or OAuth access + refresh + expiry
    ▼
-@mkagent/shared/credentials
+@opcagent/shared/credentials
    │  persist via OS keychain (Keychain / libsecret / Credential Vault)
    ▼
 connection record (no plaintext key)
@@ -124,9 +124,9 @@ When you delete a connection, the credential reference is removed from the keych
 
 ## Limitations
 
-- MkAgent does not look at environment variables as a substitute for storing credentials, except for the CLI's `--api-key` and `LLM_API_KEY` self-contained run mode. The Desktop and WebUI always read from the credential manager.
+- OPC Agent does not look at environment variables as a substitute for storing credentials, except for the CLI's `--api-key` and `LLM_API_KEY` self-contained run mode. The Desktop and WebUI always read from the credential manager.
 - Per-workspace connections are not implemented; the registry is global. A workspace can still pin a single `defaultConnectionId`.
-- Quota and rate-limit monitoring is delegated to the provider; MkAgent surfaces provider-reported errors verbatim.
+- Quota and rate-limit monitoring is delegated to the provider; OPC Agent surfaces provider-reported errors verbatim.
 
 ## What is intentionally absent
 

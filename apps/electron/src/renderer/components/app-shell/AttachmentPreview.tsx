@@ -1,6 +1,6 @@
 import * as React from "react"
 import { X, Image as ImageIcon } from "lucide-react"
-import { Spinner, FileTypeIcon, getFileTypeLabel } from "@mkagent/ui"
+import { Spinner, FileTypeIcon, getFileTypeLabel } from "@opcagent/ui"
 import { cn } from "@/lib/utils"
 import type { FileAttachment } from "../../../shared/types"
 

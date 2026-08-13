@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'bun:test'
-import { RPC_CHANNELS } from '@mkagent/shared/protocol'
+import { RPC_CHANNELS } from '@opcagent/shared/protocol'
 import { getTurnExitCode, parseArgs, resolveWorkspace, shouldSetupLlmConnection } from './index.ts'
 
 describe('run command', () => {
   it('uses an existing server when URL and token are provided', () => {
     const args = parseArgs([
-      'bun', 'mkagent', '--url', 'ws://127.0.0.1:9100', '--token', 'secret',
+      'bun', 'opcagent', '--url', 'ws://127.0.0.1:9100', '--token', 'secret',
       'run', 'hello',
     ])
     expect(args.url).toBe('ws://127.0.0.1:9100')
@@ -15,20 +15,20 @@ describe('run command', () => {
   })
 
   it('parses stream-json output', () => {
-    expect(parseArgs(['bun', 'mkagent', '--output-format', 'stream-json', 'run', 'hello']).outputFormat).toBe('stream-json')
+    expect(parseArgs(['bun', 'opcagent', '--output-format', 'stream-json', 'run', 'hello']).outputFormat).toBe('stream-json')
   })
 
   it('parses the no-cleanup flag', () => {
-    expect(parseArgs(['bun', 'mkagent', '--no-cleanup', 'run', 'hello']).noCleanup).toBe(true)
+    expect(parseArgs(['bun', 'opcagent', '--no-cleanup', 'run', 'hello']).noCleanup).toBe(true)
   })
 
   it('parses workspace-dir', () => {
-    expect(parseArgs(['bun', 'mkagent', '--workspace-dir', '/tmp/workspace', 'run', 'hello']).workspaceDir).toBe('/tmp/workspace')
+    expect(parseArgs(['bun', 'opcagent', '--workspace-dir', '/tmp/workspace', 'run', 'hello']).workspaceDir).toBe('/tmp/workspace')
   })
 
   it('parseArgs: run with --source accumulates sources', () => {
     const args = parseArgs([
-      'bun', 'mkagent',
+      'bun', 'opcagent',
       '--source', 'craft-kb',
       '--source', 'github',
       'run', 'do', 'stuff',
@@ -39,7 +39,7 @@ describe('run command', () => {
   })
 
   it('leaves workspace-dir undefined by default', () => {
-    expect(parseArgs(['bun', 'mkagent', 'run', 'hello']).workspaceDir).toBeUndefined()
+    expect(parseArgs(['bun', 'opcagent', 'run', 'hello']).workspaceDir).toBeUndefined()
   })
 
   it('bootstraps a connection only when required', () => {

@@ -1,4 +1,4 @@
-/** API-key/local connection step for the Pi-only MkAgent runtime. */
+/** API-key/local connection step for the Pi-only OPC Agent runtime. */
 import { useTranslation } from "react-i18next"
 import { ExternalLink } from "lucide-react"
 import type { ApiSetupMethod } from "./APISetupStep"

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Check, DatabaseZap } from 'lucide-react'
-import { FilterableSelectPopover } from '@mkagent/ui'
+import { FilterableSelectPopover } from '@opcagent/ui'
 
 import { cn } from '@/lib/utils'
 import { SourceAvatar } from '@/components/ui/source-avatar'

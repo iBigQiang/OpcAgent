@@ -1,11 +1,11 @@
 import { useState } from "react"
-import { parseLabelEntry, formatLabelEntry, formatDisplayValue } from "@mkagent/shared/labels"
+import { parseLabelEntry, formatLabelEntry, formatDisplayValue } from "@opcagent/shared/labels"
 import { useTheme } from "@/context/ThemeContext"
 import { cn } from "@/lib/utils"
 import { openLabelLink } from "@/lib/open-label-link"
 import { LabelValuePopover } from "./label-value-popover"
 import { LabelValueTypeIcon, resolveLabelColor } from "./label-icon"
-import type { LabelConfig } from "@mkagent/shared/labels"
+import type { LabelConfig } from "@opcagent/shared/labels"
 
 interface EntityListLabelBadgeProps {
   label: LabelConfig

@@ -8,13 +8,13 @@ const SESSION_MANAGER_URL = pathToFileURL(join(import.meta.dir, 'SessionManager.
 
 describe('SessionManager branching', () => {
   it('copies transcript and Pi resume metadata through the selected message', () => {
-    const configDir = mkdtempSync(join(tmpdir(), 'mkagent-session-branch-'))
+    const configDir = mkdtempSync(join(tmpdir(), 'opcagent-session-branch-'))
     try {
       const script = `
         import { mkdirSync, writeFileSync } from 'node:fs';
         import { join } from 'node:path';
         import { SessionManager, savePiTurnAnchor, loadPiTurnAnchors } from ${JSON.stringify(SESSION_MANAGER_URL)};
-        import { createSession, getSessionPath, loadSession, saveSession } from '@mkagent/shared/sessions';
+        import { createSession, getSessionPath, loadSession, saveSession } from '@opcagent/shared/sessions';
 
         const configDir = process.env.CONFIG_DIR;
         const workspaceRoot = join(configDir, 'workspaces', 'default');

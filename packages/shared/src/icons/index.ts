@@ -1,7 +1,7 @@
 /**
  * Icons module - re-exports all icon types and constants.
  *
- * Import via: `import { IconSize, ResolvedEntityIcon } from '@mkagent/shared/icons'`
+ * Import via: `import { IconSize, ResolvedEntityIcon } from '@opcagent/shared/icons'`
  */
 export {
   type IconConfig,

@@ -1,8 +1,8 @@
-import { RPC_CHANNELS } from '@mkagent/shared/protocol'
-import { getCredentialManager } from '@mkagent/shared/credentials'
-import type { RpcServer } from '@mkagent/server-core/transport'
+import { RPC_CHANNELS } from '@opcagent/shared/protocol'
+import { getCredentialManager } from '@opcagent/shared/credentials'
+import type { RpcServer } from '@opcagent/server-core/transport'
 import type { HandlerDeps } from '../handler-deps'
-import { requestClientConfirmDialog } from '@mkagent/server-core/transport'
+import { requestClientConfirmDialog } from '@opcagent/server-core/transport'
 
 export const HANDLED_CHANNELS = [
   RPC_CHANNELS.auth.SHOW_DELETE_SESSION_CONFIRMATION,

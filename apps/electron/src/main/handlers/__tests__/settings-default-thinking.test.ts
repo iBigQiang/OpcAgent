@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, mock } from 'bun:test'
 import { RPC_CHANNELS } from '../../../shared/types'
-import type { RpcServer } from '@mkagent/server-core/transport'
+import type { RpcServer } from '@opcagent/server-core/transport'
 import type { HandlerDeps } from '../handler-deps'
 
 type HandlerFn = (ctx: { clientId: string }, ...args: any[]) => Promise<any> | any
@@ -8,7 +8,7 @@ type HandlerFn = (ctx: { clientId: string }, ...args: any[]) => Promise<any> | a
 const getDefaultThinkingLevelMock = mock(() => 'think')
 const setDefaultThinkingLevelMock = mock((_level: string) => true)
 
-mock.module('@mkagent/shared/config', () => ({
+mock.module('@opcagent/shared/config', () => ({
   getPreferencesPath: () => '/tmp/preferences.json',
   getSessionDraft: () => null,
   setSessionDraft: () => {},
@@ -61,7 +61,7 @@ describe('settings default thinking RPC handlers', () => {
       },
     }
 
-    const { registerSettingsHandlers } = await import('@mkagent/server-core/handlers/rpc/settings')
+    const { registerSettingsHandlers } = await import('@opcagent/server-core/handlers/rpc/settings')
     registerSettingsHandlers(server, deps)
   })
 

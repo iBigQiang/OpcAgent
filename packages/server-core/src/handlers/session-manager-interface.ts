@@ -4,9 +4,9 @@ import type {
   StoredAttachment,
   Workspace,
   WorkspaceInfo,
-} from '@mkagent/core/types'
-import type { PermissionMode } from '@mkagent/shared/agent/mode-types'
-import type { ThinkingLevel } from '@mkagent/shared/agent/thinking-levels'
+} from '@opcagent/core/types'
+import type { PermissionMode } from '@opcagent/shared/agent/mode-types'
+import type { ThinkingLevel } from '@opcagent/shared/agent/thinking-levels'
 import type {
   AuthResult,
   CreateSessionOptions,
@@ -17,8 +17,8 @@ import type {
   SendMessageOptions,
   Session,
   UnreadSummary,
-} from '@mkagent/shared/protocol'
-import type { DispatchMode, SessionBundle } from '@mkagent/shared/sessions'
+} from '@opcagent/shared/protocol'
+import type { DispatchMode, SessionBundle } from '@opcagent/shared/sessions'
 import type { EventSink } from '../transport'
 import type { ExecutePromptAutomationInput } from '../sessions/SessionManager'
 

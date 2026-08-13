@@ -17,7 +17,7 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from '@mkagent/ui'
+} from '@opcagent/ui'
 import type { SourceConnectionStatus } from '../../../shared/types'
 
 export interface SourceStatusIndicatorProps {

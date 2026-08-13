@@ -25,7 +25,7 @@ class DocDiffSmokeTests(unittest.TestCase):
         f1 = self.tmpdir / "a.txt"
         f2 = self.tmpdir / "b.txt"
         f1.write_text("hello\nworld\n", encoding="utf-8")
-        f2.write_text("hello\nmkagent\n", encoding="utf-8")
+        f2.write_text("hello\nopcagent\n", encoding="utf-8")
 
         result = self.run_tool(str(f1), str(f2), "--format", "summary")
         self.assertEqual(result.returncode, 0, msg=result.stderr)

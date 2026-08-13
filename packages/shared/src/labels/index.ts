@@ -6,7 +6,7 @@
  * Hierarchy is encoded as a nested JSON tree (children arrays).
  *
  * This barrel is browser-safe (no Node.js dependencies).
- * For filesystem operations, import from '@mkagent/shared/labels/storage'.
+ * For filesystem operations, import from '@opcagent/shared/labels/storage'.
  */
 
 // Types
@@ -24,5 +24,5 @@ export * from './resolve.ts';
 // Label filter matching (the single list/AppShell filter predicate)
 export * from './filter.ts';
 
-// Auto-labels: import directly from '@mkagent/shared/labels/auto' to keep
+// Auto-labels: import directly from '@opcagent/shared/labels/auto' to keep
 // regex evaluation code out of the renderer bundle (backend-only concern).

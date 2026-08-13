@@ -1,4 +1,4 @@
-import type { ActivityItem, FileChange } from '@mkagent/ui'
+import type { ActivityItem, FileChange } from '@opcagent/ui'
 
 function asString(value: unknown): string | undefined {
   return typeof value === 'string' ? value : undefined

@@ -7,7 +7,7 @@ import { exportResources, importResources, validateResourceBundle } from '../res
 const roots: string[] = []
 
 function workspace(): string {
-  const root = mkdtempSync(join(tmpdir(), 'mkagent-resources-'))
+  const root = mkdtempSync(join(tmpdir(), 'opcagent-resources-'))
   roots.push(root)
   mkdirSync(join(root, 'sources'), { recursive: true })
   mkdirSync(join(root, 'skills'), { recursive: true })

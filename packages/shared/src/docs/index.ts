@@ -4,7 +4,7 @@
  * Provides access to built-in documentation that Claude can reference
  * when performing retained configuration tasks.
  *
- * Docs are stored at ~/.mkagent/docs/ and synced from bundled assets.
+ * Docs are stored at ~/.opcagent/docs/ and synced from bundled assets.
  * Source content lives in apps/electron/resources/docs/*.md for easier editing.
  */
 
@@ -111,7 +111,7 @@ export const DOC_REFS = {
   markdownPreview: `${APP_ROOT}/docs/markdown-preview.md`,
   llmTool: `${APP_ROOT}/docs/llm-tool.md`,
   browserTools: `${APP_ROOT}/docs/browser-tools.md`,
-  mkagentCli: `${APP_ROOT}/docs/mkagent-cli.md`,
+  opcagentCli: `${APP_ROOT}/docs/opcagent-cli.md`,
   docsDir: `${APP_ROOT}/docs/`,
 } as const;
 

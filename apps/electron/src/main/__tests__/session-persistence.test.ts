@@ -5,7 +5,7 @@
  * 3. Orphaned llmConnection references must be detected
  */
 import { describe, it, expect } from 'bun:test'
-import { DEFAULT_MODEL } from '@mkagent/shared/config'
+import { DEFAULT_MODEL } from '@opcagent/shared/config'
 
 // ============================================================================
 // createdAt preservation during persistence

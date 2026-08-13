@@ -23,8 +23,8 @@
     "noPropertyAccessFromIndexSignature": false,
     "baseUrl": ".",
     "paths": {
-      "@mkagent/core": ["./src/index.ts"],
-      "@mkagent/core/*": ["./src/*"]
+      "@opcagent/core": ["./src/index.ts"],
+      "@opcagent/core/*": ["./src/*"]
     },
     "rootDir": "src",
     "outDir": "dist",

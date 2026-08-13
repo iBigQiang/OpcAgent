@@ -9,7 +9,7 @@ import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import * as Icons from 'lucide-react'
-import { Spinner } from '@mkagent/ui'
+import { Spinner } from '@opcagent/ui'
 import {
   DropdownMenu,
   DropdownMenuTrigger,

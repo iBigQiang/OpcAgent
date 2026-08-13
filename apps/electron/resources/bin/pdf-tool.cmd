@@ -1,2 +1,2 @@
 @echo off
-"%MKAGENT_UV%" run --python 3.12 "%MKAGENT_SCRIPTS%\pdf_tool.py" %*
+"%OPCAGENT_UV%" run --python 3.12 "%OPCAGENT_SCRIPTS%\pdf_tool.py" %*

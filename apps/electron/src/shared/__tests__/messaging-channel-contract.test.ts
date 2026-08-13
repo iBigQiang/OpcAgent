@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { RPC_CHANNELS } from '@mkagent/shared/protocol'
+import { RPC_CHANNELS } from '@opcagent/shared/protocol'
 import { CHANNEL_MAP } from '../../transport/channel-map'
 
 describe('restored Messaging renderer contract', () => {

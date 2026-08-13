@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import { RPC_CHANNELS } from '@mkagent/shared/protocol'
+import { RPC_CHANNELS } from '@opcagent/shared/protocol'
 import { SessionManager } from './SessionManager.ts'
 
 // Locks the session_created emit primitive used by createSession's default announcement.

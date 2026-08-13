@@ -1,6 +1,6 @@
 {
-  "name": "@mkagent/messaging-whatsapp-worker",
-  "version": "0.1.0",
+  "name": "@opcagent/messaging-whatsapp-worker",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "main": "src/worker.ts",

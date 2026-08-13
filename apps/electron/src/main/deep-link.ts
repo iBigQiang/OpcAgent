@@ -1,19 +1,19 @@
 /**
  * Deep Link Handler
  *
- * Parses mkagent:// URLs and routes to appropriate actions.
+ * Parses opcagent:// URLs and routes to appropriate actions.
  *
  * URL Formats (workspace is optional - uses active window if omitted):
  *
  * Compound format (hierarchical navigation):
- *   mkagent://allSessions[/session/{sessionId}]            - Session list (all sessions)
- *   mkagent://flagged[/session/{sessionId}]             - Session list (flagged filter)
- *   mkagent://archived[/session/{sessionId}]            - Archived sessions
- *   mkagent://settings[/{subpage}]                   - Settings (general, shortcuts, preferences)
+ *   opcagent://allSessions[/session/{sessionId}]            - Session list (all sessions)
+ *   opcagent://flagged[/session/{sessionId}]             - Session list (flagged filter)
+ *   opcagent://archived[/session/{sessionId}]            - Archived sessions
+ *   opcagent://settings[/{subpage}]                   - Settings (general, shortcuts, preferences)
  *
  * Action format:
- *   mkagent://action/{actionName}[/{id}][?params]
- *   mkagent://workspace/{workspaceId}/action/{actionName}[?params]
+ *   opcagent://action/{actionName}[/{id}][?params]
+ *   opcagent://workspace/{workspaceId}/action/{actionName}[?params]
  *
  * Actions:
  *   new-chat                  - Create new chat, optional ?input=text&name=name&send=true
@@ -23,18 +23,18 @@
  *   unflag-session/{id}       - Unflag session
  *
  * Examples:
- *   mkagent://allSessions                               (all sessions view)
- *   mkagent://allSessions/session/abc123                (specific session)
- *   mkagent://settings/shortcuts                     (shortcuts page)
- *   mkagent://action/new-chat                        (uses active window)
- *   mkagent://workspace/ws123/allSessions/session/abc123   (targets specific workspace)
+ *   opcagent://allSessions                               (all sessions view)
+ *   opcagent://allSessions/session/abc123                (specific session)
+ *   opcagent://settings/shortcuts                     (shortcuts page)
+ *   opcagent://action/new-chat                        (uses active window)
+ *   opcagent://workspace/ws123/allSessions/session/abc123   (targets specific workspace)
  */
 
 import type { BrowserWindow } from 'electron'
 import { mainLog } from './logger'
 import type { WindowManager } from './window-manager'
 import { RPC_CHANNELS } from '../shared/types'
-import type { EventSink } from '@mkagent/server-core/transport'
+import type { EventSink } from '@opcagent/server-core/transport'
 
 export interface DeepLinkTarget {
   /** Workspace ID - undefined means use active window */
@@ -92,13 +92,13 @@ export function parseDeepLink(url: string): DeepLinkTarget | null {
   try {
     const parsed = new URL(url)
 
-    if (parsed.protocol !== 'mkagent:') {
+    if (parsed.protocol !== 'opcagent:') {
       return null
     }
 
     // For custom protocols, the hostname contains the first path segment
-    // e.g., mkagent://workspace/ws123 → hostname='workspace', pathname='/ws123'
-    // e.g., mkagent://allSessions/chat/abc → hostname='allSessions', pathname='/chat/abc'
+    // e.g., opcagent://workspace/ws123 → hostname='workspace', pathname='/ws123'
+    // e.g., opcagent://allSessions/chat/abc → hostname='allSessions', pathname='/chat/abc'
     const host = parsed.hostname
     const pathParts = parsed.pathname.split('/').filter(Boolean)
     const windowMode = parseWindowMode(parsed)
@@ -109,7 +109,7 @@ export function parseDeepLink(url: string): DeepLinkTarget | null {
       'allSessions', 'flagged', 'archived', 'settings', 'skills'
     ]
 
-    // mkagent://allSessions/..., mkagent://settings/..., etc. (compound routes)
+    // opcagent://allSessions/..., opcagent://settings/..., etc. (compound routes)
     if (COMPOUND_ROUTE_PREFIXES.includes(host)) {
       // Reconstruct the full compound route from host + pathname
       const viewRoute = pathParts.length > 0 ? `${host}/${pathParts.join('/')}` : host
@@ -121,7 +121,7 @@ export function parseDeepLink(url: string): DeepLinkTarget | null {
       }
     }
 
-    // mkagent://workspace/{workspaceId}/... (with workspace targeting)
+    // opcagent://workspace/{workspaceId}/... (with workspace targeting)
     if (host === 'workspace') {
       const workspaceId = pathParts[0]
       if (!workspaceId) return null
@@ -159,7 +159,7 @@ export function parseDeepLink(url: string): DeepLinkTarget | null {
       return result
     }
 
-    // mkagent://action/... (no workspace - uses active window)
+    // opcagent://action/... (no workspace - uses active window)
     if (host === 'action') {
       const result: DeepLinkTarget = {
         workspaceId: undefined,

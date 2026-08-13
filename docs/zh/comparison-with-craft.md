@@ -1,40 +1,40 @@
-# MkAgent vs Craft Agents 当前差异对比
+# OPC Agent vs Craft Agents 当前差异对比
 
 > 快照时间：**2026-08-10**。
-> 对比基线：**2026-08-10** 的 MkAgent `main`（`00c0df4`）以及上游 tag [`craft-ai-agents/craft-agents-oss` `v0.11.2` / `a60ebc1a5a7c`](https://github.com/craft-ai-agents/craft-agents-oss)。数字是仓库快照，不是实时发布指标。任一基线变化后，应按文末命令重新审计；当前 checkout 存在一个既有的 `README.md` 修改但未刷新血缘 manifest 的提示。
+> 对比基线：**2026-08-10** 的 OPC Agent `main`（`00c0df4`）以及上游 tag [`craft-ai-agents/craft-agents-oss` `v0.11.2` / `a60ebc1a5a7c`](https://github.com/craft-ai-agents/craft-agents-oss)。数字是仓库快照，不是实时发布指标。任一基线变化后，应按文末命令重新审计；当前 checkout 存在一个既有的 `README.md` 修改但未刷新血缘 manifest 的提示。
 > 数据来源：两个仓库当前 on-disk 的工作区与既有的构建产物（非本轮新抓的网络数据）；重跑前请用记录中的 commit 重新 checkout 两个仓库。
 
-本文用源码与构件证据解释 MkAgent 相对 Craft Agents 保留了什么、物理删除了什么、以及这些选择会怎样改变你最终交付的安装包。MkAgent 是基于同一套架构与 renderer 的"Lite"衍生版；下面的表格是"现在到底哪里不一样"的标准答案。
+本文用源码与构件证据解释 OPC Agent 相对 Craft Agents 保留了什么、物理删除了什么、以及这些选择会怎样改变你最终交付的安装包。OPC Agent 是基于同一套架构与 renderer 的"Lite"衍生版；下面的表格是"现在到底哪里不一样"的标准答案。
 
 ## 1. 仓库与源码规模
 
-两个仓库都是 Bun monorepo，使用相同的 workspace 布局（`apps/{electron,webui,cli}` + `packages/{core,shared,ui,server-core,server,pi-agent-server,session-tools-core}`）。MkAgent 沿用这套布局，丢弃了 Craft 中两个仅供产品使用的 package（`messaging-gateway`、`messaging-whatsapp-worker`），删除了整个 `apps/viewer` 应用，并且完全不实例化 Craft 的 session-MCP/bridge-MCP server。
+两个仓库都是 Bun monorepo，使用相同的 workspace 布局（`apps/{electron,webui,cli}` + `packages/{core,shared,ui,server-core,server,pi-agent-server,session-tools-core}`）。OPC Agent 沿用这套布局，丢弃了 Craft 中两个仅供产品使用的 package（`messaging-gateway`、`messaging-whatsapp-worker`），删除了整个 `apps/viewer` 应用，并且完全不实例化 Craft 的 session-MCP/bridge-MCP server。
 
-| 指标 | MkAgent | Craft Agents | 备注 |
+| 指标 | OPC Agent | Craft Agents | 备注 |
 |---|---:|---:|---|
-| 已跟踪的 TypeScript/TSX 行数（`*.ts`、`*.tsx`，排除 `node_modules`、`dist`、`release`、`.git`） | **190,558** | 344,964 | MkAgent 源码规模约 Craft 的 **55 %** |
+| 已跟踪的 TypeScript/TSX 行数（`*.ts`、`*.tsx`，排除 `node_modules`、`dist`、`release`、`.git`） | **190,558** | 344,964 | OPC Agent 源码规模约 Craft 的 **55 %** |
 | 当前 `git ls-files` 跟踪的源文件数 | 1,163 | ~1,719 | 与 Craft 同路径率 96 %（`bun run audit:craft-reuse`） |
-| 同路径且归一化后逐字一致 | 686（59 %） | — | 归一化只允许机械替换：`@mkagent/*` <-> `@craft-agent/*`、`mkagent://` 协议、`~/.mkagent` 配置根目录、品牌字符串 |
+| 同路径且归一化后逐字一致 | 686（59 %） | — | 归一化只允许机械替换：`@opcagent/*` <-> `@craft-agent/*`、`opcagent://` 协议、`~/.opcagent` 配置根目录、品牌字符串 |
 | 同路径但属于 Lite 定制缝 | 430 | — | Lite 边界（如 Sources/MCP 分支被删）+ 品牌替换 |
-| MkAgent 独有源文件 | 47 | — | MkAgent 品牌资产、`audit:craft-reuse`、lint/CLI 脚本；等价于 Craft 的 `apps/online-docs` 文件已移除 |
-| Craft 有而 MkAgent 没有的源文件 | — | 606 | 被 Lite 边界删除（Claude backend、OAuth、Sources、MCP、Messaging、Viewer、automations...） |
-| `dependencies` 顶层条目 | 55 | 61 | MkAgent 删去 `@anthropic-ai/claude-agent-sdk`、`@anthropic-ai/sdk`、`@dnd-kit/{dom,helpers}`、`@github/copilot-sdk`、`@modelcontextprotocol/sdk`，以及 messaging OAuth 流程相关包；数字下降反映的是 Lite 后端注册表，不是运行时缺失 |
-| `devDependencies` 顶层条目 | 33 | 34 | 唯一有意义的差异是 `@aws-sdk/client-s3`（只在上游 release 上传到 S3 时使用；MkAgent 的 `electron-updater` 走 GitHub Releases，不需要它） |
+| OPC Agent 独有源文件 | 47 | — | OPC Agent 品牌资产、`audit:craft-reuse`、lint/CLI 脚本；等价于 Craft 的 `apps/online-docs` 文件已移除 |
+| Craft 有而 OPC Agent 没有的源文件 | — | 606 | 被 Lite 边界删除（Claude backend、OAuth、Sources、MCP、Messaging、Viewer、automations...） |
+| `dependencies` 顶层条目 | 55 | 61 | OPC Agent 删去 `@anthropic-ai/claude-agent-sdk`、`@anthropic-ai/sdk`、`@dnd-kit/{dom,helpers}`、`@github/copilot-sdk`、`@modelcontextprotocol/sdk`，以及 messaging OAuth 流程相关包；数字下降反映的是 Lite 后端注册表，不是运行时缺失 |
+| `devDependencies` 顶层条目 | 33 | 34 | 唯一有意义的差异是 `@aws-sdk/client-s3`（只在上游 release 上传到 S3 时使用；OPC Agent 的 `electron-updater` 走 GitHub Releases，不需要它） |
 | 在干净 `bun install --frozen-lockfile` 下的 `node_modules/` 大小 | **2.0 GB** | 2.5 GB | 0.5 GB 差量与下文删除的 native + SDK bundle 一致 |
 
 ## 2. 实际存在的 apps 和 packages
 
-| 路径 | MkAgent | Craft Agents |
+| 路径 | OPC Agent | Craft Agents |
 |---|---|---|
 | `apps/electron` | Yes（共享 renderer + preload + Browser 面板 + Sentry + 自动更新） | Yes（同） |
 | `apps/webui` | Yes（通过浏览器 adapter 加载同一份 renderer） | Yes（同） |
-| `apps/cli` | Yes（`run`、`session`、`workspace`、`send` 等） | Yes（同命令面 + Sources/Automations 额外子命令，MkAgent **不**暴露） |
+| `apps/cli` | Yes（`run`、`session`、`workspace`、`send` 等） | Yes（同命令面 + Sources/Automations 额外子命令，OPC Agent **不**暴露） |
 | `apps/viewer` | No（已删除） | Yes（用于公开分享会话的独立 Electron Viewer） |
 | `packages/core` | Yes | Yes |
 | `packages/shared` | Yes（已移除 `messaging-gateway`、`interceptor-common`、`feature-flags`、`interceptor-request-utils`） | Yes（完整规模） |
 | `packages/ui` | Yes | Yes |
 | `packages/server-core` | Yes | Yes |
-| `packages/server` | Yes（headless `MKAGENT_SERVER_TOKEN` server） | Yes |
+| `packages/server` | Yes（headless `OPCAGENT_SERVER_TOKEN` server） | Yes |
 | `packages/pi-agent-server` | Yes（唯一注册的 backend） | Yes（与 Craft 的 `claude-agent-sdk` 并存） |
 | `packages/session-tools-core` | Yes（Labels/Statuses/MCP/Sources OAuth 分支被裁剪） | Yes（完整规模） |
 | `packages/messaging-gateway` | No（已删除） | Yes |
@@ -45,7 +45,7 @@
 
 ## 3. Backend / 运行时边界
 
-| 维度 | MkAgent | Craft Agents |
+| 维度 | OPC Agent | Craft Agents |
 |---|---|---|
 | 已注册的 `AgentBackend` | 仅 `pi` | `pi`、`claude-agent-sdk`，外加可选的 **Copilot / gateway** 订阅 |
 | 鉴权模型 | API key + 自定义端点 + Ollama + **ChatGPT/Claude 订阅 OAuth**，全部通过 Pi | API key + 自定义 + **OAuth（Anthropic、OpenAI、GitHub Copilot、Google Workspace、Slack、Microsoft）** + 订阅流程 + gateway |
@@ -53,11 +53,11 @@
 | 内置传输 | OpenAI-兼容、Anthropic-兼容、Ollama（Pi `0.80.6`） | 同上，外加 Anthropic SDK 直连模式与 Copilot SDK 模式 |
 | 图片生成 | No（未接入生图工具；图片附件仍支持） | No（未注册生图工具；底层 `pi-ai` 依赖包含未接入的 OpenRouter 图片生成 API） |
 
-这里的“图片生成”指 Agent 可调用的产品能力，而不是依赖包是否包含相关 API。MkAgent 与当前对照的 Craft 源码都没有 `gen_image` 的实现或工具注册；两者使用的 `@earendil-works/pi-ai` 依赖虽然提供独立的 `ImagesModel` / `generateImages()` 抽象及 OpenRouter provider，但 Craft 只接入了普通模型目录和对话调用链。`supportsImages` 则表示对话模型能否接收图片附件，属于图片输入/视觉能力，也不代表能够生成图片。
+这里的“图片生成”指 Agent 可调用的产品能力，而不是依赖包是否包含相关 API。OPC Agent 与当前对照的 Craft 源码都没有 `gen_image` 的实现或工具注册；两者使用的 `@earendil-works/pi-ai` 依赖虽然提供独立的 `ImagesModel` / `generateImages()` 抽象及 OpenRouter provider，但 Craft 只接入了普通模型目录和对话调用链。`supportsImages` 则表示对话模型能否接收图片附件，属于图片输入/视觉能力，也不代表能够生成图片。
 
 ## 4. Agent tools —— 模型实际能调用的工具
 
-两边都通过三个通道把工具暴露给 LLM：(a) Pi SDK 自带的工具，在 `packages/pi-agent-server/src/index.ts` 的 `builtinDefs` 里实例化；(b) Web 工具，同一文件里通过 `createSearchTool` + `createWebFetchTool` 声明；(c) 会话级工具，由主进程通过 `register_tools` 消息注册到 Pi 子进程，模型侧以 `mcp__session__<name>` 前缀看到（详见 `packages/session-tools-core/src/tool-defs.ts`）。Craft 还额外从 `mcpPool`（Sources / bridge / session MCP）暴露工具；MkAgent 没有 `mcpPool`，`registerPoolToolsWithSubprocess()` 在代码上物理删除（`packages/shared/src/agent/pi-agent.ts`）。
+两边都通过三个通道把工具暴露给 LLM：(a) Pi SDK 自带的工具，在 `packages/pi-agent-server/src/index.ts` 的 `builtinDefs` 里实例化；(b) Web 工具，同一文件里通过 `createSearchTool` + `createWebFetchTool` 声明；(c) 会话级工具，由主进程通过 `register_tools` 消息注册到 Pi 子进程，模型侧以 `mcp__session__<name>` 前缀看到（详见 `packages/session-tools-core/src/tool-defs.ts`）。Craft 还额外从 `mcpPool`（Sources / bridge / session MCP）暴露工具；OPC Agent 没有 `mcpPool`，`registerPoolToolsWithSubprocess()` 在代码上物理删除（`packages/shared/src/agent/pi-agent.ts`）。
 
 ### 4.1 Pi SDK 内置工具（两边完全一致）
 
@@ -84,9 +84,9 @@
 
 ### 4.3 会话级 `mcp__session__*` 工具 —— 真正的砍点
 
-`packages/session-tools-core/src/tool-defs.ts` 的 `SESSION_TOOL_DEFS` 是单一来源。模型看到的每个条目都带 `mcp__session__` 前缀。MkAgent 保留 **15** 个，Craft 暴露 **27** 个。
+`packages/session-tools-core/src/tool-defs.ts` 的 `SESSION_TOOL_DEFS` 是单一来源。模型看到的每个条目都带 `mcp__session__` 前缀。OPC Agent 保留 **15** 个，Craft 暴露 **27** 个。
 
-| 工具（模型侧名称） | MkAgent | Craft | 作用 / MkAgent 删除原因 |
+| 工具（模型侧名称） | OPC Agent | Craft | 作用 / OPC Agent 删除原因 |
 |:---:|:---:|:---:|:---|
 | `mcp__session__SubmitPlan` | Yes | Yes | 计划评审；提交 plan 文件并暂停当前 turn |
 | `mcp__session__browser_tool` | Yes | Yes | 控制 Browser 面板 |
@@ -107,8 +107,8 @@
 | `mcp__session__list_messaging_channels` | No | Yes | 列出已绑定的外部 messaging channel。和 messaging gateway 一起删除。 |
 | `mcp__session__unbind_messaging_channel` | No | Yes | `list_messaging_channels` 的对应动作；同上。 |
 | `mcp__session__render_template` | No | Yes | 模板渲染助手。属于会话工具渲染禁用的一部分删除；见 `migration/migration-features.md`。 |
-| `mcp__session__set_session_labels` | No | Yes | 在会话上设置用户自定义 label。MkAgent 没有 label 产品面。 |
-| `mcp__session__set_session_status` | No | Yes | 在会话上设置用户自定义 status。MkAgent 没有用户自定义 status。 |
+| `mcp__session__set_session_labels` | No | Yes | 在会话上设置用户自定义 label。OPC Agent 没有 label 产品面。 |
+| `mcp__session__set_session_status` | No | Yes | 在会话上设置用户自定义 status。OPC Agent 没有用户自定义 status。 |
 | `mcp__session__source_credential_prompt` | No | Yes | Source 的 OAuth 凭证输入。和 Sources 一起删除。 |
 | `mcp__session__source_oauth_trigger` | No | Yes | 通用 Source OAuth 触发器。 |
 | `mcp__session__source_google_oauth_trigger` | No | Yes | Google OAuth Source 触发器。 |
@@ -118,9 +118,9 @@
 
 ### 4.4 Source pool / MCP 工具
 
-Craft 在 `mcpPool` 里注册所有 Source（API Source、MCP Source）暴露的 proxy 工具，并通过第二个 `register_tools` 消息把这些 tool 定义发到 Pi 子进程（`packages/shared/src/agent/pi-agent.ts` 的 `registerPoolToolsWithSubprocess`）。同时 Craft 自带 `bridge-mcp-server` 和 `session-mcp-server` 两个 MCP server 包。MkAgent 没有 `mcpPool`，也不带这两个 MCP 包。
+Craft 在 `mcpPool` 里注册所有 Source（API Source、MCP Source）暴露的 proxy 工具，并通过第二个 `register_tools` 消息把这些 tool 定义发到 Pi 子进程（`packages/shared/src/agent/pi-agent.ts` 的 `registerPoolToolsWithSubprocess`）。同时 Craft 自带 `bridge-mcp-server` 和 `session-mcp-server` 两个 MCP server 包。OPC Agent 没有 `mcpPool`，也不带这两个 MCP 包。
 
-| Source / MCP 通道 | MkAgent | Craft | 备注 |
+| Source / MCP 通道 | OPC Agent | Craft | 备注 |
 |:---:|:---:|:---:|:---|
 | API Source 代理（HTTP / GraphQL 等） | No | Yes | 通过 Sources UI 配置的真实 API 端点 |
 | MCP Source 代理（stdio MCP server） | No | Yes | 每个 Source 一个独立 MCP 进程，自带权限 |
@@ -130,9 +130,9 @@ Craft 在 `mcpPool` 里注册所有 Source（API Source、MCP Source）暴露的
 
 ### 4.5 Claude backend 工具（只在 Craft 存在）
 
-Craft 注册的第二个 backend 是 `claude-agent-sdk`，自带的 Claude Code 风格工具，Pi 并不定义。MkAgent 没有 Claude backend，因此这些工具全部不存在。Claude backend 绑定在仓库里物理删除 —— `packages/shared/src/agent/backend/internal/drivers/` 下没有 `claude-agent-sdk` driver —— 即便在系统 prompt 里看到一个 Claude 工具名，MkAgent 也没有执行路径。
+Craft 注册的第二个 backend 是 `claude-agent-sdk`，自带的 Claude Code 风格工具，Pi 并不定义。OPC Agent 没有 Claude backend，因此这些工具全部不存在。Claude backend 绑定在仓库里物理删除 —— `packages/shared/src/agent/backend/internal/drivers/` 下没有 `claude-agent-sdk` driver —— 即便在系统 prompt 里看到一个 Claude 工具名，OPC Agent 也没有执行路径。
 
-| Tool | 所属 backend | MkAgent | Craft |
+| Tool | 所属 backend | OPC Agent | Craft |
 |---|---|:---:|:---:|
 | `TodoWrite` | claude-agent-sdk | No | Yes |
 | `NotebookEdit` | claude-agent-sdk | No | Yes |
@@ -143,7 +143,7 @@ Craft 注册的第二个 backend 是 `claude-agent-sdk`，自带的 Claude Code 
 
 只在"没有用户配置 Source"的前提下数每个 backend 默认注册的、可调用的工具数：
 
-| 工具来源 | MkAgent | Craft |
+| 工具来源 | OPC Agent | Craft |
 |---|---:|---:|
 | Pi SDK 内置（§4.1） | 7 | 7 |
 | Web 工具（§4.2） | 2 | 2 |
@@ -157,11 +157,11 @@ Craft 注册的第二个 backend 是 `claude-agent-sdk`，自带的 Claude Code 
 
 ## 5. 安装包体积（最关键的数字）
 
-以下是真正会交付给用户的体积，来自磁盘上 `apps/electron/release/<arch>/MkAgent.app` 的 dev 构建，以及 audit 脚本读到的上游 `craft-agents-oss` checkout。**所有数字都不包含代码签名开销**（MkAgent dev 构建设置 `MKAGENT_DEV_RUNTIME=1`；使用 `CSC_IDENTITY_AUTO_DISCOVERY=false` 的 release 构建是 ad-hoc/未签名的）。Craft Agents 的对照数字直接来自 `node_modules`，其中 `claude-agent-sdk-darwin-arm64/claude` 二进制单文件 **217 MB**。
+以下是真正会交付给用户的体积，来自磁盘上 `apps/electron/release/<arch>/OPC Agent.app` 的 dev 构建，以及 audit 脚本读到的上游 `craft-agents-oss` checkout。**所有数字都不包含代码签名开销**（OPC Agent dev 构建设置 `OPCAGENT_DEV_RUNTIME=1`；使用 `CSC_IDENTITY_AUTO_DISCOVERY=false` 的 release 构建是 ad-hoc/未签名的）。Craft Agents 的对照数字直接来自 `node_modules`，其中 `claude-agent-sdk-darwin-arm64/claude` 二进制单文件 **217 MB**。
 
-### 4.1 macOS arm64（`MkAgent.app` / `Craft-Agents-arm64.app`）
+### 4.1 macOS arm64（`OPC Agent.app` / `Craft-Agents-arm64.app`）
 
-| 组件 | MkAgent | Craft Agents | 差量（Craft − MkAgent） |
+| 组件 | OPC Agent | Craft Agents | 差量（Craft − OPC Agent） |
 |---|---:|---:|---:|
 | `Contents/Resources/app/dist/`（打包的 JS、renderer 资源、脚本） | 116 MB | ~380 MB | ~−264 MB |
 | `Contents/Resources/app/node_modules/`（运行时 node_modules + cron 包） | 5.0 MB | ~210 MB | ~−205 MB（Craft 还打包 SDK、MCP server、WhatsApp worker 等） |
@@ -170,17 +170,17 @@ Craft 注册的第二个 backend 是 `claude-agent-sdk`，自带的 Claude Code 
 | **小计** | **~183 MB** | **~652 MB** | **~−469 MB**（约 −72 %） |
 | `Contents/Frameworks/Electron Framework.framework` | 253 MB | 253 MB | 0（Electron 版本相同：`39.2.7`） |
 | `Contents/Frameworks/{Mantle,ReactiveObjC,Squirrel, Squirrel.framework}` | ~1 MB | ~1 MB | 0 |
-| `MkAgent Helper*.app`（Renderer/GPU/Plugin） | ~1 MB | ~1 MB | 0 |
-| **`MkAgent.app` 合计（未打包）** | **438 MB** | **~907 MB** | **~−469 MB** |
+| `OPC Agent Helper*.app`（Renderer/GPU/Plugin） | ~1 MB | ~1 MB | 0 |
+| **`OPC Agent.app` 合计（未打包）** | **438 MB** | **~907 MB** | **~−469 MB** |
 
-> 未打包 `.app` 已经包含 Helper apps 与 Electron framework；**不含**平台下载（DMG/ZIP 壳）。因为 `craft-agents-oss/node_modules/@anthropic-ai/claude-agent-sdk-darwin-arm64/claude` 单独就是一个 **217 MB** 的二进制，并且 `-darwin-x64` / `-win32-x64` / `-linux-x64` 的 per-platform `.zip` 体积相近，Craft 的 DMG/ZIP 压缩后**始终比 MkAgent 大 ≥ ~250 MB**。
+> 未打包 `.app` 已经包含 Helper apps 与 Electron framework；**不含**平台下载（DMG/ZIP 壳）。因为 `craft-agents-oss/node_modules/@anthropic-ai/claude-agent-sdk-darwin-arm64/claude` 单独就是一个 **217 MB** 的二进制，并且 `-darwin-x64` / `-win32-x64` / `-linux-x64` 的 per-platform `.zip` 体积相近，Craft 的 DMG/ZIP 压缩后**始终比 OPC Agent 大 ≥ ~250 MB**。
 
 ### 4.2 `electron-builder` 通过 `extraResources` 实际携带的内容
 
-| 安装包携带项 | MkAgent | Craft Agents | 携带体积 |
+| 安装包携带项 | OPC Agent | Craft Agents | 携带体积 |
 |---|---|---|---:|
 | per-platform **`claude` native 二进制**（Anthropic SDK） | No | Yes | **每个平台架构约 217 MB** |
-| 自带的 **`uv`** Python launcher（位于 `resources/bin/<platform-arch>/`） | Yes（`uv 0.10.6`；通过 `MKAGENT_UV` 注入） | Yes | 每个安装包携带目标架构约 ~30–55 MB |
+| 自带的 **`uv`** Python launcher（位于 `resources/bin/<platform-arch>/`） | Yes（`uv 0.10.6`；通过 `OPCAGENT_UV` 注入） | Yes | 每个安装包携带目标架构约 ~30–55 MB |
 | `@anthropic-ai/claude-agent-sdk` 精简 core + per-platform binary shim | No | Yes | core ~3.5 MB + binary 每个架构 ~217 MB |
 | `bridge-mcp-server/`（Craft 的 MCP bridge） | No | Yes | ~13 MB |
 | `session-mcp-server/`（Craft 的 session MCP） | No | Yes | ~50 KB TypeScript |
@@ -194,20 +194,20 @@ Craft 注册的第二个 backend 是 `claude-agent-sdk`，自带的 Claude Code 
 
 ### 4.3 对终端用户的实际效果
 
-| 效果 | MkAgent | Craft Agents |
+| 效果 | OPC Agent | Craft Agents |
 |---|---|---|
 | DMG（macOS arm64 / x64）下载包 | ~165 MB¹ | ~370 MB¹ |
 | macOS `.app` 安装占用 | ~438 MB | ~907 MB |
 | NSIS `.exe`（Windows x64） | ~210 MB¹ | ~430 MB¹ |
 | Linux AppImage | ~200 MB¹ | ~420 MB¹ |
-| 纯 CLI 模式（无 Electron） | `bun run cli:build` → `dist/mkagent` 约 1 MB；Craft 同 | ~1 MB（CLI payload 本身一致） |
+| 纯 CLI 模式（无 Electron） | `bun run cli:build` → `dist/opcagent` 约 1 MB；Craft 同 | ~1 MB（CLI payload 本身一致） |
 | `uv` 缓存为空时首次调用文档工具 | 可能按需下载 Python 3.12 与脚本声明的依赖 | 相同 |
 
-¹ **说明。** DMG / NSIS / AppImage 数字是从未打包 `.app` 大小以及 `electron-builder.yml` 的 `files` / `extraResources` 规则**推算**的，不是同窗口重建的实测值。两边的 release pipeline 都会下载或复制目标平台的 `uv`；Craft 还会引入约 217 MB 的 Claude SDK 二进制，MkAgent 跳过的是这部分 backend payload，而不是 `uv`。
+¹ **说明。** DMG / NSIS / AppImage 数字是从未打包 `.app` 大小以及 `electron-builder.yml` 的 `files` / `extraResources` 规则**推算**的，不是同窗口重建的实测值。两边的 release pipeline 都会下载或复制目标平台的 `uv`；Craft 还会引入约 217 MB 的 Claude SDK 二进制，OPC Agent 跳过的是这部分 backend payload，而不是 `uv`。
 
 ## 6. 功能面
 
-| 范围 | MkAgent | Craft Agents |
+| 范围 | OPC Agent | Craft Agents |
 |---|---|---|
 | Electron Desktop + WebUI + headless server + CLI + 共享 renderer | Yes | Yes |
 | Pi agent + Pi provider preset + API key 连接 | Yes | Yes |
@@ -218,7 +218,7 @@ Craft 注册的第二个 backend 是 `claude-agent-sdk`，自带的 Claude Code 
 | Browser 面板 + `web_search` + `web_fetch` | Yes | Yes |
 | 权限（safe / allow-all）+ 权限询问 | Yes | Yes |
 | 网络代理 | Yes | Yes |
-| 通过 `electron-updater` 从 GitHub Releases 自动更新 | Yes（指向 `MkThingsHQ/mkagent`） | Yes（指向 `https://agents.craft.do/electron/latest`） |
+| 通过 `electron-updater` 从 GitHub Releases 自动更新 | Yes（指向 `iBigQiang/OpcAgent`） | Yes（指向 `https://agents.craft.do/electron/latest`） |
 | Sentry（`@sentry/electron` + `@sentry/react`）；以 `SENTRY_ELECTRON_INGEST_URL` 为门控 | Yes | Yes |
 | Document tools（PDF / DOCX / XLSX / PPTX / 图片 / iCal / doc-diff / MarkItDown），基于 `uv` Python 包装 | Yes（自带 per-platform `uv`；开发期可从 PATH 回退） | Yes（自带 per-platform `uv`） |
 | Mini chat、`EditPopover`、mini model、标题与摘要 | Yes | Yes |
@@ -242,26 +242,26 @@ Craft 注册的第二个 backend 是 `claude-agent-sdk`，自带的 Claude Code 
 
 ## 7. 测试 / typecheck / lint 覆盖率差异
 
-| 检查 | MkAgent | Craft Agents | 结果 |
+| 检查 | OPC Agent | Craft Agents | 结果 |
 |---|---|---|---|
 | `bun run test`（主测试套件） | 3,078 通过 / 11 平台条件 skip | （量级接近；新 checkout 全量数待补） | 都绿 |
 | `bun run test:doc-tools` | 8 个 Python smoke 测试：pdf_tool、xlsx_tool、docx_tool、pptx_tool、img_tool、ical_tool、doc_diff、markitdown | （同） | 都绿 |
-| `bun run typecheck:all` | 通过；`apps/online-docs` 通过 `workspaces` glob 在 MkAgent 工作区中被排除，Craft 也是同样跳过 | 通过 | 都绿 |
-| `bun run lint` | `lint:craft-ui-sync`、`lint:craft-test-coverage`、`lint:electron`、`lint:shared`、`lint:ui` 通过；保留上游的 **20 个 React Hook `exhaustive-deps` 警告** | 额外有 `lint:ipc-sends`、`lint:tool-name-checks`、`lint:i18n:coverage`、`lint:i18n:strings`；**45 个 React Hook 警告** | MkAgent 的 lint 范围更窄 |
+| `bun run typecheck:all` | 通过；`apps/online-docs` 通过 `workspaces` glob 在 OPC Agent 工作区中被排除，Craft 也是同样跳过 | 通过 | 都绿 |
+| `bun run lint` | `lint:craft-ui-sync`、`lint:craft-test-coverage`、`lint:electron`、`lint:shared`、`lint:ui` 通过；保留上游的 **20 个 React Hook `exhaustive-deps` 警告** | 额外有 `lint:ipc-sends`、`lint:tool-name-checks`、`lint:i18n:coverage`、`lint:i18n:strings`；**45 个 React Hook 警告** | OPC Agent 的 lint 范围更窄 |
 | `bun run audit:craft-reuse` | 同路径 96 %、逐字一致 59 %、无解释缺失 0 条 | （不适用） | 绿 |
 | `bun run lint:craft-test-coverage` | 246 保留 / 5 替代 / 122 因 Lite 边界剔除 / **0 条无解释缺失** | （不适用） | 绿 |
 
-MkAgent 那边"零无解释缺失"的硬约束来自 [`scripts/check-craft-test-coverage.ts`](../../scripts/check-craft-test-coverage.ts)：每个上游 test 必须满足以下三项之一——(a) 同路径保留；(b) 替换为 Lite 等价测试；(c) 显式绑定到一项已删除的产品能力。
+OPC Agent 那边"零无解释缺失"的硬约束来自 [`scripts/check-craft-test-coverage.ts`](../../scripts/check-craft-test-coverage.ts)：每个上游 test 必须满足以下三项之一——(a) 同路径保留；(b) 替换为 Lite 等价测试；(c) 显式绑定到一项已删除的产品能力。
 
 ## 8. 许可证与归属
 
-两个项目均以 **Apache-2.0** 发布。MkAgent 在仓库根目录提供 [`NOTICE`](../../NOTICE)，按上游要求保留归属；[`docs/featues.md`](./featues.md) 以可读文本记录保留/删除范围。源码与 release 产物（DMG/ZIP/NSIS/AppImage、manifest、blockmap、checksum）现在统一放在 `MkThingsHQ/mkagent`，不再维护仅存放产物的镜像仓库。
+两个项目均以 **Apache-2.0** 发布。OPC Agent 在仓库根目录提供 [`NOTICE`](../../NOTICE)，按上游要求保留归属；[`docs/featues.md`](./featues.md) 以可读文本记录保留/删除范围。源码与 release 产物（DMG/ZIP/NSIS/AppImage、manifest、blockmap、checksum）现在统一放在 `iBigQiang/OpcAgent`，不再维护仅存放产物的镜像仓库。
 
 ## 9. 重跑本审计
 
 ```bash
-# 在 MkAgent checkout
-git rev-parse HEAD              # 记下 MkAgent commit
+# 在 OPC Agent checkout
+git rev-parse HEAD              # 记下 OPC Agent commit
 bun install --frozen-lockfile
 bun run audit:craft-reuse       # 96 % 同路径 / 59 % 逐字一致
 bun run lint:craft-test-coverage

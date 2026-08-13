@@ -1,4 +1,4 @@
-import type { RpcServer } from '@mkagent/server-core/transport'
+import type { RpcServer } from '@opcagent/server-core/transport'
 import type { HandlerDeps } from '../handler-deps'
 
 import { registerAuthHandlers } from './auth'

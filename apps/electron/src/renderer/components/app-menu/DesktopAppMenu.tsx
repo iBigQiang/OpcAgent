@@ -14,7 +14,7 @@ import {
   StyledDropdownMenuSubTrigger,
   StyledDropdownMenuSubContent,
 } from "@/components/ui/styled-dropdown"
-import { MkAgentAppIcon } from "../icons/MkAgentAppIcon"
+import { OPCAgentAppIcon } from "../icons/OPCAgentAppIcon"
 import { SquarePenRounded } from "../icons/SquarePenRounded"
 import { SETTINGS_ICONS } from "../icons/SettingsIcons"
 import { TopBarButton } from "../ui/TopBarButton"
@@ -168,7 +168,7 @@ export function DesktopAppMenu({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <TopBarButton aria-label={t("menu.craftMenu")}>
-          <MkAgentAppIcon className="h-4 w-4" size={16} />
+          <OPCAgentAppIcon className="h-4 w-4" size={16} />
         </TopBarButton>
       </DropdownMenuTrigger>
       <StyledDropdownMenuContent align="start" minWidth="min-w-48">

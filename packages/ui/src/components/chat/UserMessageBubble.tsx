@@ -13,8 +13,8 @@
 
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Clock } from 'lucide-react'
-import type { StoredAttachment, ContentBadge } from '@mkagent/core'
-import { normalizePath } from '@mkagent/core/utils'
+import type { StoredAttachment, ContentBadge } from '@opcagent/core'
+import { normalizePath } from '@opcagent/core/utils'
 import { cn } from '../../lib/utils'
 import { Markdown } from '../markdown'
 import { FileTypeIcon, getFileTypeLabel } from './attachment-helpers'
@@ -172,10 +172,10 @@ function InlineFileBadge({
   badge: ContentBadge
   onFileClick?: (path: string) => void
 }) {
-  // Strip .mkagent workspace/session path prefix for cleaner tooltip display
+  // Strip .opcagent workspace/session path prefix for cleaner tooltip display
   // e.g. "/Users/.../workspaces/{id}/sessions/{id}/plans/foo.md" → "plans/foo.md"
   const rawPath = badge.filePath || badge.label
-  const tooltipPath = normalizePath(rawPath).replace(/^.*\.mkagent\/workspaces\/[^/]+\/(sessions\/[^/]+\/)?/, '')
+  const tooltipPath = normalizePath(rawPath).replace(/^.*\.opcagent\/workspaces\/[^/]+\/(sessions\/[^/]+\/)?/, '')
   const isClickable = !!badge.filePath && !!onFileClick
 
   const badgeContent = (

@@ -1,4 +1,4 @@
-# PowerShell AST Parser for MkAgent
+# PowerShell AST Parser for OPCAgent
 # Parses a command string and outputs a JSON AST for validation in Node.js
 #
 # Usage: pwsh -File powershell-parser.ps1 -Command "Get-Process | Select-Object Name"

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'bun:test'
-import { InitGate } from '@mkagent/server-core/domain'
+import { InitGate } from '@opcagent/server-core/domain'
 
 describe('InitGate', () => {
   it('resolves waiters when marked ready', async () => {

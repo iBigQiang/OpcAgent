@@ -7,7 +7,7 @@ import { pathToFileURL } from 'url'
 const STORAGE_MODULE_PATH = pathToFileURL(join(import.meta.dir, '..', 'storage.ts')).href
 
 function makeConfigDir(): string {
-  return mkdtempSync(join(tmpdir(), 'mkagent-drafts-'))
+  return mkdtempSync(join(tmpdir(), 'opcagent-drafts-'))
 }
 
 function runEval(configDir: string, code: string): string {

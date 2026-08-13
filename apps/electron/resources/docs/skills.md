@@ -4,10 +4,10 @@ Skills are reusable instructions stored in a directory containing `SKILL.md`. Th
 
 ## Skill precedence
 
-MkAgent discovers skills at three levels, with the more specific level taking precedence:
+OPC Agent discovers skills at three levels, with the more specific level taking precedence:
 
 1. Global: `~/.agents/skills/{slug}/SKILL.md`
-2. Workspace: `~/.mkagent/workspaces/{workspace}/skills/{slug}/SKILL.md`
+2. Workspace: `~/.opcagent/workspaces/{workspace}/skills/{slug}/SKILL.md`
 3. Project: `<project>/.agents/skills/{slug}/SKILL.md`
 
 This allows a workspace or project skill to override a more general skill with the same slug.
@@ -79,7 +79,7 @@ alwaysAllow:
 
 An emoji or URL. Relative icon values are not supported. A colocated `icon.svg`, `icon.png`, `icon.jpg`, or `icon.jpeg` is discovered automatically without an `icon` field.
 
-MkAgent does not provide Craft Sources, so `requiredSources` is not part of the retained Skill contract.
+OPC Agent does not provide Craft Sources, so `requiredSources` is not part of the retained Skill contract.
 
 ## Creating a Skill
 
@@ -88,7 +88,7 @@ MkAgent does not provide Craft Sources, so `requiredSources` is not part of the 
 For a workspace Skill:
 
 ```bash
-mkdir -p ~/.mkagent/workspaces/{workspace}/skills/code-review
+mkdir -p ~/.opcagent/workspaces/{workspace}/skills/code-review
 ```
 
 For a project Skill:

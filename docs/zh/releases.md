@@ -1,6 +1,6 @@
 # 发布、更新与遥测
 
-开源仓库中的版本 tag 会触发 macOS DMG/ZIP、Windows NSIS、Linux AppImage、各平台 headless server 与基于 Bun 的 CLI bundle 构建。源码与可下载产物统一放在 [MkThingsHQ/mkagent](https://github.com/MkThingsHQ/mkagent/releases/latest)。签名凭证是可选的：零 secret 会发布 ad-hoc 签名的 macOS 包和未签名 Windows 安装包；某个平台的完整凭证会自动启用 Apple Developer ID 签名与公证或 Windows Authenticode。workflow 使用仓库范围的 GitHub Actions token 发布。
+开源仓库中的版本 tag 会触发 macOS DMG/ZIP、Windows NSIS、Linux AppImage、各平台 headless server 与基于 Bun 的 CLI bundle 构建。源码与可下载产物统一放在 [iBigQiang/OpcAgent](https://github.com/iBigQiang/OpcAgent/releases/latest)。签名凭证是可选的：零 secret 会发布 ad-hoc 签名的 macOS 包和未签名 Windows 安装包；某个平台的完整凭证会自动启用 Apple Developer ID 签名与公证或 Windows Authenticode。workflow 使用仓库范围的 GitHub Actions token 发布。
 
 ## 发布流水线
 
@@ -15,7 +15,7 @@
                                                        │
                                                        ▼
                   上传安装包 + manifest + blockmap + checksum
-                          到 MkThingsHQ/mkagent GitHub Releases
+                          到 iBigQiang/OpcAgent GitHub Releases
                                                        │
                                                        ▼
                               electron-updater 读取同一仓库
@@ -27,7 +27,7 @@ Pull Request 和推送到 `main` 的提交会运行未签名打包矩阵，覆�
 
 ## 版本与 Changelog 规范
 
-MkAgent 使用语义化版本和 `v<major>.<minor>.<patch>` tag。[`CHANGELOG.md`](../../CHANGELOG.md) 是累计变更记录的唯一来源；`apps/electron/resources/release-notes/<version>.md` 是随应用内置、并原样发布到公开 GitHub Release 的用户版说明。
+OPC Agent 使用语义化版本和 `v<major>.<minor>.<patch>` tag。[`CHANGELOG.md`](../../CHANGELOG.md) 是累计变更记录的唯一来源；`apps/electron/resources/release-notes/<version>.md` 是随应用内置、并原样发布到公开 GitHub Release 的用户版说明。
 
 只从干净的 `main` 分支准备版本：
 
@@ -39,7 +39,7 @@ git diff --check
 git add CHANGELOG.md package.json bun.lock apps/*/package.json packages/*/package.json \
   apps/electron/resources/release-notes/0.2.0.md scripts/craft-source-overrides.json
 git commit -m "chore(release): prepare v0.2.0"
-git tag -a v0.2.0 -m "MkAgent v0.2.0"
+git tag -a v0.2.0 -m "OPC Agent v0.2.0"
 git push origin main v0.2.0
 ```
 
@@ -49,24 +49,24 @@ git push origin main v0.2.0
 
 | 平台                    | 构建                     | 命名                               | 签名                               | 备注                                                                                  |
 | ----------------------- | ------------------------ | ---------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------- |
-| macOS arm64             | DMG + ZIP                | `MkAgent-0.1.0-arm64.{dmg,zip}`    | ad-hoc 或 Developer ID + 公证      | 无证书构建关闭 Hardened Runtime，并且需要手动更新                                      |
-| macOS x64               | DMG + ZIP                | `MkAgent-0.1.0-x64.{dmg,zip}`      | 同上                               | 给 Intel Mac 用                                                                       |
-| Windows x64             | NSIS                     | `MkAgent-0.1.0-x64.exe`            | 未签名或 Authenticode              | 未签名构建可能触发 SmartScreen；每用户安装到 `%LOCALAPPDATA%\Programs\`              |
-| Linux x64               | AppImage                 | `MkAgent-0.1.0-x64.AppImage`       | 无                                 | desktop 类别:Utility                                                                  |
-| Headless server(每架构) | `bun build --compile`    | `mkagent-server-<platform>-<arch>` | 无                                 | 给 WebUI 与 CLI 用户消费                                                              |
-| CLI                     | `bun build --target=bun` | `MkAgent-cli-bun.tar.gz`           | 无                                 | JavaScript bundle；用户机器需要 Bun                                                   |
+| macOS arm64             | DMG + ZIP                | `OPC Agent-0.1.0-arm64.{dmg,zip}`    | ad-hoc 或 Developer ID + 公证      | 无证书构建关闭 Hardened Runtime，并且需要手动更新                                      |
+| macOS x64               | DMG + ZIP                | `OPC Agent-0.1.0-x64.{dmg,zip}`      | 同上                               | 给 Intel Mac 用                                                                       |
+| Windows x64             | NSIS                     | `OPC Agent-0.1.0-x64.exe`            | 未签名或 Authenticode              | 未签名构建可能触发 SmartScreen；每用户安装到 `%LOCALAPPDATA%\Programs\`              |
+| Linux x64               | AppImage                 | `OPC Agent-0.1.0-x64.AppImage`       | 无                                 | desktop 类别:Utility                                                                  |
+| Headless server(每架构) | `bun build --compile`    | `opcagent-server-<platform>-<arch>` | 无                                 | 给 WebUI 与 CLI 用户消费                                                              |
+| CLI                     | `bun build --target=bun` | `OPC Agent-cli-bun.tar.gz`           | 无                                 | JavaScript bundle；用户机器需要 Bun                                                   |
 
 `bun run electron:dist:dev:mac` 会生成本地 ad-hoc 签名构建并关闭自动更新。Release job 在缺少 Apple 凭证时也会显式设置 `CSC_IDENTITY_AUTO_DISCOVERY=false`、`mac.identity=-` 与 `hardenedRuntime=false`。ad-hoc 签名满足 Apple Silicon 的代码完整性要求，但不代表受信任开发者身份，因此仍会出现 Gatekeeper 警告。
 
 ## 更新
 
-Electron 通过 `electron-updater` 命中 `MkThingsHQ/mkagent` 上的 GitHub Releases API。公开仓库及其更新 manifest 不需要客户端携带 GitHub token。
+Electron 通过 `electron-updater` 命中 `iBigQiang/OpcAgent` 上的 GitHub Releases API。公开仓库及其更新 manifest 不需要客户端携带 GitHub token。
 
 | 字段         | 设置位置                                                     |
 | ------------ | ------------------------------------------------------------ |
-| `appId`      | `apps/electron/electron-builder.yml` → `app.mkagent.desktop` |
+| `appId`      | `apps/electron/electron-builder.yml` → `app.opcagent.desktop` |
 | Provider     | `github`                                                     |
-| Owner / repo | `MkThingsHQ` / `mkagent`                                     |
+| Owner / repo | `MkThingsHQ` / `opcagent`                                     |
 | Manifest     | 由 electron-builder 在 release 时自动生成                    |
 
 降级需要手动装老版本;自动更新只会往前走。
@@ -87,7 +87,7 @@ Sentry 沿用 desktop 默认行为。除非构建时设置了 `SENTRY_ELECTRON_I
 
 ## 跨 builder 可复现性
 
-`electron-builder.yml` 的 `files` / `extraResources` 块是 Lite 边界的一等产物,它们决定了 MkAgent 更小的安装包体积;具体数字见 [`comparison-with-craft.md`](./comparison-with-craft.md)。发布前对其中任一块的改动都必须同时更新该文档,以及同文件顶部的 `appId` / `productName` / `copyright`。
+`electron-builder.yml` 的 `files` / `extraResources` 块是 Lite 边界的一等产物,它们决定了 OPC Agent 更小的安装包体积;具体数字见 [`comparison-with-craft.md`](./comparison-with-craft.md)。发布前对其中任一块的改动都必须同时更新该文档,以及同文件顶部的 `appId` / `productName` / `copyright`。
 
 ## GitHub 发布环境
 

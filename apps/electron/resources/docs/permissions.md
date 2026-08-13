@@ -1,6 +1,6 @@
 # Permissions Configuration Guide
 
-MkAgent keeps Craft's three permission modes and workspace permission rules. The bundled default policy is installed at `~/.mkagent/permissions/default.json`; a workspace can extend it with `<workspace>/permissions.json`.
+OPC Agent keeps Craft's three permission modes and workspace permission rules. The bundled default policy is installed at `~/.opcagent/permissions/default.json`; a workspace can extend it with `<workspace>/permissions.json`.
 
 ## Permission modes
 

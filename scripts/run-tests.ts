@@ -7,7 +7,7 @@ const tracked = Bun.spawnSync(
 )
 
 if (tracked.exitCode !== 0) {
-  throw new Error(`Unable to discover MkAgent tests: ${tracked.stderr.toString().trim()}`)
+  throw new Error(`Unable to discover OPC Agent tests: ${tracked.stderr.toString().trim()}`)
 }
 
 const files = tracked.stdout.toString().split('\0').filter(Boolean)
@@ -30,7 +30,7 @@ function runTests(testFiles: string[]): void {
   if (result.exitCode !== 0) process.exit(result.exitCode)
 }
 
-console.log(`Running ${tests.length} MkAgent test files`)
+console.log(`Running ${tests.length} OPC Agent test files`)
 runTests(tests)
 
 for (const file of isolatedTests) {

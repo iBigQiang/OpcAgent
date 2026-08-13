@@ -1,6 +1,6 @@
-# MkAgent CLI
+# OPC Agent CLI
 
-The CLI connects to the MkAgent headless server over WebSocket. `run` can also start a temporary local server, create a session, stream one turn, and clean it up.
+The CLI connects to the OPC Agent headless server over WebSocket. `run` can also start a temporary local server, create a session, stream one turn, and clean it up.
 
 ```bash
 bun run apps/cli/src/index.ts --help
@@ -11,12 +11,12 @@ DEEPSEEK_API_KEY=... bun run apps/cli/src/index.ts run "Summarize this repositor
 
 | Flag | Environment variable | Default |
 |---|---|---|
-| `--url <ws-url>` | `MKAGENT_SERVER_URL` | temporary server for `run` |
-| `--token <secret>` | `MKAGENT_SERVER_TOKEN` | generated for a temporary server |
-| `--workspace <id>` | `MKAGENT_WORKSPACE` | workspace named `default`, then first workspace |
+| `--url <ws-url>` | `OPCAGENT_SERVER_URL` | temporary server for `run` |
+| `--token <secret>` | `OPCAGENT_SERVER_TOKEN` | generated for a temporary server |
+| `--workspace <id>` | `OPCAGENT_WORKSPACE` | workspace named `default`, then first workspace |
 | `--timeout <ms>` | — | `10000` |
 | `--send-timeout <ms>` | — | `300000` |
-| `--tls-ca <path>` | `MKAGENT_TLS_CA` | — |
+| `--tls-ca <path>` | `OPCAGENT_TLS_CA` | — |
 | `--json` | — | `false` |
 
 ## Commands
@@ -44,9 +44,9 @@ listen <channel>
 The default provider is DeepSeek. An API key is resolved from `--api-key`, `LLM_API_KEY`, or the provider-specific environment variable. Existing configured DeepSeek connections are reused.
 
 ```bash
-DEEPSEEK_API_KEY=... mkagent run "Explain the failing tests"
-OPENAI_API_KEY=... mkagent --provider openai --model gpt-4o run "Review this project"
-mkagent --provider ollama --base-url http://127.0.0.1:11434/v1 --model llama3.2 run "Hello"
+DEEPSEEK_API_KEY=... opcagent run "Explain the failing tests"
+OPENAI_API_KEY=... opcagent --provider openai --model gpt-4o run "Review this project"
+opcagent --provider ollama --base-url http://127.0.0.1:11434/v1 --model llama3.2 run "Hello"
 ```
 
 Run options:
@@ -67,9 +67,9 @@ Run options:
 ## Existing server
 
 ```bash
-mkagent --url ws://127.0.0.1:9100 --token "$MKAGENT_SERVER_TOKEN" workspace list
-mkagent --url ws://127.0.0.1:9100 --token "$MKAGENT_SERVER_TOKEN" session create --name review
-mkagent --url ws://127.0.0.1:9100 --token "$MKAGENT_SERVER_TOKEN" send <session-id> "Run tests"
+opcagent --url ws://127.0.0.1:9100 --token "$OPCAGENT_SERVER_TOKEN" workspace list
+opcagent --url ws://127.0.0.1:9100 --token "$OPCAGENT_SERVER_TOKEN" session create --name review
+opcagent --url ws://127.0.0.1:9100 --token "$OPCAGENT_SERVER_TOKEN" send <session-id> "Run tests"
 ```
 
 The CLI binds the selected workspace before session commands so streamed events are delivered to the client. Use `wss://` and `--tls-ca` when connecting through TLS.

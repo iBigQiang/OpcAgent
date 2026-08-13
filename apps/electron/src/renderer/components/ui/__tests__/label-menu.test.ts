@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import type { LabelConfig } from '@mkagent/shared/labels'
+import type { LabelConfig } from '@opcagent/shared/labels'
 import { createLabelMenuItems, filterItems, filterSessionStatuses } from '../label-menu-utils'
 
 describe('label menu', () => {

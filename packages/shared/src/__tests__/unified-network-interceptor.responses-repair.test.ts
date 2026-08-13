@@ -5,7 +5,7 @@ let validateOpenAiResponsesBody: typeof import('../unified-network-interceptor.t
 
 describe('unified-network-interceptor responses-history repair (#613)', () => {
   beforeAll(async () => {
-    process.env.MKAGENT_INTERCEPTOR_DISABLE_AUTO_INSTALL = '1';
+    process.env.OPCAGENT_INTERCEPTOR_DISABLE_AUTO_INSTALL = '1';
     const mod = await import('../unified-network-interceptor.ts');
     repairResponsesHistoryInPlace = mod.repairResponsesHistoryInPlace;
     validateOpenAiResponsesBody = mod.validateOpenAiResponsesBody;

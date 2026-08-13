@@ -1,21 +1,21 @@
-# MkAgent UI 对齐复盘与后续实施规范
+# OPC Agent UI 对齐复盘与后续实施规范
 
 > 2026-07-30 补充：订阅入口边界已调整为仅恢复 Craft 的 Claude Pro/Max 与 ChatGPT Plus 卡片、凭证步骤和状态交互；不恢复 Copilot 或 Sources UI。仍遵循本文的“直接复用完整保留闭包，外围只做最小 Pi-only 适配”原则。
 
 ## 1. 文档目的
 
-本文复盘 MkAgent 从 MVP 到三轮 Craft Agent UI 对齐的实施过程，解释前两轮反复出现视觉和交互偏差的原因，记录第三轮源码复用带来的改进及新暴露的范围问题，并形成后续 UI 开发必须遵守的实施和验收规范。
+本文复盘 OPC Agent 从 MVP 到三轮 Craft Agent UI 对齐的实施过程，解释前两轮反复出现视觉和交互偏差的原因，记录第三轮源码复用带来的改进及新暴露的范围问题，并形成后续 UI 开发必须遵守的实施和验收规范。
 
 本文所说的“对齐”包含四个层面：
 
 1. **源码对齐**：保留功能的 UI 组件、布局、样式、图标、交互和文案直接来自 Craft，不重新实现相似版本。
 2. **视觉对齐**：三栏结构、尺寸、间距、背景、分割线、图标、按钮、菜单、输入框和设置控件与 Craft 一致。
 3. **功能对齐**：保留界面的操作流程和状态变化可用，不只是静态外观相似。
-4. **范围对齐**：MkAgent 明确排除的功能必须从源码、路由、接口、文案和测试中物理删除，不能只隐藏入口。
+4. **范围对齐**：OPC Agent 明确排除的功能必须从源码、路由、接口、文案和测试中物理删除，不能只隐藏入口。
 
 最终原则是：
 
-> 保留的功能直接复用 Craft 源码；排除的功能完整删除；MkAgent 只在产品标识、Pi-only 后端和确有必要的接口边界上做少量定制。
+> 保留的功能直接复用 Craft 源码；排除的功能完整删除；OPC Agent 只在产品标识、Pi-only 后端和确有必要的接口边界上做少量定制。
 
 ## 2. 产品边界与基线
 
@@ -24,9 +24,9 @@
 - 参考仓库：`/Users/javayhu/workspace/agents/craft-agents-oss`
 - 已记录基线：Craft Agent `v0.11.2` / `a60ebc1a5a7c`
 - Craft 是 UI 布局、组件、图标、主题、交互、设置顺序和中英文文案的唯一来源。
-- Echo、XAgent 等仓库只能用于理解改造方式，不能作为 MkAgent UI 的实现来源。
+- Echo、XAgent 等仓库只能用于理解改造方式，不能作为 OPC Agent UI 的实现来源。
 
-### 2.2 MkAgent 保留范围
+### 2.2 OPC Agent 保留范围
 
 - Electron Desktop、WebUI、CLI 和 headless server
 - 三栏应用框架和可拖动布局
@@ -35,7 +35,7 @@
 - Chat、权限模式、模型选择、附件、Browser 和文档工具
 - 主题、快捷键、自动更新等仍在产品范围内的设置
 
-### 2.3 MkAgent 排除范围
+### 2.3 OPC Agent 排除范围
 
 - Claude backend 和订阅/OAuth 登录
 - Messaging
@@ -66,10 +66,10 @@ MVP 首先完成了 Pi-only 的 Desktop/WebUI/CLI、WebSocket RPC、会话、Ski
 
 - 三栏背景层级、圆角、顶部分割线和窗口标题栏关系不同。
 - 左栏和中栏宽度及拖动行为不完整。
-- Session item、Skill item、空状态和标题区域由 MkAgent 自己组织。
+- Session item、Skill item、空状态和标题区域由 OPC Agent 自己组织。
 - Chat header、菜单、分享/关闭按钮、输入框、权限模式和模型选择器没有使用 Craft 的完整组合。
 - 设置页只模仿外观，控件宽度、下拉菜单、顺序、行高和说明文字持续漂移。
-- MkAgent 新增了 Craft 中不存在的入口和文案，例如 Running、New session、No messages yet 等。
+- OPC Agent 新增了 Craft 中不存在的入口和文案，例如 Running、New session、No messages yet 等。
 
 经验：**设计语言相似不等于 UI 对齐。** 当目标是像素、交互和文案都以现有产品为准时，重新实现必然会产生大量局部决策，而每个局部决策都会成为偏差源。
 
@@ -82,18 +82,18 @@ MVP 首先完成了 Pi-only 的 Desktop/WebUI/CLI、WebSocket RPC、会话、Ski
 - Settings 的 Row、Section、Select、Toggle 等基础组件
 - 部分布局和主题处理
 
-改进点是开始复用 Craft 的局部组件和视觉原语，但应用的主框架、页面组合和状态流仍以原 MkAgent 实现为中心。结果是基础控件更像 Craft，整体结构仍不是 Craft。
+改进点是开始复用 Craft 的局部组件和视觉原语，但应用的主框架、页面组合和状态流仍以原 OPC Agent 实现为中心。结果是基础控件更像 Craft，整体结构仍不是 Craft。
 
 主要问题：
 
 - 以文件或控件为单位迁移，没有以完整用户界面和依赖闭包为单位迁移。
 - 只替换可见组件，没有同步 Craft 的父容器、状态 Hook、路由和组合逻辑。
-- 混合使用 Craft 组件和 MkAgent 自定义组件，产生新的尺寸、属性和行为差异。
+- 混合使用 Craft 组件和 OPC Agent 自定义组件，产生新的尺寸、属性和行为差异。
 - 缺少逐页面、逐状态的视觉回归验证。
 
 经验：**不能只复制叶子组件。** 一个按钮或列表项的最终表现由上层布局、上下文、状态、主题 token 和相邻组件共同决定。缺少其中任何一层，都可能造成“代码来自 Craft，但界面仍不一样”。
 
-### 3.3 第二轮对齐：`526d455 feat: align MkAgent UI with Craft`
+### 3.3 第二轮对齐：`526d455 feat: align OPC Agent UI with Craft`
 
 这一轮修改了 42 个文件，新增约 2,384 行，继续补充：
 
@@ -104,7 +104,7 @@ MVP 首先完成了 Pi-only 的 Desktop/WebUI/CLI、WebSocket RPC、会话、Ski
 - Settings segmented control、textarea 和多个设置页
 - ThemeContext 和 local storage
 
-这一轮覆盖了更多界面，但仍采用“看着 Craft 源码，再在 MkAgent 中组装相似实现”的方式。`CraftChatInput` 之类的新组件名称带有 Craft，但并不等于复用了 Craft 原始输入区的完整组件树和状态逻辑。
+这一轮覆盖了更多界面，但仍采用“看着 Craft 源码，再在 OPC Agent 中组装相似实现”的方式。`CraftChatInput` 之类的新组件名称带有 Craft，但并不等于复用了 Craft 原始输入区的完整组件树和状态逻辑。
 
 最终仍出现了用户反馈中的系统性偏差：
 
@@ -115,7 +115,7 @@ MVP 首先完成了 Pi-only 的 Desktop/WebUI/CLI、WebSocket RPC、会话、Ski
 - Skill item 图标和详情页编辑按钮位置不一致。
 - Settings 的宽度、下拉样式、设置项顺序、About 布局、Connection 流程、Workspace icon、默认模式和快捷键文案不一致。
 
-这些不是孤立 bug，而是实施方法错误的结果：MkAgent 仍在为每个界面重新做产品和视觉决策。
+这些不是孤立 bug，而是实施方法错误的结果：OPC Agent 仍在为每个界面重新做产品和视觉决策。
 
 经验：**“参考源码实现”仍然是重新实现。** 只要本地存在一套独立的页面结构和交互逻辑，后续就会不断追赶 Craft，且每次 Craft 更新都会扩大维护成本。
 
@@ -124,16 +124,16 @@ MVP 首先完成了 Pi-only 的 Desktop/WebUI/CLI、WebSocket RPC、会话、Ski
 这一轮修改了 555 个文件，目标从“模仿”改为“直接复用”：
 
 - 迁移 Craft renderer 的组件、页面、Hook、状态、样式、测试和资源。
-- 将包 scope 从 `@craft-agent/*` 规范化为 `@mkagent/*`。
-- 将协议和数据目录等产品标识改为 MkAgent。
+- 将包 scope 从 `@craft-agent/*` 规范化为 `@opcagent/*`。
+- 将协议和数据目录等产品标识改为 OPC Agent。
 - Electron 与 WebUI 复用相同 renderer 和兼容适配层。
 - 增加 `scripts/check-craft-ui-sync.ts` 检查复制文件是否偏离 Craft。
 - 通过真实应用检查三栏拖动、Sessions、Skills、Settings 和 Add Connection。
 - 当轮完整测试记录为 2,980 passed、11 个 Windows-only skipped、0 failed；Electron/WebUI 构建、相关 typecheck 和 UI sync 检查通过。
 
-这轮解决了前两轮最核心的问题：保留界面的组件树和交互不再由 MkAgent 独立设计，三栏、列表、详情、设置和输入区能够随 Craft 源码整体迁移。
+这轮解决了前两轮最核心的问题：保留界面的组件树和交互不再由 OPC Agent 独立设计，三栏、列表、详情、设置和输入区能够随 Craft 源码整体迁移。
 
-但这轮又暴露了另一个方向的问题：为了让完整 Craft renderer 运行，保留了大量 MkAgent 不需要的 UI 源码，并通过以下方式隐藏或托底：
+但这轮又暴露了另一个方向的问题：为了让完整 Craft renderer 运行，保留了大量 OPC Agent 不需要的 UI 源码，并通过以下方式隐藏或托底：
 
 - `product-profile.ts` 过滤侧边栏和设置入口，并关闭 Sources 和 Kanban 的可见入口。
 - `craft-renderer-compat.ts` 为 Sources、Projects、Automations、Labels、Statuses、Messaging 等缺失能力返回空值或 no-op。
@@ -166,7 +166,7 @@ MVP 首先完成了 Pi-only 的 Desktop/WebUI/CLI、WebSocket RPC、会话、Ski
 
 - 用户可见页面和状态
 - Craft 源文件及依赖闭包
-- MkAgent 是否保留
+- OPC Agent 是否保留
 - 是否允许定制及定制原因
 - 对应功能接口
 - 对应自动化测试和视觉用例
@@ -181,16 +181,16 @@ MVP 首先完成了 Pi-only 的 Desktop/WebUI/CLI、WebSocket RPC、会话、Ski
 
 - Craft tag 和 commit SHA
 - 本次涉及的页面和组件
-- MkAgent 保留/删除功能矩阵
+- OPC Agent 保留/删除功能矩阵
 - 上一基线到新基线的上游差异
 
-未更新功能矩阵前，不得因为 Craft 新增了入口就自动带入 MkAgent。
+未更新功能矩阵前，不得因为 Craft 新增了入口就自动带入 OPC Agent。
 
 ### 5.2 第二步：建立源码 allowlist，而不是运行时 feature profile
 
 为每个保留界面记录 Craft 源文件和必要依赖，例如：
 
-| 界面 | Craft 源码范围 | MkAgent 策略 |
+| 界面 | Craft 源码范围 | OPC Agent 策略 |
 | --- | --- | --- |
 | 三栏 AppShell | Panel、PanelSlot、ResizeSash、保留导航所需 AppShell 逻辑 | 原样复用；仅删除排除导航分支 |
 | Sessions | SessionList、SessionItem、SessionMenu、搜索和筛选依赖 | 原样复用；删除 Labels/Projects 等筛选分支 |
@@ -226,16 +226,16 @@ MVP 首先完成了 Pi-only 的 Desktop/WebUI/CLI、WebSocket RPC、会话、Ski
 兼容层可以处理：
 
 - Electron 与 WebUI 的宿主能力差异。
-- `@craft-agent` 到 `@mkagent` 的包名变化。
-- `craftagents://` 到 `mkagent://` 的协议变化。
-- `.craft-agent` 到 `.mkagent` 的数据目录变化。
-- Craft UI 所需接口与 MkAgent Pi-only 后端之间、且属于保留功能的字段映射。
+- `@craft-agent` 到 `@opcagent` 的包名变化。
+- `craftagents://` 到 `opcagent://` 的协议变化。
+- `.craft-agent` 到 `.opcagent` 的数据目录变化。
+- Craft UI 所需接口与 OPC Agent Pi-only 后端之间、且属于保留功能的字段映射。
 
 兼容层不得处理：
 
 - 为已删除功能返回空数组。
 - 为已删除功能注册 no-op listener。
-- 让不属于 MkAgent 的页面“能挂载但不可用”。
+- 让不属于 OPC Agent 的页面“能挂载但不可用”。
 - 吞掉错误并伪装成功。
 
 如果 renderer 仍要求某个排除功能的接口，说明该功能依赖尚未删除干净。
@@ -245,7 +245,7 @@ MVP 首先完成了 Pi-only 的 Desktop/WebUI/CLI、WebSocket RPC、会话、Ski
 - 保留界面默认直接复制 Craft 的 `en` 和 `zh-Hans` locale key/value。
 - 禁止新增解释性空状态、按钮、标签和状态名称。
 - 产品名必须替换时，优先改写为不含产品名称的中性文案。
-- 只有 MkAgent 独有功能才允许新增 key，并在评审中单独列出。
+- 只有 OPC Agent 独有功能才允许新增 key，并在评审中单独列出。
 - CI 同时检查 locale key parity、排序、废弃 key 和新增 key allowlist。
 
 ### 5.6 第六步：按界面闭环功能，而不是一次复制整个目录
@@ -267,13 +267,13 @@ MVP 首先完成了 Pi-only 的 Desktop/WebUI/CLI、WebSocket RPC、会话、Ski
 ### 6.1 源码验收
 
 - allowlist 中未声明 override 的文件与固定 Craft 基线完全一致，仅允许机械化产品标识替换。
-- 不存在 MkAgent 自己实现的 Craft 平行组件，例如 `CraftXxx` 但内部不是 Craft 原组件的情况。
+- 不存在 OPC Agent 自己实现的 Craft 平行组件，例如 `CraftXxx` 但内部不是 Craft 原组件的情况。
 - override 数量保持最小，并能说明每一处差异的必要性。
 - 排除功能的组件、路由、API、文案、资源和测试均无残留。
 
 ### 6.2 视觉验收
 
-至少对以下状态进行 Craft/MkAgent 同尺寸截图对比：
+至少对以下状态进行 Craft/OPC Agent 同尺寸截图对比：
 
 - 空会话、普通会话、运行中、权限请求和错误状态。
 - 左栏展开/收起，中栏最小/默认/最大宽度，右栏不同内容。
@@ -331,7 +331,7 @@ MVP 首先完成了 Pi-only 的 Desktop/WebUI/CLI、WebSocket RPC、会话、Ski
 - 禁止新增 Craft 中不存在的按钮、状态、空状态和说明文案。
 - 禁止只复制样式而忽略父容器和状态逻辑。
 - 禁止用配置、feature flag、CSS、空数据或 no-op 冒充功能删除。
-- 禁止为了让全量 Craft renderer 启动而扩大 MkAgent 后端接口。
+- 禁止为了让全量 Craft renderer 启动而扩大 OPC Agent 后端接口。
 - 禁止在没有差异清单和测试证据时批量同步新上游版本。
 - 禁止只用 build/typecheck 代替真实 UI 和交互验证。
 
@@ -344,7 +344,7 @@ MVP 首先完成了 Pi-only 的 Desktop/WebUI/CLI、WebSocket RPC、会话、Ski
   - Craft 原样复用
   - 机械化产品标识替换
   - Pi-only 必要适配
-  - MkAgent 产品范围删除
+  - OPC Agent 产品范围删除
 - 任何无法归入以上四类的 UI 改动都应默认拒绝，除非用户明确提出新的产品需求。
 
 ## 10. 最终经验
@@ -352,7 +352,7 @@ MVP 首先完成了 Pi-only 的 Desktop/WebUI/CLI、WebSocket RPC、会话、Ski
 本次对齐最重要的经验不是“多比较几次截图”，而是要同时控制复用粒度和产品边界：
 
 - 粒度过小，会变成模仿 Craft，持续产生视觉和交互偏差。
-- 范围过大，会把 MkAgent 不需要的 Craft 产品功能和维护负担全部带回来。
+- 范围过大，会把 OPC Agent 不需要的 Craft 产品功能和维护负担全部带回来。
 - 正确做法是以保留功能的完整依赖闭包为单位直接复用，以明确 allowlist 管理上游同步，以物理删除落实产品范围，并用源码、视觉、功能和自动化四层证据完成验收。
 
-后续所有 MkAgent UI 工作都应以本文为准，不再采用“先自行实现，再反复对齐”的方式。
+后续所有 OPC Agent UI 工作都应以本文为准，不再采用“先自行实现，再反复对齐”的方式。

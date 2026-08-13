@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
-import { RPC_CHANNELS } from '@mkagent/shared/protocol'
-import type { HandlerFn, RequestContext, RpcServer } from '@mkagent/server-core/transport'
+import { RPC_CHANNELS } from '@opcagent/shared/protocol'
+import type { HandlerFn, RequestContext, RpcServer } from '@opcagent/server-core/transport'
 import type { HandlerDeps } from '../handler-deps'
 import { registerAutomationsHandlers } from './automations'
 import { registerLabelsHandlers } from './labels'

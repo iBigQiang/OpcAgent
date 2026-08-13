@@ -14,7 +14,7 @@ import {
   isReadOnlyBashCommandWithConfig,
   getBashRejectionReason,
 } from '../src/agent/mode-manager.ts';
-import { getMkAgentReadOnlyBashPatterns } from '../src/config/cli-domains.ts';
+import { getOPCAgentReadOnlyBashPatterns } from '../src/config/cli-domains.ts';
 
 // ============================================================
 // Test Configuration (mirrors mode-manager.test.ts TEST_MODE_CONFIG)
@@ -100,8 +100,8 @@ const TEST_MODE_CONFIG = {
       comment: 'npm read operations',
     },
 
-    // mkagent CLI read-only
-    ...getMkAgentReadOnlyBashPatterns().map(rule => ({
+    // opcagent CLI read-only
+    ...getOPCAgentReadOnlyBashPatterns().map(rule => ({
       regex: new RegExp(rule.pattern),
       source: rule.pattern,
       comment: rule.comment,
@@ -834,39 +834,39 @@ describe('ShellGuard corpus: resource exhaustion', () => {
 });
 
 // ============================================================
-// Group 27: mkagent CLI allowlist
+// Group 27: opcagent CLI allowlist
 // ============================================================
 
-describe('ShellGuard corpus: mkagent CLI allowlist', () => {
+describe('ShellGuard corpus: opcagent CLI allowlist', () => {
   const shouldAllow = [
-    'mkagent',
-    'mkagent --help',
-    'mkagent --version',
-    'mkagent --discover',
-    'mkagent workspace --help',
-    'mkagent workspace list',
-    'mkagent session list',
-    'mkagent session messages abc123',
-    'mkagent connections list',
-    'mkagent config validate',
+    'opcagent',
+    'opcagent --help',
+    'opcagent --version',
+    'opcagent --discover',
+    'opcagent workspace --help',
+    'opcagent workspace list',
+    'opcagent session list',
+    'opcagent session messages abc123',
+    'opcagent connections list',
+    'opcagent config validate',
   ];
 
   const shouldBlock = [
-    'mkagent label create --name Bug',
-    'mkagent label update bug --name "Bug Report"',
-    'mkagent label delete bug',
-    'mkagent label move bug --parent root',
-    'mkagent label reorder --parent root a b c',
-    'mkagent source create --name Linear --provider linear --type mcp',
-    'mkagent source update linear --json "{\"enabled\":false}"',
-    'mkagent source delete linear',
-    'mkagent skill create --name "Review" --description "x"',
-    'mkagent skill update review --json "{\"description\":\"y\"}"',
-    'mkagent skill delete review',
-    'mkagent skill list',
-    'mkagent session delete abc123',
-    'mkagent connections test openai',
-    'mkagent workspace create Example',
+    'opcagent label create --name Bug',
+    'opcagent label update bug --name "Bug Report"',
+    'opcagent label delete bug',
+    'opcagent label move bug --parent root',
+    'opcagent label reorder --parent root a b c',
+    'opcagent source create --name Linear --provider linear --type mcp',
+    'opcagent source update linear --json "{\"enabled\":false}"',
+    'opcagent source delete linear',
+    'opcagent skill create --name "Review" --description "x"',
+    'opcagent skill update review --json "{\"description\":\"y\"}"',
+    'opcagent skill delete review',
+    'opcagent skill list',
+    'opcagent session delete abc123',
+    'opcagent connections test openai',
+    'opcagent workspace create Example',
   ];
 
   for (const cmd of shouldAllow) {

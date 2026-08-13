@@ -1,5 +1,5 @@
 /**
- * @mkagent/ui - Shared React UI components for MkAgent
+ * @opcagent/ui - Shared React UI components for OPCAgent
  *
  * This package provides platform-agnostic UI components shared by the Desktop
  * and WebUI clients.

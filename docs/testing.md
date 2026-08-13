@@ -48,7 +48,7 @@ A "missing" tag — a test that silently dropped — is a lint error. Current sn
 ```bash
 bun run electron:build           # main + preload + renderer + resources + assets
 bun run webui:build              # vite build for the shared renderer
-bun run cli:build                # produces apps/cli/dist/mkagent
+bun run cli:build                # produces apps/cli/dist/opcagent
 bun run server:build:subprocess  # packages/pi-agent-server/dist/index.js
 bun run electron:dist:dev:mac    # macOS arm64 dev .app, ad-hoc signed
 ```
@@ -58,8 +58,8 @@ CI adds macOS, Windows, and Linux unpacked desktop builds plus a headless assemb
 ## Clean-worktree validation
 
 ```bash
-git clone <this repo> /tmp/mkagent-clean
-cd /tmp/mkagent-clean
+git clone <this repo> /tmp/opcagent-clean
+cd /tmp/opcagent-clean
 bun install --force --frozen-lockfile
 bun run validate:ci
 bun run electron:build

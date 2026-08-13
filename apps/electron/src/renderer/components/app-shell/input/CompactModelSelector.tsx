@@ -7,7 +7,7 @@ import {
   ChevronRight,
   Image as ImageIcon,
 } from 'lucide-react'
-import { Spinner } from '@mkagent/ui'
+import { Spinner } from '@opcagent/ui'
 import {
   Drawer,
   DrawerTrigger,
@@ -34,7 +34,7 @@ import {
 import {
   THINKING_LEVELS,
   type ThinkingLevel,
-} from '@mkagent/shared/agent/thinking-levels'
+} from '@opcagent/shared/agent/thinking-levels'
 import { ConnectionIcon } from '@/components/icons/ConnectionIcon'
 import { derivePickerMode } from './picker-mode'
 import {

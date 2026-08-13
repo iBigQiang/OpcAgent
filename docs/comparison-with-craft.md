@@ -1,38 +1,38 @@
-# MkAgent vs. Craft Agents — current comparison
+# OPC Agent vs. Craft Agents — current comparison
 
-> Snapshot taken on **2026-08-10** against MkAgent `main` at `00c0df4` and the upstream tag [`craft-ai-agents/craft-agents-oss` `v0.11.2` / `a60ebc1a5a7c`](https://github.com/craft-ai-agents/craft-agents-oss). Numbers are repository snapshots, not live release metrics. Re-run the commands in the final section after changing either baseline; the current checkout has a pre-existing `README.md` lineage-manifest warning if that file is modified without refreshing the manifest.
+> Snapshot taken on **2026-08-10** against OPC Agent `main` at `00c0df4` and the upstream tag [`craft-ai-agents/craft-agents-oss` `v0.11.2` / `a60ebc1a5a7c`](https://github.com/craft-ai-agents/craft-agents-oss). Numbers are repository snapshots, not live release metrics. Re-run the commands in the final section after changing either baseline; the current checkout has a pre-existing `README.md` lineage-manifest warning if that file is modified without refreshing the manifest.
 
-This document explains, with evidence, what MkAgent keeps from Craft Agents, what it physically removes, and how those choices change the artifact you ship. MkAgent is the "Lite" derivative built on the same architecture and renderer; the table below is the canonical answer to "what's actually different?".
+This document explains, with evidence, what OPC Agent keeps from Craft Agents, what it physically removes, and how those choices change the artifact you ship. OPC Agent is the "Lite" derivative built on the same architecture and renderer; the table below is the canonical answer to "what's actually different?".
 
 ## 1. Repository & source line count
 
-Both repositories are Bun monorepos with the same workspace layout (`apps/{electron,webui,cli}` + `packages/{core,shared,ui,server-core,server,pi-agent-server,session-tools-core}`). MkAgent reuses that layout, drops two product-only packages from Craft (`messaging-gateway`, `messaging-whatsapp-worker`), removes the entire `apps/viewer` app, and never instantiates Craft's session-MCP/bridge-MCP servers.
+Both repositories are Bun monorepos with the same workspace layout (`apps/{electron,webui,cli}` + `packages/{core,shared,ui,server-core,server,pi-agent-server,session-tools-core}`). OPC Agent reuses that layout, drops two product-only packages from Craft (`messaging-gateway`, `messaging-whatsapp-worker`), removes the entire `apps/viewer` app, and never instantiates Craft's session-MCP/bridge-MCP servers.
 
-| Metric | MkAgent | Craft Agents | Notes |
+| Metric | OPC Agent | Craft Agents | Notes |
 |---|---:|---:|---|
-| Tracked TypeScript / TSX LOC (`*.ts`,`*.tsx`, excludes `node_modules`,`dist`,`release`,`.git`) | **190,558** | 344,964 | MkAgent source ≈ **55 %** of Craft's |
+| Tracked TypeScript / TSX LOC (`*.ts`,`*.tsx`, excludes `node_modules`,`dist`,`release`,`.git`) | **190,558** | 344,964 | OPC Agent source ≈ **55 %** of Craft's |
 | Tracked source files (current `git ls-files`) | 1,163 | ~1,719 | 96 % same-path rate against Craft (`bun run audit:craft-reuse`) |
-| Same-path files normalized to byte-identical | 686 (59 %) | — | Mechanical replacements only: scope (`@mkagent/*` <-> `@craft-agent/*`), URL scheme (`mkagent://`), config root (`~/.mkagent`), brand strings |
+| Same-path files normalized to byte-identical | 686 (59 %) | — | Mechanical replacements only: scope (`@opcagent/*` <-> `@craft-agent/*`), URL scheme (`opcagent://`), config root (`~/.opcagent`), brand strings |
 | Same-path Lite-customized | 430 | — | Lite boundary (e.g. deleted Sources/MCP branch) plus brand |
-| MkAgent-only source files | 47 | — | MkAgent brand assets, `audit:craft-reuse`, lint/CLI scripts, `apps/online-docs`-equivalent leftovers removed |
-| Source files Craft has that MkAgent does not | — | 606 | Removed by the Lite boundary (Claude backend, OAuth, Sources, MCP, Messaging, Viewer, automations, ...) |
-| Top-level `dependencies` | 55 | 61 | MkAgent drops `@anthropic-ai/claude-agent-sdk`, `@anthropic-ai/sdk`, `@dnd-kit/{dom,helpers}`, `@github/copilot-sdk`, `@modelcontextprotocol/sdk`, plus the messaging OAuth flow packages (the lowered number reflects the Lite backend registry, not a runtime regression) |
-| Top-level `devDependencies` | 33 | 34 | Only meaningful drop is `@aws-sdk/client-s3` (used only for the upstream release upload to S3; MkAgent's `electron-updater` GitHub provider does not need it) |
+| OPC-Agent-only source files | 47 | — | OPC Agent brand assets, `audit:craft-reuse`, lint/CLI scripts, `apps/online-docs`-equivalent leftovers removed |
+| Source files Craft has that OPC Agent does not | — | 606 | Removed by the Lite boundary (Claude backend, OAuth, Sources, MCP, Messaging, Viewer, automations, ...) |
+| Top-level `dependencies` | 55 | 61 | OPC Agent drops `@anthropic-ai/claude-agent-sdk`, `@anthropic-ai/sdk`, `@dnd-kit/{dom,helpers}`, `@github/copilot-sdk`, `@modelcontextprotocol/sdk`, plus the messaging OAuth flow packages (the lowered number reflects the Lite backend registry, not a runtime regression) |
+| Top-level `devDependencies` | 33 | 34 | Only meaningful drop is `@aws-sdk/client-s3` (used only for the upstream release upload to S3; OPC Agent's `electron-updater` GitHub provider does not need it) |
 | `node_modules/` size on a clean `bun install --frozen-lockfile` | **2.0 GB** | 2.5 GB | The 0.5 GB delta matches the dropped native + SDK bundles below |
 
 ## 2. Apps & packages actually present
 
-| Path | MkAgent | Craft Agents |
+| Path | OPC Agent | Craft Agents |
 |---|---|---|
 | `apps/electron` | Yes (shared renderer + preload + Browser pane + Sentry + auto-update) | Yes (same) |
 | `apps/webui` | Yes (loads the same renderer through a browser adapter) | Yes (same) |
-| `apps/cli` | Yes (`run`, `session`, `workspace`, `send`, ...) | Yes (same surface plus extra Sources/Automations sub-commands, which MkAgent does **not** expose) |
+| `apps/cli` | Yes (`run`, `session`, `workspace`, `send`, ...) | Yes (same surface plus extra Sources/Automations sub-commands, which OPC Agent does **not** expose) |
 | `apps/viewer` | No (deleted) | Yes (Electron Viewer app for sharing sessions publicly) |
 | `packages/core` | Yes | Yes |
 | `packages/shared` | Yes (with `messaging-gateway`, `interceptor-common`, `feature-flags`, `interceptor-request-utils` removed) | Yes (full size) |
 | `packages/ui` | Yes | Yes |
 | `packages/server-core` | Yes | Yes |
-| `packages/server` | Yes (headless `MKAGENT_SERVER_TOKEN` server) | Yes |
+| `packages/server` | Yes (headless `OPCAGENT_SERVER_TOKEN` server) | Yes |
 | `packages/pi-agent-server` | Yes (only registered backend) | Yes (alongside Craft's `claude-agent-sdk` backend) |
 | `packages/session-tools-core` | Yes (Labels/Statuses/MCP/Sources OAuth branches trimmed) | Yes (full size) |
 | `packages/messaging-gateway` | No (deleted) | Yes |
@@ -43,7 +43,7 @@ Both repositories are Bun monorepos with the same workspace layout (`apps/{elect
 
 ## 3. Backend / runtime boundary
 
-| Concern | MkAgent | Craft Agents |
+| Concern | OPC Agent | Craft Agents |
 |---|---|---|
 | Registered `AgentBackend`s | `pi` only | `pi`, `claude-agent-sdk`, plus optional **Copilot / gateway** subscriptions |
 | Auth model | API key + custom endpoints + Ollama + **ChatGPT/Claude subscription OAuth**, all through Pi | API-key + custom + **OAuth (Anthropic, OpenAI, GitHub Copilot, Google Workspace, Slack, Microsoft)** + subscription flows + gateway |
@@ -53,7 +53,7 @@ Both repositories are Bun monorepos with the same workspace layout (`apps/{elect
 
 ## 4. Agent tools (what the model can actually call)
 
-Both products expose tools to the LLM through three channels: (a) Pi SDK built-ins wired in `packages/pi-agent-server/src/index.ts` `builtinDefs`, (b) web tools declared in the same file (`createSearchTool` + `createWebFetchTool`), and (c) session-level tools registered through the main process via `register_tools` and exposed to the model with the `mcp__session__<name>` prefix (see `packages/session-tools-core/src/tool-defs.ts`). Craft additionally surfaces tools from its `mcpPool` (Sources / bridge / session MCP). MkAgent has no `mcpPool` — the `registerPoolToolsWithSubprocess()` call is physically removed (`packages/shared/src/agent/pi-agent.ts`).
+Both products expose tools to the LLM through three channels: (a) Pi SDK built-ins wired in `packages/pi-agent-server/src/index.ts` `builtinDefs`, (b) web tools declared in the same file (`createSearchTool` + `createWebFetchTool`), and (c) session-level tools registered through the main process via `register_tools` and exposed to the model with the `mcp__session__<name>` prefix (see `packages/session-tools-core/src/tool-defs.ts`). Craft additionally surfaces tools from its `mcpPool` (Sources / bridge / session MCP). OPC Agent has no `mcpPool` — the `registerPoolToolsWithSubprocess()` call is physically removed (`packages/shared/src/agent/pi-agent.ts`).
 
 ### 4.1 Pi SDK built-in tools (identical)
 
@@ -80,9 +80,9 @@ Both repositories import the same helpers from `@earendil-works/pi-coding-agent`
 
 ### 4.3 Session-level `mcp__session__*` tools — the real cut
 
-`SESSION_TOOL_DEFS` in `packages/session-tools-core/src/tool-defs.ts` is the single source of truth. The model sees every entry here with the `mcp__session__` prefix. MkAgent keeps **15** of these; Craft exposes **27**.
+`SESSION_TOOL_DEFS` in `packages/session-tools-core/src/tool-defs.ts` is the single source of truth. The model sees every entry here with the `mcp__session__` prefix. OPC Agent keeps **15** of these; Craft exposes **27**.
 
-| Tool (model-visible name) | MkAgent | Craft | What it does / why MkAgent dropped it |
+| Tool (model-visible name) | OPC Agent | Craft | What it does / why OPC Agent dropped it |
 |---|:---:|:---:|---|
 | `mcp__session__SubmitPlan` | Yes | Yes | Plan review; submits a plan file and pauses the turn |
 | `mcp__session__browser_tool` | Yes | Yes | Browser pane control |
@@ -103,8 +103,8 @@ Both repositories import the same helpers from `@earendil-works/pi-coding-agent`
 | `mcp__session__list_messaging_channels` | No | Yes | Lists bound external messaging channels. Removed with the messaging gateway. |
 | `mcp__session__unbind_messaging_channel` | No | Yes | Counterpart of `list_messaging_channels`; same reason. |
 | `mcp__session__render_template` | No | Yes | Template-rendering helper. Removed as part of the session-tool rendering disablement; see `migration/migration-features.md`. |
-| `mcp__session__set_session_labels` | No | Yes | User-configurable labels on a session. MkAgent has no labels product area. |
-| `mcp__session__set_session_status` | No | Yes | User-configurable status on a session. MkAgent has no user statuses. |
+| `mcp__session__set_session_labels` | No | Yes | User-configurable labels on a session. OPC Agent has no labels product area. |
+| `mcp__session__set_session_status` | No | Yes | User-configurable status on a session. OPC Agent has no user statuses. |
 | `mcp__session__source_credential_prompt` | No | Yes | OAuth credential prompt for a Source. Removed with Sources. |
 | `mcp__session__source_oauth_trigger` | No | Yes | Generic Source OAuth trigger. |
 | `mcp__session__source_google_oauth_trigger` | No | Yes | Google OAuth Source trigger. |
@@ -114,9 +114,9 @@ Both repositories import the same helpers from `@earendil-works/pi-coding-agent`
 
 ### 4.4 Source pool / MCP tools
 
-Craft Agents registers an `mcpPool` and forwards its proxy tool definitions through a second `register_tools` message (`packages/shared/src/agent/pi-agent.ts` → `registerPoolToolsWithSubprocess`). The pool contains tools exposed by every configured Source (API Source, MCP Source) and by Craft's bundled `bridge-mcp-server` / `session-mcp-server`. MkAgent has no `mcpPool` and ships neither MCP server package.
+Craft Agents registers an `mcpPool` and forwards its proxy tool definitions through a second `register_tools` message (`packages/shared/src/agent/pi-agent.ts` → `registerPoolToolsWithSubprocess`). The pool contains tools exposed by every configured Source (API Source, MCP Source) and by Craft's bundled `bridge-mcp-server` / `session-mcp-server`. OPC Agent has no `mcpPool` and ships neither MCP server package.
 
-| Source / MCP channel | MkAgent | Craft | Notes |
+| Source / MCP channel | OPC Agent | Craft | Notes |
 |---|:---:|:---:|---|
 | API Source proxies (HTTP / GraphQL / etc.) | No | Yes | Live API endpoints, configured through the Sources UI |
 | MCP Source proxies (stdio MCP servers) | No | Yes | Per-source MCP process with its own permissions |
@@ -126,9 +126,9 @@ Craft Agents registers an `mcpPool` and forwards its proxy tool definitions thro
 
 ### 4.5 Claude backend tools (exist only in Craft)
 
-Craft Agents' second registered backend, `claude-agent-sdk`, brings Claude-Code-style tools that Pi does not define. MkAgent has no Claude backend, so none of these exist in MkAgent. The Claude backend binding is physically removed — `packages/shared/src/agent/backend/internal/drivers/` does not carry a `claude-agent-sdk` driver — and even if a tool name appeared in the system prompt, MkAgent has no execution path for it.
+Craft Agents' second registered backend, `claude-agent-sdk`, brings Claude-Code-style tools that Pi does not define. OPC Agent has no Claude backend, so none of these exist in OPC Agent. The Claude backend binding is physically removed — `packages/shared/src/agent/backend/internal/drivers/` does not carry a `claude-agent-sdk` driver — and even if a tool name appeared in the system prompt, OPC Agent has no execution path for it.
 
-| Tool | Backend | MkAgent | Craft |
+| Tool | Backend | OPC Agent | Craft |
 |---|---|:---:|:---:|
 | `TodoWrite` | claude-agent-sdk | No | Yes |
 | `NotebookEdit` | claude-agent-sdk | No | Yes |
@@ -139,7 +139,7 @@ Craft Agents' second registered backend, `claude-agent-sdk`, brings Claude-Code-
 
 Counting only the tools the model can invoke at run time, with no user-configured Source configured:
 
-| Source of tools | MkAgent | Craft |
+| Source of tools | OPC Agent | Craft |
 |---|---:|---:|
 | Pi SDK built-ins (§4.1) | 7 | 7 |
 | Web tools (§4.2) | 2 | 2 |
@@ -153,11 +153,11 @@ The 12 dropped `mcp__session__*` tools map one-to-one onto the Lite boundary del
 
 ## 5. Installer / package size (the headline numbers)
 
-These are the sizes you actually ship to users, taken from the on-disk dev build at `apps/electron/release/<arch>/MkAgent.app` and the upstream `craft-agents-oss` checkout that the audit script read. **None** of these include code-signing overhead (MkAgent dev build sets `MKAGENT_DEV_RUNTIME=1`; release builds with `CSC_IDENTITY_AUTO_DISCOVERY=false` are unsigned/ad-hoc). For a Craft Agents reference, the `claude-agent-sdk-darwin-arm64/claude` binary alone (`217 MB`) was measured directly from `node_modules`.
+These are the sizes you actually ship to users, taken from the on-disk dev build at `apps/electron/release/<arch>/OPC Agent.app` and the upstream `craft-agents-oss` checkout that the audit script read. **None** of these include code-signing overhead (OPC Agent dev build sets `OPCAGENT_DEV_RUNTIME=1`; release builds with `CSC_IDENTITY_AUTO_DISCOVERY=false` are unsigned/ad-hoc). For a Craft Agents reference, the `claude-agent-sdk-darwin-arm64/claude` binary alone (`217 MB`) was measured directly from `node_modules`.
 
-### 4.1 macOS arm64 (`MkAgent.app` / `Craft-Agents-arm64.app`)
+### 4.1 macOS arm64 (`OPC Agent.app` / `Craft-Agents-arm64.app`)
 
-| Component | MkAgent | Craft Agents | Delta (Craft − MkAgent) |
+| Component | OPC Agent | Craft Agents | Delta (Craft − OPC Agent) |
 |---|---:|---:|---:|
 | `Contents/Resources/app/dist/` (bundled JS, renderer assets, scripts) | 116 MB | ~380 MB | ~−264 MB |
 | `Contents/Resources/app/node_modules/` (runtime node_modules + cron packs) | 5.0 MB | ~210 MB | ~−205 MB (Craft bundles the SDK, MCP servers, WhatsApp worker, plus more) |
@@ -166,17 +166,17 @@ These are the sizes you actually ship to users, taken from the on-disk dev build
 | **Subtotal** | **~183 MB** | **~652 MB** | **~−469 MB** (~−72 %) |
 | `Contents/Frameworks/Electron Framework.framework` | 253 MB | 253 MB | 0 (identical Electron `39.2.7`) |
 | `Contents/Frameworks/{Mantle,ReactiveObjC,Squirrel, Squirrel.framework}` | ~1 MB | ~1 MB | 0 |
-| `MkAgent Helper*.app` (Renderer/GPU/Plugin) | ~1 MB | ~1 MB | 0 |
-| **`MkAgent.app` total (unpacked)** | **438 MB** | **~907 MB** | **~−469 MB** |
+| `OPC Agent Helper*.app` (Renderer/GPU/Plugin) | ~1 MB | ~1 MB | 0 |
+| **`OPC Agent.app` total (unpacked)** | **438 MB** | **~907 MB** | **~−469 MB** |
 
-> The unpacked `.app` sizes already include helper apps and the Electron framework; they **exclude** the platform download (DMG/ZIP wrapper). Because `craft-agents-oss/node_modules/@anthropic-ai/claude-agent-sdk-darwin-arm64/claude` is a single **217 MB** binary with a per-platform `.zip` for `-darwin-x64` / `-win32-x64` / `-linux-x64` of similar shape, the upstream DMG/ZIP for Craft always exceeds MkAgent's by **≥ ~250 MB** after compression.
+> The unpacked `.app` sizes already include helper apps and the Electron framework; they **exclude** the platform download (DMG/ZIP wrapper). Because `craft-agents-oss/node_modules/@anthropic-ai/claude-agent-sdk-darwin-arm64/claude` is a single **217 MB** binary with a per-platform `.zip` for `-darwin-x64` / `-win32-x64` / `-linux-x64` of similar shape, the upstream DMG/ZIP for Craft always exceeds OPC Agent's by **≥ ~250 MB** after compression.
 
 ### 4.2 What `electron-builder` carries in `extraResources`
 
-| Bundled to installer | MkAgent | Craft Agents | Approx. size carried in installer |
+| Bundled to installer | OPC Agent | Craft Agents | Approx. size carried in installer |
 |---|---|---|---:|
 | Per-platform **`claude` native binary** (Anthropic SDK) | No | Yes | **~217 MB per platform arch** |
-| Bundled **`uv`** Python launcher (target-platform binary under `resources/bin/<platform-arch>/`) | Yes (`uv 0.10.6`; injected through `MKAGENT_UV`) | Yes | ~30–55 MB for the target arch in each package |
+| Bundled **`uv`** Python launcher (target-platform binary under `resources/bin/<platform-arch>/`) | Yes (`uv 0.10.6`; injected through `OPCAGENT_UV`) | Yes | ~30–55 MB for the target arch in each package |
 | `@anthropic-ai/claude-agent-sdk` thin core + per-platform binary shim | No | Yes | ~3.5 MB core + ~217 MB binary per arch |
 | `bridge-mcp-server/` (Craft's MCP bridge) | No | Yes | ~13 MB |
 | `session-mcp-server/` (Craft's session MCP) | No | Yes | ~50 KB TypeScript |
@@ -190,22 +190,22 @@ These are the sizes you actually ship to users, taken from the on-disk dev build
 
 ### 4.3 Net effect for end users
 
-| Effect | MkAgent | Craft Agents |
+| Effect | OPC Agent | Craft Agents |
 |---|---|---|
 | DMG (macOS arm64 / x64) download | ~165 MB¹ | ~370 MB¹ |
 | macOS `.app` install footprint | ~438 MB | ~907 MB |
 | NSIS `.exe` (Windows x64) | ~210 MB¹ | ~430 MB¹ |
 | Linux AppImage | ~200 MB¹ | ~420 MB¹ |
-| `bun run apps/cli` pure-CLI mode (no Electron) | `bun run cli:build` → ~1 MB `dist/mkagent` package; same on Craft | ~1 MB (CLI payload itself is identical) |
+| `bun run apps/cli` pure-CLI mode (no Electron) | `bun run cli:build` → ~1 MB `dist/opcagent` package; same on Craft | ~1 MB (CLI payload itself is identical) |
 | First document-tool run with a cold `uv` cache | May download Python 3.12 and declared script dependencies on demand | Same |
 
-¹ **Caveat.** DMG / NSIS / AppImage numbers above are **inferred** from the unpacked `.app` sizes and the `electron-builder.yml` `files` / `extraResources` rules; they are not freshly built side-by-side. Both release pipelines fetch or copy a target-platform `uv` binary. Craft additionally brings the ~217 MB Claude SDK binary; MkAgent skips that backend payload, not `uv`.
+¹ **Caveat.** DMG / NSIS / AppImage numbers above are **inferred** from the unpacked `.app` sizes and the `electron-builder.yml` `files` / `extraResources` rules; they are not freshly built side-by-side. Both release pipelines fetch or copy a target-platform `uv` binary. Craft additionally brings the ~217 MB Claude SDK binary; OPC Agent skips that backend payload, not `uv`.
 
 ## 6. Feature surface
 
 The matrix below extends [`docs/featues.md`](./featues.md) with explicit numbers from the audit and pointing at concrete file evidence.
 
-| Area | MkAgent | Craft Agents |
+| Area | OPC Agent | Craft Agents |
 |---|---|---|
 | Electron Desktop + WebUI + headless server + CLI + shared renderer | Yes | Yes |
 | Pi agent + Pi provider preset + API-key connections | Yes | Yes |
@@ -216,7 +216,7 @@ The matrix below extends [`docs/featues.md`](./featues.md) with explicit numbers
 | Browser pane + `web_search` + `web_fetch` | Yes | Yes |
 | Permissions (safe / allow-all) + permission prompts | Yes | Yes |
 | Network proxy | Yes | Yes |
-| Auto-update via `electron-updater` against GitHub Releases | Yes (against `MkThingsHQ/mkagent`) | Yes (against `https://agents.craft.do/electron/latest`) |
+| Auto-update via `electron-updater` against GitHub Releases | Yes (against `iBigQiang/OpcAgent`) | Yes (against `https://agents.craft.do/electron/latest`) |
 | Sentry (`@sentry/electron` + `@sentry/react`); gated by `SENTRY_ELECTRON_INGEST_URL` | Yes | Yes |
 | Document tools (PDF / DOCX / XLSX / PPTX / image / iCal / doc-diff / MarkItDown) with `uv`-based Python wrappers | Yes (bundled per-platform `uv`; PATH fallback in development) | Yes (bundled per-platform `uv`) |
 | Mini chat, `EditPopover`, mini model, titles, summaries | Yes | Yes |
@@ -240,26 +240,26 @@ The matrix below extends [`docs/featues.md`](./featues.md) with explicit numbers
 
 ## 7. Test, typecheck and lint coverage delta
 
-| Gate | MkAgent | Craft Agents | Result |
+| Gate | OPC Agent | Craft Agents | Result |
 |---|---|---|---|
 | `bun run test` (main suite) | 3,078 pass / 11 platform-conditional skip | (similar order of magnitude; full count TBD on fresh checkout) | both green |
 | `bun run test:doc-tools` | 8 Python smoke tests for `pdf_tool`, `xlsx_tool`, `docx_tool`, `pptx_tool`, `img_tool`, `ical_tool`, `doc_diff`, `markitdown` | (same) | both green |
-| `bun run typecheck:all` | passes; `apps/online-docs` is excluded from the workspace by `workspaces` globs in MkAgent and skipped in Craft | passes | both green |
-| `bun run lint` | `lint:craft-ui-sync`, `lint:craft-test-coverage`, `lint:electron`, `lint:shared`, `lint:ui` pass; **20 React Hook `exhaustive-deps` warnings retained** from upstream | adds `lint:ipc-sends`, `lint:tool-name-checks`, `lint:i18n:coverage`, `lint:i18n:strings`; **45 Craft-origin React Hook warnings** | MkAgent's lint scope is narrower |
+| `bun run typecheck:all` | passes; `apps/online-docs` is excluded from the workspace by `workspaces` globs in OPC Agent and skipped in Craft | passes | both green |
+| `bun run lint` | `lint:craft-ui-sync`, `lint:craft-test-coverage`, `lint:electron`, `lint:shared`, `lint:ui` pass; **20 React Hook `exhaustive-deps` warnings retained** from upstream | adds `lint:ipc-sends`, `lint:tool-name-checks`, `lint:i18n:coverage`, `lint:i18n:strings`; **45 Craft-origin React Hook warnings** | OPC Agent's lint scope is narrower |
 | `bun run audit:craft-reuse` | 96 % same-path, 59 % byte-identical, 0 missing-without-explanation | (not applicable) | green |
 | `bun run lint:craft-test-coverage` | 246 kept / 5 substituted / 122 dropped-for-product-boundary / **0 missing-without-explanation** | (not applicable) | green |
 
-The MkAgent-side lifts (zero "missing test without explanation") come from [`scripts/check-craft-test-coverage.ts`](../scripts/check-craft-test-coverage.ts), which enforces that every Craft test is one of: (a) same-path kept, (b) replaced with a Lite equivalent, (c) explicitly tied to a removed product area.
+The OPC-Agent-side lifts (zero "missing test without explanation") come from [`scripts/check-craft-test-coverage.ts`](../scripts/check-craft-test-coverage.ts), which enforces that every Craft test is one of: (a) same-path kept, (b) replaced with a Lite equivalent, (c) explicitly tied to a removed product area.
 
 ## 8. License & attribution
 
-Both projects are released under **Apache-2.0**. MkAgent ships [`NOTICE`](../NOTICE) on the repo root with the attribution upstream required, and [`docs/featues.md`](./featues.md) records the kept/removed capabilities in human-readable form. Source and release artifacts (DMG/ZIP/NSIS/AppImage, manifests, blockmaps, and checksums) now share the `MkThingsHQ/mkagent` repository; no release-only mirror is used.
+Both projects are released under **Apache-2.0**. OPC Agent ships [`NOTICE`](../NOTICE) on the repo root with the attribution upstream required, and [`docs/featues.md`](./featues.md) records the kept/removed capabilities in human-readable form. Source and release artifacts (DMG/ZIP/NSIS/AppImage, manifests, blockmaps, and checksums) now share the `iBigQiang/OpcAgent` repository; no release-only mirror is used.
 
 ## 9. Re-running this audit
 
 ```bash
-# From the MkAgent checkout
-git rev-parse HEAD              # record MkAgent commit
+# From the OPC Agent checkout
+git rev-parse HEAD              # record OPC Agent commit
 bun install --frozen-lockfile
 bun run audit:craft-reuse       # 96 % same-path / 59 % byte-identical
 bun run lint:craft-test-coverage

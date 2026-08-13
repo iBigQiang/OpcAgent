@@ -1,10 +1,10 @@
 import { writeFileSync, readFileSync, unlinkSync, existsSync } from 'node:fs'
 import { uptime as osUptime } from 'node:os'
 import { join } from 'node:path'
-import { OAuthFlowStore } from '@mkagent/shared/auth'
-import { ensureConfigDir, loadStoredConfig, saveConfig } from '@mkagent/shared/config'
-import { CONFIG_DIR } from '@mkagent/shared/config/paths'
-import { setBundledAssetsRoot } from '@mkagent/shared/utils'
+import { OAuthFlowStore } from '@opcagent/shared/auth'
+import { ensureConfigDir, loadStoredConfig, saveConfig } from '@opcagent/shared/config'
+import { CONFIG_DIR } from '@opcagent/shared/config/paths'
+import { setBundledAssetsRoot } from '@opcagent/shared/utils'
 import { WsRpcServer, type WsRpcTlsOptions } from '../transport/server'
 import type { EventSink, RpcServer } from '../transport/types'
 import { createHeadlessPlatform } from '../runtime/platform-headless'
@@ -258,9 +258,9 @@ function ensureGlobalConfigExists(platform: PlatformServices): void {
 export async function bootstrapServer<TSessionManager, THandlerDeps>(
   options: ServerBootstrapOptions<TSessionManager, THandlerDeps>,
 ): Promise<ServerInstance<TSessionManager>> {
-  const serverToken = options.serverToken ?? process.env.MKAGENT_SERVER_TOKEN
+  const serverToken = options.serverToken ?? process.env.OPCAGENT_SERVER_TOKEN
   if (!serverToken) {
-    throw new Error('Server token is required. Pass options.serverToken or set MKAGENT_SERVER_TOKEN.')
+    throw new Error('Server token is required. Pass options.serverToken or set OPCAGENT_SERVER_TOKEN.')
   }
 
   const entropy = validateTokenEntropy(serverToken)
@@ -271,7 +271,7 @@ export async function bootstrapServer<TSessionManager, THandlerDeps>(
   const platform = options.platformFactory?.() ?? createHeadlessPlatform({ appVersion: options.serverVersion })
 
   const bundledAssetsRoot = options.bundledAssetsRoot
-    ?? process.env.MKAGENT_BUNDLED_ASSETS_ROOT
+    ?? process.env.OPCAGENT_BUNDLED_ASSETS_ROOT
     ?? process.cwd()
   setBundledAssetsRoot(bundledAssetsRoot)
 
@@ -288,8 +288,8 @@ export async function bootstrapServer<TSessionManager, THandlerDeps>(
   const modelRefreshService = options.initModelRefreshService()
   const sessionManager = options.createSessionManager()
 
-  const rpcHost = options.rpcHost ?? process.env.MKAGENT_RPC_HOST ?? '127.0.0.1'
-  const rpcPortRaw = options.rpcPort ?? parseInt(process.env.MKAGENT_RPC_PORT ?? '9100', 10)
+  const rpcHost = options.rpcHost ?? process.env.OPCAGENT_RPC_HOST ?? '127.0.0.1'
+  const rpcPortRaw = options.rpcPort ?? parseInt(process.env.OPCAGENT_RPC_PORT ?? '9100', 10)
   if (!Number.isFinite(rpcPortRaw) || rpcPortRaw < 0 || rpcPortRaw > 65535) {
     throw new Error(`Invalid RPC port: ${rpcPortRaw}`)
   }
@@ -348,7 +348,7 @@ export async function bootstrapServer<TSessionManager, THandlerDeps>(
 
   modelRefreshService.startAll()
 
-  platform.logger.info(`MkAgent server listening on ${wsServer.protocol}://${rpcHost}:${wsServer.port}`)
+  platform.logger.info(`OPC Agent server listening on ${wsServer.protocol}://${rpcHost}:${wsServer.port}`)
 
   let stopped = false
   const stop = async (): Promise<void> => {

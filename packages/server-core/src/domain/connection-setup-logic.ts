@@ -5,7 +5,7 @@
  * No dependency on ipcMain, sessionManager, credential manager, or file I/O.
  */
 
-import type { ModelDefinition } from '@mkagent/shared/config/models'
+import type { ModelDefinition } from '@opcagent/shared/config/models'
 import {
   type LlmConnection,
   type CustomEndpointApi,
@@ -13,7 +13,7 @@ import {
   getDefaultModelsForConnection,
   getDefaultModelForConnection,
   defaultMidStreamBehavior,
-} from '@mkagent/shared/config'
+} from '@opcagent/shared/config'
 
 // ============================================================
 // Error Parsing
@@ -132,7 +132,7 @@ export function getDefaultConnectionName(
   if (platformProfile === 'anyrouter') return 'AnyRouter-CC'
   if (platformProfile === 'anyrouter_pi') return 'AnyRouter-Pi'
   if (platformProfile === 'agentrouter') return 'AgentRouter'
-  return providerName ? `MkAgent Backend (${providerName})` : 'MkAgent Backend'
+  return providerName ? `OPC Agent Backend (${providerName})` : 'OPC Agent Backend'
 }
 
 /** Keep a user's connection name when re-saving an existing profile. */
@@ -170,7 +170,7 @@ export const BUILT_IN_CONNECTION_TEMPLATES: Record<string, {
     piAuthProvider: 'openai-codex',
   },
   'pi-api-key': {
-    name: 'MkAgent Backend (API Key)',
+    name: 'OPC Agent Backend (API Key)',
     providerType: 'pi',
     authType: 'api_key',
     // piAuthProvider set dynamically from setup.piAuthProvider

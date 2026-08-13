@@ -46,7 +46,7 @@ describe('ResponsesApiSearchProvider', () => {
       apiBase: 'https://api.openai.com/v1',
       apiKey: 'sk-test',
     });
-    const results = await provider.search('mkagent', 5);
+    const results = await provider.search('opcagent', 5);
 
     expect(calledUrl).toBe('https://api.openai.com/v1/responses');
     expect(calledBody.model).toBe('gpt-4o-mini');
@@ -131,7 +131,7 @@ describe('ResponsesApiSearchProvider', () => {
       apiBase: 'https://api.openai.com/v1',
       apiKey: 'sk-test',
     });
-    const results = await provider.search('mkagent', 2);
+    const results = await provider.search('opcagent', 2);
 
     expect(results).toHaveLength(2);
     expect(results.map((r) => r.url)).toEqual(['https://1.com', 'https://2.com']);
@@ -156,7 +156,7 @@ describe('ResponsesApiSearchProvider', () => {
       apiBase: 'https://api.openai.com/v1',
       apiKey: 'sk-test',
     });
-    const results = await provider.search('mkagent', 5);
+    const results = await provider.search('opcagent', 5);
 
     expect(results).toHaveLength(1);
     expect(results[0]?.title).toContain('Search results for');

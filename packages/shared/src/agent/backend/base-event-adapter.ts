@@ -13,7 +13,7 @@
  * - Turn lifecycle (reset on new turn)
  */
 
-import type { AgentEvent } from '@mkagent/core/types';
+import type { AgentEvent } from '@opcagent/core/types';
 import { parseReadCommand, type ReadCommandInfo } from './read-patterns.ts';
 import { createLogger } from '../../utils/debug.ts';
 

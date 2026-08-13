@@ -2,9 +2,9 @@ import * as React from 'react'
 import { useTranslation } from "react-i18next"
 import { Command as CommandPrimitive } from 'cmdk'
 import { Check, Minimize2 } from 'lucide-react'
-import { Icon_Folder } from '@mkagent/ui'
+import { Icon_Folder } from '@opcagent/ui'
 import { cn } from '@/lib/utils'
-import { PERMISSION_MODE_CONFIG, PERMISSION_MODE_ORDER, type PermissionMode } from '@mkagent/shared/agent/modes'
+import { PERMISSION_MODE_CONFIG, PERMISSION_MODE_ORDER, type PermissionMode } from '@opcagent/shared/agent/modes'
 
 // ============================================================================
 // Types

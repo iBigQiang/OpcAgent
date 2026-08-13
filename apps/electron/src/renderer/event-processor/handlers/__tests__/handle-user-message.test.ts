@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import { groupMessagesByTurn } from '@mkagent/ui/chat/turn-utils'
+import { groupMessagesByTurn } from '@opcagent/ui/chat/turn-utils'
 import { handleUserMessage } from '../session'
 import type { SessionState, UserMessageEvent } from '../../types'
 

@@ -15,9 +15,9 @@ Default model:   已安装的 Ollama 模型名,如 llama3.2
 
 保存后点击 "Test"。成功返回模型列表。
 
-## MkAgent 如何用 Ollama
+## OPC Agent 如何用 Ollama
 
-Ollama 作为 `openai-completions` 连接注册。session 启动时,Pi 的 provider 解析这条连接 id,并以空 auth 把所有模型调用路由过去。streaming、thinking-level、工具调用、权限弹窗、cancel、resume 全部由 Pi 统一管理;MkAgent 没有给 Ollama 单独的旁路。
+Ollama 作为 `openai-completions` 连接注册。session 启动时,Pi 的 provider 解析这条连接 id,并以空 auth 把所有模型调用路由过去。streaming、thinking-level、工具调用、权限弹窗、cancel、resume 全部由 Pi 统一管理;OPC Agent 没有给 Ollama 单独的旁路。
 
 这意味着:
 
@@ -31,7 +31,7 @@ Ollama 作为 `openai-completions` 连接注册。session 启动时,Pi 的 provi
 # 在 shell 里 sanity check
 curl http://127.0.0.1:11434/v1/models
 
-# 通过 MkAgent CLI 验证
+# 通过 OPC Agent CLI 验证
 bun run apps/cli/src/index.ts connections list
 bun run apps/cli/src/index.ts connections test <id>
 bun run apps/cli/src/index.ts run "Hello" \
@@ -44,6 +44,6 @@ bun run apps/cli/src/index.ts run "Hello" \
 
 ## 限制
 
-- Ollama 的 OpenAI-兼容 surface 缺一些 MkAgent 可能发的字段(尤其是并行工具调用与某些 reasoning payloads)。某些 Ollama 模型会把工具调用报成纯文本;agentic 会话请选支持 tool 的模型。
+- Ollama 的 OpenAI-兼容 surface 缺一些 OPC Agent 可能发的字段(尤其是并行工具调用与某些 reasoning payloads)。某些 Ollama 模型会把工具调用报成纯文本;agentic 会话请选支持 tool 的模型。
 - 网络访问是本地的;即使配置了代理,`127.0.0.1` 也不走代理。
 - 多模型连接不能跨 provider 拆开;一个 Ollama base URL 对应一条连接。

@@ -1,2 +1,2 @@
 #!/bin/sh
-exec "$MKAGENT_UV" run --python 3.12 "$MKAGENT_SCRIPTS/pptx_tool.py" "$@"
+exec "$OPCAGENT_UV" run --python 3.12 "$OPCAGENT_SCRIPTS/pptx_tool.py" "$@"

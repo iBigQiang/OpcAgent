@@ -1,14 +1,13 @@
 {
-  "name": "@mkagent/electron",
-  "version": "0.1.0",
-  "description": "Electron desktop app for MkAgent",
+  "name": "@opcagent/electron",
+  "version": "0.1.1",
+  "description": "Electron desktop app for OPC Agent",
   "main": "dist/main.cjs",
   "private": true,
   "author": {
-    "name": "MkAgent contributors",
-    "email": "support@mkagent.app"
+    "name": "OPC Agent contributors"
   },
-  "homepage": "https://mkagent.app",
+  "homepage": "https://github.com/iBigQiang/OpcAgent",
   "license": "Apache-2.0",
   "type": "module",
   "engines": {
@@ -36,11 +35,11 @@
     "lint:fix": "eslint src/ --fix"
   },
   "devDependencies": {
-    "@mkagent/core": "workspace:*",
-    "@mkagent/messaging-gateway": "workspace:*",
-    "@mkagent/server-core": "workspace:*",
-    "@mkagent/shared": "workspace:*",
-    "@mkagent/ui": "workspace:*",
+    "@opcagent/core": "workspace:*",
+    "@opcagent/messaging-gateway": "workspace:*",
+    "@opcagent/server-core": "workspace:*",
+    "@opcagent/shared": "workspace:*",
+    "@opcagent/ui": "workspace:*",
     "@paper-design/shaders-react": "^0.0.69",
     "@pierre/diffs": "^1.0.4",
     "@radix-ui/react-context-menu": "^2.2.16",

@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="./apps/electron/resources/icon.png" alt="MkAgent" width="96" height="96" />
+  <img src="./apps/electron/resources/icon.png" alt="OPC Agent" width="96" height="96" />
 </p>
 
-<h1 align="center">MkAgent</h1>
+<h1 align="center">OPC Agent</h1>
 
 <p align="center">
   A local-first, Pi-powered AI agent workspace for Desktop, WebUI, and CLI.
@@ -15,14 +15,14 @@
 </p>
 
 <p align="center">
-  <a href="https://mkagent.app">Website</a> ·
+  <a href="https://github.com/iBigQiang/OpcAgent">Website</a> ·
   <a href="./docs/README.md">Documentation</a> ·
   <a href="./docs/zh/README.md">中文文档</a> ·
   <a href="#getting-started">Quick Start</a> ·
-  <a href="https://mksaas.link/discord">Community</a> ·
+  <a href="https://github.com/iBigQiang/OpcAgent/discussions">Community</a> ·
 </p>
 
-MkAgent is an open-source, local-first AI agent workspace for anyone who wants more control over
+OPC Agent is an open-source, local-first AI agent workspace for anyone who wants more control over
 their AI work. Download and use it through Desktop, WebUI, or CLI, or extend its open-source
 foundation to build your own desktop agent product. Powered by the
 [Pi](https://github.com/badlogic/pi-mono) agent runtime, it combines persistent local workspaces,
@@ -30,7 +30,7 @@ model flexibility, browser tools, and document tools in one application.
 Application state stays under your local data directory, and credentials are stored through the
 operating system credential manager.
 
-[![MkAgent local-first, Pi-powered AI agent workspace](./docs/assets/mkagent-homepage.png)](https://mkagent.app)
+[![OPC Agent local-first, Pi-powered AI agent workspace](./docs/assets/opcagent-homepage.png)](https://github.com/iBigQiang/OpcAgent)
 
 ## Features
 
@@ -75,13 +75,13 @@ operating system credential manager.
 ### Run the Desktop app
 
 ```bash
-git clone https://github.com/MkThingsHQ/mkagent.git
-cd mkagent
+git clone https://github.com/iBigQiang/OpcAgent.git
+cd opcagent
 bun install --frozen-lockfile
 bun run electron:dev
 ```
 
-MkAgent creates its default workspace at `~/.mkagent/workspaces/default`. The configuration root can
+OPC Agent creates its default workspace at `~/.opcagent/workspaces/default`. The configuration root can
 be isolated for development or testing with `CONFIG_DIR=/path/to/directory`.
 
 ### Common commands
@@ -100,7 +100,7 @@ More commands and environment variables are documented in the
 
 ## Architecture
 
-MkAgent is a Bun workspace with a shared runtime and renderer across its three interfaces:
+OPC Agent is a Bun workspace with a shared runtime and renderer across its three interfaces:
 
 ```text
 apps/
@@ -145,36 +145,23 @@ bun run validate:ci
 git diff --check
 ```
 
-Use [GitHub Issues](https://github.com/MkThingsHQ/mkagent/issues) for bugs and feature requests.
+Use [GitHub Issues](https://github.com/iBigQiang/OpcAgent/issues) for bugs and feature requests.
 
 ## Links
 
-- [Website](https://mkagent.app) — Learn more about MkAgent.
+- [Website](https://github.com/iBigQiang/OpcAgent) — Learn more about OPC Agent.
 - [Documentation](./docs/README.md) — Explore setup, architecture, models, tools, and development guides.
 - [Chinese documentation](./docs/zh/README.md) — Read the Simplified Chinese guides.
-- [Discord](https://mksaas.link/discord) — Join the community and get help.
-- [GitHub Issues](https://github.com/MkThingsHQ/mkagent/issues) — Report bugs or request features.
+- [Community discussions](https://github.com/iBigQiang/OpcAgent/discussions) — Ask questions and share feedback.
+- [GitHub Issues](https://github.com/iBigQiang/OpcAgent/issues) — Report bugs or request features.
 
 ## Project lineage
 
-MkAgent started from selected architecture and code in
+OPC Agent started from selected architecture and code in
 [Craft Agents OSS](https://github.com/craft-ai-agents/craft-agents-oss) `v0.11.2`
-(`a60ebc1a5a7c`) and continues with an independent Git history and product boundary. MkAgent is not
+(`a60ebc1a5a7c`) and continues with an independent Git history and product boundary. OPC Agent is not
 affiliated with or endorsed by the upstream project. See [NOTICE](./NOTICE) for attribution and the
 [comparison guide](./docs/comparison-with-craft.md) for the current differences.
-
-## Author
-
-[OpenFox](https://mksaas.link/fox-x) is an independent developer building products and developer
-tools. His products include:
-
-- [MkAgent](https://mkagent.app) — A local-first, Pi-powered AI agent workspace for Desktop, WebUI,
-  and CLI.
-- [TanStarter](https://tanstarter.dev) — Ship Faster with TanStack, Cost Less with Cloudflare.
-- [MkSaaS](https://mksaas.com) — Make Your AI SaaS Product in a Weekend.
-- [MkImage](https://mkimage.ai) — Make Any Images Possible.
-- [Mkdirs](https://mkdirs.com) — Launch AI-powered directory in 30 minutes.
-- [MkDollar](https://mkdollar.com) — The all-in-one platform to help you make first dollar online.
 
 ## License
 

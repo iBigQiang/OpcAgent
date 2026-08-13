@@ -1,5 +1,5 @@
 import { motion } from 'motion/react'
-import { MkAgentAppIcon } from './icons/MkAgentAppIcon'
+import { OPCAgentAppIcon } from './icons/OPCAgentAppIcon'
 
 interface SplashScreenProps {
   isExiting: boolean
@@ -36,7 +36,7 @@ export function SplashScreen({ isExiting, onExitComplete }: SplashScreenProps) {
           ease: [0.16, 1, 0.3, 1] // Exponential out curve
         }}
       >
-        <MkAgentAppIcon className="h-8 w-8" size={32} />
+        <OPCAgentAppIcon className="h-8 w-8" size={32} />
       </motion.div>
     </motion.div>
   )

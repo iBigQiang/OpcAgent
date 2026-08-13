@@ -26,28 +26,28 @@ describe('parseArgs', () => {
     expect(args.rest).toEqual(['session-1', 'hello'])
   })
 
-  it('falls back to MkAgent env vars', () => {
-    const previous = [process.env.MKAGENT_SERVER_URL, process.env.MKAGENT_SERVER_TOKEN, process.env.MKAGENT_TLS_CA]
-    process.env.MKAGENT_SERVER_URL = 'ws://env-server:8080'
-    process.env.MKAGENT_SERVER_TOKEN = 'env-token'
-    process.env.MKAGENT_TLS_CA = '/env/ca.pem'
+  it('falls back to OPCAgent env vars', () => {
+    const previous = [process.env.OPCAGENT_SERVER_URL, process.env.OPCAGENT_SERVER_TOKEN, process.env.OPCAGENT_TLS_CA]
+    process.env.OPCAGENT_SERVER_URL = 'ws://env-server:8080'
+    process.env.OPCAGENT_SERVER_TOKEN = 'env-token'
+    process.env.OPCAGENT_TLS_CA = '/env/ca.pem'
     try {
       const args = parseArgs(['bun', 'index.ts', 'ping'])
       expect([args.url, args.token, args.tlsCa]).toEqual(['ws://env-server:8080', 'env-token', '/env/ca.pem'])
     } finally {
-      const keys = ['MKAGENT_SERVER_URL', 'MKAGENT_SERVER_TOKEN', 'MKAGENT_TLS_CA'] as const
+      const keys = ['OPCAGENT_SERVER_URL', 'OPCAGENT_SERVER_TOKEN', 'OPCAGENT_TLS_CA'] as const
       keys.forEach((key, index) => previous[index] === undefined ? delete process.env[key] : process.env[key] = previous[index])
     }
   })
 
   it('explicit flags override env vars', () => {
-    const previous = process.env.MKAGENT_SERVER_URL
-    process.env.MKAGENT_SERVER_URL = 'ws://env-server:8080'
+    const previous = process.env.OPCAGENT_SERVER_URL
+    process.env.OPCAGENT_SERVER_URL = 'ws://env-server:8080'
     try {
       expect(parseArgs(['bun', 'index.ts', '--url', 'ws://flag-server:9090', 'ping']).url).toBe('ws://flag-server:9090')
     } finally {
-      if (previous === undefined) delete process.env.MKAGENT_SERVER_URL
-      else process.env.MKAGENT_SERVER_URL = previous
+      if (previous === undefined) delete process.env.OPCAGENT_SERVER_URL
+      else process.env.OPCAGENT_SERVER_URL = previous
     }
   })
 

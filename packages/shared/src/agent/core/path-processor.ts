@@ -31,11 +31,11 @@ export { expandPath, normalizePath, pathStartsWith, toPortablePath };
  * These files have specific formats (JSON, TOML, YAML) that can break apps if malformed.
  */
 const CONFIG_FILE_PATTERNS = [
-  // MkAgent configs
-  /\.mkagent\/.*\/(config|permissions|theme|guide)\.json$/,
-  /\.mkagent\/config\.json$/,
-  /\.mkagent\/preferences\.json$/,
-  /\.mkagent\/.*\/SKILL\.md$/,
+  // OPCAgent configs
+  /\.opcagent\/.*\/(config|permissions|theme|guide)\.json$/,
+  /\.opcagent\/config\.json$/,
+  /\.opcagent\/preferences\.json$/,
+  /\.opcagent\/.*\/SKILL\.md$/,
   // Common config files
   /package\.json$/,
   /tsconfig\.json$/,
@@ -51,7 +51,7 @@ function normalizeConfigPathForMatch(filePath: string): string {
   return process.platform === 'win32' ? normalized.toLowerCase() : normalized;
 }
 
-function isMkAgentConfigPath(filePath: string): boolean {
+function isOPCAgentConfigPath(filePath: string): boolean {
   const normalized = normalizeConfigPathForMatch(filePath);
   const configRoot = normalizeConfigPathForMatch(CONFIG_DIR).replace(/\/+$/, '');
   if (!normalized.startsWith(`${configRoot}/`)) return false;
@@ -178,7 +178,7 @@ export class PathProcessor {
    */
   isConfigFile(filePath: string): boolean {
     const normalized = this.normalizeForComparison(this.expandPath(filePath));
-    return isMkAgentConfigPath(normalized) || CONFIG_FILE_PATTERNS.some((pattern) => pattern.test(normalized));
+    return isOPCAgentConfigPath(normalized) || CONFIG_FILE_PATTERNS.some((pattern) => pattern.test(normalized));
   }
 
   /**

@@ -10,7 +10,7 @@
  */
 import { describe, it, expect, beforeEach } from 'bun:test';
 import { BaseEventAdapter } from '../backend/base-event-adapter.ts';
-import type { AgentEvent } from '@mkagent/core/types';
+import type { AgentEvent } from '@opcagent/core/types';
 
 /**
  * Concrete test implementation of BaseEventAdapter.

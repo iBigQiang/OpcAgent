@@ -1,5 +1,5 @@
 import type { ImageProcessor } from '../runtime/platform'
-import { IMAGE_LIMITS } from '@mkagent/shared/utils'
+import { IMAGE_LIMITS } from '@opcagent/shared/utils'
 
 export interface ImageResizeResult {
   /** Resized image buffer */

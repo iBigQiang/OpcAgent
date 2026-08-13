@@ -1,5 +1,5 @@
 /**
- * Utility functions for @mkagent/ui
+ * Utility functions for @opcagent/ui
  */
 
 import { type ClassValue, clsx } from 'clsx'

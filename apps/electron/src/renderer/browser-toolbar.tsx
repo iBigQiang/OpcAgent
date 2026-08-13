@@ -10,9 +10,9 @@ import React, { useState, useEffect, useCallback, useRef } from 'react'
 import ReactDOM from 'react-dom/client'
 import { useTranslation, initReactI18next } from 'react-i18next'
 import LanguageDetector from 'i18next-browser-languagedetector'
-import { setupI18n } from '@mkagent/shared/i18n'
+import { setupI18n } from '@opcagent/shared/i18n'
 import { EyeOff, X, XCircle } from 'lucide-react'
-import { BrowserControls } from '@mkagent/ui'
+import { BrowserControls } from '@opcagent/ui'
 import { HeaderIconButton } from '@/components/ui/HeaderIconButton'
 import {
   DropdownMenu,
@@ -43,7 +43,7 @@ type BrowserThemeMode = 'light' | 'dark' | 'system'
 
 declare global {
   interface Window {
-    __MKAGENT_APPLY_BROWSER_THEME__?: (mode: BrowserThemeMode) => void
+    __OPCAGENT_APPLY_BROWSER_THEME__?: (mode: BrowserThemeMode) => void
     browserToolbar: {
       instanceId: string
       navigate: (url: string) => Promise<void>
@@ -104,7 +104,7 @@ function BrowserToolbarApp() {
   useEffect(() => {
     if (!api) return
     return api.onThemeMode((mode) => {
-      window.__MKAGENT_APPLY_BROWSER_THEME__?.(mode)
+      window.__OPCAGENT_APPLY_BROWSER_THEME__?.(mode)
     })
   }, [api])
 

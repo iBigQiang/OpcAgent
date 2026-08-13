@@ -8,7 +8,7 @@ export type {
   McpOAuthAuthRequest,
   MicrosoftOAuthAuthRequest,
   SlackOAuthAuthRequest,
-} from '@mkagent/session-tools-core';
+} from '@opcagent/session-tools-core';
 
 export type { BrowserPaneFns } from './browser-tools.ts';
 export {

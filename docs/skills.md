@@ -5,10 +5,10 @@ Skills are discovered in global, workspace, and project locations with priority 
 ## Discovery paths
 
 ```text
-1. ~/.mkagent/skills/                     (global)
-2. ~/.mkagent/workspaces/<slug>/skills/   (workspace)
-3. <workingDirectory>/.mkagent/skills/    (project)
-4. <workingDirectory>/.claude/skills/      (legacy project, equivalent to .mkagent)
+1. ~/.opcagent/skills/                     (global)
+2. ~/.opcagent/workspaces/<slug>/skills/   (workspace)
+3. <workingDirectory>/.opcagent/skills/    (project)
+4. <workingDirectory>/.claude/skills/      (legacy project, equivalent to .opcagent)
 ```
 
 A Skill with the same name in multiple locations resolves to the higher-priority location; the others are shadowed but not deleted.
@@ -34,8 +34,8 @@ Plan the deck structure, draft slide titles, then run `pptx-tool` to materialize
 | `description` | yes | one-line description used by the picker and the watcher |
 | `license` | optional | shows up in the Skill details panel |
 | `allowed-tools` | optional | Pi prompt hint; the permission engine still applies regardless |
-| `requiredSources` | ignored | legacy field; Sources are not part of MkAgent |
-| `minMkAgent` | optional | minimum version gate |
+| `requiredSources` | ignored | legacy field; Sources are not part of OPC Agent |
+| `minOPCAgent` | optional | minimum version gate |
 
 ## Operations
 

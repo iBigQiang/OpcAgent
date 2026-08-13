@@ -1,5 +1,5 @@
 import { describe, expect, it, mock } from 'bun:test'
-import type { AnnotationV1 } from '@mkagent/core/types'
+import type { AnnotationV1 } from '@opcagent/core/types'
 
 mock.module('electron', () => ({
   app: {
@@ -25,7 +25,7 @@ mock.module('../notifications', () => ({
   updateBadgeCount: () => {},
 }))
 
-const { SessionManager } = await import('@mkagent/server-core/sessions')
+const { SessionManager } = await import('@opcagent/server-core/sessions')
 
 function makeAnnotation(id: string, extraMeta?: Record<string, unknown>): AnnotationV1 {
   return {

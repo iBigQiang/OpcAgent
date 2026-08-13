@@ -2,13 +2,13 @@ import { afterEach, describe, expect, it, mock, spyOn } from 'bun:test'
 import { copyFileSync, mkdirSync, rmSync, rmdirSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { RPC_CHANNELS } from '@mkagent/shared/protocol'
-import { CLIENT_OPEN_EXTERNAL } from '@mkagent/server-core/transport'
-import type { RpcServer, HandlerFn, RequestContext } from '@mkagent/server-core/transport'
+import { RPC_CHANNELS } from '@opcagent/shared/protocol'
+import { CLIENT_OPEN_EXTERNAL } from '@opcagent/server-core/transport'
+import type { RpcServer, HandlerFn, RequestContext } from '@opcagent/server-core/transport'
 import type { HandlerDeps } from '../handler-deps'
-import * as backend from '@mkagent/shared/agent/backend'
-import * as config from '@mkagent/shared/config'
-import * as handlerUtils from '@mkagent/server-core/handlers'
+import * as backend from '@opcagent/shared/agent/backend'
+import * as config from '@opcagent/shared/config'
+import * as handlerUtils from '@opcagent/server-core/handlers'
 import { registerSystemCoreHandlers } from './system'
 
 afterEach(() => mock.restore())
@@ -131,10 +131,10 @@ describe('registerSystemCoreHandlers Claude Code CLI', () => {
 })
 
 describe('registerSystemCoreHandlers OPEN_URL', () => {
-  it('routes mkagent action links internally via deeplink:navigate', async () => {
+  it('routes opcagent action links internally via deeplink:navigate', async () => {
     const { openUrl, ctx, invokeClientCalls, pushCalls } = createTestHarness()
 
-    await openUrl(ctx, 'mkagent://action/new-session?input=sg&send=true')
+    await openUrl(ctx, 'opcagent://action/new-session?input=sg&send=true')
 
     expect(invokeClientCalls).toHaveLength(0)
     expect(pushCalls).toHaveLength(1)
@@ -148,7 +148,7 @@ describe('registerSystemCoreHandlers OPEN_URL', () => {
   it('routes workspace deep links to workspace target when URL workspace differs', async () => {
     const { openUrl, ctx, invokeClientCalls, pushCalls } = createTestHarness({ workspaceId: 'ws-1' })
 
-    await openUrl(ctx, 'mkagent://workspace/ws-2/action/new-session?input=hello')
+    await openUrl(ctx, 'opcagent://workspace/ws-2/action/new-session?input=hello')
 
     expect(invokeClientCalls).toHaveLength(0)
     expect(pushCalls).toHaveLength(1)
@@ -159,17 +159,17 @@ describe('registerSystemCoreHandlers OPEN_URL', () => {
     })
   })
 
-  it('falls back to client openExternal for mkagent window-mode links', async () => {
+  it('falls back to client openExternal for opcagent window-mode links', async () => {
     const { openUrl, ctx, invokeClientCalls, pushCalls } = createTestHarness()
 
-    await openUrl(ctx, 'mkagent://action/new-session?window=focused')
+    await openUrl(ctx, 'opcagent://action/new-session?window=focused')
 
     expect(pushCalls).toHaveLength(0)
     expect(invokeClientCalls).toHaveLength(1)
     expect(invokeClientCalls[0]).toEqual({
       clientId: 'client-1',
       channel: CLIENT_OPEN_EXTERNAL,
-      args: ['mkagent://action/new-session?window=focused'],
+      args: ['opcagent://action/new-session?window=focused'],
     })
   })
 

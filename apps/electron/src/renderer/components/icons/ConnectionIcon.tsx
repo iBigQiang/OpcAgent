@@ -14,7 +14,7 @@
 import { Brain } from 'lucide-react'
 import { getProviderIcon } from '@/lib/provider-icons'
 import { getModelDisplayName } from '@config/models'
-import { Tooltip, TooltipTrigger, TooltipContent } from '@mkagent/ui'
+import { Tooltip, TooltipTrigger, TooltipContent } from '@opcagent/ui'
 import type { LlmConnectionWithStatus } from '../../../shared/types'
 
 interface ConnectionIconProps {

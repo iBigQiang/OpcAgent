@@ -85,7 +85,7 @@ import { getDefaultSummarizationModel } from '../../shared/src/config/models.ts'
 import { createWebFetchTool } from './tools/web-fetch.ts';
 import { resolveSearchProvider } from './tools/search/resolve-provider.ts';
 import { createSearchTool } from './tools/search/create-search-tool.ts';
-import { allowMkAgentMetadataProperties, stripMkAgentMetadata } from './mkagent-metadata-schema.ts';
+import { allowOPCAgentMetadataProperties, stripOPCAgentMetadata } from './opcagent-metadata-schema.ts';
 import {
   applySystemPromptAppend,
   applySystemPromptOverride,
@@ -467,7 +467,7 @@ function injectPiAuthCredential(
   }
 }
 
-function applyMkAgentSystemPrompt(session: AgentSession, prompt: string): void {
+function applyOPCAgentSystemPrompt(session: AgentSession, prompt: string): void {
   const preservePiIdentity = shouldPreservePiSystemPrompt(
     initConfig?.baseUrl,
     initConfig?.customEndpoint,
@@ -491,7 +491,7 @@ function setInterceptorApiHints(model: { api?: string; provider?: string; baseUr
   if (!model) return;
 
   debugLog(
-    `[interceptor-hint] api=${process.env.MKAGENT_PI_MODEL_API || '-'} provider=${process.env.MKAGENT_PI_MODEL_PROVIDER || '-'} baseUrl=${process.env.MKAGENT_PI_MODEL_BASE_URL || '-'}`,
+    `[interceptor-hint] api=${process.env.OPCAGENT_PI_MODEL_API || '-'} provider=${process.env.OPCAGENT_PI_MODEL_PROVIDER || '-'} baseUrl=${process.env.OPCAGENT_PI_MODEL_BASE_URL || '-'}`,
   );
 }
 
@@ -687,11 +687,11 @@ async function ensureSession(): Promise<AgentSession> {
     mkdirSync(agentDir, { recursive: true });
     sessionOptions.agentDir = agentDir;
     const settingsManager = PiSettingsManager.create(cwd, agentDir);
-    const shellPath = process.env.MKAGENT_GIT_BASH_PATH?.trim();
+    const shellPath = process.env.OPCAGENT_GIT_BASH_PATH?.trim();
     if (shellPath) settingsManager.applyOverrides({ shellPath });
     sessionOptions.settingsManager = settingsManager;
 
-    // Session resume: use a per-MkAgent-session directory so the Pi SDK can
+    // Session resume: use a per-OPCAgent-session directory so the Pi SDK can
     // persist and resume its own session across subprocess restarts.
     // continueRecent() loads the existing session if one exists, otherwise
     // creates a new one — so this handles both first-run and resume.
@@ -836,7 +836,7 @@ function makeErrorResult(message: string): AgentToolResult<any> {
 
 function wrapSingleTool(tool: ToolDefinition<any, any>): ToolDefinition<any, any> {
   const originalExecute = tool.execute;
-  const parameters = allowMkAgentMetadataProperties(tool.parameters);
+  const parameters = allowOPCAgentMetadataProperties(tool.parameters);
 
   const wrappedExecute: ToolDefinition<any, any>['execute'] = async (
     toolCallId,
@@ -860,10 +860,10 @@ function wrapSingleTool(tool: ToolDefinition<any, any>): ToolDefinition<any, any
     // Send to main process for permission checking + transforms
     inputObj = await requestPreToolUseApproval(sdkToolName, inputObj, toolCallId);
 
-    // Metadata is for MkAgent UI only. Keep a final defensive strip here so the
+    // Metadata is for OPCAgent UI only. Keep a final defensive strip here so the
     // upstream Pi tool implementation always receives clean executable args,
     // even if a future pre-tool-use path returns `allow` without modification.
-    inputObj = stripMkAgentMetadata(inputObj);
+    inputObj = stripOPCAgentMetadata(inputObj);
 
     // Execute original tool with (potentially modified) input
     const result = await originalExecute(toolCallId, inputObj, signal, onUpdate, ctx);
@@ -1086,7 +1086,7 @@ async function queryLlm(request: LLMQueryRequest): Promise<LLMQueryResult> {
     // assignment to `state.systemPrompt` doesn't survive `session.prompt()`.
     const promptForSession =
       request.systemPrompt ?? 'Reply with ONLY the requested text. No explanation.';
-    applyMkAgentSystemPrompt(ephemeralSession, promptForSession);
+    applyOPCAgentSystemPrompt(ephemeralSession, promptForSession);
 
     // Collect response text and errors from events
     let result = '';
@@ -1443,11 +1443,11 @@ async function handlePrompt(msg: Extract<InboundMessage, { type: 'prompt' }>): P
 
     const session = await ensureSession();
 
-    // Apply the MkAgent-built instructions to the Pi session. Direct assignment
+    // Apply the OPCAgent-built instructions to the Pi session. Direct assignment
     // to `state.systemPrompt` is wiped on every `session.prompt()` call by the Pi
     // SDK (see system-prompt-override.ts).
     if (msg.systemPrompt) {
-      applyMkAgentSystemPrompt(session, msg.systemPrompt);
+      applyOPCAgentSystemPrompt(session, msg.systemPrompt);
     }
 
     // Wire up event handler
@@ -1473,7 +1473,7 @@ async function handlePrompt(msg: Extract<InboundMessage, { type: 'prompt' }>): P
     // calls agent.continue() to retry once. Running our own session.compact()
     // in parallel raced against the SDK and is the documented cause of the
     // AbortController crash in `_runAutoCompaction` (see
-    // plans/fix-pi-gpt-compaction.md). PiEventAdapter holds the MkAgent event
+    // plans/fix-pi-gpt-compaction.md). PiEventAdapter holds the OPCAgent event
     // queue open across the SDK's recovery flow so the recovered turn
     // reaches the UI.
 

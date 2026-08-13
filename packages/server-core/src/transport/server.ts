@@ -23,10 +23,10 @@ import {
   type MessageEnvelope,
   type PushTarget,
   type ErrorCode,
-} from '@mkagent/shared/protocol'
+} from '@opcagent/shared/protocol'
 import type { RpcServer, HandlerFn, RequestContext } from './types'
 import { serializeEnvelope, deserializeEnvelope } from './codec'
-import { createLogger } from '@mkagent/shared/utils'
+import { createLogger } from '@opcagent/shared/utils'
 
 // ---------------------------------------------------------------------------
 // Client connection state

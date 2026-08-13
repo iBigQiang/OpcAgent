@@ -6,7 +6,7 @@ import {
   registerSessionScopedToolCallbacks,
   unregisterSessionScopedToolCallbacks,
 } from '../session-scoped-tool-callback-registry.ts'
-import type { AgentEvent } from '@mkagent/core/types'
+import type { AgentEvent } from '@opcagent/core/types'
 
 const resources: Array<{ stop(): void }> = []
 const tempDirs: string[] = []
@@ -57,7 +57,7 @@ describe('Pi conversation flow with a local OpenAI-compatible endpoint', () => {
     })
     resources.push(server)
 
-    const workspaceRoot = mkdtempSync(join(tmpdir(), 'mkagent-flow-'))
+    const workspaceRoot = mkdtempSync(join(tmpdir(), 'opcagent-flow-'))
     tempDirs.push(workspaceRoot)
     const configDir = join(workspaceRoot, 'config')
     process.env.CONFIG_DIR = configDir

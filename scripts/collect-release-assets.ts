@@ -13,6 +13,7 @@ import {
 import { basename, join } from "node:path";
 import { createHash } from "node:crypto";
 import yaml from "js-yaml";
+import { generateReleaseManifest } from "./generate-release-manifest";
 
 const [inputArg, outputArg, versionArg] = Bun.argv.slice(2);
 if (!inputArg || !outputArg || !versionArg) {
@@ -62,10 +63,10 @@ for (const [name, paths] of grouped) {
     ).values(),
   ];
   const expectedMacUrls = [
-    `MkAgent-${versionArg}-arm64.dmg`,
-    `MkAgent-${versionArg}-arm64.zip`,
-    `MkAgent-${versionArg}-x64.dmg`,
-    `MkAgent-${versionArg}-x64.zip`,
+    `OPC-Agent-${versionArg}-arm64.dmg`,
+    `OPC-Agent-${versionArg}-arm64.zip`,
+    `OPC-Agent-${versionArg}-x64.dmg`,
+    `OPC-Agent-${versionArg}-x64.zip`,
   ];
   const macUrls = new Set(
     uniqueFiles.map((file) => (file as { url?: string }).url),
@@ -83,7 +84,7 @@ for (const [name, paths] of grouped) {
   const preferred =
     uniqueFiles.find(
       (file) =>
-        (file as { url?: string }).url === `MkAgent-${versionArg}-arm64.zip`,
+        (file as { url?: string }).url === `OPC-Agent-${versionArg}-arm64.zip`,
     ) ?? uniqueFiles[0];
   writeFileSync(
     destination,
@@ -104,19 +105,19 @@ for (const [name, paths] of grouped) {
   );
 }
 
-const names = readdirSync(outputArg).sort();
 const required = [
-  `MkAgent-${versionArg}-arm64.dmg`,
-  `MkAgent-${versionArg}-arm64.zip`,
-  `MkAgent-${versionArg}-x64.dmg`,
-  `MkAgent-${versionArg}-x64.zip`,
-  `MkAgent-${versionArg}-x64.exe`,
-  `MkAgent-${versionArg}-x86_64.AppImage`,
+  `OPC-Agent-${versionArg}-arm64.dmg`,
+  `OPC-Agent-${versionArg}-arm64.zip`,
+  `OPC-Agent-${versionArg}-x64.dmg`,
+  `OPC-Agent-${versionArg}-x64.zip`,
+  `OPC-Agent-${versionArg}-x64.exe`,
+  `OPC-Agent-${versionArg}-x86_64.AppImage`,
   "latest-mac.yml",
   "latest.yml",
   "latest-linux.yml",
-  "MkAgent-cli-bun.tar.gz",
+  "OPC-Agent-cli-bun.tar.gz",
 ];
+const collectedNames = readdirSync(outputArg).sort();
 for (const name of required) {
   if (!existsSync(join(outputArg, name)))
     throw new Error(`missing required release asset: ${name}`);
@@ -128,13 +129,20 @@ for (const platform of [
   "linux-x64",
 ]) {
   if (
-    !names.some((name) =>
-      name.startsWith(`MkAgent-server-${versionArg}-${platform}.`),
+    !collectedNames.some((name) =>
+      name.startsWith(`OPC-Agent-server-${versionArg}-${platform}.`),
     )
   ) {
     throw new Error(`missing headless server archive for ${platform}`);
   }
 }
+
+generateReleaseManifest(
+  join(outputArg, "OPC-Agent-cli-bun.tar.gz"),
+  join(outputArg, "manifest.json"),
+  versionArg,
+);
+const names = readdirSync(outputArg).sort();
 
 const checksums = names
   .map(

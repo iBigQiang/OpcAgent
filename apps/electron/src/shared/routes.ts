@@ -16,7 +16,7 @@
  */
 
 import type { SettingsSubpage } from './settings-registry'
-import type { PermissionMode } from '@mkagent/shared/agent/mode-types'
+import type { PermissionMode } from '@opcagent/shared/agent/mode-types'
 
 // Helper to build query strings from params
 function toQueryString(params?: Record<string, string | undefined>): string {

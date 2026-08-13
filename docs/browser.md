@@ -7,7 +7,7 @@ The Browser pane is available from the desktop chat surface and from session too
 | Surface | Location |
 |---|---|
 | Desktop chat | top-right Browser button on the chat header |
-| Session tools | `mcp__session__browser` is registered in `@mkagent/session-tools-core` |
+| Session tools | `mcp__session__browser` is registered in `@opcagent/session-tools-core` |
 | Settings | Browser tooling toggle (`browserToolEnabled`) in the per-workspace settings |
 | WebUI | Browser pane is host-delegated; no remote Browser pane is created |
 
@@ -28,7 +28,7 @@ The manager survives the lifecycle of the session; closing the Browser button on
 
 ## `web_search` and `web_fetch`
 
-In addition to the Browser pane, MkAgent ships two non-interactive retrieval tools:
+In addition to the Browser pane, OPC Agent ships two non-interactive retrieval tools:
 
 | Tool | Purpose | Implementation |
 |---|---|---|

@@ -1,12 +1,12 @@
-# MkAgent Windows Installer
+# OPC Agent Windows Installer
 # Usage: download this script from the source repository, inspect it, then run it.
 
 & {
 $ErrorActionPreference = "Stop"
 
-$VERSIONS_URL = "https://github.com/MkThingsHQ/mkagent/releases/latest/download"
-$DOWNLOAD_DIR = "$env:TEMP\mkagent-install"
-$APP_NAME = "MkAgent"
+$VERSIONS_URL = "https://github.com/iBigQiang/OpcAgent/releases/latest/download"
+$DOWNLOAD_DIR = "$env:TEMP\opcagent-install"
+$APP_NAME = "OPC Agent"
 
 # Colors for output
 function Write-Info { Write-Host "> $args" -ForegroundColor Blue }
@@ -58,7 +58,7 @@ Write-Info "Latest version: $version"
 # Parse YAML to extract sha512, url (filename), and size for our architecture
 # YAML format:
 #   files:
-#     - url: MkAgent-0.1.0-x64.exe
+#     - url: OPC-Agent-0.1.0-x64.exe
 #       sha512: <base64>
 #       size: 123456789
 #       arch: x64
@@ -108,7 +108,7 @@ if (-not $checksum -or $checksum.Length -lt 80) {
 
 # Use default filename if not found
 if (-not $filename) {
-    $filename = "MkAgent-$version-$arch.exe"
+    $filename = "OPC-Agent-$version-$arch.exe"
 }
 
 $installerUrl = "$VERSIONS_URL/$filename"
@@ -192,9 +192,9 @@ if ($actualHash -ne $checksum) {
 Write-Success "Checksum verified!"
 
 # Close the app if it's running
-$process = Get-Process -Name "MkAgent" -ErrorAction SilentlyContinue
+$process = Get-Process -Name "OPC Agent" -ErrorAction SilentlyContinue
 if ($process) {
-    Write-Info "Closing MkAgent..."
+    Write-Info "Closing OPC Agent..."
     $process | Stop-Process -Force
     Start-Sleep -Seconds 2
 }
@@ -227,11 +227,11 @@ Write-Info "Cleaning up..."
 Remove-Item -Path $installerPath -Force -ErrorAction SilentlyContinue
 
 # Add command line shortcut
-Write-Info "Adding 'mkagent' command to PATH..."
+Write-Info "Adding 'opcagent' command to PATH..."
 
-$binDir = "$env:LOCALAPPDATA\MkAgent\bin"
-$cmdFile = "$binDir\mkagent.cmd"
-$exePath = "$env:LOCALAPPDATA\Programs\MkAgent\MkAgent.exe"
+$binDir = "$env:LOCALAPPDATA\OPC Agent\bin"
+$cmdFile = "$binDir\opcagent.cmd"
+$exePath = "$env:LOCALAPPDATA\Programs\OPC Agent\OPC Agent.exe"
 
 # Create bin directory
 New-Item -ItemType Directory -Force -Path $binDir | Out-Null
@@ -245,9 +245,9 @@ $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
 if ($userPath -notlike "*$binDir*") {
     $newPath = "$userPath;$binDir"
     [Environment]::SetEnvironmentVariable("Path", $newPath, "User")
-    Write-Success "Added to PATH (restart terminal to use 'mkagent' command)"
+    Write-Success "Added to PATH (restart terminal to use 'opcagent' command)"
 } else {
-    Write-Success "Command 'mkagent' is ready"
+    Write-Success "Command 'opcagent' is ready"
 }
 
 Write-Host ""
@@ -255,10 +255,10 @@ Write-Host "--------------------------------------------------------------------
 Write-Host ""
 Write-Success "Installation complete!"
 Write-Host ""
-Write-Host "  MkAgent has been installed."
+Write-Host "  OPC Agent has been installed."
 Write-Host ""
 Write-Host "  Launch from:"
 Write-Host "    - Start Menu or desktop shortcut"
-Write-Host "    - Command line: mkagent (restart terminal first)"
+Write-Host "    - Command line: opcagent (restart terminal first)"
 Write-Host ""
 }

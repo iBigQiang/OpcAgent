@@ -1,10 +1,10 @@
 # Workspaces
 
-MkAgent creates the `default` workspace on first startup. Each local workspace isolates sessions, Skills, permissions, Views, and project context.
+OPC Agent creates the `default` workspace on first startup. Each local workspace isolates sessions, Skills, permissions, Views, and project context.
 
 ## Workspace directory
 
-A workspace lives under `~/.mkagent/workspaces/<slug>/`. The slug is a URL-safe identifier derived from the workspace name; the `default` workspace always uses the literal slug `default`.
+A workspace lives under `~/.opcagent/workspaces/<slug>/`. The slug is a URL-safe identifier derived from the workspace name; the `default` workspace always uses the literal slug `default`.
 
 ## Workspace `config.json`
 

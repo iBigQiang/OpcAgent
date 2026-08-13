@@ -18,7 +18,7 @@ Settings can enable HTTP and HTTPS proxy URLs plus a comma-separated no-proxy li
 
 Proxy credentials are sensitive. They must not appear in:
 
-- Server logs (`~/.mkagent/logs/mkagent-server-*.log`)
+- Server logs (`~/.opcagent/logs/opcagent-server-*.log`)
 - Sentry breadcrumbs
 - Session JSONL
 - Session exports
@@ -55,7 +55,7 @@ The proxy settings page can be temporarily overridden by exporting the standard 
 | `NO_PROXY` / `no_proxy` | Comma-separated no-proxy list |
 | `ALL_PROXY` | Default when `HTTP_PROXY`/`HTTPS_PROXY` is unset |
 
-Electron itself respects these env vars when launching. Once the app is running, the in-app setting wins for connections that MkAgent opens itself; only system-level requests (auto-update, Sentry) keep using the env vars.
+Electron itself respects these env vars when launching. Once the app is running, the in-app setting wins for connections that OPC Agent opens itself; only system-level requests (auto-update, Sentry) keep using the env vars.
 
 ## Sandbox notes
 
@@ -69,4 +69,4 @@ If a custom application proxy is unnecessary, prefer the operating system proxy:
 - Linux: `HTTP_PROXY` env var via systemd user environment
 - Windows: Settings → Network & Internet → Proxy
 
-This avoids dragging credentials into MkAgent's setting file and keeps them out of any future import/export scenario.
+This avoids dragging credentials into OPC Agent's setting file and keeps them out of any future import/export scenario.

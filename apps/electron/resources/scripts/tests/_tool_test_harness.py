@@ -58,8 +58,8 @@ def resolve_wrapper(tool_name: str) -> Path:
 def build_env() -> dict[str, str]:
     uv = resolve_uv_binary()
     env = dict(os.environ)
-    env["MKAGENT_UV"] = str(uv)
-    env["MKAGENT_SCRIPTS"] = str(SCRIPTS_DIR)
+    env["OPCAGENT_UV"] = str(uv)
+    env["OPCAGENT_SCRIPTS"] = str(SCRIPTS_DIR)
     env["PATH"] = os.pathsep.join([
         str(BIN_DIR),
         str(uv.parent),

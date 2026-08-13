@@ -54,6 +54,6 @@ UV_SOURCE=$(find "$UV_TEMP_DIR" -type f -name uv -print -quit)
 cp "$UV_SOURCE" "$UV_DIR/uv"
 chmod +x "$UV_DIR/uv"
 
-MKAGENT_TARGET_PLATFORM=linux MKAGENT_TARGET_ARCH="$ARCH" bun run electron:build
+OPCAGENT_TARGET_PLATFORM=linux OPCAGENT_TARGET_ARCH="$ARCH" bun run electron:build
 cd "$ELECTRON_DIR"
 bunx electron-builder --config electron-builder.yml --linux --"$ARCH"

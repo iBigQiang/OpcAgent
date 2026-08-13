@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import { rollbackFailedBranchCreation } from '@mkagent/server-core/domain'
+import { rollbackFailedBranchCreation } from '@opcagent/server-core/domain'
 
 describe('rollbackFailedBranchCreation', () => {
   it('cleans runtime + storage and tears down agent/pool on preflight failure', async () => {

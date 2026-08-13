@@ -2,4 +2,4 @@ export {
   serializeEnvelope,
   deserializeEnvelope,
   validateEnvelopeShape,
-} from '@mkagent/server-core/transport'
+} from '@opcagent/server-core/transport'

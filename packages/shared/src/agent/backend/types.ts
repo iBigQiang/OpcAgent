@@ -12,7 +12,7 @@
  * - AsyncGenerator for streaming: consistent across Desktop, WebUI, and CLI
  */
 
-import type { AgentEvent } from '@mkagent/core/types';
+import type { AgentEvent } from '@opcagent/core/types';
 import type { FileAttachment } from '../../utils/files.ts';
 import type { ThinkingLevel } from '../thinking-levels.ts';
 import type { PermissionMode } from '../mode-manager.ts';
@@ -127,7 +127,7 @@ export interface BackendHostRuntimeContext {
   interceptorBundlePath?: string;
   /** Optional Claude Code executable override for the AnyRouter CLI backend. */
   claudeExecutablePath?: string;
-  /** Persisted MkAgent Claude Code executable path. Takes precedence over host overrides. */
+  /** Persisted OPCAgent Claude Code executable path. Takes precedence over host overrides. */
   persistedClaudeExecutablePath?: string;
 }
 

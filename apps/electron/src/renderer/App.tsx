@@ -4,7 +4,7 @@ import { useTheme } from '@/hooks/useTheme'
 import type { ThemeOverrides } from '@config/theme'
 import { useSetAtom, useStore, useAtomValue, useAtom } from 'jotai'
 import type { Session, Workspace, SessionEvent, Message, FileAttachment, StoredAttachment, PermissionRequest, CredentialRequest, CredentialResponse, SetupNeeds, NewChatActionParams, ContentBadge, LlmConnectionWithStatus, PermissionModeState } from '../shared/types'
-import type { SessionDraft, DraftAttachmentRef } from '@mkagent/shared/config'
+import type { SessionDraft, DraftAttachmentRef } from '@opcagent/shared/config'
 import type { SessionOptions, SessionOptionUpdates } from './hooks/useSessionOptions'
 import { defaultSessionOptions, mergeSessionOptions } from './hooks/useSessionOptions'
 import { generateMessageId } from '../shared/types'
@@ -15,7 +15,7 @@ import type { AppShellContextType } from '@/context/AppShellContext'
 import { OnboardingWizard, ReauthScreen } from '@/components/onboarding'
 import { ResetConfirmationDialog } from '@/components/ResetConfirmationDialog'
 import { SplashScreen } from '@/components/SplashScreen'
-import { TooltipProvider } from '@mkagent/ui'
+import { TooltipProvider } from '@opcagent/ui'
 import { FocusProvider } from '@/context/FocusContext'
 import { ModalProvider } from '@/context/ModalContext'
 import { DismissibleLayerProvider } from '@/context/DismissibleLayerContext'
@@ -31,8 +31,8 @@ import { stripMarkdown } from './utils/text'
 import { coerceInputText } from './lib/input-text'
 import { getSessionsToRefreshAfterStaleReconnect } from './lib/reconnect-recovery'
 import { formatSessionLoadFailure, shouldTreatSessionLoadFailureAsTransportFallback } from './lib/session-load'
-import { extractWorkspaceSlugFromPath } from '@mkagent/shared/utils/workspace-slug'
-import { DEFAULT_THINKING_LEVEL } from '@mkagent/shared/agent/thinking-levels'
+import { extractWorkspaceSlugFromPath } from '@opcagent/shared/utils/workspace-slug'
+import { DEFAULT_THINKING_LEVEL } from '@opcagent/shared/agent/thinking-levels'
 import { initRendererPerf } from './lib/perf'
 import {
   initializeSessionsAtom,
@@ -70,7 +70,7 @@ import {
   CodePreviewOverlay,
   DocumentFormattedMarkdownOverlay,
   JSONPreviewOverlay,
-} from '@mkagent/ui'
+} from '@opcagent/ui'
 import { useLinkInterceptor, type FilePreviewState } from '@/hooks/useLinkInterceptor'
 import { useTransportConnectionState } from '@/hooks/useTransportConnectionState'
 import { useStaleSessionRecovery } from '@/hooks/useStaleSessionRecovery'
@@ -708,7 +708,7 @@ export default function App() {
         setSetupNeeds(needs)
 
         if (needs.isFullyConfigured) {
-          // MkAgent is local-first. If a window has no explicit workspace,
+          // OPC Agent is local-first. If a window has no explicit workspace,
           // select the first configured local workspace instead of exposing
           // Craft's remote-server workspace picker.
           if (!wsId) {
@@ -1910,7 +1910,7 @@ export default function App() {
     openNewChat,
   ])
 
-  // Platform actions for @mkagent/ui components (overlays, etc.)
+  // Platform actions for @opcagent/ui components (overlays, etc.)
   // Memoized to prevent re-renders when these callbacks don't change
   // NOTE: Must be defined before early returns to maintain consistent hook order
   const platformActions = useMemo(() => ({

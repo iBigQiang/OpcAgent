@@ -4,7 +4,7 @@
  * in both the callback server and the playground preview.
  */
 
-import { MKAGENT_MARK_IMAGE_DATA_URI } from '../branding.ts';
+import { OPCAGENT_MARK_IMAGE_DATA_URI } from '../branding.ts';
 
 export type AppType = 'terminal' | 'electron';
 
@@ -43,7 +43,7 @@ export function generateCallbackPage(options: {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MkAgent - ${title}</title>
+  <title>OPC Agent - ${title}</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -160,12 +160,12 @@ export function generateCallbackPage(options: {
 </head>
 <body>
   <div class="content">
-    <img class="logo" src="${MKAGENT_MARK_IMAGE_DATA_URI}" alt="MkAgent" />
+    <img class="logo" src="${OPCAGENT_MARK_IMAGE_DATA_URI}" alt="OPC Agent" />
     <div class="card">
       <div class="status">${statusMessage}</div>
     </div>
     <div class="hint">${isSuccess ? 'You can now return to the application.' : 'Please close this window and try again.'}</div>
-    ${deeplinkUrl ? `<a href="${deeplinkUrl}" class="return-link">MkAgent</a>` : ''}
+    ${deeplinkUrl ? `<a href="${deeplinkUrl}" class="return-link">OPC Agent</a>` : ''}
   </div>
   <script>${autoCloseScript}</script>
 </body>

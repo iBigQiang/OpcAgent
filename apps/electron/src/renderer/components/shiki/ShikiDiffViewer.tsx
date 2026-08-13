@@ -8,7 +8,7 @@
  */
 
 import * as React from 'react'
-import { ShikiDiffViewer as BaseShikiDiffViewer, type ShikiDiffViewerProps as BaseProps } from '@mkagent/ui'
+import { ShikiDiffViewer as BaseShikiDiffViewer, type ShikiDiffViewerProps as BaseProps } from '@opcagent/ui'
 import { useTheme } from '@/hooks/useTheme'
 
 export interface ShikiDiffViewerProps extends Omit<BaseProps, 'theme' | 'shikiTheme'> {}

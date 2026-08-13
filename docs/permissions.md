@@ -1,6 +1,6 @@
 # Permissions
 
-Pi tool calls pass through the shared permission engine. There is no Sources/MCP-specific rule path: those products are not part of MkAgent.
+Pi tool calls pass through the shared permission engine. There is no Sources/MCP-specific rule path: those products are not part of OPC Agent.
 
 ## Modes
 
@@ -18,7 +18,7 @@ Workspace settings control the default mode and the cyclable list (`cyclablePerm
                   Pi tool call (read/write/bash/edit/web_search/...)
                                   │
                                   ▼
-            shared permission engine (@mkagent/shared/agent/permissions-config)
+            shared permission engine (@opcagent/shared/agent/permissions-config)
                                   │
        ┌──────────────────┬───────┴────────┬────────────────────────┐
        ▼                  ▼                ▼                        ▼
@@ -37,7 +37,7 @@ The engine is shared by Electron and headless server. The renderer is the only p
 | Tool | What `safe` allows | What `safe` blocks |
 |---|---|---|
 | File read (`read`) | relative + whitelisted absolute paths | network paths, working directory outside `workingDirectory` |
-| File write (`write`, `edit`) | workspace `workingDirectory` and `/tmp/mkagent-*` | everything outside that |
+| File write (`write`, `edit`) | workspace `workingDirectory` and `/tmp/opcagent-*` | everything outside that |
 | Bash | explicit allowlisted commands | everything else |
 | Browser actions | same-origin and explicit cross-origin list | cookie writes, downloads, arbitrary scripts |
 | Network | configured proxy, plus `localhost` | ports outside the configured allowlist |
@@ -54,11 +54,11 @@ Source, MCP, and Source-OAuth allowlists are not loaded — the corresponding sc
 
 ## Workspace overrides
 
-`~/.mkagent/workspaces/<slug>/permissions/` stores overrides that take precedence over the bundled policy. Override changes apply to new tool calls only; in-flight turns keep the policy they had when the turn started.
+`~/.opcagent/workspaces/<slug>/permissions/` stores overrides that take precedence over the bundled policy. Override changes apply to new tool calls only; in-flight turns keep the policy they had when the turn started.
 
 ## CLI overrides
 
-`mkagent run --mode <mode>` sets the initial mode of the temporary session. `send` and the live CLI inherit the workspace's default mode unless `--mode` is provided.
+`opcagent run --mode <mode>` sets the initial mode of the temporary session. `send` and the live CLI inherit the workspace's default mode unless `--mode` is provided.
 
 ## Auditing permission decisions
 

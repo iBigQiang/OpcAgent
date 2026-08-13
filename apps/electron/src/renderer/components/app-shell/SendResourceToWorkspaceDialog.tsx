@@ -2,7 +2,7 @@
  * SendResourceToWorkspaceDialog — Copy a source or skill to another workspace.
  *
  * Uses the resources:export → resources:import RPC pipeline.
- * MkAgent's retained workspace model is local, so both RPC calls use the same server.
+ * OPCAgent's retained workspace model is local, so both RPC calls use the same server.
  *
  * Adapted from SendToWorkspaceDialog (session transfer).
  */

@@ -70,41 +70,41 @@ chmodSync(rgDestination, 0o755)
 cpSync(join(root, 'node_modules', 'xlsx'), join(output, 'node_modules', 'xlsx'), { recursive: true })
 
 if (process.platform === 'win32') {
-  writeFileSync(join(output, 'mkagent-server.cmd'), [
+  writeFileSync(join(output, 'opcagent-server.cmd'), [
     '@echo off',
     'set "ROOT=%~dp0"',
-    'set "MKAGENT_BUNDLED_ASSETS_ROOT=%ROOT%"',
-    'set "MKAGENT_APP_ROOT=%ROOT%"',
-    'set "MKAGENT_RESOURCES_PATH=%ROOT%resources"',
-    'set "MKAGENT_WEBUI_DIR=%ROOT%webui"',
-    'set "MKAGENT_IS_PACKAGED=true"',
-    `set "MKAGENT_UV=%ROOT%resources\\bin\\${hostPlatform}-${hostArch}\\uv.exe"`,
-    'set "MKAGENT_SCRIPTS=%ROOT%resources\\scripts"',
+    'set "OPCAGENT_BUNDLED_ASSETS_ROOT=%ROOT%"',
+    'set "OPCAGENT_APP_ROOT=%ROOT%"',
+    'set "OPCAGENT_RESOURCES_PATH=%ROOT%resources"',
+    'set "OPCAGENT_WEBUI_DIR=%ROOT%webui"',
+    'set "OPCAGENT_IS_PACKAGED=true"',
+    `set "OPCAGENT_UV=%ROOT%resources\\bin\\${hostPlatform}-${hostArch}\\uv.exe"`,
+    'set "OPCAGENT_SCRIPTS=%ROOT%resources\\scripts"',
     `set "PATH=%ROOT%resources\\bin;%ROOT%resources\\bin\\${hostPlatform}-${hostArch};%ROOT%vendor\\bun;%PATH%"`,
     '"%ROOT%vendor\\bun\\bun.exe" "%ROOT%server.js" %*',
     '',
   ].join('\r\n'))
 } else {
-  const launcher = join(output, 'mkagent-server')
+  const launcher = join(output, 'opcagent-server')
   writeFileSync(launcher, `#!/usr/bin/env sh
 set -eu
 ROOT="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
-export MKAGENT_BUNDLED_ASSETS_ROOT="$ROOT"
-export MKAGENT_APP_ROOT="$ROOT"
-export MKAGENT_RESOURCES_PATH="$ROOT/resources"
-export MKAGENT_WEBUI_DIR="$ROOT/webui"
-export MKAGENT_IS_PACKAGED=true
-export MKAGENT_UV="$ROOT/resources/bin/${hostPlatform}-${hostArch}/uv"
-export MKAGENT_SCRIPTS="$ROOT/resources/scripts"
+export OPCAGENT_BUNDLED_ASSETS_ROOT="$ROOT"
+export OPCAGENT_APP_ROOT="$ROOT"
+export OPCAGENT_RESOURCES_PATH="$ROOT/resources"
+export OPCAGENT_WEBUI_DIR="$ROOT/webui"
+export OPCAGENT_IS_PACKAGED=true
+export OPCAGENT_UV="$ROOT/resources/bin/${hostPlatform}-${hostArch}/uv"
+export OPCAGENT_SCRIPTS="$ROOT/resources/scripts"
 export PATH="$ROOT/resources/bin:$ROOT/vendor/bun:$PATH"
 exec "$ROOT/vendor/bun/bun" "$ROOT/server.js" "$@"
 `)
   chmodSync(launcher, 0o755)
 }
 
-writeFileSync(join(output, 'README.md'), `# MkAgent headless server
+writeFileSync(join(output, 'README.md'), `# OPC Agent headless server
 
-Set a strong \`MKAGENT_SERVER_TOKEN\` and run \`${process.platform === 'win32' ? 'mkagent-server.cmd' : './mkagent-server'}\`.
+Set a strong \`OPCAGENT_SERVER_TOKEN\` and run \`${process.platform === 'win32' ? 'opcagent-server.cmd' : './opcagent-server'}\`.
 The bundled WebUI is served on the RPC port. Non-localhost deployments must configure TLS.
 `)
 
@@ -128,4 +128,4 @@ if (values.compress) {
   }
 }
 
-console.log(`Built MkAgent headless server at ${output}`)
+console.log(`Built OPC Agent headless server at ${output}`)

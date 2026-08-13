@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import * as Icons from 'lucide-react'
 import { motion, AnimatePresence } from 'motion/react'
 import { useRegisterDismissibleLayer } from '@/context/DismissibleLayerContext'
-import { MkAgentAppIcon } from '../icons/MkAgentAppIcon'
+import { OPCAgentAppIcon } from '../icons/OPCAgentAppIcon'
 import { SquarePenRounded } from '../icons/SquarePenRounded'
 import { SETTINGS_ICONS } from '../icons/SettingsIcons'
 import { TopBarButton } from '../ui/TopBarButton'
@@ -181,7 +181,7 @@ export function MobileAppMenu(props: AppMenuProps) {
         data-state={state.isOpen ? 'open' : 'closed'}
         className="rounded-[8px]"
       >
-        <MkAgentAppIcon className="h-5 w-5" size={20} />
+        <OPCAgentAppIcon className="h-5 w-5" size={20} />
       </TopBarButton>
       <MobileMenuSheet
         state={state}

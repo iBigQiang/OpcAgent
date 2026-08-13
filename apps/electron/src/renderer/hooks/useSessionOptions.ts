@@ -11,8 +11,8 @@
  */
 
 import type { PermissionMode } from '../../shared/types'
-import type { ThinkingLevel } from '@mkagent/shared/agent/thinking-levels'
-import { DEFAULT_THINKING_LEVEL } from '@mkagent/shared/agent/thinking-levels'
+import type { ThinkingLevel } from '@opcagent/shared/agent/thinking-levels'
+import { DEFAULT_THINKING_LEVEL } from '@opcagent/shared/agent/thinking-levels'
 
 /**
  * All session-scoped options in one place.

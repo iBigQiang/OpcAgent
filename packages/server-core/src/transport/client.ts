@@ -17,7 +17,7 @@ import {
   isErrorCode,
   type ErrorCode,
   type MessageEnvelope,
-} from '@mkagent/shared/protocol'
+} from '@opcagent/shared/protocol'
 import type { RpcClient } from './types'
 import { serializeEnvelope, deserializeEnvelope } from './codec'
 

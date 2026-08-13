@@ -7,7 +7,7 @@
 
 import type { SessionState, ToolStartEvent, ToolResultEvent, TaskBackgroundedEvent, ShellBackgroundedEvent, TaskProgressEvent, TaskCompletedEvent } from '../types'
 import type { Message } from '../../../shared/types'
-import { isParentTaskTool } from '@mkagent/shared/utils/toolNames'
+import { isParentTaskTool } from '@opcagent/shared/utils/toolNames'
 import {
   findToolMessage,
   updateMessageAt,

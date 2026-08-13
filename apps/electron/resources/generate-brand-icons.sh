@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
-# Generate every MkAgent app icon asset from a single SVG or PNG source.
+# Generate every OPC Agent app icon asset from a single SVG or PNG source.
 #
 # Usage:
 #   bun run icons:generate
-#   bun run icons:generate apps/electron/resources/mkagent/mkagent-padded.png
+#   bun run icons:generate apps/electron/resources/opcagent/opcagent-padded.png
 #   ICON_MARK_SOURCE=apps/electron/resources/mark-source.png bun run icons:generate
 #
 # Defaults:
 #   - Positional source defaults to apps/electron/resources/source.png
 #   - In-app menu mark source (ICON_MARK_SOURCE or 2nd positional arg)
-#     defaults to apps/electron/resources/mark-source.png. MkAgent imports
+#     defaults to apps/electron/resources/mark-source.png. OPC Agent imports
 #     both canonical sources directly from Echo, while generated files retain
-#     MkAgent's existing filenames and application-facing labels.
+#     OPCAgent's existing filenames and application-facing labels.
 #
 # PNG sources preserve their alpha channel by default. Prepare the PNG with
 # the desired macOS transparent outer padding before running this script.
@@ -75,14 +75,14 @@ EOF
 }
 
 write_embedded_svg() {
-  write_png_embedded_svg "$1" "$RESOURCES_DIR/source.png" "MkAgent" "1024"
+  write_png_embedded_svg "$1" "$RESOURCES_DIR/source.png" "OPC Agent" "1024"
 }
 
 write_embedded_svgs() {
   write_embedded_svg "$RESOURCES_DIR/icon.svg"
   write_embedded_svg "$RESOURCES_DIR/icon.icon/Assets/icon.svg"
   mkdir -p "$RESOURCES_DIR/tool-icons"
-  write_embedded_svg "$RESOURCES_DIR/tool-icons/mkagent.svg"
+  write_embedded_svg "$RESOURCES_DIR/tool-icons/opcagent.svg"
   write_embedded_svg "$REPO_ROOT/apps/webui/src/public/favicon.svg"
 }
 
@@ -93,7 +93,7 @@ case "$SOURCE_EXT" in
     copy_svg "$RESOURCES_DIR/icon.svg"
     copy_svg "$RESOURCES_DIR/icon.icon/Assets/icon.svg"
     mkdir -p "$RESOURCES_DIR/tool-icons"
-    copy_svg "$RESOURCES_DIR/tool-icons/mkagent.svg"
+    copy_svg "$RESOURCES_DIR/tool-icons/opcagent.svg"
     copy_svg "$REPO_ROOT/apps/webui/src/public/favicon.svg"
     ;;
   png)
@@ -150,11 +150,11 @@ magick "$TMP_DIR/favicon-16.png" "$TMP_DIR/favicon-32.png" "$TMP_DIR/favicon-48.
 
 echo "Generating renderer logo asset..."
 mkdir -p "$REPO_ROOT/apps/electron/src/renderer/assets"
-magick "$RESOURCES_DIR/source.png" -alpha on -resize 256x256 "$REPO_ROOT/apps/electron/src/renderer/assets/mkagent_app_icon.png"
-write_png_embedded_svg "$REPO_ROOT/apps/electron/src/renderer/assets/mkagent_app_icon.svg" "$REPO_ROOT/apps/electron/src/renderer/assets/mkagent_app_icon.png" "MkAgent app icon" "256"
+magick "$RESOURCES_DIR/source.png" -alpha on -resize 256x256 "$REPO_ROOT/apps/electron/src/renderer/assets/opcagent_app_icon.png"
+write_png_embedded_svg "$REPO_ROOT/apps/electron/src/renderer/assets/opcagent_app_icon.svg" "$REPO_ROOT/apps/electron/src/renderer/assets/opcagent_app_icon.png" "OPC Agent app icon" "256"
 
 echo "Generating renderer mark asset..."
-# MkAgent reuses Echo's standalone robot-head mark for the in-app menu.
+# OPC Agent reuses Echo's standalone robot-head mark for the in-app menu.
 #
 # Source selection priority:
 #   1. ICON_MARK_SOURCE env var
@@ -168,8 +168,8 @@ echo "Generating renderer mark asset..."
 #     (body + eyes) and repaint them in the brand green.
 #   - If the mark source is already an isolated mark (the normal Echo source),
 #     background plate detected), we just trim to bbox + center on 256x256.
-MARK_PNG="$REPO_ROOT/apps/electron/src/renderer/assets/mkagent_mark.png"
-MARK_SVG="$REPO_ROOT/apps/electron/src/renderer/assets/mkagent_mark.svg"
+MARK_PNG="$REPO_ROOT/apps/electron/src/renderer/assets/opcagent_mark.png"
+MARK_SVG="$REPO_ROOT/apps/electron/src/renderer/assets/opcagent_mark.svg"
 MARK_SOURCE_INPUT="${ICON_MARK_SOURCE:-${2:-$RESOURCES_DIR/mark-source.png}}"
 if [[ "$MARK_SOURCE_INPUT" != /* ]]; then
   MARK_SOURCE_INPUT="$PWD/$MARK_SOURCE_INPUT"
@@ -243,7 +243,7 @@ if is_full_app_icon:
   kept = [c for c in components if len(c) >= threshold]
 
   # Step 3: repaint kept pixels in brand green, preserving the alpha mask.
-  BRAND = (29, 164, 45)  # MkAgent brand green (#1da42d)
+  BRAND = (29, 164, 45)  # OPC Agent brand green (#1da42d)
   mark_full = Image.new("RGBA", (W, H), (0, 0, 0, 0))
   mfp = mark_full.load()
   for comp in kept:
@@ -267,10 +267,10 @@ canvas.alpha_composite(cropped, ((256 - cropped.width) // 2, (256 - cropped.heig
 Path(os.environ["MARK_TARGET"]).parent.mkdir(parents=True, exist_ok=True)
 canvas.save(os.environ["MARK_TARGET"])
 PY
-write_png_embedded_svg "$MARK_SVG" "$MARK_PNG" "MkAgent mark" "256"
+write_png_embedded_svg "$MARK_SVG" "$MARK_PNG" "OPC Agent mark" "256"
 
 echo "Generating OAuth callback branding asset..."
-magick "$RESOURCES_DIR/source.png" -alpha on -resize 128x128 "$TMP_DIR/mkagent-mark-128.png"
+magick "$RESOURCES_DIR/source.png" -alpha on -resize 128x128 "$TMP_DIR/opcagent-mark-128.png"
 cat > "$TMP_DIR/update-branding.cjs" <<'EOF'
 const fs = require("fs");
 
@@ -278,12 +278,12 @@ const path = "packages/shared/src/branding.ts";
 const dataUri = process.env.BRANDING_DATA_URI;
 let source = fs.readFileSync(path, "utf8");
 source = source.replace(
-  /export const MKAGENT_MARK_IMAGE_DATA_URI = (?:'data:image\/png;base64,[^']*'|);/,
-  `export const MKAGENT_MARK_IMAGE_DATA_URI = '${dataUri}';`,
+  /export const OPCAGENT_MARK_IMAGE_DATA_URI = (?:'data:image\/png;base64,[^']*'|);/,
+  `export const OPCAGENT_MARK_IMAGE_DATA_URI = '${dataUri}';`,
 );
 fs.writeFileSync(path, source);
 EOF
-BRANDING_DATA_URI="data:image/png;base64,$(base64 < "$TMP_DIR/mkagent-mark-128.png" | tr -d '\n')" bun "$TMP_DIR/update-branding.cjs"
+BRANDING_DATA_URI="data:image/png;base64,$(base64 < "$TMP_DIR/opcagent-mark-128.png" | tr -d '\n')" bun "$TMP_DIR/update-branding.cjs"
 
 echo "Copying Electron resources to dist..."
 (

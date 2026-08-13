@@ -1,5 +1,5 @@
 /**
- * MainContentPanel - retained Craft content routes for MkAgent Lite.
+ * MainContentPanel - retained Craft content routes for OPC Agent Lite.
  *
  * The panel keeps Craft's settings, Skills, sessions, focus-mode stoplight
  * handling, and multi-select shell while physically excluding removed product

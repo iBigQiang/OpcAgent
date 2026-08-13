@@ -2,10 +2,10 @@
  * PermissionsSettingsPage
  *
  * Displays permissions configuration for Explore mode.
- * Shows both default patterns (from ~/.mkagent/permissions/default.json)
+ * Shows both default patterns (from ~/.opcagent/permissions/default.json)
  * and custom workspace additions (from workspace permissions.json).
  *
- * Default patterns can be edited by the user in ~/.mkagent/permissions/default.json.
+ * Default patterns can be edited by the user in ~/.opcagent/permissions/default.json.
  * Custom patterns can be edited via workspace permissions.json file.
  */
 
@@ -17,7 +17,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { HeaderMenu } from '@/components/ui/HeaderMenu'
 import { Loader2 } from 'lucide-react'
 import { useAppShellContext, useActiveWorkspace } from '@/context/AppShellContext'
-import { type PermissionsConfigFile } from '@mkagent/shared/agent/modes'
+import { type PermissionsConfigFile } from '@opcagent/shared/agent/modes'
 import {
   PermissionsDataTable,
   type PermissionRow,
@@ -27,7 +27,7 @@ import {
   SettingsCard,
 } from '@/components/settings'
 import { EditPopover, EditButton, getEditConfig } from '@/components/ui/EditPopover'
-import { getDocUrl } from '@mkagent/shared/docs/doc-links'
+import { getDocUrl } from '@opcagent/shared/docs/doc-links'
 import { routes } from '@/lib/navigate'
 import type { DetailsPageMeta } from '@/lib/navigation-registry'
 
@@ -37,7 +37,7 @@ export const meta: DetailsPageMeta = {
 }
 
 /**
- * Build default permissions data from ~/.mkagent/permissions/default.json.
+ * Build default permissions data from ~/.opcagent/permissions/default.json.
  * These are the Explore mode patterns that can be customized by the user.
  * Patterns can include comments which are displayed in the table.
  *
@@ -116,7 +116,7 @@ export default function PermissionsSettingsPage() {
   const [defaultPermissionsPath, setDefaultPermissionsPath] = useState<string | null>(null)
   const [customConfig, setCustomConfig] = useState<PermissionsConfigFile | null>(null)
 
-  // Build default permissions data from ~/.mkagent/permissions/default.json
+  // Build default permissions data from ~/.opcagent/permissions/default.json
   const defaultPermissionsData = useMemo(() => buildDefaultPermissionsData(defaultConfig), [defaultConfig])
 
   // Fallback labels for custom permissions (translated)

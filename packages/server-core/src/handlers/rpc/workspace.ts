@@ -1,11 +1,11 @@
 import { existsSync } from 'node:fs'
 import { join } from 'path'
-import { RPC_CHANNELS } from '@mkagent/shared/protocol'
-import { getWorkspaceByNameOrId, addWorkspace, removeWorkspace, setActiveWorkspace } from '@mkagent/shared/config'
-import { getDefaultWorkspacesDir } from '@mkagent/shared/workspaces'
-import { perf } from '@mkagent/shared/utils'
-import { safeJsonParse } from '@mkagent/shared/utils/files'
-import { pushTyped, type RpcServer } from '@mkagent/server-core/transport'
+import { RPC_CHANNELS } from '@opcagent/shared/protocol'
+import { getWorkspaceByNameOrId, addWorkspace, removeWorkspace, setActiveWorkspace } from '@opcagent/shared/config'
+import { getDefaultWorkspacesDir } from '@opcagent/shared/workspaces'
+import { perf } from '@opcagent/shared/utils'
+import { safeJsonParse } from '@opcagent/shared/utils/files'
+import { pushTyped, type RpcServer } from '@opcagent/server-core/transport'
 import type { HandlerDeps } from '../handler-deps'
 import { isValidWorkspaceRootPath } from '../../utils/path-validation'
 
@@ -139,7 +139,7 @@ export function registerWorkspaceCoreHandlers(server: RpcServer, deps: HandlerDe
     if (!workspace) return null
 
     const { existsSync, readFileSync } = await import('fs')
-    const { getWorkspacePermissionsPath } = await import('@mkagent/shared/agent')
+    const { getWorkspacePermissionsPath } = await import('@opcagent/shared/agent')
     const path = getWorkspacePermissionsPath(workspace.rootPath)
 
     if (!existsSync(path)) return null
@@ -155,7 +155,7 @@ export function registerWorkspaceCoreHandlers(server: RpcServer, deps: HandlerDe
 
   server.handle(RPC_CHANNELS.permissions.GET_DEFAULTS, async () => {
     const { existsSync, readFileSync } = await import('fs')
-    const { getAppPermissionsDir } = await import('@mkagent/shared/agent')
+    const { getAppPermissionsDir } = await import('@opcagent/shared/agent')
     const { join } = await import('path')
 
     const defaultPath = join(getAppPermissionsDir(), 'default.json')
@@ -306,28 +306,28 @@ export function registerWorkspaceCoreHandlers(server: RpcServer, deps: HandlerDe
   // ============================================================
 
   server.handle(RPC_CHANNELS.theme.GET_APP, async () => {
-    const { loadAppTheme } = await import('@mkagent/shared/config/storage')
+    const { loadAppTheme } = await import('@opcagent/shared/config/storage')
     return loadAppTheme()
   })
 
   // Preset themes (app-level)
   server.handle(RPC_CHANNELS.theme.GET_PRESETS, async () => {
-    const { loadPresetThemes } = await import('@mkagent/shared/config/storage')
+    const { loadPresetThemes } = await import('@opcagent/shared/config/storage')
     return loadPresetThemes()
   })
 
   server.handle(RPC_CHANNELS.theme.LOAD_PRESET, async (_ctx, themeId: string) => {
-    const { loadPresetTheme } = await import('@mkagent/shared/config/storage')
+    const { loadPresetTheme } = await import('@opcagent/shared/config/storage')
     return loadPresetTheme(themeId)
   })
 
   server.handle(RPC_CHANNELS.theme.GET_COLOR_THEME, async () => {
-    const { getColorTheme } = await import('@mkagent/shared/config/storage')
+    const { getColorTheme } = await import('@opcagent/shared/config/storage')
     return getColorTheme()
   })
 
   server.handle(RPC_CHANNELS.theme.SET_COLOR_THEME, async (_ctx, themeId: string) => {
-    const { setColorTheme } = await import('@mkagent/shared/config/storage')
+    const { setColorTheme } = await import('@opcagent/shared/config/storage')
     setColorTheme(themeId)
   })
 
@@ -339,8 +339,8 @@ export function registerWorkspaceCoreHandlers(server: RpcServer, deps: HandlerDe
 
   // Workspace-level theme overrides
   server.handle(RPC_CHANNELS.theme.GET_WORKSPACE_COLOR_THEME, async (_ctx, workspaceId: string) => {
-    const { getWorkspaces } = await import('@mkagent/shared/config/storage')
-    const { getWorkspaceColorTheme } = await import('@mkagent/shared/workspaces/storage')
+    const { getWorkspaces } = await import('@opcagent/shared/config/storage')
+    const { getWorkspaceColorTheme } = await import('@opcagent/shared/workspaces/storage')
     const workspaces = getWorkspaces()
     const workspace = workspaces.find(w => w.id === workspaceId)
     if (!workspace) return null
@@ -348,8 +348,8 @@ export function registerWorkspaceCoreHandlers(server: RpcServer, deps: HandlerDe
   })
 
   server.handle(RPC_CHANNELS.theme.SET_WORKSPACE_COLOR_THEME, async (_ctx, workspaceId: string, themeId: string | null) => {
-    const { getWorkspaces } = await import('@mkagent/shared/config/storage')
-    const { setWorkspaceColorTheme } = await import('@mkagent/shared/workspaces/storage')
+    const { getWorkspaces } = await import('@opcagent/shared/config/storage')
+    const { setWorkspaceColorTheme } = await import('@opcagent/shared/workspaces/storage')
     const workspaces = getWorkspaces()
     const workspace = workspaces.find(w => w.id === workspaceId)
     if (!workspace) return
@@ -357,8 +357,8 @@ export function registerWorkspaceCoreHandlers(server: RpcServer, deps: HandlerDe
   })
 
   server.handle(RPC_CHANNELS.theme.GET_ALL_WORKSPACE_THEMES, async () => {
-    const { getWorkspaces } = await import('@mkagent/shared/config/storage')
-    const { getWorkspaceColorTheme } = await import('@mkagent/shared/workspaces/storage')
+    const { getWorkspaces } = await import('@opcagent/shared/config/storage')
+    const { getWorkspaceColorTheme } = await import('@opcagent/shared/workspaces/storage')
     const workspaces = getWorkspaces()
     const themes: Record<string, string | undefined> = {}
     for (const ws of workspaces) {
@@ -379,9 +379,9 @@ export function registerWorkspaceCoreHandlers(server: RpcServer, deps: HandlerDe
   // Tool icon mappings — loads tool-icons.json and resolves each entry's icon to a data URL
   // for display in the Appearance settings page
   server.handle(RPC_CHANNELS.toolIcons.GET_MAPPINGS, async () => {
-    const { getToolIconsDir } = await import('@mkagent/shared/config/storage')
-    const { loadToolIconConfig } = await import('@mkagent/shared/utils/cli-icon-resolver')
-    const { encodeIconToDataUrl } = await import('@mkagent/shared/utils/icon-encoder')
+    const { getToolIconsDir } = await import('@opcagent/shared/config/storage')
+    const { loadToolIconConfig } = await import('@opcagent/shared/utils/cli-icon-resolver')
+    const { encodeIconToDataUrl } = await import('@opcagent/shared/utils/icon-encoder')
     const { join } = await import('path')
 
     const toolIconsDir = getToolIconsDir()
@@ -405,7 +405,7 @@ export function registerWorkspaceCoreHandlers(server: RpcServer, deps: HandlerDe
 
   // Logo URL resolution (uses Node.js filesystem cache for provider domains)
   server.handle(RPC_CHANNELS.logo.GET_URL, async (_ctx, serviceUrl: string, provider?: string) => {
-    const { getLogoUrl } = await import('@mkagent/shared/utils/logo')
+    const { getLogoUrl } = await import('@opcagent/shared/utils/logo')
     const result = getLogoUrl(serviceUrl, provider)
     return result
   })

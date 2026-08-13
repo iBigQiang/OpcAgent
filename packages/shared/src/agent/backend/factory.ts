@@ -2,7 +2,7 @@
  * Agent Factory
  *
  * Creates the appropriate AI agent based on configuration.
- * MkAgent currently registers PiAgent only.
+ * OPCAgent currently registers PiAgent only.
  *
  * All agents implement AgentBackend directly.
  *

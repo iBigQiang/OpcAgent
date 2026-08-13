@@ -222,38 +222,38 @@ export function cleanEnv(): Record<string, string> {
 const PAYLOAD_SKIP_KEYS = new Set(['sessionId', 'sessionName', 'workspaceId', 'timestamp']);
 
 /**
- * Build the base MKAGENT_* environment variables shared by both prompt and webhook actions.
+ * Build the base OPCAGENT_* environment variables shared by both prompt and webhook actions.
  * Contains event info, session metadata, scheduler time, and payload fields (unsanitized).
  */
 function buildBaseEventEnv(event: AutomationEvent, payload: BaseEventPayload): Record<string, string> {
   const env: Record<string, string> = {
-    MKAGENT_EVENT: event,
-    MKAGENT_EVENT_DATA: JSON.stringify(payload),
+    OPCAGENT_EVENT: event,
+    OPCAGENT_EVENT_DATA: JSON.stringify(payload),
   };
 
-  if (payload.sessionId) env.MKAGENT_SESSION_ID = payload.sessionId;
-  if (payload.sessionName) env.MKAGENT_SESSION_NAME = payload.sessionName;
-  if (payload.workspaceId) env.MKAGENT_WORKSPACE_ID = payload.workspaceId;
+  if (payload.sessionId) env.OPCAGENT_SESSION_ID = payload.sessionId;
+  if (payload.sessionName) env.OPCAGENT_SESSION_NAME = payload.sessionName;
+  if (payload.workspaceId) env.OPCAGENT_WORKSPACE_ID = payload.workspaceId;
 
   // Session metadata as JSON
   const sessionMetadata: Record<string, string> = {};
   if (payload.sessionId) sessionMetadata.id = payload.sessionId;
   if (payload.sessionName) sessionMetadata.name = payload.sessionName;
   if (Object.keys(sessionMetadata).length > 0) {
-    env.MKAGENT_SESSION_METADATA = JSON.stringify(sessionMetadata);
+    env.OPCAGENT_SESSION_METADATA = JSON.stringify(sessionMetadata);
   }
 
   // Local time for scheduler events
   if (event === 'SchedulerTick') {
     const now = new Date();
-    env.MKAGENT_LOCAL_TIME = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
-    env.MKAGENT_LOCAL_DATE = now.toISOString().split('T')[0]!;
+    env.OPCAGENT_LOCAL_TIME = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+    env.OPCAGENT_LOCAL_DATE = now.toISOString().split('T')[0]!;
   }
 
-  // Payload fields as MKAGENT_ vars (raw — callers apply sanitization if needed)
+  // Payload fields as OPCAGENT_ vars (raw — callers apply sanitization if needed)
   for (const [key, value] of Object.entries(payload)) {
     if (PAYLOAD_SKIP_KEYS.has(key)) continue;
-    const envKey = `MKAGENT_${toSnakeCase(key).toUpperCase()}`;
+    const envKey = `OPCAGENT_${toSnakeCase(key).toUpperCase()}`;
     env[envKey] = typeof value === 'string' ? value : String(value);
   }
 
@@ -269,12 +269,12 @@ export function buildEnvFromPayload(event: AutomationEvent, payload: BaseEventPa
   const env: Record<string, string> = { ...cleanEnv(), ...base };
 
   // Sanitize session name for shell context
-  if (payload.sessionName) env.MKAGENT_SESSION_NAME = sanitizeForShell(payload.sessionName);
+  if (payload.sessionName) env.OPCAGENT_SESSION_NAME = sanitizeForShell(payload.sessionName);
 
   // Sanitize payload field values for shell context
   for (const [key, value] of Object.entries(payload)) {
     if (PAYLOAD_SKIP_KEYS.has(key)) continue;
-    const envKey = `MKAGENT_${toSnakeCase(key).toUpperCase()}`;
+    const envKey = `OPCAGENT_${toSnakeCase(key).toUpperCase()}`;
     env[envKey] = typeof value === 'string' ? sanitizeForShell(value) : String(value);
   }
 
@@ -287,23 +287,23 @@ export function buildEnvFromPayload(event: AutomationEvent, payload: BaseEventPa
  * Unlike buildEnvFromPayload (used by prompt actions), this:
  * - Does NOT spread process.env (no secret leakage)
  * - Does NOT apply shell sanitization (irrelevant for HTTP context)
- * - Only injects MKAGENT_WH_* user-defined vars from process.env (webhook secrets)
- * - Includes MKAGENT_* system vars derived from the event payload
+ * - Only injects OPCAGENT_WH_* user-defined vars from process.env (webhook secrets)
+ * - Includes OPCAGENT_* system vars derived from the event payload
  *
  * Users set webhook secrets in their shell profile:
- *   export MKAGENT_WH_SLACK_URL="https://hooks.slack.com/services/T.../B.../xxx"
- *   export MKAGENT_WH_DISCORD_TOKEN="abc123"
+ *   export OPCAGENT_WH_SLACK_URL="https://hooks.slack.com/services/T.../B.../xxx"
+ *   export OPCAGENT_WH_DISCORD_TOKEN="abc123"
  *
  * Then reference them in automations.json:
- *   "url": "${MKAGENT_WH_SLACK_URL}"
- *   "headers": { "Authorization": "Bearer ${MKAGENT_WH_DISCORD_TOKEN}" }
+ *   "url": "${OPCAGENT_WH_SLACK_URL}"
+ *   "headers": { "Authorization": "Bearer ${OPCAGENT_WH_DISCORD_TOKEN}" }
  */
 export function buildWebhookEnv(event: AutomationEvent, payload: BaseEventPayload): Record<string, string> {
   const env = buildBaseEventEnv(event, payload);
 
-  // User-defined webhook secrets: only MKAGENT_WH_* from process.env
+  // User-defined webhook secrets: only OPCAGENT_WH_* from process.env
   for (const [key, value] of Object.entries(process.env)) {
-    if (key.startsWith('MKAGENT_WH_') && value !== undefined) {
+    if (key.startsWith('OPCAGENT_WH_') && value !== undefined) {
       env[key] = value;
     }
   }

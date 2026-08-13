@@ -12,7 +12,7 @@ export interface ResolvedScriptRuntime {
 
 export interface ResolveScriptRuntimeContext {
   /**
-   * Whether host app is packaged. Defaults to MKAGENT_IS_PACKAGED=1.
+   * Whether host app is packaged. Defaults to OPCAGENT_IS_PACKAGED=1.
    * In packaged mode, PATH fallback is blocked by default.
    */
   isPackaged?: boolean;
@@ -64,7 +64,7 @@ function getPlatformRuntimeDir(): string {
 
 function inferPackagedMode(ctx?: ResolveScriptRuntimeContext): boolean {
   if (typeof ctx?.isPackaged === 'boolean') return ctx.isPackaged;
-  return process.env.MKAGENT_IS_PACKAGED === '1';
+  return process.env.OPCAGENT_IS_PACKAGED === '1';
 }
 
 function getProcessResourcesPath(): string | undefined {
@@ -72,7 +72,7 @@ function getProcessResourcesPath(): string | undefined {
 }
 
 function resolveResourcesBase(ctx?: ResolveScriptRuntimeContext): string | null {
-  const explicit = ctx?.resourcesBasePath || process.env.MKAGENT_RESOURCES_BASE;
+  const explicit = ctx?.resourcesBasePath || process.env.OPCAGENT_RESOURCES_BASE;
   if (explicit) return resolve(explicit);
 
   const resourcesPath = getProcessResourcesPath();
@@ -85,7 +85,7 @@ function resolveResourcesBase(ctx?: ResolveScriptRuntimeContext): string | null 
 }
 
 function resolveAppRoot(ctx?: ResolveScriptRuntimeContext): string | null {
-  const explicit = ctx?.appRootPath || process.env.MKAGENT_APP_ROOT;
+  const explicit = ctx?.appRootPath || process.env.OPCAGENT_APP_ROOT;
   return explicit ? resolve(explicit) : null;
 }
 
@@ -132,7 +132,7 @@ function validatePackagedEnvRuntime(command: string, label: string): string {
   if (!isAbsolute(command) && !hasPathSeparator) {
     throw new Error(
       `${label} runtime from env is not an absolute/bundled path (${command}). ` +
-      'Packaged builds do not allow PATH-based runtime resolution. Configure an absolute MKAGENT_* path or ship a bundled runtime.'
+      'Packaged builds do not allow PATH-based runtime resolution. Configure an absolute OPCAGENT_* path or ship a bundled runtime.'
     );
   }
 
@@ -140,7 +140,7 @@ function validatePackagedEnvRuntime(command: string, label: string): string {
   if (!existsSync(resolvedCommand)) {
     throw new Error(
       `${label} runtime from env does not exist: ${resolvedCommand}. ` +
-      'Configure a valid absolute MKAGENT_* path or ship a bundled runtime.'
+      'Configure a valid absolute OPCAGENT_* path or ship a bundled runtime.'
     );
   }
 
@@ -151,7 +151,7 @@ function validatePackagedEnvRuntime(command: string, label: string): string {
  * Resolve runtime command and fixed argument prefix for script execution tools.
  *
  * Resolution order:
- * - env override (MKAGENT_UV / MKAGENT_NODE / MKAGENT_BUN)
+ * - env override (OPCAGENT_UV / OPCAGENT_NODE / OPCAGENT_BUN)
  * - bundled binary path (when available)
  * - PATH fallback (dev only)
  */
@@ -162,10 +162,10 @@ export function resolveScriptRuntime(
   const isPackaged = inferPackagedMode(ctx);
 
   if (language === 'python3') {
-    if (process.env.MKAGENT_UV) {
+    if (process.env.OPCAGENT_UV) {
       const cmd = isPackaged
-        ? validatePackagedEnvRuntime(process.env.MKAGENT_UV, 'Python/uv')
-        : process.env.MKAGENT_UV;
+        ? validatePackagedEnvRuntime(process.env.OPCAGENT_UV, 'Python/uv')
+        : process.env.OPCAGENT_UV;
 
       return {
         command: cmd,
@@ -197,15 +197,15 @@ export function resolveScriptRuntime(
     throw new Error(
       isPackaged
         ? 'Python runtime unavailable in packaged app: uv was not found in env or bundled resources.'
-        : 'Python runtime unavailable: uv was not found. Configure MKAGENT_UV or install uv on PATH.'
+        : 'Python runtime unavailable: uv was not found. Configure OPCAGENT_UV or install uv on PATH.'
     );
   }
 
   if (language === 'node') {
-    if (process.env.MKAGENT_NODE) {
+    if (process.env.OPCAGENT_NODE) {
       const cmd = isPackaged
-        ? validatePackagedEnvRuntime(process.env.MKAGENT_NODE, 'Node')
-        : process.env.MKAGENT_NODE;
+        ? validatePackagedEnvRuntime(process.env.OPCAGENT_NODE, 'Node')
+        : process.env.OPCAGENT_NODE;
       return { command: cmd, argsPrefix: [], source: 'env' };
     }
 
@@ -224,14 +224,14 @@ export function resolveScriptRuntime(
     throw new Error(
       isPackaged
         ? 'Node runtime unavailable in packaged app: node was not found in env or bundled resources.'
-        : 'Node runtime unavailable: configure MKAGENT_NODE or install node on PATH.'
+        : 'Node runtime unavailable: configure OPCAGENT_NODE or install node on PATH.'
     );
   }
 
-  if (process.env.MKAGENT_BUN) {
+  if (process.env.OPCAGENT_BUN) {
     const cmd = isPackaged
-      ? validatePackagedEnvRuntime(process.env.MKAGENT_BUN, 'Bun')
-      : process.env.MKAGENT_BUN;
+      ? validatePackagedEnvRuntime(process.env.OPCAGENT_BUN, 'Bun')
+      : process.env.OPCAGENT_BUN;
     return { command: cmd, argsPrefix: [], source: 'env' };
   }
 
@@ -250,6 +250,6 @@ export function resolveScriptRuntime(
   throw new Error(
     isPackaged
       ? 'Bun runtime unavailable in packaged app: bun was not found in env or bundled resources.'
-      : 'Bun runtime unavailable: configure MKAGENT_BUN or install bun on PATH.'
+      : 'Bun runtime unavailable: configure OPCAGENT_BUN or install bun on PATH.'
   );
 }

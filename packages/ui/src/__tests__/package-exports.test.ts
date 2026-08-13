@@ -2,7 +2,7 @@ import { describe, expect, it } from 'bun:test'
 import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
-describe('@mkagent/ui package exports', () => {
+describe('@opcagent/ui package exports', () => {
   it('points every explicit export at an existing file', () => {
     const packageRoot = resolve(import.meta.dir, '..', '..')
     const manifest = JSON.parse(readFileSync(resolve(packageRoot, 'package.json'), 'utf-8')) as {

@@ -19,12 +19,12 @@
     "noUnusedParameters": false,
     "baseUrl": ".",
     "paths": {
-      "@mkagent/shared": ["../shared/src/index.ts"],
-      "@mkagent/shared/*": ["../shared/src/*"],
-      "@mkagent/server-core": ["../server-core/src/index.ts"],
-      "@mkagent/server-core/*": ["../server-core/src/*"],
-      "@mkagent/core": ["../core/src/index.ts"],
-      "@mkagent/core/*": ["../core/src/*"]
+      "@opcagent/shared": ["../shared/src/index.ts"],
+      "@opcagent/shared/*": ["../shared/src/*"],
+      "@opcagent/server-core": ["../server-core/src/index.ts"],
+      "@opcagent/server-core/*": ["../server-core/src/*"],
+      "@opcagent/core": ["../core/src/index.ts"],
+      "@opcagent/core/*": ["../core/src/*"]
     }
   },
   "include": ["src/**/*", "../shared/src/agent/bash-parser.d.ts"],

@@ -22,7 +22,7 @@ let reconnectTimer: ReturnType<typeof setTimeout> | null = null
 let starting = false
 const MAX_RECONNECT_ATTEMPTS = 10
 const emit = (event: WorkerEvent): void => { process.stdout.write(encodeMessage(event)) }
-const log = (...args: unknown[]) => process.stderr.write(`[mkagent-whatsapp-worker] ${args.map(String).join(' ')}\n`)
+const log = (...args: unknown[]) => process.stderr.write(`[opcagent-whatsapp-worker] ${args.map(String).join(' ')}\n`)
 
 async function loadBaileys(): Promise<Baileys | null> { try { return await import('@whiskeysockets/baileys') as unknown as Baileys } catch { return null } }
 

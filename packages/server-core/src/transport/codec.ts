@@ -1,4 +1,4 @@
-import type { MessageEnvelope } from '@mkagent/shared/protocol'
+import type { MessageEnvelope } from '@opcagent/shared/protocol'
 
 const WIRE_TYPE_KEY = '__craftRpcType'
 const WIRE_BASE64_KEY = 'base64'

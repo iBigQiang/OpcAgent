@@ -11,13 +11,13 @@ import {
   type BrowserCapabilityRequest,
   type ConfirmDialogSpec,
   type FileDialogSpec,
-} from '@mkagent/server-core/transport'
+} from '@opcagent/server-core/transport'
 import { WsRpcClient, type TransportConnectionState } from '../transport/client'
 import { buildClientApi } from '../transport/build-api'
 import { CHANNEL_MAP } from '../transport/channel-map'
-import { createCallbackServer } from '@mkagent/shared/auth/callback-server'
-import { CHATGPT_OAUTH_CONFIG } from '@mkagent/shared/auth/chatgpt-oauth-config'
-import { RPC_CHANNELS } from '@mkagent/shared/protocol'
+import { createCallbackServer } from '@opcagent/shared/auth/callback-server'
+import { CHATGPT_OAUTH_CONFIG } from '@opcagent/shared/auth/chatgpt-oauth-config'
+import { RPC_CHANNELS } from '@opcagent/shared/protocol'
 
 const webContentsId = ipcRenderer.sendSync('__get-web-contents-id') as number
 const workspaceId = ipcRenderer.sendSync('__get-workspace-id') as string
@@ -61,7 +61,7 @@ api.onReconnected = (callback: (isStale: boolean) => void) => {
   })
 }
 api.getSystemWarnings = async () => ({
-  vcredistMissing: process.platform === 'win32' && process.env.MKAGENT_VCREDIST_MISSING === '1',
+  vcredistMissing: process.platform === 'win32' && process.env.OPCAGENT_VCREDIST_MISSING === '1',
 })
 api.getFilePath = (file: File) => webUtils.getPathForFile(file)
 api.changeLanguage = (language: string) => ipcRenderer.invoke('__i18n:changeLanguage', language)

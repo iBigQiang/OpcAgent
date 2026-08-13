@@ -1,6 +1,6 @@
-import type { BindingAccessMode, LarkCredentials, MessagingConfig, PlatformType } from '@mkagent/messaging-gateway'
-import { RPC_CHANNELS } from '@mkagent/shared/protocol'
-import type { RpcServer } from '@mkagent/server-core/transport'
+import type { BindingAccessMode, LarkCredentials, MessagingConfig, PlatformType } from '@opcagent/messaging-gateway'
+import { RPC_CHANNELS } from '@opcagent/shared/protocol'
+import type { RpcServer } from '@opcagent/server-core/transport'
 import type { HandlerDeps } from '../handler-deps'
 import type { IMessagingGatewayRegistry, MessagingPendingEntryKey, MessagingPlatformOwnerInfo } from '../messaging-registry-interface'
 

@@ -14,7 +14,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import type { Subprocess } from 'bun'
 import WebSocket from 'ws'
-import { RPC_CHANNELS } from '@mkagent/shared/protocol'
+import { RPC_CHANNELS } from '@opcagent/shared/protocol'
 
 const SERVER_ENTRY = join(import.meta.dir, '..', 'index.ts')
 const STARTUP_TIMEOUT = 15_000
@@ -30,18 +30,18 @@ interface SpawnedServer {
 
 async function spawnTestServer(extraEnv?: Record<string, string>): Promise<SpawnedServer> {
   const token = crypto.randomUUID() + crypto.randomUUID() // 72 chars, well above 16 minimum
-  const configDir = join(tmpdir(), `mkagent-server-test-${crypto.randomUUID()}`)
+  const configDir = join(tmpdir(), `opcagent-server-test-${crypto.randomUUID()}`)
   const { CLAUDECODE: _, ...parentEnv } = process.env
 
   const proc = Bun.spawn(['bun', 'run', SERVER_ENTRY], {
     env: {
       ...parentEnv,
       ...extraEnv,
-      MKAGENT_SERVER_TOKEN: token,
+      OPCAGENT_SERVER_TOKEN: token,
       CONFIG_DIR: configDir,
-      MKAGENT_RPC_PORT: '0',
-      MKAGENT_RPC_HOST: '127.0.0.1',
-      MKAGENT_HEALTH_PORT: '0', // random port
+      OPCAGENT_RPC_PORT: '0',
+      OPCAGENT_RPC_HOST: '127.0.0.1',
+      OPCAGENT_HEALTH_PORT: '0', // random port
     },
     stdout: 'pipe',
     stderr: 'pipe',
@@ -60,8 +60,8 @@ async function spawnTestServer(extraEnv?: Record<string, string>): Promise<Spawn
       const lines = buffer.split('\n')
       buffer = lines.pop() ?? ''
       for (const line of lines) {
-        if (line.startsWith('MKAGENT_SERVER_URL=')) {
-          url = line.slice('MKAGENT_SERVER_URL='.length).trim()
+        if (line.startsWith('OPCAGENT_SERVER_URL=')) {
+          url = line.slice('OPCAGENT_SERVER_URL='.length).trim()
         }
         if (url) {
           clearTimeout(timer)
@@ -97,7 +97,7 @@ async function spawnTestServer(extraEnv?: Record<string, string>): Promise<Spawn
       clearTimeout(timer)
       if (!url) {
         rmSync(configDir, { recursive: true, force: true })
-        reject(new Error('Server exited before printing MKAGENT_SERVER_URL'))
+        reject(new Error('Server exited before printing OPCAGENT_SERVER_URL'))
       }
     })()
   })
@@ -182,15 +182,15 @@ describe('headless server smoke test', () => {
 
   it('rejects short token at startup', async () => {
     const token = 'short'
-    const configDir = join(tmpdir(), `mkagent-server-test-${crypto.randomUUID()}`)
+    const configDir = join(tmpdir(), `opcagent-server-test-${crypto.randomUUID()}`)
     const { CLAUDECODE: _, ...parentEnv } = process.env
     const proc = Bun.spawn(['bun', 'run', SERVER_ENTRY], {
       env: {
         ...parentEnv,
-        MKAGENT_SERVER_TOKEN: token,
+        OPCAGENT_SERVER_TOKEN: token,
         CONFIG_DIR: configDir,
-        MKAGENT_RPC_PORT: '0',
-        MKAGENT_RPC_HOST: '127.0.0.1',
+        OPCAGENT_RPC_PORT: '0',
+        OPCAGENT_RPC_HOST: '127.0.0.1',
       },
       stdout: 'pipe',
       stderr: 'pipe',

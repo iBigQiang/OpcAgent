@@ -77,7 +77,7 @@ export class TelegramAdapter implements PlatformAdapter {
     if (!response.ok) throw new Error('Telegram attachment download failed')
     const buffer = Buffer.from(await response.arrayBuffer())
     if (buffer.byteLength > MAX_ATTACHMENT_BYTES) throw new Error('Telegram attachment is too large')
-    const localPath = join(tmpdir(), `mkagent-telegram-${randomUUID()}-${fileName}`)
+    const localPath = join(tmpdir(), `opcagent-telegram-${randomUUID()}-${fileName}`)
     await writeFile(localPath, buffer)
     return { localPath, fileName, fileSize: buffer.byteLength }
   }

@@ -15,9 +15,9 @@ Default model:   the installed Ollama model name, e.g. llama3.2
 
 Save and click "Test". A successful test reports back the model list.
 
-## How MkAgent uses Ollama
+## How OPC Agent uses Ollama
 
-Ollama is registered as a `openai-completions` connection. At session startup, Pi's provider resolves the connection id and routes every model call through that endpoint with empty auth. Streaming, thinking-level prompts, tool calls, permission prompts, cancel, and resume are all Pi-managed; Ollama does not get any custom path in MkAgent.
+Ollama is registered as a `openai-completions` connection. At session startup, Pi's provider resolves the connection id and routes every model call through that endpoint with empty auth. Streaming, thinking-level prompts, tool calls, permission prompts, cancel, and resume are all Pi-managed; Ollama does not get any custom path in OPC Agent.
 
 This means:
 
@@ -31,7 +31,7 @@ This means:
 # Sanity check from the shell
 curl http://127.0.0.1:11434/v1/models
 
-# Verify via MkAgent CLI
+# Verify via OPC Agent CLI
 bun run apps/cli/src/index.ts connections list
 bun run apps/cli/src/index.ts connections test <id>
 bun run apps/cli/src/index.ts run "Hello" \
@@ -44,6 +44,6 @@ A connection using Ollama still passes through the shared permission engine. Too
 
 ## Limitations
 
-- Ollama's OpenAI-compatible surface misses a few fields that MkAgent may send (notably parallel tool calls and certain reasoning payloads). Tool calls may be reported as plain text by some Ollama models; prefer a tool-capable model for agentic sessions.
+- Ollama's OpenAI-compatible surface misses a few fields that OPC Agent may send (notably parallel tool calls and certain reasoning payloads). Tool calls may be reported as plain text by some Ollama models; prefer a tool-capable model for agentic sessions.
 - Network access is local; the proxy is not used for `127.0.0.1` even when configured.
 - A multi-model connection cannot be split across providers; create one connection per Ollama base URL.

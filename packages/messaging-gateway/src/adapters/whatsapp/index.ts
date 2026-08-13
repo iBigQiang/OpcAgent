@@ -1,6 +1,6 @@
 import { spawn, type ChildProcess } from 'node:child_process'
 import { StringDecoder } from 'node:string_decoder'
-import { parseFrames, encodeMessage, type WorkerCommand, type WorkerEvent } from '@mkagent/messaging-whatsapp-worker'
+import { parseFrames, encodeMessage, type WorkerCommand, type WorkerEvent } from '@opcagent/messaging-whatsapp-worker'
 import type { IncomingMessage, MessagingPlatformConfig, PlatformAdapter, PlatformRuntimeInfo, SentMessage, WhatsAppUiEvent } from '../../types'
 
 /**

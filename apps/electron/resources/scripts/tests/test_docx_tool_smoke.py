@@ -68,14 +68,14 @@ class DocxToolSmokeTests(unittest.TestCase):
             "--find",
             "Balint",
             "--replace-with",
-            "MkAgent",
+            "OPC Agent",
             "-o",
             str(replaced_doc),
         )
         self.assertEqual(repl.returncode, 0, msg=repl.stderr)
 
         extracted_replaced = self.run_tool("extract", str(replaced_doc))
-        self.assertIn("MkAgent", extracted_replaced.stdout)
+        self.assertIn("OPC Agent", extracted_replaced.stdout)
 
     def test_template_invalid_json_fails(self) -> None:
         template_doc = self.tmpdir / "bad-template.docx"

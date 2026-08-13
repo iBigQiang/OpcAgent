@@ -1,9 +1,9 @@
 #!/usr/bin/env bun
-/** Terminal client for the MkAgent headless server. */
+/** Terminal client for the OPC Agent headless server. */
 
 import { readFile, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
-import { RPC_CHANNELS, type SessionEvent } from '@mkagent/shared/protocol'
+import { RPC_CHANNELS, type SessionEvent } from '@opcagent/shared/protocol'
 import { CliRpcClient } from './client.ts'
 import { spawnServer, type SpawnedServer } from './server-spawner.ts'
 
@@ -43,7 +43,7 @@ export function parseArgs(argv: string[]): CliArgs {
   const args: CliArgs = {
     url: '',
     token: '',
-    workspace: process.env.MKAGENT_WORKSPACE,
+    workspace: process.env.OPCAGENT_WORKSPACE,
     timeout: 10_000,
     json: false,
     sendTimeout: 300_000,
@@ -98,9 +98,9 @@ export function parseArgs(argv: string[]): CliArgs {
     }
   }
 
-  args.url ||= process.env.MKAGENT_SERVER_URL ?? ''
-  args.token ||= process.env.MKAGENT_SERVER_TOKEN ?? ''
-  args.tlsCa ||= process.env.MKAGENT_TLS_CA
+  args.url ||= process.env.OPCAGENT_SERVER_URL ?? ''
+  args.token ||= process.env.OPCAGENT_SERVER_TOKEN ?? ''
+  args.tlsCa ||= process.env.OPCAGENT_TLS_CA
   args.provider ||= process.env.LLM_PROVIDER ?? 'deepseek'
   args.model ||= process.env.LLM_MODEL ?? ''
   args.apiKey ||= process.env.LLM_API_KEY ?? ''
@@ -130,7 +130,7 @@ async function readStdin(): Promise<string> {
 }
 
 async function connect(args: CliArgs): Promise<CliRpcClient> {
-  if (!args.url) throw new Error('No server URL. Pass --url or set MKAGENT_SERVER_URL.')
+  if (!args.url) throw new Error('No server URL. Pass --url or set OPCAGENT_SERVER_URL.')
   const client = new CliRpcClient(args.url, {
     token: args.token,
     workspaceId: args.workspace,
@@ -365,7 +365,7 @@ async function commandSession(client: CliRpcClient, args: CliArgs): Promise<unkn
     case 'archive': return client.invoke(RPC_CHANNELS.sessions.COMMAND, sessionId, { type: 'archive' })
     case 'unarchive': return client.invoke(RPC_CHANNELS.sessions.COMMAND, sessionId, { type: 'unarchive' })
     case 'export': {
-      const file = args.rest.shift() ?? `${sessionId}.mkagent-session.json`
+      const file = args.rest.shift() ?? `${sessionId}.opcagent-session.json`
       const bundle = await client.invoke(RPC_CHANNELS.sessions.EXPORT, sessionId)
       await writeFile(file, JSON.stringify(bundle, null, 2), 'utf-8')
       return { file }
@@ -454,9 +454,9 @@ async function commandListen(client: CliRpcClient, args: CliArgs): Promise<never
 }
 
 function printHelp(): void {
-  process.stdout.write(`mkagent — Terminal client for MkAgent
+  process.stdout.write(`opcagent — Terminal client for OPC Agent
 
-Usage: mkagent [options] <command>
+Usage: opcagent [options] <command>
 
 Commands:
   run <prompt>                         Run in a temporary local server

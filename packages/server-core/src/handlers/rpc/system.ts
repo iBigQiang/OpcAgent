@@ -2,20 +2,20 @@ import { resolve } from 'path'
 import { join } from 'path'
 import { homedir } from 'os'
 import { execSync } from 'child_process'
-import { RPC_CHANNELS } from '@mkagent/shared/protocol'
-import { getWorkspaceByNameOrId, getGitBashPath, setGitBashPath, clearGitBashPath, clearClaudeExecutablePath, setClaudeExecutablePath } from '@mkagent/shared/config'
-import { resolveClaudeExecutable, validateClaudeExecutablePath } from '@mkagent/shared/agent/backend'
-import { classifyExternalUrl, formatBlockedUrlError } from '@mkagent/shared/utils/url-safety'
-import { deriveGitBashPathsFromGitPaths, isUsableGitBashPath, validateGitBashPath } from '@mkagent/server-core/services'
-import { buildBackendHostRuntimeContext, validateFilePath, getWorkspaceAllowedDirs } from '@mkagent/server-core/handlers'
-import type { RpcServer } from '@mkagent/server-core/transport'
+import { RPC_CHANNELS } from '@opcagent/shared/protocol'
+import { getWorkspaceByNameOrId, getGitBashPath, setGitBashPath, clearGitBashPath, clearClaudeExecutablePath, setClaudeExecutablePath } from '@opcagent/shared/config'
+import { resolveClaudeExecutable, validateClaudeExecutablePath } from '@opcagent/shared/agent/backend'
+import { classifyExternalUrl, formatBlockedUrlError } from '@opcagent/shared/utils/url-safety'
+import { deriveGitBashPathsFromGitPaths, isUsableGitBashPath, validateGitBashPath } from '@opcagent/server-core/services'
+import { buildBackendHostRuntimeContext, validateFilePath, getWorkspaceAllowedDirs } from '@opcagent/server-core/handlers'
+import type { RpcServer } from '@opcagent/server-core/transport'
 import type { HandlerDeps } from '../handler-deps'
 import {
   requestClientOpenExternal,
   requestClientOpenPath,
   requestClientShowInFolder,
   requestClientOpenFileDialog,
-} from '@mkagent/server-core/transport'
+} from '@opcagent/server-core/transport'
 
 export const CORE_HANDLED_CHANNELS = [
   RPC_CHANNELS.theme.GET_SYSTEM_PREFERENCE,
@@ -69,8 +69,8 @@ function collectDeepLinkParams(parsed: URL, pathId?: string): Record<string, str
   return Object.keys(params).length > 0 ? params : undefined
 }
 
-function parseInternalMkAgentDeepLink(parsed: URL): ParsedInternalDeepLink | null {
-  if (parsed.protocol !== 'mkagent:') return null
+function parseInternalOPCAgentDeepLink(parsed: URL): ParsedInternalDeepLink | null {
+  if (parsed.protocol !== 'opcagent:') return null
 
   const host = parsed.hostname
   const pathParts = parsed.pathname.split('/').filter(Boolean)
@@ -159,12 +159,12 @@ export function registerSystemCoreHandlers(server: RpcServer, deps: HandlerDeps)
 
   // Release notes
   server.handle(RPC_CHANNELS.releaseNotes.GET, async () => {
-    const { getCombinedReleaseNotes } = require('@mkagent/shared/release-notes') as typeof import('@mkagent/shared/release-notes')
+    const { getCombinedReleaseNotes } = require('@opcagent/shared/release-notes') as typeof import('@opcagent/shared/release-notes')
     return getCombinedReleaseNotes()
   })
 
   server.handle(RPC_CHANNELS.releaseNotes.GET_LATEST_VERSION, async () => {
-    const { getLatestReleaseVersion } = require('@mkagent/shared/release-notes') as typeof import('@mkagent/shared/release-notes')
+    const { getLatestReleaseVersion } = require('@opcagent/shared/release-notes') as typeof import('@opcagent/shared/release-notes')
     return getLatestReleaseVersion()
   })
 
@@ -201,7 +201,7 @@ export function registerSystemCoreHandlers(server: RpcServer, deps: HandlerDeps)
     const persistedPath = getGitBashPath()
     if (persistedPath) {
       if (await isUsableGitBashPath(persistedPath)) {
-        process.env.MKAGENT_GIT_BASH_PATH = persistedPath.trim()
+        process.env.OPCAGENT_GIT_BASH_PATH = persistedPath.trim()
         return { found: true, path: persistedPath, platform }
       }
       clearGitBashPath()
@@ -209,7 +209,7 @@ export function registerSystemCoreHandlers(server: RpcServer, deps: HandlerDeps)
 
     for (const bashPath of commonPaths) {
       if (await isUsableGitBashPath(bashPath)) {
-        process.env.MKAGENT_GIT_BASH_PATH = bashPath
+        process.env.OPCAGENT_GIT_BASH_PATH = bashPath
         setGitBashPath(bashPath)
         return { found: true, path: bashPath, platform }
       }
@@ -223,7 +223,7 @@ export function registerSystemCoreHandlers(server: RpcServer, deps: HandlerDeps)
       })
       for (const bashPath of deriveGitBashPathsFromGitPaths(gitPaths)) {
         if (await isUsableGitBashPath(bashPath)) {
-          process.env.MKAGENT_GIT_BASH_PATH = bashPath
+          process.env.OPCAGENT_GIT_BASH_PATH = bashPath
           setGitBashPath(bashPath)
           return { found: true, path: bashPath, platform }
         }
@@ -240,7 +240,7 @@ export function registerSystemCoreHandlers(server: RpcServer, deps: HandlerDeps)
       }).trim()
       const firstPath = result.split('\n')[0]?.trim()
       if (firstPath && firstPath.toLowerCase().includes('git') && await isUsableGitBashPath(firstPath)) {
-        process.env.MKAGENT_GIT_BASH_PATH = firstPath
+        process.env.OPCAGENT_GIT_BASH_PATH = firstPath
         setGitBashPath(firstPath)
         return { found: true, path: firstPath, platform }
       }
@@ -248,7 +248,7 @@ export function registerSystemCoreHandlers(server: RpcServer, deps: HandlerDeps)
       // where command failed
     }
 
-    delete process.env.MKAGENT_GIT_BASH_PATH
+    delete process.env.OPCAGENT_GIT_BASH_PATH
     return { found: false, path: null, platform }
   })
 
@@ -274,7 +274,7 @@ export function registerSystemCoreHandlers(server: RpcServer, deps: HandlerDeps)
     }
 
     setGitBashPath(validation.path)
-    process.env.MKAGENT_GIT_BASH_PATH = validation.path
+    process.env.OPCAGENT_GIT_BASH_PATH = validation.path
     return { success: true }
   })
 
@@ -322,7 +322,7 @@ export function registerSystemCoreHandlers(server: RpcServer, deps: HandlerDeps)
     deps.platform.logger.info('[renderer]', ...args)
   })
 
-  // Shell operations - open URL in external browser (or handle mkagent:// internally)
+  // Shell operations - open URL in external browser (or handle opcagent:// internally)
   server.handle(RPC_CHANNELS.shell.OPEN_URL, async (ctx, url: string) => {
     deps.platform.logger.info('[OPEN_URL] Received request:', url)
     try {
@@ -334,21 +334,21 @@ export function registerSystemCoreHandlers(server: RpcServer, deps: HandlerDeps)
       const parsed = new URL(url)
 
       if (classification.kind === 'internal-deeplink') {
-        const deepLink = parseInternalMkAgentDeepLink(parsed)
+        const deepLink = parseInternalOPCAgentDeepLink(parsed)
 
         if (deepLink?.navigation?.view || deepLink?.navigation?.action) {
           const target = deepLink.workspaceId && deepLink.workspaceId !== ctx.workspaceId
             ? { to: 'workspace' as const, workspaceId: deepLink.workspaceId }
             : { to: 'client' as const, clientId: ctx.clientId }
 
-          deps.platform.logger.info('[OPEN_URL] Routing mkagent:// URL internally via deeplink:navigate')
+          deps.platform.logger.info('[OPEN_URL] Routing opcagent:// URL internally via deeplink:navigate')
           server.push(RPC_CHANNELS.deeplink.NAVIGATE, target, deepLink.navigation)
           return
         }
 
         // For links requiring window management (e.g. window=focused/full), or
         // unknown deep-link shapes, fall back to the client protocol handler.
-        deps.platform.logger.info('[OPEN_URL] Falling back to client openExternal for mkagent:// URL')
+        deps.platform.logger.info('[OPEN_URL] Falling back to client openExternal for opcagent:// URL')
         const deepLinkResult = await requestClientOpenExternal(server, ctx.clientId, url)
         if (!deepLinkResult.opened) {
           deps.platform.logger.error(`[OPEN_URL] Client capability failed: ${deepLinkResult.error}`)

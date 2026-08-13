@@ -1,6 +1,6 @@
 # Architecture
 
-MkAgent is a Bun monorepo with three clients sharing one authenticated WebSocket RPC protocol. Only the `pi` agent backend is registered. The direct Pi integration is `@earendil-works/pi-coding-agent`; `pi-agent-core` and `pi-ai` are lower-level dependencies, not the application-facing session API.
+OPC Agent is a Bun monorepo with three clients sharing one authenticated WebSocket RPC protocol. Only the `pi` agent backend is registered. The direct Pi integration is `@earendil-works/pi-coding-agent`; `pi-agent-core` and `pi-ai` are lower-level dependencies, not the application-facing session API.
 
 ## Layered topology
 
@@ -15,7 +15,7 @@ MkAgent is a Bun monorepo with three clients sharing one authenticated WebSocket
 +---------|----------------|--------------------|-------------+
           v                v                    v
    Browser adapter  ──>  preload Client API  ──> RPC client
-                          (window.MkAgent)         (rpc-client.ts)
+                          (window.OPCAgent)         (rpc-client.ts)
                                                        |
                                                 WebSocket (wss://)
                                                        v
@@ -26,7 +26,7 @@ MkAgent is a Bun monorepo with three clients sharing one authenticated WebSocket
 |   model-fetchers / sessions                               |
 +---------|---------------------------------------|
           v                                       |
-   packages/server (headless `MKAGENT_SERVER_TOKEN` server)
+   packages/server (headless `OPCAGENT_SERVER_TOKEN` server)
           v                                       |
 +-----------------------------------------------------------+
 | packages/shared                                           |
@@ -61,7 +61,7 @@ All three clients operate the same workspace and JSONL sessions; there is no cli
 ## Shared packages
 
 - `packages/server-core` owns transport, handlers, `SessionManager`, and platform-neutral services. Subpackages: `bootstrap/`, `domain/`, `handlers/`, `model-fetchers/`, `runtime/`, `services/`, `sessions/`, `transport/`, `utils/`, `webui/`.
-- `packages/shared` owns protocol DTOs (`@mkagent/shared/protocol`), config, credentials, Skills, prompts, the backend registry, workspace storage, and the Pi client.
+- `packages/shared` owns protocol DTOs (`@opcagent/shared/protocol`), config, credentials, Skills, prompts, the backend registry, workspace storage, and the Pi client.
 - `packages/pi-agent-server` runs `createAgentSession(...)` from `@earendil-works/pi-coding-agent` in a separate Bun subprocess (`packages/pi-agent-server/dist/index.js`) and communicates through JSONL. The same SDK boundary is used in development and packaged builds; `bun run server:build:subprocess` produces the bundle.
 - `packages/ui` and `packages/session-tools-core` provide shared rendering and session-level tools. They are platform-neutral: Electron, WebUI, and CLI reuse them.
 
@@ -71,10 +71,10 @@ Only the `pi` backend is registered. Custom endpoints (`openai-completions`, `an
 
 ## Auth handshake
 
-1. The server binds on `MKAGENT_RPC_HOST:MKAGENT_RPC_PORT` (default `127.0.0.1:9100`).
-2. The bearer token is read from `MKAGENT_SERVER_TOKEN` (Electron generates one automatically on launch; the headless server requires it to be passed in).
-3. The token is exchanged for a short-lived JWT used on every subsequent WebSocket frame (`@mkagent/server-core/webui`).
-4. WebUI and CLI additionally support `MKAGENT_WEBUI_PASSWORD` (falls back to `MKAGENT_SERVER_TOKEN`) and an optional `MKAGENT_TLS_CA` for TLS pinning.
+1. The server binds on `OPCAGENT_RPC_HOST:OPCAGENT_RPC_PORT` (default `127.0.0.1:9100`).
+2. The bearer token is read from `OPCAGENT_SERVER_TOKEN` (Electron generates one automatically on launch; the headless server requires it to be passed in).
+3. The token is exchanged for a short-lived JWT used on every subsequent WebSocket frame (`@opcagent/server-core/webui`).
+4. WebUI and CLI additionally support `OPCAGENT_WEBUI_PASSWORD` (falls back to `OPCAGENT_SERVER_TOKEN`) and an optional `OPCAGENT_TLS_CA` for TLS pinning.
 5. The handshake binds a workspace id; later RPC commands are scoped to that workspace and only see its sessions, Skills, permissions, and Views.
 
 ## Subprocess boundary
@@ -88,17 +88,17 @@ main process (Bun)
               Pi SDK <-> provider (HTTPS)
 ```
 
-Abort, model switching, thinking-level change, permission responses, and session resume are all routed through the same JSONL stream. Pi recovery files are stored under `~/.mkagent/workspaces/<slug>/sessions/<id>/`.
+Abort, model switching, thinking-level change, permission responses, and session resume are all routed through the same JSONL stream. Pi recovery files are stored under `~/.opcagent/workspaces/<slug>/sessions/<id>/`.
 
 ## Packaging surface
 
 - Desktop app: macOS arm64 / x64 (DMG + ZIP), Windows x64 (NSIS), Linux x64 (AppImage). Build entry: `bun run electron:dist[:dev][:mac|:win|:linux]`.
 - Headless server: per-platform compiled Bun archive; build with `bun run scripts/build-server.ts`.
-- CLI: `bun run cli:build` produces `dist/mkagent`.
+- CLI: `bun run cli:build` produces `dist/opcagent`.
 - Pi subprocess: `bun run server:build:subprocess` produces `packages/pi-agent-server/dist/index.js`.
 
-The main `MkThingsHQ/mkagent` repository publishes DMG/ZIP/NSIS/AppImage assets, headless-server archives, a Bun CLI archive, manifests, blockmaps, checksums, and release notes in GitHub Releases. `electron-updater` reads the public manifests and never embeds a GitHub token in the client.
+The main `iBigQiang/OpcAgent` repository publishes DMG/ZIP/NSIS/AppImage assets, headless-server archives, a Bun CLI archive, manifests, blockmaps, checksums, and release notes in GitHub Releases. `electron-updater` reads the public manifests and never embeds a GitHub token in the client.
 
 ## What is intentionally absent
 
-Craft Agents bundles broad OAuth and Sources integrations, a Slack/Teams/Lark messaging gateway, a WhatsApp worker backed by Baileys, a session MCP server, a bridge MCP server, and an `apps/viewer` Electron app for public sharing. MkAgent retains only the ChatGPT and Claude LLM OAuth flows from that surface; the other components remain absent. Although Craft's underlying `pi-ai` dependency contains an OpenRouter image-generation API, neither Craft nor MkAgent registers it as an agent tool. See [`comparison-with-craft.md`](./comparison-with-craft.md) for an evidence-backed side-by-side and the resulting installer-size delta.
+Craft Agents bundles broad OAuth and Sources integrations, a Slack/Teams/Lark messaging gateway, a WhatsApp worker backed by Baileys, a session MCP server, a bridge MCP server, and an `apps/viewer` Electron app for public sharing. OPC Agent retains only the ChatGPT and Claude LLM OAuth flows from that surface; the other components remain absent. Although Craft's underlying `pi-ai` dependency contains an OpenRouter image-generation API, neither Craft nor OPC Agent registers it as an agent tool. See [`comparison-with-craft.md`](./comparison-with-craft.md) for an evidence-backed side-by-side and the resulting installer-size delta.

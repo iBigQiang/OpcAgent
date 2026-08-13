@@ -8,11 +8,11 @@ function createConfig(): BackendConfig {
     workspace: {
       id: 'ws-test',
       name: 'Test Workspace',
-      rootPath: '/tmp/mkagent-test',
+      rootPath: '/tmp/opcagent-test',
     } as any,
     session: {
       id: 'session-test',
-      workspaceRootPath: '/tmp/mkagent-test',
+      workspaceRootPath: '/tmp/opcagent-test',
       createdAt: Date.now(),
       lastUsedAt: Date.now(),
     } as any,

@@ -1,9 +1,9 @@
-import { RPC_CHANNELS } from '@mkagent/shared/protocol'
-import { getWorkspaceByNameOrId } from '@mkagent/shared/config'
-import { loadWorkspaceSources } from '@mkagent/shared/sources'
-import { safeJsonParse } from '@mkagent/shared/utils/files'
-import { getCredentialManager } from '@mkagent/shared/credentials'
-import type { RpcServer } from '@mkagent/server-core/transport'
+import { RPC_CHANNELS } from '@opcagent/shared/protocol'
+import { getWorkspaceByNameOrId } from '@opcagent/shared/config'
+import { loadWorkspaceSources } from '@opcagent/shared/sources'
+import { safeJsonParse } from '@opcagent/shared/utils/files'
+import { getCredentialManager } from '@opcagent/shared/credentials'
+import type { RpcServer } from '@opcagent/server-core/transport'
 import type { HandlerDeps } from '../handler-deps'
 
 export const HANDLED_CHANNELS = [
@@ -30,10 +30,10 @@ export function registerSourcesHandlers(server: RpcServer, deps: HandlerDeps): v
   })
 
   // Create a new source
-  server.handle(RPC_CHANNELS.sources.CREATE, async (_ctx, workspaceId: string, config: Partial<import('@mkagent/shared/sources').CreateSourceInput>) => {
+  server.handle(RPC_CHANNELS.sources.CREATE, async (_ctx, workspaceId: string, config: Partial<import('@opcagent/shared/sources').CreateSourceInput>) => {
     const workspace = getWorkspaceByNameOrId(workspaceId)
     if (!workspace) throw new Error(`Workspace not found: ${workspaceId}`)
-    const { createSource } = await import('@mkagent/shared/sources')
+    const { createSource } = await import('@opcagent/shared/sources')
     return createSource(workspace.rootPath, {
       name: config.name || 'New Source',
       provider: config.provider || 'custom',
@@ -49,11 +49,11 @@ export function registerSourcesHandlers(server: RpcServer, deps: HandlerDeps): v
   server.handle(RPC_CHANNELS.sources.DELETE, async (_ctx, workspaceId: string, sourceSlug: string) => {
     const workspace = getWorkspaceByNameOrId(workspaceId)
     if (!workspace) throw new Error(`Workspace not found: ${workspaceId}`)
-    const { deleteSource } = await import('@mkagent/shared/sources')
+    const { deleteSource } = await import('@opcagent/shared/sources')
     deleteSource(workspace.rootPath, sourceSlug)
 
     // Clean up stale slug from workspace default sources
-    const { loadWorkspaceConfig, saveWorkspaceConfig } = await import('@mkagent/shared/workspaces')
+    const { loadWorkspaceConfig, saveWorkspaceConfig } = await import('@opcagent/shared/workspaces')
     const config = loadWorkspaceConfig(workspace.rootPath)
     if (config?.defaults?.enabledSourceSlugs?.includes(sourceSlug)) {
       config.defaults.enabledSourceSlugs = config.defaults.enabledSourceSlugs.filter(s => s !== sourceSlug)
@@ -74,7 +74,7 @@ export function registerSourcesHandlers(server: RpcServer, deps: HandlerDeps): v
   server.handle(RPC_CHANNELS.sources.SAVE_CREDENTIALS, async (_ctx, workspaceId: string, sourceSlug: string, credential: string) => {
     const workspace = getWorkspaceByNameOrId(workspaceId)
     if (!workspace) throw new Error(`Workspace not found: ${workspaceId}`)
-    const { loadSource, getSourceCredentialManager } = await import('@mkagent/shared/sources')
+    const { loadSource, getSourceCredentialManager } = await import('@opcagent/shared/sources')
 
     const source = loadSource(workspace.rootPath, sourceSlug)
     if (!source) {
@@ -94,7 +94,7 @@ export function registerSourcesHandlers(server: RpcServer, deps: HandlerDeps): v
     if (!workspace) return null
 
     const { existsSync, readFileSync } = await import('fs')
-    const { getSourcePermissionsPath } = await import('@mkagent/shared/agent')
+    const { getSourcePermissionsPath } = await import('@opcagent/shared/agent')
     const path = getSourcePermissionsPath(workspace.rootPath, sourceSlug)
 
     if (!existsSync(path)) return null
@@ -130,7 +130,7 @@ export function registerSourcesHandlers(server: RpcServer, deps: HandlerDeps): v
         return { success: false, error: 'Source has not been tested yet' }
       }
 
-      const { CraftMcpClient } = await import('@mkagent/shared/mcp')
+      const { CraftMcpClient } = await import('@opcagent/shared/mcp')
       let client: InstanceType<typeof CraftMcpClient>
 
       if (source.config.mcp.transport === 'stdio') {
@@ -170,7 +170,7 @@ export function registerSourcesHandlers(server: RpcServer, deps: HandlerDeps): v
       const tools = await client.listTools()
       await client.close()
 
-      const { loadSourcePermissionsConfig, permissionsConfigCache } = await import('@mkagent/shared/agent')
+      const { loadSourcePermissionsConfig, permissionsConfigCache } = await import('@opcagent/shared/agent')
       const permissionsConfig = loadSourcePermissionsConfig(workspace.rootPath, sourceSlug)
 
       const mergedConfig = permissionsConfigCache.getMergedConfig({

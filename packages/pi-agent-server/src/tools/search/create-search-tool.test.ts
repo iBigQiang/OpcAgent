@@ -29,7 +29,7 @@ describe('createSearchTool', () => {
     };
 
     const tool = createSearchTool(provider);
-    const result = await tool.execute('tool-1', { query: 'mkagent', count: 99 });
+    const result = await tool.execute('tool-1', { query: 'opcagent', count: 99 });
 
     expect(capturedCount).toBe(10);
     expect(result.details?.isError).toBeUndefined();
@@ -53,7 +53,7 @@ describe('createSearchTool', () => {
     };
 
     const tool = createSearchTool(provider, fallbackProvider);
-    const result = await tool.execute('tool-2', { query: 'mkagent', count: 5 });
+    const result = await tool.execute('tool-2', { query: 'opcagent', count: 5 });
 
     expect(result.details?.isError).toBeUndefined();
     expect((result.content[0] as any).text).toContain('automatically fell back to DuckDuckGo');
@@ -77,7 +77,7 @@ describe('createSearchTool', () => {
     };
 
     const tool = createSearchTool(provider, fallbackProvider);
-    const result = await tool.execute('tool-3', { query: 'mkagent', count: -1 });
+    const result = await tool.execute('tool-3', { query: 'opcagent', count: -1 });
 
     expect(result.details?.isError).toBe(true);
     expect((result.content[0] as any).text).toContain('primary (OpenAI) failed');
@@ -93,7 +93,7 @@ describe('createSearchTool', () => {
     };
 
     const tool = createSearchTool(ddgProvider, ddgProvider);
-    const result = await tool.execute('tool-4', { query: 'mkagent' });
+    const result = await tool.execute('tool-4', { query: 'opcagent' });
 
     expect(result.details?.isError).toBe(true);
     expect((result.content[0] as any).text).toContain('Search failed');

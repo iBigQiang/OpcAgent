@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils"
 import { Button, type ButtonProps } from "@/components/ui/button"
-import { Spinner } from "@mkagent/ui"
+import { Spinner } from "@opcagent/ui"
 import { useTranslation } from "react-i18next"
 
 /* =============================================================================

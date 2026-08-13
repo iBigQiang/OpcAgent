@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import type { AnnotationV1 } from '@mkagent/core'
+import type { AnnotationV1 } from '@opcagent/core'
 import { resolveTextAnnotations } from '../annotation-resolver'
 
 function makeAnnotation(selectors: AnnotationV1['target']['selectors']): AnnotationV1 {

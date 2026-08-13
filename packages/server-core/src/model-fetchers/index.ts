@@ -10,15 +10,15 @@
  * 3. MODEL_REGISTRY — hardcoded offline seed data, last resort
  */
 
-import type { ModelFetcherMap, ModelFetcherCredentials, FetchableProvider } from '@mkagent/shared/config'
-import type { ModelDefinition } from '@mkagent/shared/config'
+import type { ModelFetcherMap, ModelFetcherCredentials, FetchableProvider } from '@opcagent/shared/config'
+import type { ModelDefinition } from '@opcagent/shared/config'
 import {
   getLlmConnections,
   getLlmConnection,
   updateLlmConnection,
   isCompatProvider,
   getModelsForProviderType,
-} from '@mkagent/shared/config'
+} from '@opcagent/shared/config'
 import { MODEL_FETCHERS } from './registry'
 import { handlerLog } from './runtime'
 

@@ -1,5 +1,5 @@
 /**
- * Context exports for @mkagent/ui
+ * Context exports for @opcagent/ui
  */
 
 export {

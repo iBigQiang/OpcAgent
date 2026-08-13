@@ -33,7 +33,7 @@ python3 -m unittest apps.electron.resources.scripts.tests.test_xlsx_tool_smoke
 ## Notes
 
 - Tests execute the **wrapper binaries** in `resources/bin/*` (not scripts directly).
-- The shared harness configures `MKAGENT_UV`, `MKAGENT_SCRIPTS`, and `PATH`.
+- The shared harness configures `OPCAGENT_UV`, `OPCAGENT_SCRIPTS`, and `PATH`.
 - If bundled `uv` is missing for your platform, harness falls back to `uv` on PATH.
 - Tests create temporary fixtures at runtime and clean them up automatically.
 

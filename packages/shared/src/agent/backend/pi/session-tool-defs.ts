@@ -1,7 +1,7 @@
 /**
  * Pi Session Tool Proxy Definitions
  *
- * Thin wrapper around the canonical tool definitions in @mkagent/session-tools-core.
+ * Thin wrapper around the canonical tool definitions in @opcagent/session-tools-core.
  * Adds the `mcp__session__` prefix that the Pi SDK expects.
  */
 
@@ -9,7 +9,7 @@ import {
   getToolDefsAsJsonSchema,
   SESSION_TOOL_NAMES,
   type JsonSchemaToolDef,
-} from '@mkagent/session-tools-core';
+} from '@opcagent/session-tools-core';
 import { FEATURE_FLAGS } from '../../../feature-flags.ts';
 
 export type SessionToolProxyDef = JsonSchemaToolDef;

@@ -2,8 +2,8 @@ import { afterEach, beforeEach, describe, expect, it } from 'bun:test'
 import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import type { AgentEvent } from '@mkagent/core/types'
-import { resolveBackendContext } from '@mkagent/shared/agent/backend'
+import type { AgentEvent } from '@opcagent/core/types'
+import { resolveBackendContext } from '@opcagent/shared/agent/backend'
 import { SessionManager, createManagedSession } from './SessionManager.ts'
 import { buildBackendRuntimeSignature, buildRestartRequiredSignature } from './runtime-config.ts'
 
@@ -12,7 +12,7 @@ describe('retained session event behavior', () => {
   let manager: SessionManager
 
   beforeEach(() => {
-    root = mkdtempSync(join(tmpdir(), 'mkagent-retained-events-'))
+    root = mkdtempSync(join(tmpdir(), 'opcagent-retained-events-'))
     manager = new SessionManager()
   })
 
@@ -164,7 +164,7 @@ describe('retained session event behavior', () => {
   it('terminates a registered background shell and emits its removal event', async () => {
     const sessionId = 'kill-shell'
     const shellId = 'shell-1'
-    const marker = `mkagent-kill-shell-${crypto.randomUUID()}`
+    const marker = `opcagent-kill-shell-${crypto.randomUUID()}`
     const child = Bun.spawn([
       process.execPath,
       '--eval',

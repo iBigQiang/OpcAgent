@@ -7,11 +7,11 @@ import { createHash, randomUUID } from 'node:crypto'
 import { existsSync } from 'node:fs'
 import { homedir, hostname } from 'node:os'
 import { delimiter, join } from 'node:path'
-import { bootstrapServer } from '@mkagent/server-core/bootstrap'
-import { cleanupSessionFileWatchForClient } from '@mkagent/server-core/handlers/rpc'
-import { initModelRefreshService, setFetcherPlatform } from '@mkagent/server-core/model-fetchers'
-import { setImageProcessor, setSearchPlatform } from '@mkagent/server-core/services'
-import { SessionManager, setSessionPlatform, setSessionRuntimeHooks } from '@mkagent/server-core/sessions'
+import { bootstrapServer } from '@opcagent/server-core/bootstrap'
+import { cleanupSessionFileWatchForClient } from '@opcagent/server-core/handlers/rpc'
+import { initModelRefreshService, setFetcherPlatform } from '@opcagent/server-core/model-fetchers'
+import { setImageProcessor, setSearchPlatform } from '@opcagent/server-core/services'
+import { SessionManager, setSessionPlatform, setSessionRuntimeHooks } from '@opcagent/server-core/sessions'
 import {
   addWorkspace,
   ensurePresetThemes,
@@ -20,17 +20,17 @@ import {
   getWorkspaces,
   registerPiModelResolver,
   setPersistedUiLanguage,
-} from '@mkagent/shared/config'
-import { getCredentialManager } from '@mkagent/shared/credentials'
-import { initializeDocs } from '@mkagent/shared/docs'
-import { setupI18n, i18n, SUPPORTED_LANGUAGE_CODES, type LanguageCode } from '@mkagent/shared/i18n'
-import { ensureDefaultPermissions } from '@mkagent/shared/agent/permissions-config'
-import { initializeBackendHostRuntime } from '@mkagent/shared/agent/backend'
-import { initializeReleaseNotes } from '@mkagent/shared/release-notes'
-import { getAllPiModels, getPiModelsForAuthProvider } from '@mkagent/shared/config'
-import { getDefaultWorkspacesDir, ensureDefaultWorkspace } from '@mkagent/shared/workspaces'
-import { createMessagingBootstrap } from '@mkagent/messaging-gateway'
-import { setBundledAssetsRoot } from '@mkagent/shared/utils'
+} from '@opcagent/shared/config'
+import { getCredentialManager } from '@opcagent/shared/credentials'
+import { initializeDocs } from '@opcagent/shared/docs'
+import { setupI18n, i18n, SUPPORTED_LANGUAGE_CODES, type LanguageCode } from '@opcagent/shared/i18n'
+import { ensureDefaultPermissions } from '@opcagent/shared/agent/permissions-config'
+import { initializeBackendHostRuntime } from '@opcagent/shared/agent/backend'
+import { initializeReleaseNotes } from '@opcagent/shared/release-notes'
+import { getAllPiModels, getPiModelsForAuthProvider } from '@opcagent/shared/config'
+import { getDefaultWorkspacesDir, ensureDefaultWorkspace } from '@opcagent/shared/workspaces'
+import { createMessagingBootstrap } from '@opcagent/messaging-gateway'
+import { setBundledAssetsRoot } from '@opcagent/shared/utils'
 import { BrowserPaneManager } from './browser-pane-manager'
 import { registerAllRpcHandlers } from './handlers'
 import type { HandlerDeps } from './handlers/handler-deps'
@@ -45,9 +45,9 @@ import { registerThumbnailHandler, registerThumbnailScheme } from './thumbnail-p
 setupI18n()
 const persistedUiLanguage = getPersistedUiLanguage()
 if (persistedUiLanguage) void i18n.changeLanguage(persistedUiLanguage)
-app.setName(process.env.MKAGENT_APP_NAME || 'MkAgent')
-if (process.env.MKAGENT_USER_DATA_DIR) {
-  app.setPath('userData', process.env.MKAGENT_USER_DATA_DIR)
+app.setName(process.env.OPCAGENT_APP_NAME || 'OPC Agent')
+if (process.env.OPCAGENT_USER_DATA_DIR) {
+  app.setPath('userData', process.env.OPCAGENT_USER_DATA_DIR)
 }
 
 Sentry.init({
@@ -82,15 +82,15 @@ let isQuitting = false
 let messagingBootstrap: ReturnType<typeof createMessagingBootstrap> | null = null
 
 function findDeepLink(args: string[]): string | undefined {
-  return args.find(argument => argument.startsWith('mkagent://'))
+  return args.find(argument => argument.startsWith('opcagent://'))
 }
 
 function registerProtocolHandler() {
   if (process.defaultApp && process.argv[1]) {
-    app.setAsDefaultProtocolClient('mkagent', process.execPath, [process.argv[1]])
+    app.setAsDefaultProtocolClient('opcagent', process.execPath, [process.argv[1]])
     return
   }
-  app.setAsDefaultProtocolClient('mkagent')
+  app.setAsDefaultProtocolClient('opcagent')
 }
 
 async function routeDeepLink(url: string) {
@@ -113,15 +113,15 @@ function configureBundledTools() {
   const scriptsDir = join(resources, 'scripts')
   const uv = join(uvDir, process.platform === 'win32' ? 'uv.exe' : 'uv')
   const bun = join(root, 'vendor', 'bun', process.platform === 'win32' ? 'bun.exe' : 'bun')
-  process.env.MKAGENT_IS_PACKAGED = app.isPackaged ? '1' : '0'
-  process.env.MKAGENT_RESOURCES_BASE = root
-  process.env.MKAGENT_APP_ROOT = app.isPackaged ? app.getAppPath() : process.cwd()
-  process.env.MKAGENT_UV = existsSync(uv) ? uv : 'uv'
-  if (existsSync(bun)) process.env.MKAGENT_BUN = bun
-  process.env.MKAGENT_SCRIPTS = scriptsDir
+  process.env.OPCAGENT_IS_PACKAGED = app.isPackaged ? '1' : '0'
+  process.env.OPCAGENT_RESOURCES_BASE = root
+  process.env.OPCAGENT_APP_ROOT = app.isPackaged ? app.getAppPath() : process.cwd()
+  process.env.OPCAGENT_UV = existsSync(uv) ? uv : 'uv'
+  if (existsSync(bun)) process.env.OPCAGENT_BUN = bun
+  process.env.OPCAGENT_SCRIPTS = scriptsDir
   process.env.PATH = `${binDir}${delimiter}${uvDir}${delimiter}${process.env.PATH ?? ''}`
   setBundledAssetsRoot(app.isPackaged ? join(root, 'dist') : join(root, 'apps', 'electron'))
-  initializeBackendHostRuntime({ hostRuntime: { appRootPath: process.env.MKAGENT_APP_ROOT, resourcesPath: root, isPackaged: app.isPackaged } })
+  initializeBackendHostRuntime({ hostRuntime: { appRootPath: process.env.OPCAGENT_APP_ROOT, resourcesPath: root, isPackaged: app.isPackaged } })
 }
 
 function ensureLocalWorkspace() {

@@ -33,7 +33,7 @@ describe('config_validate', () => {
   let workspacePath: string;
 
   beforeEach(() => {
-    workspacePath = mkdtempSync(join(tmpdir(), 'mkagent-config-validate-'));
+    workspacePath = mkdtempSync(join(tmpdir(), 'opcagent-config-validate-'));
   });
 
   afterEach(() => {

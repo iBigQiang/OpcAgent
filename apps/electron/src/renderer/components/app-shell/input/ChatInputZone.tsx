@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { cn } from '@/lib/utils'
 import { CHAT_LAYOUT } from '@/config/layout'
-import type { PermissionMode } from '@mkagent/shared/agent/modes'
+import type { PermissionMode } from '@opcagent/shared/agent/modes'
 import type { BackgroundTask } from '../ActiveTasksBar'
 import { ActiveOptionBadges } from '../ActiveOptionBadges'
 import { InputContainer } from './InputContainer'

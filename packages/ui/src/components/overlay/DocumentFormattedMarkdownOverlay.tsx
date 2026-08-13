@@ -14,7 +14,7 @@
 import { ListTodo } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Markdown } from '../markdown'
-import type { AnnotationV1 } from '@mkagent/core'
+import type { AnnotationV1 } from '@opcagent/core'
 import type { ExternalOpenAnnotationRequest } from '../annotations/use-annotation-interaction-controller'
 import { FullscreenOverlayBase } from './FullscreenOverlayBase'
 import type { OverlayTypeBadge } from './FullscreenOverlayBaseHeader'

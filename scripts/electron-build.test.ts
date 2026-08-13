@@ -30,9 +30,9 @@ describe('Electron CJS build configuration', () => {
       readFileSync(resolve(import.meta.dir, '../packages/shared/package.json'), 'utf-8'),
     ) as { exports: Record<string, string> }
 
-    expect(preload).not.toContain("from '@mkagent/shared/auth'")
-    expect(preload).toContain("from '@mkagent/shared/auth/callback-server'")
-    expect(preload).toContain("from '@mkagent/shared/auth/chatgpt-oauth-config'")
+    expect(preload).not.toContain("from '@opcagent/shared/auth'")
+    expect(preload).toContain("from '@opcagent/shared/auth/callback-server'")
+    expect(preload).toContain("from '@opcagent/shared/auth/chatgpt-oauth-config'")
     expect(sharedPackage.exports['./auth/callback-server']).toBe('./src/auth/callback-server.ts')
     expect(sharedPackage.exports['./auth/chatgpt-oauth-config']).toBe(
       './src/auth/chatgpt-oauth-config.ts',

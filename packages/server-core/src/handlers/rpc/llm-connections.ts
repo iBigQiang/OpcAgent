@@ -1,4 +1,4 @@
-import { RPC_CHANNELS, type LlmConnectionSetup } from '@mkagent/shared/protocol'
+import { RPC_CHANNELS, type LlmConnectionSetup } from '@opcagent/shared/protocol'
 import {
   addLlmConnection,
   deleteLlmConnection,
@@ -18,18 +18,18 @@ import {
   updateLlmConnection,
   type LlmConnection,
   type LlmConnectionWithStatus,
-} from '@mkagent/shared/config'
-import { getCredentialManager } from '@mkagent/shared/credentials'
+} from '@opcagent/shared/config'
+import { getCredentialManager } from '@opcagent/shared/credentials'
 import {
   resolveSetupTestConnectionHint,
   testBackendConnection,
   validateStoredBackendConnection,
-} from '@mkagent/shared/agent/backend'
-import { getModelRefreshService } from '@mkagent/server-core/model-fetchers'
+} from '@opcagent/shared/agent/backend'
+import { getModelRefreshService } from '@opcagent/server-core/model-fetchers'
 import {
   buildBackendHostRuntimeContext,
   getWorkspaceOrThrow,
-} from '@mkagent/server-core/handlers'
+} from '@opcagent/server-core/handlers'
 import {
   parseTestConnectionError,
   createBuiltInConnection,
@@ -40,8 +40,8 @@ import {
   setupTestRequiresApiKey,
   validateModelList,
   validateSetupTestInput,
-} from '@mkagent/server-core/domain'
-import type { RpcServer } from '@mkagent/server-core/transport'
+} from '@opcagent/server-core/domain'
+import type { RpcServer } from '@opcagent/server-core/transport'
 import type { HandlerDeps } from '../handler-deps'
 import { randomUUID } from 'node:crypto'
 
@@ -250,7 +250,7 @@ export function registerLlmConnectionsHandlers(server: RpcServer, deps: HandlerD
 
   server.handle(RPC_CHANNELS.chatgpt.START_OAUTH, async (ctx, connectionSlug: string) => {
     cleanupExpiredChatGptFlows()
-    const { prepareChatGptOAuth } = await import('@mkagent/shared/auth')
+    const { prepareChatGptOAuth } = await import('@opcagent/shared/auth')
     const prepared = prepareChatGptOAuth()
     const flowId = randomUUID()
     pendingChatGptFlows.set(prepared.state, {
@@ -278,7 +278,7 @@ export function registerLlmConnectionsHandlers(server: RpcServer, deps: HandlerD
       throw new Error('ChatGPT OAuth flow expired')
     }
     try {
-      const { exchangeChatGptTokens } = await import('@mkagent/shared/auth')
+      const { exchangeChatGptTokens } = await import('@opcagent/shared/auth')
       const tokens = await exchangeChatGptTokens(args.code, flow.codeVerifier)
       await getCredentialManager().setLlmOAuth(flow.connectionSlug, {
         accessToken: tokens.accessToken,
@@ -377,7 +377,7 @@ export function registerLlmConnectionsHandlers(server: RpcServer, deps: HandlerD
     try {
       if (slug && !getLlmConnection(slug)) return { success: false, error: 'Connection not found' }
       const workspace = getWorkspaceOrThrow(workspaceId)
-      const { loadWorkspaceConfig, saveWorkspaceConfig } = await import('@mkagent/shared/workspaces')
+      const { loadWorkspaceConfig, saveWorkspaceConfig } = await import('@opcagent/shared/workspaces')
       const config = loadWorkspaceConfig(workspace.rootPath)
       if (!config) return { success: false, error: 'Failed to load workspace config' }
       config.defaults ??= {}

@@ -1,7 +1,7 @@
-import { getCredentialManager } from '@mkagent/shared/credentials'
+import { getCredentialManager } from '@opcagent/shared/credentials'
 import { readFileSync, realpathSync, statSync } from 'node:fs'
 import { relative, sep } from 'node:path'
-import type { SessionEvent } from '@mkagent/shared/protocol'
+import type { SessionEvent } from '@opcagent/shared/protocol'
 import type { MessagingSessionManager } from './session-manager'
 import { BindingStore } from './binding-store'
 import { ConfigStore } from './config-store'
@@ -40,7 +40,7 @@ export interface MessagingGatewayRegistryOptions {
   /** Credentials remain accessed only inside this package and are never returned by Messaging APIs. */
   credentialManager?: MessagingCredentialManager
   whatsapp?: { workerEntry: string; nodeBin?: string; pairingMode?: 'qr' | 'code'; electronRunAsNode?: boolean }
-  sendToSession?: (workspaceId: string, sessionId: string, text: string, attachments?: import('@mkagent/shared/protocol').FileAttachment[]) => Promise<void>
+  sendToSession?: (workspaceId: string, sessionId: string, text: string, attachments?: import('@opcagent/shared/protocol').FileAttachment[]) => Promise<void>
   logger?: MessagingLogger
   adapters?: Partial<Record<PlatformType, PlatformAdapter>>
   createAdapter?: (platform: PlatformType, workspaceId: string) => PlatformAdapter | undefined

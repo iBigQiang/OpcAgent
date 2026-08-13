@@ -4,7 +4,7 @@ import {
   normalizeBrowserToolName,
   getBrowserToolCommandVerb,
   shouldActivateBrowserOverlay,
-} from '@mkagent/server-core/domain'
+} from '@opcagent/server-core/domain'
 
 describe('browser-tool-detection', () => {
   describe('normalizeBrowserToolName', () => {

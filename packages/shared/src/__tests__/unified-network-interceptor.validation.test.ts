@@ -7,7 +7,7 @@ let sanitizeOpenAiHistoryInPlace: typeof import('../unified-network-interceptor.
 
 describe('unified-network-interceptor validators (#613)', () => {
   beforeAll(async () => {
-    process.env.MKAGENT_INTERCEPTOR_DISABLE_AUTO_INSTALL = '1';
+    process.env.OPCAGENT_INTERCEPTOR_DISABLE_AUTO_INSTALL = '1';
     const mod = await import('../unified-network-interceptor.ts');
     validateOpenAiChatBody = mod.validateOpenAiChatBody;
     validateOpenAiResponsesBody = mod.validateOpenAiResponsesBody;

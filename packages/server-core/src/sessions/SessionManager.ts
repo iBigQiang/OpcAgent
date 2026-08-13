@@ -1,5 +1,5 @@
-import type { EventSink, RpcServer } from '@mkagent/server-core/transport'
-import { RPC_CHANNELS, generateMessageId } from '@mkagent/shared/protocol'
+import type { EventSink, RpcServer } from '@opcagent/server-core/transport'
+import { RPC_CHANNELS, generateMessageId } from '@opcagent/shared/protocol'
 import type {
   AuthRequest,
   AuthResult,
@@ -12,14 +12,14 @@ import type {
   Session,
   SessionEvent,
   UnreadSummary,
-} from '@mkagent/shared/protocol'
-import type { ISessionManager, IBrowserPaneManager } from '@mkagent/server-core/handlers'
+} from '@opcagent/shared/protocol'
+import type { ISessionManager, IBrowserPaneManager } from '@opcagent/server-core/handlers'
 import {
   CONSOLE_LOGGER,
   createScopedLogger,
   type Logger,
   type PlatformServices,
-} from '@mkagent/server-core/runtime'
+} from '@opcagent/server-core/runtime'
 import type {
   ActiveSessionInfo,
   AgentEvent,
@@ -28,19 +28,19 @@ import type {
   StoredAttachment,
   Workspace,
   WorkspaceInfo,
-} from '@mkagent/core/types'
-import { messageToStored, storedToMessage } from '@mkagent/core/types'
+} from '@opcagent/core/types'
+import { messageToStored, storedToMessage } from '@opcagent/core/types'
 import {
   AbortReason,
   createBackendFromResolvedContext,
   resolveBackendContext,
   type AgentBackend,
-} from '@mkagent/shared/agent/backend'
+} from '@opcagent/shared/agent/backend'
 import {
   mergeSessionScopedToolCallbacks,
   unregisterSessionScopedToolCallbacks,
   type BrowserPaneFns,
-} from '@mkagent/shared/agent'
+} from '@opcagent/shared/agent'
 import {
   ConfigWatcher,
   getMiniModel,
@@ -48,15 +48,15 @@ import {
   getWorkspaces,
   resolveTitleLanguageName,
   type ConfigWatcherCallbacks,
-} from '@mkagent/shared/config'
-import { loadSkillBySlug, type LoadedSkill } from '@mkagent/shared/skills'
-import { loadWorkspaceConfig } from '@mkagent/shared/workspaces'
-import { loadProjectPromptContext } from '@mkagent/shared/projects'
-import { AutomationSystem, type PendingPrompt } from '@mkagent/shared/automations'
-import { evaluateAutoLabels } from '@mkagent/shared/labels/auto/evaluator'
-import { formatLabelEntry } from '@mkagent/shared/labels'
-import { listLabels } from '@mkagent/shared/labels/storage'
-import { McpClientPool } from '@mkagent/shared/mcp'
+} from '@opcagent/shared/config'
+import { loadSkillBySlug, type LoadedSkill } from '@opcagent/shared/skills'
+import { loadWorkspaceConfig } from '@opcagent/shared/workspaces'
+import { loadProjectPromptContext } from '@opcagent/shared/projects'
+import { AutomationSystem, type PendingPrompt } from '@opcagent/shared/automations'
+import { evaluateAutoLabels } from '@opcagent/shared/labels/auto/evaluator'
+import { formatLabelEntry } from '@opcagent/shared/labels'
+import { listLabels } from '@opcagent/shared/labels/storage'
+import { McpClientPool } from '@opcagent/shared/mcp'
 import {
   SERVER_BUILD_ERRORS,
   TokenRefreshManager,
@@ -72,8 +72,8 @@ import {
   markSourceAuthenticated,
   type LoadedSource,
   type SourceWithCredential,
-} from '@mkagent/shared/sources'
-import { getCredentialManager } from '@mkagent/shared/credentials'
+} from '@opcagent/shared/sources'
+import { getCredentialManager } from '@opcagent/shared/credentials'
 import {
   clearPendingPlanExecution as clearStoredPendingPlanExecution,
   createSession as createStoredSession,
@@ -98,14 +98,14 @@ import {
   type SessionMetadata,
   type SessionTokenUsage,
   type StoredSession,
-} from '@mkagent/shared/sessions'
-import { restoreFiles } from '@mkagent/shared/utils/bundle-files'
-import { readFileAttachment } from '@mkagent/shared/utils'
-import { getWorkspaceAllowedDirs, validateFilePath } from '@mkagent/server-core/handlers'
-import { normalizeThinkingLevel, type ThinkingLevel } from '@mkagent/shared/agent/thinking-levels'
-import type { PermissionMode } from '@mkagent/shared/agent/mode-types'
+} from '@opcagent/shared/sessions'
+import { restoreFiles } from '@opcagent/shared/utils/bundle-files'
+import { readFileAttachment } from '@opcagent/shared/utils'
+import { getWorkspaceAllowedDirs, validateFilePath } from '@opcagent/server-core/handlers'
+import { normalizeThinkingLevel, type ThinkingLevel } from '@opcagent/shared/agent/thinking-levels'
+import type { PermissionMode } from '@opcagent/shared/agent/mode-types'
 import { buildBackendRuntimeSignature, buildRestartRequiredSignature } from './runtime-config'
-import { rollbackFailedBranchCreation, sanitizeForTitle } from '@mkagent/server-core/domain'
+import { rollbackFailedBranchCreation, sanitizeForTitle } from '@opcagent/server-core/domain'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { basename, join } from 'node:path'
 
@@ -2345,7 +2345,7 @@ export class SessionManager implements ISessionManager {
         this.broadcastSkillsChanged(workspaceId, skills)
       },
       onSkillChange: async () => {
-        const { loadAllSkills } = await import('@mkagent/shared/skills')
+        const { loadAllSkills } = await import('@opcagent/shared/skills')
         this.broadcastSkillsChanged(workspaceId, loadAllSkills(workspaceRootPath))
       },
       onSessionMetadataChange: (sessionId, header) => {
@@ -2364,7 +2364,7 @@ export class SessionManager implements ISessionManager {
 
   /**
    * Explicit opt-in runtime contract. initialize() does not invoke this, so
-   * opening MkAgent cannot execute persisted prompt or webhook automations.
+   * opening OPCAgent cannot execute persisted prompt or webhook automations.
    */
   enableAutomationRuntime(workspaceId: string): boolean {
     const workspace = getWorkspaces().find(item => item.id === workspaceId || item.slug === workspaceId)
@@ -2554,4 +2554,4 @@ export class SessionManager implements ISessionManager {
   }
 }
 
-export { sanitizeForTitle } from '@mkagent/server-core/domain'
+export { sanitizeForTitle } from '@opcagent/server-core/domain'

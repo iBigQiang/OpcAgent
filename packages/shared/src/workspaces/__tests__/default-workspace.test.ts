@@ -8,7 +8,7 @@ const STORAGE_URL = pathToFileURL(join(import.meta.dir, '..', 'storage.ts')).hre
 
 describe('ensureDefaultWorkspace', () => {
   it('creates an idempotent default workspace with sessions and Skills directories', () => {
-    const configDir = mkdtempSync(join(tmpdir(), 'mkagent-default-workspace-'));
+    const configDir = mkdtempSync(join(tmpdir(), 'opcagent-default-workspace-'));
     try {
       const script = `
         import { ensureDefaultWorkspace } from ${JSON.stringify(STORAGE_URL)};

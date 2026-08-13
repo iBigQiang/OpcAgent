@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next"
 import { Check, Key } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { StepFormLayout, BackButton, ContinueButton } from "./primitives"
-import type { LlmAuthType, LlmProviderType } from "@mkagent/shared/config/llm-connections"
+import type { LlmAuthType, LlmProviderType } from "@opcagent/shared/config/llm-connections"
 
 export type ApiSetupMethod = 'claude_oauth' | 'pi_chatgpt_oauth' | 'pi_api_key'
 

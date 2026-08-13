@@ -4,16 +4,16 @@
  * Handles workspace resource export/import (sources and skills).
  */
 
-import { RPC_CHANNELS } from '@mkagent/shared/protocol'
-import { getWorkspaceByNameOrId } from '@mkagent/shared/config'
-import { getCredentialManager, SOURCE_CREDENTIAL_TYPES } from '@mkagent/shared/credentials'
-import type { RpcServer } from '@mkagent/server-core/transport'
+import { RPC_CHANNELS } from '@opcagent/shared/protocol'
+import { getWorkspaceByNameOrId } from '@opcagent/shared/config'
+import { getCredentialManager, SOURCE_CREDENTIAL_TYPES } from '@opcagent/shared/credentials'
+import type { RpcServer } from '@opcagent/server-core/transport'
 import type { HandlerDeps } from '../handler-deps'
 import type {
   ResourceBundle,
   ResourceImportMode,
   ExportResourcesOptions,
-} from '@mkagent/shared/resources'
+} from '@opcagent/shared/resources'
 
 export const HANDLED_CHANNELS = [
   RPC_CHANNELS.resources.EXPORT,
@@ -28,7 +28,7 @@ export function registerResourcesHandlers(server: RpcServer, deps: HandlerDeps):
       const workspace = getWorkspaceByNameOrId(workspaceId)
       if (!workspace) throw new Error(`Workspace not found: ${workspaceId}`)
 
-      const { exportResources } = await import('@mkagent/shared/resources')
+      const { exportResources } = await import('@opcagent/shared/resources')
       const result = exportResources(workspace.rootPath, options)
 
       deps.platform.logger?.info(
@@ -49,7 +49,7 @@ export function registerResourcesHandlers(server: RpcServer, deps: HandlerDeps):
       const workspace = getWorkspaceByNameOrId(workspaceId)
       if (!workspace) throw new Error(`Workspace not found: ${workspaceId}`)
 
-      const { importResources } = await import('@mkagent/shared/resources')
+      const { importResources } = await import('@opcagent/shared/resources')
       const credManager = getCredentialManager()
 
       const result = await importResources(workspace.rootPath, bundle, mode, {

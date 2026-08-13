@@ -10,7 +10,7 @@ import { useTheme as useThemeContext } from '@/context/ThemeContext'
 
 interface UseThemeOptions {
   /**
-   * App-level theme override (from ~/.mkagent/theme.json)
+   * App-level theme override (from ~/.opcagent/theme.json)
    * When provided, merges with the preset theme from context.
    */
   appTheme?: ThemeOverrides | null

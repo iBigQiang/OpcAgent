@@ -18,7 +18,7 @@ import { cn } from '@/lib/utils'
 import { openLabelLink } from '@/lib/open-label-link'
 import { parseDate } from 'chrono-node'
 import { format, parse } from 'date-fns'
-import type { LabelConfig } from '@mkagent/shared/labels'
+import type { LabelConfig } from '@opcagent/shared/labels'
 
 export interface LabelValuePopoverProps {
   /** Label configuration (color, name, valueType) */

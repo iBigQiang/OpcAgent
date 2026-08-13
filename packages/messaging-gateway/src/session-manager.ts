@@ -1,4 +1,4 @@
-import type { FileAttachment, PermissionResponseOptions } from '@mkagent/shared/protocol'
+import type { FileAttachment, PermissionResponseOptions } from '@opcagent/shared/protocol'
 
 export interface MessagingSession {
   id: string

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MkAgent Craft Lite 源码复用与裁剪审计</title>
+<title>OPC Agent Craft Lite 源码复用与裁剪审计</title>
 <style>
 :root{--bg:#fff;--surface:#f8fafc;--card:#fff;--text:#172033;--muted:#667085;--line:#e4e7ec;--nav:#172033;--navText:#cbd5e1;--accent:#635bff;--accentBg:#f0efff;--ok:#087443;--okBg:#ecfdf3;--warn:#b54708;--warnBg:#fffaeb;--danger:#b42318;--dangerBg:#fef3f2;--shadow:0 1px 3px rgba(16,24,40,.08);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans-serif;color-scheme:light}
 [data-theme=dark]{--bg:#101828;--surface:#1d2939;--card:#1d2939;--text:#f2f4f7;--muted:#98a2b3;--line:#344054;--nav:#0c111d;--navText:#98a2b3;--accent:#9b8afb;--accentBg:#28234b;--ok:#32d583;--okBg:#053321;--warn:#fdb022;--warnBg:#3b2810;--danger:#f97066;--dangerBg:#3b1110;color-scheme:dark}
@@ -13,15 +13,15 @@
 <body>
 <button class="mobile" id="menu">☰</button>
 <nav class="sidebar" id="sidebar">
-  <h1>MkAgent</h1><small>Craft Lite 源码复用与裁剪审计</small>
+  <h1>OPC Agent</h1><small>Craft Lite 源码复用与裁剪审计</small>
   <a href="#overview">结论</a><a href="#shape">仓库结构</a><a href="#architecture">架构</a><a href="#lineage">Craft 复用</a><a href="#removed">物理裁剪</a><a href="#retained">保留能力</a><a href="#quality">验证</a><a href="#risks">风险</a>
   <footer>2026-07-29<br>Craft v0.11.2 <button id="theme">切换暗色模式</button></footer>
 </nav>
 <main class="content">
   <header class="hero" id="overview">
-    <h1>MkAgent Craft Lite 源码复用与裁剪审计</h1>
+    <h1>OPC Agent Craft Lite 源码复用与裁剪审计</h1>
     <div class="risk"><strong>历史快照：</strong>本文统计对应 2026-07-29 边界。2026-07-30 起已在保持 Pi-only 的前提下恢复 ChatGPT Plus 与 Claude Pro/Max 两种 LLM OAuth；Claude Agent SDK、GitHub Copilot 与 Sources/MCP 仍不恢复。</div>
-    <p>MkAgent 是 Craft Agents OSS 的 Pi-only Lite 版本，不是独立重写。此前 UI 对齐确实大规模复用了 Craft，但把许多排除功能留在代码中并仅隐藏；本轮已把它们从文件、状态、路由、协议、事件、设置和文案层物理删除。</p>
+    <p>OPC Agent 是 Craft Agents OSS 的 Pi-only Lite 版本，不是独立重写。此前 UI 对齐确实大规模复用了 Craft，但把许多排除功能留在代码中并仅隐藏；本轮已把它们从文件、状态、路由、协议、事件、设置和文案层物理删除。</p>
     <div class="meta"><span>基线 5c8308b</span><span>Craft a60ebc1 / v0.11.2</span><span>TypeScript / React</span><span>Apache-2.0</span></div>
   </header>
 
@@ -59,15 +59,15 @@ CLI ──────────────┘                               
 
   <section id="lineage"><h2>Craft 源码复用</h2>
     <div class="table"><table><thead><tr><th>指标</th><th>数量</th><th>解释</th></tr></thead><tbody>
-      <tr><td>MkAgent tracked source</td><td>1,163</td><td>不含报告和生成物</td></tr>
+      <tr><td>OPC Agent tracked source</td><td>1,163</td><td>不含报告和生成物</td></tr>
       <tr><td>与 Craft 同路径</td><td>1,116</td><td><span class="tag ok">96.0%</span></td></tr>
       <tr><td>归一化逐字一致</td><td>686</td><td><span class="tag ok">59.0%</span></td></tr>
       <tr><td>Craft 派生且修改</td><td>430</td><td>Lite 裁剪、品牌、Pi-only 适配和恢复的 Craft 测试</td></tr>
-      <tr><td>MkAgent-only</td><td>47</td><td>CI、文档、品牌、Pi 元数据、集成测试和审计脚本</td></tr>
+      <tr><td>OPC Agent-only</td><td>47</td><td>CI、文档、品牌、Pi 元数据、集成测试和审计脚本</td></tr>
       <tr><td>Craft-only</td><td>606</td><td>主要是完整产品功能</td></tr>
     </tbody></table></div>
     <p>同路径率比“相同代码率”更能回答是否重写：96.0% 文件沿用 Craft 的模块位置。逐字一致率则给出最严格下界。从 UI 对齐基线起累计变更 389 个文件，增加 6,315 行、删除 56,761 行，形态仍是明确的源码减法。</p>
-    <div class="card"><strong>Renderer 强约束：</strong>386 个文件中，170 个必须与 Craft 归一化完全一致，211 个登记为 Lite 裁剪缝，5 个是 MkAgent 品牌资产。排除功能路径和关键调用重新出现会让 lint 失败。</div>
+    <div class="card"><strong>Renderer 强约束：</strong>386 个文件中，170 个必须与 Craft 归一化完全一致，211 个登记为 Lite 裁剪缝，5 个是 OPC Agent 品牌资产。排除功能路径和关键调用重新出现会让 lint 失败。</div>
   </section>
 
   <section id="removed"><h2>物理裁剪</h2>

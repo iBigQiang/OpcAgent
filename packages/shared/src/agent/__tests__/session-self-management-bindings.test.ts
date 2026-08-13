@@ -14,7 +14,7 @@ afterEach(() => unregisterSessionScopedToolCallbacks(sessionId))
 function makeContext() {
   const context = createPiContext({
     sessionId,
-    workspacePath: '/tmp/mkagent-bindings',
+    workspacePath: '/tmp/opcagent-bindings',
     onPlanSubmitted: () => {},
   })
   attachSessionSelfManagementBindings(context, sessionId)

@@ -2,13 +2,13 @@
  * Mermaid Validate Handler
  *
  * Validates Mermaid diagram syntax using beautiful-mermaid renderer.
- * No DOM is required, so the validator works in every MkAgent surface.
+ * No DOM is required, so the validator works in every OPCAgent surface.
  */
 
 import type { SessionToolContext } from '../context.ts';
 import type { ToolResult } from '../types.ts';
 import { renderMermaidSVG } from 'beautiful-mermaid';
-import { DOC_REFS } from '@mkagent/shared/docs';
+import { DOC_REFS } from '@opcagent/shared/docs';
 import { normalizeMermaidSource } from '../validation.ts';
 
 export interface MermaidValidateArgs {

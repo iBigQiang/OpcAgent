@@ -102,36 +102,36 @@
       "comment": "CLI tools: bare invocation (prints help)"
     },
     {
-      "pattern": "^mkagent\\s+workspace\\s+(list)\\b",
-      "comment": "mkagent workspace read-only operations"
+      "pattern": "^opcagent\\s+workspace\\s+(list)\\b",
+      "comment": "opcagent workspace read-only operations"
     },
     {
-      "pattern": "^mkagent\\s+session\\s+(list|messages)\\b",
-      "comment": "mkagent session read-only operations"
+      "pattern": "^opcagent\\s+session\\s+(list|messages)\\b",
+      "comment": "opcagent session read-only operations"
     },
     {
-      "pattern": "^mkagent\\s+connections\\s+(list)\\b",
-      "comment": "mkagent connections read-only operations"
+      "pattern": "^opcagent\\s+connections\\s+(list)\\b",
+      "comment": "opcagent connections read-only operations"
     },
     {
-      "pattern": "^mkagent\\s+config\\s+(validate)\\b",
-      "comment": "mkagent config read-only operations"
+      "pattern": "^opcagent\\s+config\\s+(validate)\\b",
+      "comment": "opcagent config read-only operations"
     },
     {
-      "pattern": "^mkagent\\s*$",
-      "comment": "mkagent bare invocation (prints help)"
+      "pattern": "^opcagent\\s*$",
+      "comment": "opcagent bare invocation (prints help)"
     },
     {
-      "pattern": "^mkagent\\s+(workspace|session|connections|config)\\s*$",
-      "comment": "mkagent entity help"
+      "pattern": "^opcagent\\s+(workspace|session|connections|config)\\s*$",
+      "comment": "opcagent entity help"
     },
     {
-      "pattern": "^mkagent\\s+(workspace|session|connections|config)\\s+--help\\b",
-      "comment": "mkagent entity help flags"
+      "pattern": "^opcagent\\s+(workspace|session|connections|config)\\s+--help\\b",
+      "comment": "opcagent entity help flags"
     },
     {
-      "pattern": "^mkagent\\s+--(help|version|discover)\\b",
-      "comment": "mkagent global flags"
+      "pattern": "^opcagent\\s+--(help|version|discover)\\b",
+      "comment": "opcagent global flags"
     },
     {
       "pattern": "^find\\b",

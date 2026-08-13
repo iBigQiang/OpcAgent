@@ -1,5 +1,5 @@
 /**
- * Markdown component exports for @mkagent/ui
+ * Markdown component exports for @opcagent/ui
  */
 
 export { Markdown, MemoizedMarkdown, type MarkdownProps, type RenderMode, type DisablablePreviewBlock } from './Markdown'

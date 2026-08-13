@@ -8,7 +8,7 @@ import { THINKING_LEVEL_IDS } from '../../agent/thinking-levels.ts'
 const STORAGE_MODULE_PATH = pathToFileURL(join(import.meta.dir, '..', 'storage.ts')).href
 
 function setupWorkspaceConfigDir() {
-  const configDir = mkdtempSync(join(tmpdir(), 'mkagent-config-thinking-'))
+  const configDir = mkdtempSync(join(tmpdir(), 'opcagent-config-thinking-'))
   const workspaceRoot = join(configDir, 'workspaces', 'my-workspace')
   mkdirSync(workspaceRoot, { recursive: true })
 

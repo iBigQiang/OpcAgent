@@ -4,8 +4,8 @@ import {
   createBuiltInConnection,
   validateModelList,
   validateSetupTestInput,
-} from '@mkagent/server-core/domain'
-import type { ModelDefinition } from '@mkagent/shared/config/models'
+} from '@opcagent/server-core/domain'
+import type { ModelDefinition } from '@opcagent/shared/config/models'
 
 // ============================================================
 // validateModelList

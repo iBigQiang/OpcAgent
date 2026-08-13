@@ -1,8 +1,8 @@
 {
-  "name": "@mkagent/server-core",
-  "version": "0.1.0",
+  "name": "@opcagent/server-core",
+  "version": "0.1.1",
   "license": "Apache-2.0",
-  "description": "Reusable headless server infrastructure for MkAgent",
+  "description": "Reusable headless server infrastructure for OPC Agent",
   "type": "module",
   "main": "src/index.ts",
   "types": "src/index.ts",
@@ -24,8 +24,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@mkagent/core": "workspace:*",
-    "@mkagent/shared": "workspace:*",
+    "@opcagent/core": "workspace:*",
+    "@opcagent/shared": "workspace:*",
     "jose": "^6.0.0",
     "ws": "^8.19.0",
     "sharp": "0.34.5",

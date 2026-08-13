@@ -10,7 +10,7 @@ import type {
   UpdateInfo,
 } from './dto.ts';
 import type { LoadedProject } from '../projects/types.ts';
-import type { PlatformRuntimeInfo } from '@mkagent/messaging-gateway';
+import type { PlatformRuntimeInfo } from '@opcagent/messaging-gateway';
 
 export type WhatsAppUiEvent =
   | { type: 'qr'; qr: string }

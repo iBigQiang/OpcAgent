@@ -23,7 +23,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Spinner } from '@mkagent/ui'
+import { Spinner } from '@opcagent/ui'
 import { SettingsSecretInput } from '@/components/settings'
 
 interface TelegramConnectDialogProps {

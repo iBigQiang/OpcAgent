@@ -1,5 +1,5 @@
 /**
- * Route parsing for the retained MkAgent surface.
+ * Route parsing for the retained OPCAgent surface.
  *
  * This is the Craft navigation contract with excluded navigators removed:
  * sessions, Skills, and settings still share the same URL-driven panel model.

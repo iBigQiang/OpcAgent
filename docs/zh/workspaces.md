@@ -1,10 +1,10 @@
 # Workspace
 
-MkAgent 在首次启动时创建 `default` workspace。每个本地 workspace 隔离会话、Skills、权限、Views 和项目上下文。
+OPC Agent 在首次启动时创建 `default` workspace。每个本地 workspace 隔离会话、Skills、权限、Views 和项目上下文。
 
 ## Workspace 目录
 
-workspace 位于 `~/.mkagent/workspaces/<slug>/`。slug 是从 workspace 名称派生的 URL-safe 标识;`default` workspace 始终使用字面 slug `default`。
+workspace 位于 `~/.opcagent/workspaces/<slug>/`。slug 是从 workspace 名称派生的 URL-safe 标识;`default` workspace 始终使用字面 slug `default`。
 
 ## Workspace `config.json`
 

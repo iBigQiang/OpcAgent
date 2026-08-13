@@ -83,7 +83,7 @@ function updateLineageManifest(paths: string[]): void {
     manifest.mkOnly[relativePath] = {
       sha256,
       reason:
-        "MkAgent-specific release metadata required by the release workflow",
+        "OPC-Agent-specific release metadata required by the release workflow",
     };
   }
   writeFileSync(path, `${JSON.stringify(manifest, null, 2)}\n`);
@@ -121,8 +121,8 @@ function check(input: string | undefined): void {
   if (!existsSync(notePath))
     fail(`missing apps/electron/resources/release-notes/${version}.md`);
   const note = readFileSync(notePath, "utf8").trim();
-  if (!note.startsWith(`# MkAgent ${version}\n`))
-    fail(`${version}.md must start with "# MkAgent ${version}"`);
+  if (!note.startsWith(`# OPC Agent ${version}\n`))
+    fail(`${version}.md must start with "# OPC Agent ${version}"`);
   if (note.split("\n").length < 3)
     fail(`${version}.md must contain user-visible release notes`);
 
@@ -159,7 +159,7 @@ function prepare(input: string | undefined): void {
   let nextChangelog = `${changelog.slice(0, changelog.indexOf(unreleasedHeading))}${unreleasedHeading}\n\n${unreleasedHeading.includes("placeholder") ? "" : "Add user-visible changes here before running `bun run release:prepare <version>`.\n"}\n## [${version}] - ${today}\n\n${unreleased}\n${changelog.slice(nextHeadingIndex)}`;
   nextChangelog = nextChangelog.replace(
     /^\[Unreleased\]:.*$/m,
-    `[Unreleased]: https://github.com/MkThingsHQ/mkagent/releases\n[${version}]: https://github.com/MkThingsHQ/mkagent/releases/tag/v${version}`,
+    `[Unreleased]: https://github.com/iBigQiang/OpcAgent/releases\n[${version}]: https://github.com/iBigQiang/OpcAgent/releases/tag/v${version}`,
   );
 
   const notePath = join(releaseNotesDir, `${version}.md`);
@@ -172,7 +172,7 @@ function prepare(input: string | undefined): void {
     writeFileSync(path, `${JSON.stringify(manifest, null, 2)}\n`);
   }
   writeFileSync(changelogPath, nextChangelog);
-  writeFileSync(notePath, `# MkAgent ${version}\n\n${unreleased}\n`);
+  writeFileSync(notePath, `# OPC Agent ${version}\n\n${unreleased}\n`);
 
   const install = Bun.spawnSync(["bun", "install", "--lockfile-only"], {
     cwd: root,

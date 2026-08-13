@@ -1,4 +1,4 @@
-import type { AnnotationV1 } from '@mkagent/core'
+import type { AnnotationV1 } from '@opcagent/core'
 import { annotationColorToCss } from './annotation-style-tokens'
 
 export function clearBlockAnnotationMarkers(root: HTMLElement): void {

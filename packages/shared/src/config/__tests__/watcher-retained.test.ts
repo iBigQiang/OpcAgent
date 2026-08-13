@@ -12,7 +12,7 @@ afterEach(() => {
 });
 
 function runWatcherScript(source: string): unknown {
-  const root = mkdtempSync(join(tmpdir(), 'mkagent-watcher-retained-'));
+  const root = mkdtempSync(join(tmpdir(), 'opcagent-watcher-retained-'));
   roots.push(root);
   const result = Bun.spawnSync([process.execPath, '--eval', source], {
     env: { ...process.env, CONFIG_DIR: join(root, 'config'), TEST_ROOT: root },

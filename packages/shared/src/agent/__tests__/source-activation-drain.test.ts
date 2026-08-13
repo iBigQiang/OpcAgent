@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import type { AgentEvent } from '@mkagent/core/types';
+import type { AgentEvent } from '@opcagent/core/types';
 import {
   SourceActivationDrainController,
   type PendingActivationRestart,

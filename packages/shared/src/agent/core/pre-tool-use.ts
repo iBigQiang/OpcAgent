@@ -24,8 +24,8 @@ import {
 } from '../../config/validators.ts';
 import {
   CLI_DOMAIN_POLICIES,
-  MKAGENT_AGENTS_CLI_BASH_GUARD_SCOPE_ENTRIES,
-  MKAGENT_AGENTS_CLI_WORKSPACE_SCOPE_ENTRIES,
+  OPCAGENT_AGENTS_CLI_BASH_GUARD_SCOPE_ENTRIES,
+  OPCAGENT_AGENTS_CLI_WORKSPACE_SCOPE_ENTRIES,
   type CliDomainNamespace,
 } from '../../config/cli-domains.ts';
 import { FEATURE_FLAGS } from '../../feature-flags.ts';
@@ -403,7 +403,7 @@ function buildCliDomainBlockMessage(namespace: CliDomainNamespace, context: stri
 
   return [
     `${context}`,
-    `Use \`mkagent ${namespace} ...\` instead.`,
+    `Use \`opcagent ${namespace} ...\` instead.`,
     `Run \`${policy.helpCommand}\` for the full ${namespace} command reference.`,
     '',
     'Examples:',
@@ -455,7 +455,7 @@ export function getConfigCliRedirect(
 }
 
 /**
- * Block bash commands that operate on guarded config paths unless they use mkagent commands.
+ * Block bash commands that operate on guarded config paths unless they use opcagent commands.
  * Current guarded domains in Bash are declared in shared CLI domain policy.
  */
 export function getConfigDomainBashRedirect(
@@ -466,7 +466,7 @@ export function getConfigDomainBashRedirect(
   const command = typeof input.command === 'string' ? input.command.trim() : '';
   if (!command) return null;
 
-  if (/^mkagent\s+(workspace|session|connections|config)\b/.test(command)) {
+  if (/^opcagent\s+(workspace|session|connections|config)\b/.test(command)) {
     return null;
   }
 
@@ -483,7 +483,7 @@ export function getConfigDomainBashRedirect(
     candidates.push(candidate);
   }
 
-  const bashGuardEntries: Array<{ namespace: CliDomainNamespace; scope: string }> = MKAGENT_AGENTS_CLI_BASH_GUARD_SCOPE_ENTRIES
+  const bashGuardEntries: Array<{ namespace: CliDomainNamespace; scope: string }> = OPCAGENT_AGENTS_CLI_BASH_GUARD_SCOPE_ENTRIES
 
   for (const candidate of candidates) {
     const relativePath = getWorkspaceRelativePath(candidate, workspaceRootPath, baseDir);
@@ -742,7 +742,7 @@ export function runPreToolUseChecks(ctx: PreToolUseInput): PreToolUseCheckResult
   }
 
   // 5b. Config-domain Bash guard
-  if (FEATURE_FLAGS.mkagentCli && toolName === 'Bash') {
+  if (FEATURE_FLAGS.opcagentCli && toolName === 'Bash') {
     const configDomainBashRedirect = getConfigDomainBashRedirect(currentInput, workspaceRootPath, workingDirectory);
     if (configDomainBashRedirect) {
       return { type: 'block', reason: configDomainBashRedirect.message };
@@ -756,7 +756,7 @@ export function runPreToolUseChecks(ctx: PreToolUseInput): PreToolUseCheckResult
   }
 
   // 5d. Config file CLI redirect
-  if (FEATURE_FLAGS.mkagentCli) {
+  if (FEATURE_FLAGS.opcagentCli) {
     const cliRedirect = getConfigCliRedirect(toolName, currentInput, workspaceRootPath, workingDirectory);
     if (cliRedirect) {
       return { type: 'block', reason: cliRedirect.message };

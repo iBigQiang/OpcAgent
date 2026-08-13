@@ -2,8 +2,8 @@
 
 set -e
 
-VERSIONS_URL="https://github.com/MkThingsHQ/mkagent/releases/latest/download"
-DOWNLOAD_DIR="$HOME/.mkagent/downloads"
+VERSIONS_URL="https://github.com/iBigQiang/OpcAgent/releases/latest/download"
+DOWNLOAD_DIR="$HOME/.opcagent/downloads"
 
 # Colors for output
 RED='\033[0;31m'
@@ -142,7 +142,7 @@ esac
 # Set platform-specific variables
 if [ "$OS_TYPE" = "darwin" ]; then
     platform="darwin-${arch}"
-    APP_NAME="MkAgent.app"
+    APP_NAME="OPC Agent.app"
     INSTALL_DIR="/Applications"
     ext="zip"
     yml_file="latest-mac.yml"
@@ -152,7 +152,7 @@ else
         error "Linux currently only supports x64 architecture. Your architecture: $arch"
     fi
     platform="linux-${arch}"
-    APP_NAME="MkAgent-x64.AppImage"
+    APP_NAME="OPC-Agent-x64.AppImage"
     INSTALL_DIR="$HOME/.local/bin"
     ext="AppImage"
     yml_file="latest-linux.yml"
@@ -201,7 +201,7 @@ fi
 
 # Use default filename if not found
 if [ -z "$filename" ]; then
-    filename="MkAgent-${version}-${arch}.${ext}"
+    filename="OPC-Agent-${version}-${arch}.${ext}"
 fi
 
 info "Expected sha512: ${checksum:0:20}..."
@@ -241,23 +241,23 @@ if [ "$OS_TYPE" = "darwin" ]; then
     zip_path="$installer_path"
 
     # Quit the app if it's running (use bundle ID for reliability)
-    APP_BUNDLE_ID="app.mkagent.desktop"
-    if pgrep -x "MkAgent" >/dev/null 2>&1; then
-        info "Quitting MkAgent..."
+    APP_BUNDLE_ID="app.opcagent.desktop"
+    if pgrep -x "OPC Agent" >/dev/null 2>&1; then
+        info "Quitting OPC Agent..."
         osascript -e "tell application id \"$APP_BUNDLE_ID\" to quit" 2>/dev/null || true
         # Wait for app to quit (max 5 seconds) - POSIX compatible loop
         i=0
         while [ $i -lt 10 ]; do
-            if ! pgrep -x "MkAgent" >/dev/null 2>&1; then
+            if ! pgrep -x "OPC Agent" >/dev/null 2>&1; then
                 break
             fi
             sleep 0.5
             i=$((i + 1))
         done
         # Force kill if still running
-        if pgrep -x "MkAgent" >/dev/null 2>&1; then
+        if pgrep -x "OPC Agent" >/dev/null 2>&1; then
             warn "App didn't quit gracefully. Force quitting (unsaved data may be lost)..."
-            pkill -9 -x "MkAgent" 2>/dev/null || true
+            pkill -9 -x "OPC Agent" 2>/dev/null || true
             # Wait longer for macOS to release file handles
             sleep 3
         fi
@@ -304,10 +304,10 @@ if [ "$OS_TYPE" = "darwin" ]; then
     echo ""
     success "Installation complete!"
     echo ""
-    printf "%b\n" "  MkAgent has been installed to ${BOLD}$INSTALL_DIR/$APP_NAME${NC}"
+    printf "%b\n" "  OPC Agent has been installed to ${BOLD}$INSTALL_DIR/$APP_NAME${NC}"
     echo ""
     printf "%b\n" "  You can launch it from ${BOLD}Applications${NC} or by running:"
-    printf "%b\n" "    ${BOLD}open -a 'MkAgent'${NC}"
+    printf "%b\n" "    ${BOLD}open -a 'OPC Agent'${NC}"
     echo ""
 
 else
@@ -315,14 +315,14 @@ else
     appimage_path="$installer_path"
 
     # New paths
-    APP_DIR="$HOME/.mkagent/app"
-    WRAPPER_PATH="$INSTALL_DIR/mkagent"
-    APPIMAGE_INSTALL_PATH="$APP_DIR/MkAgent-x64.AppImage"
+    APP_DIR="$HOME/.opcagent/app"
+    WRAPPER_PATH="$INSTALL_DIR/opcagent"
+    APPIMAGE_INSTALL_PATH="$APP_DIR/OPC-Agent-x64.AppImage"
 
     # Kill the app if it's running
-    if pgrep -f "MkAgent.*AppImage" >/dev/null 2>&1; then
-        info "Stopping MkAgent..."
-        pkill -f "MkAgent.*AppImage" 2>/dev/null || true
+    if pgrep -f "OPC Agent.*AppImage" >/dev/null 2>&1; then
+        info "Stopping OPC Agent..."
+        pkill -f "OPC Agent.*AppImage" 2>/dev/null || true
         sleep 2
     fi
 
@@ -342,16 +342,16 @@ else
     info "Creating launcher at $WRAPPER_PATH..."
     cat > "$WRAPPER_PATH" << 'WRAPPER_EOF'
 #!/bin/bash
-# MkAgent launcher - handles Linux-specific AppImage issues
+# OPC Agent launcher - handles Linux-specific AppImage issues
 
-APPIMAGE_PATH="$HOME/.mkagent/app/MkAgent-x64.AppImage"
-ELECTRON_CACHE="$HOME/.config/@mkagent"
-ELECTRON_CACHE_ALT="$HOME/.cache/@mkagent"
+APPIMAGE_PATH="$HOME/.opcagent/app/OPC-Agent-x64.AppImage"
+ELECTRON_CACHE="$HOME/.config/@opcagent"
+ELECTRON_CACHE_ALT="$HOME/.cache/@opcagent"
 
 # Verify AppImage exists
 if [ ! -f "$APPIMAGE_PATH" ]; then
-    echo "Error: MkAgent not found at $APPIMAGE_PATH"
-    echo "Reinstall from https://github.com/MkThingsHQ/mkagent/releases/latest"
+    echo "Error: OPC Agent not found at $APPIMAGE_PATH"
+    echo "Reinstall from https://github.com/iBigQiang/OpcAgent/releases/latest"
     exit 1
 fi
 
@@ -361,9 +361,9 @@ if [ -z "$DISPLAY" ]; then
 fi
 
 # Clear stale cache referencing AppImage mount paths
-# AppImage creates a new /tmp/.mount_MkAgen-XXXX each launch, so any cached path is stale
+# AppImage creates a new mount path on each launch, so any cached path is stale
 for cache_dir in "$ELECTRON_CACHE" "$ELECTRON_CACHE_ALT"; do
-    if [ -d "$cache_dir" ] && grep -rq '/tmp/\.mount_MkAgen' "$cache_dir" 2>/dev/null; then
+    if [ -d "$cache_dir" ] && grep -rq '/tmp/\.mount_OPC' "$cache_dir" 2>/dev/null; then
         rm -rf "$cache_dir"
     fi
 done
@@ -389,7 +389,7 @@ WRAPPER_EOF
     printf "%b\n" "  AppImage: ${BOLD}$APPIMAGE_INSTALL_PATH${NC}"
     printf "%b\n" "  Launcher: ${BOLD}$WRAPPER_PATH${NC}"
     echo ""
-    printf "%b\n" "  Run with: ${BOLD}mkagent${NC}"
+    printf "%b\n" "  Run with: ${BOLD}opcagent${NC}"
     echo ""
     printf "%b\n" "  Add to PATH if needed:"
     printf "%b\n" "    ${BOLD}echo 'export PATH=\"\$HOME/.local/bin:\$PATH\"' >> ~/.bashrc${NC}"

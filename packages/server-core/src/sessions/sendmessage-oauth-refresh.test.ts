@@ -130,8 +130,8 @@ describe('sendMessage OAuth refresh ordering (#710)', () => {
 
     // Reload source list the same way sendMessage does and verify the failed
     // source is no longer usable.
-    const { getSourcesBySlugs } = await import('@mkagent/shared/sources')
-    const { isSourceUsable } = await import('@mkagent/shared/sources/storage')
+    const { getSourcesBySlugs } = await import('@opcagent/shared/sources')
+    const { isSourceUsable } = await import('@opcagent/shared/sources/storage')
     const reloaded = getSourcesBySlugs(tmpRoot, ['failing-mcp'])
     // In-memory mutation happened on the source instance passed to refreshSources;
     // disk wasn't touched in this stub, so reloaded copy still says authenticated.

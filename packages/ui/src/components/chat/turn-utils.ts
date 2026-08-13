@@ -5,9 +5,9 @@
  * Converts the flat Message[] array into grouped turns for email-like display.
  */
 
-import type { Message, StoredMessage, MessageRole } from '@mkagent/core'
-import { isParentTaskTool } from '@mkagent/shared/utils/toolNames'
-import { storedToMessage } from '@mkagent/core'
+import type { Message, StoredMessage, MessageRole } from '@opcagent/core'
+import { isParentTaskTool } from '@opcagent/shared/utils/toolNames'
+import { storedToMessage } from '@opcagent/core'
 
 export { storedToMessage }
 import type { ActivityItem, ActivityStatus, ActivityType, ResponseContent, TodoItem } from './TurnCard'

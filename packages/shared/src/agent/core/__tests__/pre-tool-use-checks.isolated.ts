@@ -21,7 +21,7 @@ function run(toolName: string, input: Record<string, unknown>, mode: 'safe' | 'a
     input,
     sessionId,
     permissionMode: mode,
-    workspaceRootPath: '/tmp/mkagent-pre-tool',
+    workspaceRootPath: '/tmp/opcagent-pre-tool',
     workspaceId: 'workspace',
     activeSourceSlugs: [],
     allSourceSlugs: [],
@@ -68,7 +68,7 @@ describe('runPreToolUseChecks retained Pi pipeline', () => {
       input: {},
       sessionId,
       permissionMode: 'allow-all',
-      workspaceRootPath: '/tmp/mkagent-pre-tool',
+      workspaceRootPath: '/tmp/opcagent-pre-tool',
       workspaceId: 'workspace',
       activeSourceSlugs: [],
       allSourceSlugs: ['linear'],
@@ -89,7 +89,7 @@ describe('runPreToolUseChecks retained Pi pipeline', () => {
       input: {},
       sessionId,
       permissionMode: 'allow-all',
-      workspaceRootPath: '/tmp/mkagent-pre-tool',
+      workspaceRootPath: '/tmp/opcagent-pre-tool',
       workspaceId: 'workspace',
       activeSourceSlugs: ['linear'],
       allSourceSlugs: ['linear'],
@@ -101,7 +101,7 @@ describe('runPreToolUseChecks retained Pi pipeline', () => {
 })
 
 describe('shouldPromptInAskMode', () => {
-  const context = { workspaceRootPath: '/tmp/mkagent-pre-tool', activeSourceSlugs: [] }
+  const context = { workspaceRootPath: '/tmp/opcagent-pre-tool', activeSourceSlugs: [] }
 
   it('prompts for Write', () => {
     expect(shouldPromptInAskMode('Write', { file_path: '/tmp/a' }, permissionManager, context)?.promptType).toBe('file_write')

@@ -12,8 +12,8 @@
  */
 
 import { useState, useEffect, useMemo } from 'react'
-import { isEmoji } from '@mkagent/shared/utils/icon-constants'
-import type { ResolvedEntityIcon } from '@mkagent/shared/icons'
+import { isEmoji } from '@opcagent/shared/utils/icon-constants'
+import type { ResolvedEntityIcon } from '@opcagent/shared/icons'
 
 // ============================================================================
 // Types

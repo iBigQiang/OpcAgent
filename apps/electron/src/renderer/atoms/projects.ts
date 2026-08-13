@@ -5,6 +5,6 @@
  */
 
 import { atom } from 'jotai'
-import type { LoadedProject } from '@mkagent/shared/projects/types'
+import type { LoadedProject } from '@opcagent/shared/projects/types'
 
 export const projectsAtom = atom<LoadedProject[]>([])

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import { releaseBrowserOwnershipOnForcedStop } from '@mkagent/server-core/domain'
+import { releaseBrowserOwnershipOnForcedStop } from '@opcagent/server-core/domain'
 
 describe('releaseBrowserOwnershipOnForcedStop', () => {
   it('clears visuals and unbinds session ownership', async () => {

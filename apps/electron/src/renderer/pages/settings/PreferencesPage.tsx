@@ -1,7 +1,7 @@
 /**
  * PreferencesPage
  *
- * Form-based editor for stored user preferences (~/.mkagent/preferences.json).
+ * Form-based editor for stored user preferences (~/.opcagent/preferences.json).
  * Features:
  * - Fixed input fields for known preferences (name, timezone, location, language)
  * - Free-form textarea for notes
@@ -15,7 +15,7 @@ import { PanelHeader } from '@/components/app-shell/PanelHeader'
 import { HeaderMenu } from '@/components/ui/HeaderMenu'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { routes } from '@/lib/navigate'
-import { Spinner } from '@mkagent/ui'
+import { Spinner } from '@opcagent/ui'
 import {
   SettingsSection,
   SettingsCard,

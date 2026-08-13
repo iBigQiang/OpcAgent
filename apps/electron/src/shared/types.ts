@@ -1,7 +1,7 @@
 // =============================================================================
 // Protocol re-exports (channels, DTOs, events, wire types)
 // =============================================================================
-export * from '@mkagent/shared/protocol'
+export * from '@opcagent/shared/protocol'
 
 // =============================================================================
 // Package re-exports (convenience for renderer imports)
@@ -20,17 +20,17 @@ import type {
   ContentBadge,
   ToolDisplayMeta,
   AnnotationV1,
-} from '@mkagent/core/types';
+} from '@opcagent/core/types';
 
 // Mode types from dedicated subpath export (avoids pulling in SDK)
-import type { PermissionMode } from '@mkagent/shared/agent/modes';
+import type { PermissionMode } from '@opcagent/shared/agent/modes';
 export type { PermissionMode };
-export { PERMISSION_MODE_CONFIG } from '@mkagent/shared/agent/modes';
+export { PERMISSION_MODE_CONFIG } from '@opcagent/shared/agent/modes';
 
 // Thinking level types
-import type { ThinkingLevel } from '@mkagent/shared/agent/thinking-levels';
+import type { ThinkingLevel } from '@opcagent/shared/agent/thinking-levels';
 export type { ThinkingLevel };
-export { THINKING_LEVELS, DEFAULT_THINKING_LEVEL } from '@mkagent/shared/agent/thinking-levels';
+export { THINKING_LEVELS, DEFAULT_THINKING_LEVEL } from '@opcagent/shared/agent/thinking-levels';
 
 export type {
   CoreMessage as Message,
@@ -46,9 +46,9 @@ export type {
   AnnotationV1,
 };
 
-// Onboarding: minimal setup-needs shape driven by MkAgent's Lite Pi-only backend.
+// Onboarding: minimal setup-needs shape driven by OPCAgent's Lite Pi-only backend.
 // The full Craft AuthState/AuthType (Claude billing/OAuth) is not applicable here —
-// MkAgent only checks whether at least one LLM connection is configured.
+// OPC Agent only checks whether at least one LLM connection is configured.
 export interface SetupNeeds {
   /** True when the user has at least one configured LLM connection. */
   isFullyConfigured: boolean;
@@ -57,16 +57,16 @@ export interface SetupNeeds {
 }
 
 // Credential health types
-import type { CredentialHealthStatus, CredentialHealthIssue, CredentialHealthIssueType } from '@mkagent/shared/credentials/types';
+import type { CredentialHealthStatus, CredentialHealthIssue, CredentialHealthIssueType } from '@opcagent/shared/credentials/types';
 export type { CredentialHealthStatus, CredentialHealthIssue, CredentialHealthIssueType };
 
 
 // Skill types
-import type { LoadedSkill, SkillMetadata } from '@mkagent/shared/skills/types';
+import type { LoadedSkill, SkillMetadata } from '@opcagent/shared/skills/types';
 export type { LoadedSkill, SkillMetadata };
 
 // Source types for session source selection
-import type { LoadedSource, FolderSourceConfig, SourceConnectionStatus } from '@mkagent/shared/sources/types';
+import type { LoadedSource, FolderSourceConfig, SourceConnectionStatus } from '@opcagent/shared/sources/types';
 export type { LoadedSource, FolderSourceConfig, SourceConnectionStatus };
 
 // Resource bundle types (cross-workspace export/import)
@@ -76,7 +76,7 @@ import type {
   ResourceImportMode,
   ResourceBundle,
   ResourceImportResult,
-} from '@mkagent/shared/resources';
+} from '@opcagent/shared/resources';
 export type {
   ExportResourcesOptions,
   ExportResult,
@@ -87,7 +87,7 @@ export type {
 
 
 // LLM connection types
-import type { LlmConnection, LlmConnectionWithStatus, LlmAuthType, LlmProviderType, NetworkProxySettings } from '@mkagent/shared/config';
+import type { LlmConnection, LlmConnectionWithStatus, LlmAuthType, LlmProviderType, NetworkProxySettings } from '@opcagent/shared/config';
 export type { LlmConnection, LlmConnectionWithStatus, LlmAuthType, LlmProviderType, NetworkProxySettings };
 
 // =============================================================================
@@ -192,7 +192,7 @@ export interface TransportConnectionState {
 // =============================================================================
 
 // Re-import types for ElectronAPI
-import type { WorkspaceInfo, Workspace, SessionMetadata, StoredAttachment as StoredAttachmentType } from '@mkagent/core/types';
+import type { WorkspaceInfo, Workspace, SessionMetadata, StoredAttachment as StoredAttachmentType } from '@opcagent/core/types';
 
 // Import protocol types used by ElectronAPI (they come through the `export *` above,
 // but we need them in scope for the interface definition)
@@ -226,7 +226,7 @@ import type {
   ClaudeOAuthResult,
   OAuthResult,
   McpToolsResult,
-} from '@mkagent/shared/protocol'
+} from '@opcagent/shared/protocol'
 
 export interface ElectronAPI {
   // Session management
@@ -360,7 +360,7 @@ export interface ElectronAPI {
   onMenuToggleFocusMode(callback: () => void): () => void
   onMenuToggleSidebar(callback: () => void): () => void
 
-  // Deep link navigation listener (for external mkagent:// URLs)
+  // Deep link navigation listener (for external opcagent:// URLs)
   onDeepLinkNavigate(callback: (nav: DeepLinkNavigation) => void): () => void
 
   // Confirmation dialogs (native OS dialogs — main-process only)
@@ -410,10 +410,10 @@ export interface ElectronAPI {
   writePreferences(content: string): Promise<{ success: boolean; error?: string }>
 
   // Session Drafts (persisted composer state — text + attachment refs)
-  getDraft(sessionId: string): Promise<import('@mkagent/shared/config').SessionDraft | null>
-  setDraft(sessionId: string, draft: import('@mkagent/shared/config').SessionDraft): Promise<void>
+  getDraft(sessionId: string): Promise<import('@opcagent/shared/config').SessionDraft | null>
+  setDraft(sessionId: string, draft: import('@opcagent/shared/config').SessionDraft): Promise<void>
   deleteDraft(sessionId: string): Promise<void>
-  getAllDrafts(): Promise<Record<string, import('@mkagent/shared/config').SessionDraft>>
+  getAllDrafts(): Promise<Record<string, import('@opcagent/shared/config').SessionDraft>>
 
   // Session Info Panel
   getSessionFiles(sessionId: string): Promise<SessionFile[]>
@@ -432,7 +432,7 @@ export interface ElectronAPI {
   deleteSource(workspaceId: string, sourceSlug: string): Promise<void>
   startSourceOAuth(workspaceId: string, sourceSlug: string): Promise<{ success: boolean; error?: string }>
   saveSourceCredentials(workspaceId: string, sourceSlug: string, credential: string): Promise<void>
-  getSourcePermissionsConfig(workspaceId: string, sourceSlug: string): Promise<import('@mkagent/shared/agent').PermissionsConfigFile | null>
+  getSourcePermissionsConfig(workspaceId: string, sourceSlug: string): Promise<import('@opcagent/shared/agent').PermissionsConfigFile | null>
   getMcpTools(workspaceId: string, sourceSlug: string): Promise<McpToolsResult>
 
   // OAuth (server-owned credentials, client-orchestrated flow)
@@ -446,8 +446,8 @@ export interface ElectronAPI {
   exportResources(workspaceId: string, options: ExportResourcesOptions): Promise<ExportResult>
   importResources(workspaceId: string, bundle: ResourceBundle, mode: ResourceImportMode): Promise<ResourceImportResult>
 
-  getWorkspacePermissionsConfig(workspaceId: string): Promise<import('@mkagent/shared/agent').PermissionsConfigFile | null>
-  getDefaultPermissionsConfig(): Promise<{ config: import('@mkagent/shared/agent').PermissionsConfigFile | null; path: string }>
+  getWorkspacePermissionsConfig(workspaceId: string): Promise<import('@opcagent/shared/agent').PermissionsConfigFile | null>
+  getDefaultPermissionsConfig(): Promise<{ config: import('@opcagent/shared/agent').PermissionsConfigFile | null; path: string }>
 
   // Default permissions change listener (live updates when default.json changes)
   onDefaultPermissionsChanged(callback: () => void): () => void
@@ -600,28 +600,28 @@ export interface ElectronAPI {
   setWorkspaceDefaultLlmConnection(workspaceId: string, slug: string | null): Promise<{ success: boolean; error?: string }>
 
   // Labels (workspace-scoped)
-  listLabels(workspaceId: string): Promise<import('@mkagent/shared/labels').LabelConfig[]>
-  createLabel(workspaceId: string, input: import('@mkagent/shared/labels').CreateLabelInput): Promise<import('@mkagent/shared/labels').LabelConfig>
-  updateLabel(workspaceId: string, labelId: string, updates: import('@mkagent/shared/labels').UpdateLabelInput): Promise<import('@mkagent/shared/labels').LabelConfig>
+  listLabels(workspaceId: string): Promise<import('@opcagent/shared/labels').LabelConfig[]>
+  createLabel(workspaceId: string, input: import('@opcagent/shared/labels').CreateLabelInput): Promise<import('@opcagent/shared/labels').LabelConfig>
+  updateLabel(workspaceId: string, labelId: string, updates: import('@opcagent/shared/labels').UpdateLabelInput): Promise<import('@opcagent/shared/labels').LabelConfig>
   deleteLabel(workspaceId: string, labelId: string): Promise<{ stripped: number }>
   moveLabel(workspaceId: string, labelId: string, parentId: string | null): Promise<void>
   reorderLabels(workspaceId: string, parentId: string | null, orderedIds: string[]): Promise<void>
   onLabelsChanged(callback: (workspaceId: string) => void): () => void
 
   // Projects (workspace-scoped)
-  getProjects(workspaceId: string): Promise<import('@mkagent/shared/projects').LoadedProject[]>
-  getProject(workspaceId: string, projectIdOrSlug: string): Promise<import('@mkagent/shared/projects').LoadedProject | null>
-  createProject(workspaceId: string, input: import('@mkagent/shared/projects').CreateProjectInput): Promise<import('@mkagent/shared/projects').LoadedProject>
-  updateProject(workspaceId: string, projectSlug: string, patch: Partial<Omit<import('@mkagent/shared/projects').ProjectConfig, 'id' | 'slug' | 'createdAt'>>): Promise<import('@mkagent/shared/projects').LoadedProject | null>
+  getProjects(workspaceId: string): Promise<import('@opcagent/shared/projects').LoadedProject[]>
+  getProject(workspaceId: string, projectIdOrSlug: string): Promise<import('@opcagent/shared/projects').LoadedProject | null>
+  createProject(workspaceId: string, input: import('@opcagent/shared/projects').CreateProjectInput): Promise<import('@opcagent/shared/projects').LoadedProject>
+  updateProject(workspaceId: string, projectSlug: string, patch: Partial<Omit<import('@opcagent/shared/projects').ProjectConfig, 'id' | 'slug' | 'createdAt'>>): Promise<import('@opcagent/shared/projects').LoadedProject | null>
   deleteProject(workspaceId: string, projectSlug: string): Promise<void>
-  listProjectAssets(workspaceId: string, projectSlug: string): Promise<import('@mkagent/shared/projects').ProjectAsset[]>
-  uploadProjectAsset(workspaceId: string, projectSlug: string, input: import('@mkagent/shared/projects').UploadProjectAssetInput): Promise<import('@mkagent/shared/projects').ProjectAsset>
+  listProjectAssets(workspaceId: string, projectSlug: string): Promise<import('@opcagent/shared/projects').ProjectAsset[]>
+  uploadProjectAsset(workspaceId: string, projectSlug: string, input: import('@opcagent/shared/projects').UploadProjectAssetInput): Promise<import('@opcagent/shared/projects').ProjectAsset>
   deleteProjectAsset(workspaceId: string, projectSlug: string, filename: string): Promise<void>
-  onProjectsChanged(callback: (workspaceId: string, projects: import('@mkagent/shared/projects').LoadedProject[]) => void): () => void
+  onProjectsChanged(callback: (workspaceId: string, projects: import('@opcagent/shared/projects').LoadedProject[]) => void): () => void
 
   // Automations
   getAutomations(workspaceId: string): Promise<unknown>
-  testAutomation(payload: import('@mkagent/shared/protocol').TestAutomationPayload): Promise<import('@mkagent/shared/protocol').TestAutomationResult>
+  testAutomation(payload: import('@opcagent/shared/protocol').TestAutomationPayload): Promise<import('@opcagent/shared/protocol').TestAutomationResult>
   setAutomationEnabled(workspaceId: string, eventName: string, matcherIndex: number, enabled: boolean): Promise<void>
   duplicateAutomation(workspaceId: string, eventName: string, matcherIndex: number): Promise<void>
   deleteAutomation(workspaceId: string, eventName: string, matcherIndex: number): Promise<void>

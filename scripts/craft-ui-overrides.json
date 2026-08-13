@@ -5,21 +5,21 @@
       "sha256": "7cf56aeed12bbaf007a527b34e614ce61937e1d31d437fd4b3c660aadb639f08",
       "reason": "Craft app event plumbing restores source change notifications and credential responses while retaining Pi OAuth and browser flows and omitting excluded product surfaces"
     },
-    "apps/electron/src/renderer/assets/mkagent_app_icon.png": {
+    "apps/electron/src/renderer/assets/opcagent_app_icon.png": {
       "sha256": "8ef2d656c2eb9bbef8d0d8abb646e1ded0e4143046434866d541aaf9e3da6dc5",
-      "reason": "MkAgent trademark-safe replacement asset"
+      "reason": "OPC Agent trademark-safe replacement asset"
     },
-    "apps/electron/src/renderer/assets/mkagent_app_icon.svg": {
+    "apps/electron/src/renderer/assets/opcagent_app_icon.svg": {
       "sha256": "06ec2c6504dbe3fa3cde5e26428920f0dcd381c2a94f6f7017ea639110172f5c",
-      "reason": "MkAgent trademark-safe replacement asset"
+      "reason": "OPC Agent trademark-safe replacement asset"
     },
-    "apps/electron/src/renderer/assets/mkagent_mark.png": {
+    "apps/electron/src/renderer/assets/opcagent_mark.png": {
       "sha256": "7ab54137b8b7ab251a521ea1903a02dcb7f27598beabff8dca1d4a3fcd75906b",
-      "reason": "MkAgent trademark-safe replacement asset"
+      "reason": "OPC Agent trademark-safe replacement asset"
     },
-    "apps/electron/src/renderer/assets/mkagent_mark.svg": {
+    "apps/electron/src/renderer/assets/opcagent_mark.svg": {
       "sha256": "eb873c2b87d124f28f407282019238bb444a784b783dd8378dbb48da4dc304d9",
-      "reason": "MkAgent trademark-safe replacement asset"
+      "reason": "OPC Agent trademark-safe replacement asset"
     },
     "apps/electron/src/renderer/atoms/__tests__/browser-pane.test.ts": {
       "sha256": "2dab68f4f82baf7e90b06ab68b5c0692161649760820f38cb7314898a0bb3468",
@@ -31,15 +31,15 @@
     },
     "apps/electron/src/renderer/atoms/background-finished.ts": {
       "sha256": "c2a82b7e9a71f56c54066b24b7c4124c620a5814da161a1c93b4e2ece135911e",
-      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or MkAgent branding"
+      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or OPC Agent branding"
     },
     "apps/electron/src/renderer/atoms/browser-pane.ts": {
       "sha256": "1bc04554f9662333e6b1af542f42c90c277bcbaacc2f8db98f8c62857a2f18f7",
-      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or MkAgent branding"
+      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or OPC Agent branding"
     },
     "apps/electron/src/renderer/atoms/panel-stack.ts": {
       "sha256": "05b46130005ab1ea38ec876dd4b8fb8eb59af1e668d3ec32be0e7c34a5437f6c",
-      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or MkAgent branding"
+      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or OPC Agent branding"
     },
     "apps/electron/src/renderer/atoms/sessions.ts": {
       "sha256": "919ed8b93d39d160984be32bbd51b39d5cc8c9eea3559bcaa3ff5c901188659d",
@@ -63,15 +63,15 @@
     },
     "apps/electron/src/renderer/components/apisetup/ApiKeyInput.tsx": {
       "sha256": "1e62720345ab9ec3c1fabdd02c4a647e804c4692bd03ff4e8a07db739ab66cb2",
-      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or MkAgent branding"
+      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or OPC Agent branding"
     },
     "apps/electron/src/renderer/components/app-menu/DesktopAppMenu.tsx": {
       "sha256": "8fdaaab7237765c10e9e79d0ea6ea342de24cf27f239e69a2688daa3543b70d6",
-      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or MkAgent branding"
+      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or OPC Agent branding"
     },
     "apps/electron/src/renderer/components/app-menu/MobileAppMenu.tsx": {
       "sha256": "b5eeb727b566fcdebc7fa8e893a0ce746b063aebff420afa74a1cf9e0a842bc7",
-      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or MkAgent branding"
+      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or OPC Agent branding"
     },
     "apps/electron/src/renderer/components/app-shell/__tests__/transport-connection-banner.test.ts": {
       "sha256": "dcd58dff9b5a53e292c53d45f47c16fde2dfba92e3f0936b966ba15e001ff0ce",
@@ -91,7 +91,7 @@
     },
     "apps/electron/src/renderer/components/app-shell/ChatDisplay.tsx": {
       "sha256": "65036722f9ef0bb6183bf98ca7c0eac17c20c65f31aff868b15d74c719e8861b",
-      "reason": "Craft chat display restores Source authentication cards and enabled-source input state while retaining MkAgent timestamp and copy-footer fixes"
+      "reason": "Craft chat display restores Source authentication cards and enabled-source input state while retaining OPC Agent timestamp and copy-footer fixes"
     },
     "apps/electron/src/renderer/components/app-shell/CompactSessionMenu.tsx": {
       "sha256": "924b1c6d4fd0a871d145a3b496e14808102d2aa10e819c83bef4ad942f286353",
@@ -111,7 +111,7 @@
     },
     "apps/electron/src/renderer/components/app-shell/input/FreeFormInput.tsx": {
       "sha256": "ddbcceb7a15723f653e4c495b49b094fbf288e27c3550bf3f482b7ba251ef3fd",
-      "reason": "Craft free-form input restores Source selection and mentions while retaining MkAgent model, browser, attachment, and input behavior and omitting excluded label controls"
+      "reason": "Craft free-form input restores Source selection and mentions while retaining OPC Agent model, browser, attachment, and input behavior and omitting excluded label controls"
     },
     "apps/electron/src/renderer/components/app-shell/input/FreeFormInputContextBadge.tsx": {
       "sha256": "e2a36c060df1d1c99ff0096449924f26fcb2a09bffc5902230199aea6dc426c7",
@@ -123,11 +123,11 @@
     },
     "apps/electron/src/renderer/components/app-shell/input/structured/AdminApprovalRequest.tsx": {
       "sha256": "f776e5e0aeef4db46418353ae34a0fd6f3eb2aa94b3c678f3bc243a10e1fc8ea",
-      "reason": "Craft renderer file adapted for complete MkAgent localization coverage"
+      "reason": "Craft renderer file adapted for complete OPC Agent localization coverage"
     },
     "apps/electron/src/renderer/components/app-shell/input/structured/PermissionRequest.tsx": {
       "sha256": "a5a570b0d2292726b174bd8a1891627710ff4208ed82af9f8160b737c8fdaee6",
-      "reason": "Craft renderer file adapted for complete MkAgent localization coverage"
+      "reason": "Craft renderer file adapted for complete OPC Agent localization coverage"
     },
     "apps/electron/src/renderer/components/app-shell/input/StructuredInput.tsx": {
       "sha256": "3e5c4892d0412f2d6a861321314c5dd0613e2b97427705922ed80476a462a509",
@@ -203,23 +203,23 @@
     },
     "apps/electron/src/renderer/components/browser/BrowserTabStrip.tsx": {
       "sha256": "ae97ec0e0f299cc26e93948b5d046c91f7a77a56b786d977383d39512d49035d",
-      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or MkAgent branding"
+      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or OPC Agent branding"
     },
     "apps/electron/src/renderer/components/chat/EmptyStateHint.tsx": {
       "sha256": "610487c08fc536aa4f95be7b9cac9270b5b34c79503089b13aceca9973bde87d",
-      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or MkAgent branding"
+      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or OPC Agent branding"
     },
-    "apps/electron/src/renderer/components/icons/MkAgentAppIcon.tsx": {
+    "apps/electron/src/renderer/components/icons/OPCAgentAppIcon.tsx": {
       "sha256": "47300daaad3d1947766cebb1c54375a24630fd12154bc498c985326281d0a109",
-      "reason": "MkAgent trademark-safe replacement asset"
+      "reason": "OPC Agent trademark-safe replacement asset"
     },
     "apps/electron/src/renderer/components/icons/SettingsIcons.tsx": {
       "sha256": "4ad963b4a6724634bdb1be6c1fddb0260dc6ddcd3d3693b44132210b4d441fbd",
-      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or MkAgent branding"
+      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or OPC Agent branding"
     },
     "apps/electron/src/renderer/components/info/index.ts": {
       "sha256": "acdf124faf9f5f31209e7a0be52bde451be97e8cb323f68e5dec9f48a3bba7c7",
-      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or MkAgent branding"
+      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or OPC Agent branding"
     },
     "apps/electron/src/renderer/components/onboarding/APISetupStep.tsx": {
       "sha256": "a77c8f2a360bf728e6bd75613a08b97b6057840df20a843269936a2d15eddb72",
@@ -227,7 +227,7 @@
     },
     "apps/electron/src/renderer/components/onboarding/CompletionStep.tsx": {
       "sha256": "b45261dba5f445cb98e3d5d559211910943453a88f463e9ca54e46924bc154ad",
-      "reason": "Craft onboarding uses the MkAgent app icon while retaining the upstream layout"
+      "reason": "Craft onboarding uses the OPC Agent app icon while retaining the upstream layout"
     },
     "apps/electron/src/renderer/components/onboarding/CredentialsStep.tsx": {
       "sha256": "345701e98c70fb41e83554c01e591b384229e4e3dec29bd76acc861cb6d56c3a",
@@ -239,7 +239,7 @@
     },
     "apps/electron/src/renderer/components/onboarding/ProviderSelectStep.tsx": {
       "sha256": "8db1ed18418845ee97e877f403a3b12bef1f7b688aeef3b050f0bb92368f337f",
-      "reason": "Craft provider cards retain Claude and ChatGPT, use MkAgent branding, and omit Copilot"
+      "reason": "Craft provider cards retain Claude and ChatGPT, use OPC Agent branding, and omit Copilot"
     },
     "apps/electron/src/renderer/components/onboarding/ReauthScreen.tsx": {
       "sha256": "54445382c8d5f777c63dc65d6bf1c43ca9520748b8aac1ae3741601ab94dea50",
@@ -247,15 +247,15 @@
     },
     "apps/electron/src/renderer/components/onboarding/WelcomeStep.tsx": {
       "sha256": "43c307bd8c2834e2c54c7522cdc103f285101c25d14caa7790f0b0eb9952f266",
-      "reason": "Craft onboarding uses the MkAgent app icon while retaining the upstream layout"
+      "reason": "Craft onboarding uses the OPC Agent app icon while retaining the upstream layout"
     },
     "apps/electron/src/renderer/components/ServerDirectoryBrowser.tsx": {
       "sha256": "b4eb59c3e5f18cdf07651fe8e37fba65096e2129ca5c6ae59a80b420cfaf87ed",
-      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or MkAgent branding"
+      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or OPC Agent branding"
     },
     "apps/electron/src/renderer/components/SplashScreen.tsx": {
       "sha256": "9d903433262e9daaac40db1e78a4e13f90033a3c1211bc12f73ab8982fe7b87c",
-      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or MkAgent branding"
+      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or OPC Agent branding"
     },
     "apps/electron/src/renderer/components/ui/__tests__/rich-text-input.test.ts": {
       "sha256": "64285a8f3247e7379a0ea98617c8b84e3dc711025e455f7f1d1421bc41719f6d",
@@ -263,7 +263,7 @@
     },
     "apps/electron/src/renderer/components/ui/EditPopover.tsx": {
       "sha256": "4c07cc773a19f61605aa46da33416d657fb7507bc74a748a1557221413608c6f",
-      "reason": "Craft edit popover restores source creation, guide, configuration, permission, and inline credential flows with MkAgent data paths while excluded editors remain removed"
+      "reason": "Craft edit popover restores source creation, guide, configuration, permission, and inline credential flows with OPC Agent data paths while excluded editors remain removed"
     },
     "apps/electron/src/renderer/components/ui/mention-badge.tsx": {
       "sha256": "f3c73488248414d6f2bdd8de326890d1d26dfbb77e579c1b27da8c97c404056d",
@@ -275,23 +275,23 @@
     },
     "apps/electron/src/renderer/components/ui/rich-text-input.tsx": {
       "sha256": "dc4e082c10b84edbad45acdab3a781fc4d4593d9d34546270b36df77509cccda",
-      "reason": "Craft rich-text input restores Source mention rendering while retaining the MkAgent DOM and IME placeholder visibility fixes"
+      "reason": "Craft rich-text input restores Source mention rendering while retaining the OPC Agent DOM and IME placeholder visibility fixes"
     },
     "apps/electron/src/renderer/components/ui/slash-command-menu.tsx": {
       "sha256": "5dc49fe32627f98280cd04f4ddcde8b11787162a6b675fa87d9a1d1f4d34c778",
-      "reason": "Craft renderer file adapted for complete MkAgent localization coverage"
+      "reason": "Craft renderer file adapted for complete OPC Agent localization coverage"
     },
     "apps/electron/src/renderer/components/workspace/AddWorkspaceStep_Choice.tsx": {
       "sha256": "8a9b31b731e5cd8bafeced6b678c0ea0f2f6fcdc48a3a0f6e5db048bbee71aff",
-      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or MkAgent branding"
+      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or OPC Agent branding"
     },
     "apps/electron/src/renderer/components/workspace/index.ts": {
       "sha256": "fcfa0194eb5c1a76884a28acb04df11920924612907bde1d4be8db0df0e23d21",
-      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or MkAgent branding"
+      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or OPC Agent branding"
     },
     "apps/electron/src/renderer/components/workspace/WorkspaceCreationScreen.tsx": {
       "sha256": "e39df0d780b26830abf4544db0aa06a7bc60505ad9409c4b1b1236d649668e96",
-      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or MkAgent branding"
+      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or OPC Agent branding"
     },
     "apps/electron/src/renderer/context/AppShellContext.tsx": {
       "sha256": "d4c725b50f30d024655b56b566c1fc3370855aa1df51368628489a135a935e15",
@@ -299,7 +299,7 @@
     },
     "apps/electron/src/renderer/context/SessionListContext.tsx": {
       "sha256": "898db620faae11b9440f11a19321d97e0473f97f81568decdefbfee414b1d013",
-      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or MkAgent branding"
+      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or OPC Agent branding"
     },
     "apps/electron/src/renderer/context/ThemeContext.tsx": {
       "sha256": "925f487d0bfd778066cb0b55593eb7984b875c806a7cb663423a648f3d26e986",
@@ -347,7 +347,7 @@
     },
     "apps/electron/src/renderer/hooks/useNotifications.ts": {
       "sha256": "159ca806548a1ec04a587d6e6c76783d42b442d06da19f6c7f3a4be6e2705718",
-      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or MkAgent branding"
+      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or OPC Agent branding"
     },
     "apps/electron/src/renderer/hooks/useOnboarding.ts": {
       "sha256": "1694ec69d44c4888eb0a5421b1ce2598ab634a3d0fa9509bc26cbb9c342d0782",
@@ -355,19 +355,19 @@
     },
     "apps/electron/src/renderer/hooks/useSessionMenuActions.ts": {
       "sha256": "35290558b45cbadff1a7d88e9632415c31eeca95b86eceec7448955d7c194233",
-      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or MkAgent branding"
+      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or OPC Agent branding"
     },
     "apps/electron/src/renderer/hooks/useSessionSearch.ts": {
       "sha256": "e3bc5d8a032e13c3bcefcde8cf5037e67af117fd6d1220066676e65ac1c469b5",
-      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or MkAgent branding"
+      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or OPC Agent branding"
     },
     "apps/electron/src/renderer/index.css": {
       "sha256": "1c638e689c5fc94983958e7b1920146a3ee0e900e10c5185b7db6bd0d83f39cc",
-      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or MkAgent branding"
+      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or OPC Agent branding"
     },
     "apps/electron/src/renderer/index.html": {
       "sha256": "151c93d12fe764c756d56fd99c817a67fd2ca948cc71b145f7aa69e1962dccce",
-      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or MkAgent branding"
+      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or OPC Agent branding"
     },
     "apps/electron/src/renderer/lib/__tests__/mentions.test.ts": {
       "sha256": "272a102dbe2f37cad4d54edfbc4e9f8a439d464b059b4dde5847ce5728e363c5",
@@ -375,15 +375,15 @@
     },
     "apps/electron/src/renderer/lib/icon-cache.ts": {
       "sha256": "36f0fdf56f5a5f1fc6d3ad4ca3cf9a3904515914c422bc43b2e448c86daae290",
-      "reason": "Craft icon cache restores Source icon and logo caching while retaining MkAgent generic entity icon loading"
+      "reason": "Craft icon cache restores Source icon and logo caching while retaining OPC Agent generic entity icon loading"
     },
     "apps/electron/src/renderer/lib/local-storage.ts": {
       "sha256": "16d808f642373f503eb826d1d0122a73ebeedf5d40d5b431262842f5dc2f260e",
-      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or MkAgent branding"
+      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or OPC Agent branding"
     },
     "apps/electron/src/renderer/lib/mentions.ts": {
       "sha256": "89caadc3c900d7dd827cadb97bba3e402e8229059a5d97bfe3c533aa92fc93b2",
-      "reason": "Craft mention parsing and resolution restores source mentions while retaining MkAgent file and Skill mention behavior"
+      "reason": "Craft mention parsing and resolution restores source mentions while retaining OPC Agent file and Skill mention behavior"
     },
     "apps/electron/src/renderer/lib/nav-helpers.ts": {
       "sha256": "62b8ab23b6882c97e78dbf29acfb437dd7305bb32bcdee89b592674165bf54b9",
@@ -391,11 +391,11 @@
     },
     "apps/electron/src/renderer/lib/navigation-registry.ts": {
       "sha256": "f09c5e792a7565b0cb2572439784446d76c3d0730cb53cff5e2c7d149ec8cc14",
-      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or MkAgent branding"
+      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or OPC Agent branding"
     },
     "apps/electron/src/renderer/lib/provider-icons.ts": {
       "sha256": "b9b9f7a6a44e4093bb25384fc7d407a340e4cb1434d01543224fc3ad588cfcb2",
-      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or MkAgent branding"
+      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or OPC Agent branding"
     },
     "apps/electron/src/renderer/pages/ChatPage.tsx": {
       "sha256": "84920dbc183bc253e947926cc4a66757bee4e305e856bc471167cf7f86c7f856",
@@ -403,7 +403,7 @@
     },
     "apps/electron/src/renderer/pages/index.ts": {
       "sha256": "ec1e30ec73b9e7d8794cc20fcfb3d446884cf0844235a438bcd3d9f8204b2c94",
-      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or MkAgent branding"
+      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or OPC Agent branding"
     },
     "apps/electron/src/renderer/pages/settings/AiSettingsPage.tsx": {
       "sha256": "849aaf4d6c5931898ed55b42670843603a235184fc3d39651ee258ce6f2e6cff",
@@ -411,27 +411,27 @@
     },
     "apps/electron/src/renderer/pages/settings/AppearanceSettingsPage.tsx": {
       "sha256": "7306decef1eda45b0ccec12bce6df702b2e4b6edfa69e563f16243fcacc35930",
-      "reason": "Craft settings UI adapted only to retained MkAgent settings"
+      "reason": "Craft settings UI adapted only to retained OPC Agent settings"
     },
     "apps/electron/src/renderer/pages/settings/index.ts": {
       "sha256": "de28e356583392579cd1adca1a6f5420da86c15f2f20afd12b54b2da8d79ec9c",
-      "reason": "Craft settings UI adapted only to retained MkAgent settings"
+      "reason": "Craft settings UI adapted only to retained OPC Agent settings"
     },
     "apps/electron/src/renderer/pages/settings/PermissionsSettingsPage.tsx": {
       "sha256": "2515cc780495f17c02c3b756d6c76e1e1fd2c6bfa908d367cdeba87b4b52db09",
-      "reason": "Craft settings UI adapted only to retained MkAgent settings"
+      "reason": "Craft settings UI adapted only to retained OPC Agent settings"
     },
     "apps/electron/src/renderer/pages/settings/settings-pages.ts": {
       "sha256": "02dbdc4e17670c43c343a9127b1b531109a2462164453ec1b50c0edf2d34ac3c",
-      "reason": "Craft settings UI adapted only to retained MkAgent settings"
+      "reason": "Craft settings UI adapted only to retained OPC Agent settings"
     },
     "apps/electron/src/renderer/pages/settings/WorkspaceSettingsPage.tsx": {
       "sha256": "3bed7f58219cced4f426f947b73920a6a4a4e745994fff37dad4d0ba5a622b92",
-      "reason": "Craft settings UI adapted only to retained MkAgent settings"
+      "reason": "Craft settings UI adapted only to retained OPC Agent settings"
     },
     "apps/electron/src/renderer/pages/SkillInfoPage.tsx": {
       "sha256": "84f8d2af0e67e7723f5521bfbcca157cb8da241ec9376c7533bb0c8a7092a018",
-      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or MkAgent branding"
+      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or OPC Agent branding"
     },
     "apps/electron/src/renderer/utils/__tests__/session-list-collapse.test.ts": {
       "sha256": "e46fa6ab822eb26a015a81372f7b00107c0728b24354e14b1b63af628823cf09",
@@ -439,11 +439,11 @@
     },
     "apps/electron/src/renderer/utils/session-list-collapse.ts": {
       "sha256": "53666dcec4a7a9089103b69a6375cbd6d3176e1efa6ab1e54d0a8673475424bc",
-      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or MkAgent branding"
+      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or OPC Agent branding"
     },
     "apps/electron/src/renderer/utils/session.ts": {
       "sha256": "0e2d6faa76622ecbe1ab438304dc0987eb8486e4f9ac4d43a0cbbd514974771a",
-      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or MkAgent branding"
+      "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or OPC Agent branding"
     }
   }
 }

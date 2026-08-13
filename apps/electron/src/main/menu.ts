@@ -1,10 +1,10 @@
 import { Menu, app, shell, BrowserWindow } from 'electron'
-import { i18n } from '@mkagent/shared/i18n'
+import { i18n } from '@opcagent/shared/i18n'
 import { RPC_CHANNELS, type BroadcastEventMap } from '../shared/types'
 import { EDIT_MENU, VIEW_MENU, WINDOW_MENU } from '../shared/menu-schema'
 import type { MenuItem } from '../shared/menu-schema'
 import type { WindowManager } from './window-manager'
-import type { EventSink } from '@mkagent/server-core/transport'
+import type { EventSink } from '@opcagent/server-core/transport'
 import { mainLog, isDebugMode } from './logger'
 
 type ClientResolver = (webContentsId: number) => string | undefined
@@ -16,7 +16,7 @@ let cachedClientResolver: ClientResolver | null = null
 
 /**
  * Creates and sets the application menu for macOS.
- * Includes only relevant items for the MkAgent app.
+ * Includes only relevant items for the OPC Agent app.
  *
  * Call rebuildMenu() when update state changes to refresh the menu.
  */
@@ -79,7 +79,7 @@ export async function rebuildMenu(): Promise<void> {
   const template: Electron.MenuItemConstructorOptions[] = [
     // App menu (macOS only)
     ...(isMac ? [{
-      label: 'MkAgent',
+      label: 'OPC Agent',
       submenu: [
         { role: 'about' as const, label: i18n.t('menu.aboutCraftAgents') },
         updateMenuItem,
@@ -221,7 +221,7 @@ export async function rebuildMenu(): Promise<void> {
       submenu: [
         {
           label: i18n.t("menu.helpAndDocs"),
-          click: () => shell.openExternal('https://mkagent.app/docs')
+          click: () => shell.openExternal('https://github.com/iBigQiang/OpcAgent')
         },
         {
           label: i18n.t("menu.keyboardShortcuts"),

@@ -8,8 +8,8 @@ import type {
   PlatformRuntimeInfo,
   PlatformType,
   TelegramCredentialTestResult,
-} from '@mkagent/messaging-gateway'
-import type { WhatsAppUiEvent } from '@mkagent/shared/protocol'
+} from '@opcagent/messaging-gateway'
+import type { WhatsAppUiEvent } from '@opcagent/shared/protocol'
 
 export type MessagingPendingEntryKey = Required<Pick<PendingSender, 'reason'>> & Pick<PendingSender, 'bindingId'>
 export interface MessagingPairingCode { code: string; expiresAt: number; botUsername?: string }

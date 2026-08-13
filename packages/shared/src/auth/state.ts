@@ -18,7 +18,7 @@ import {
   getDefaultLlmConnection,
   getLlmConnection,
 } from '../config/storage.ts';
-import type { Workspace } from '@mkagent/core/types';
+import type { Workspace } from '@opcagent/core/types';
 import { refreshClaudeToken, isTokenExpired } from './claude-token.ts';
 import { debug } from '../utils/debug.ts';
 
@@ -271,7 +271,7 @@ export async function getAuthState(): Promise<AuthState> {
   // Determine auth type from connection (no legacy fallback - migration ensures all users have connections)
   let effectiveAuthType: AuthType | null = null;
   if (connection) {
-    // Any configured MkAgent connection counts as billing-configured.
+    // Any configured OPCAgent connection counts as billing-configured.
     effectiveAuthType = toLegacyBillingType(connection.authType)
   }
   // No fallback to legacy config.authType - if no connection, return unauthenticated state

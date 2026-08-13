@@ -23,22 +23,22 @@ const VITE_BIN = join(ROOT_DIR, `node_modules/.bin/vite${BIN_EXT}`);
 const ELECTRON_BIN = join(ROOT_DIR, `node_modules/.bin/electron${BIN_EXT}`);
 
 // Multi-instance detection (matches detect-instance.sh logic)
-// Detects instance number from folder name suffix (e.g., mkagent-1 → instance 1)
+// Detects instance number from folder name suffix (e.g., opcagent-1 → instance 1)
 function detectInstance(): void {
   // Don't override if already set (e.g., by sourcing detect-instance.sh first)
-  if (process.env.MKAGENT_VITE_PORT) return;
+  if (process.env.OPCAGENT_VITE_PORT) return;
 
   const folderName = basename(ROOT_DIR);
   const match = folderName.match(/-(\d+)$/);
 
   if (match) {
     const instanceNum = match[1];
-    process.env.MKAGENT_INSTANCE_NUMBER = instanceNum;
-    process.env.MKAGENT_VITE_PORT = `${instanceNum}173`;
-    process.env.MKAGENT_APP_NAME = `MkAgent [${instanceNum}]`;
-    process.env.CONFIG_DIR = join(process.env.HOME || "", `.mkagent-${instanceNum}`);
-    process.env.MKAGENT_DEEPLINK_SCHEME = `mkagent${instanceNum}`;
-    console.log(`🔢 Instance ${instanceNum} detected: port=${process.env.MKAGENT_VITE_PORT}, config=${process.env.CONFIG_DIR}`);
+    process.env.OPCAGENT_INSTANCE_NUMBER = instanceNum;
+    process.env.OPCAGENT_VITE_PORT = `${instanceNum}173`;
+    process.env.OPCAGENT_APP_NAME = `OPC Agent [${instanceNum}]`;
+    process.env.CONFIG_DIR = join(process.env.HOME || "", `.opcagent-${instanceNum}`);
+    process.env.OPCAGENT_DEEPLINK_SCHEME = `opcagent${instanceNum}`;
+    console.log(`Instance ${instanceNum} detected: port=${process.env.OPCAGENT_VITE_PORT}, config=${process.env.CONFIG_DIR}`);
   }
 }
 
@@ -171,32 +171,32 @@ async function buildAgentRuntime(): Promise<void> {
 function getBuildDefines(): Record<string, string> {
   return {
     "process.env.SENTRY_ELECTRON_INGEST_URL": JSON.stringify(process.env.SENTRY_ELECTRON_INGEST_URL || ""),
-    "process.env.MKAGENT_DEV_RUNTIME": JSON.stringify(process.env.MKAGENT_DEV_RUNTIME || "1"),
+    "process.env.OPCAGENT_DEV_RUNTIME": JSON.stringify(process.env.OPCAGENT_DEV_RUNTIME || "1"),
   };
 }
 
 // Get environment variables for electron process
 function getElectronEnv(): Record<string, string> {
-  const vitePort = process.env.MKAGENT_VITE_PORT || "5173";
+  const vitePort = process.env.OPCAGENT_VITE_PORT || "5173";
 
   return {
     ...process.env as Record<string, string>,
     VITE_DEV_SERVER_URL: `http://localhost:${vitePort}`,
     CONFIG_DIR: process.env.CONFIG_DIR || "",
-    MKAGENT_APP_NAME: process.env.MKAGENT_APP_NAME || "MkAgent",
-    MKAGENT_DEEPLINK_SCHEME: process.env.MKAGENT_DEEPLINK_SCHEME || "mkagent",
-    MKAGENT_INSTANCE_NUMBER: process.env.MKAGENT_INSTANCE_NUMBER || "",
-    MKAGENT_BUN: process.env.MKAGENT_BUN || process.execPath,
+    OPCAGENT_APP_NAME: process.env.OPCAGENT_APP_NAME || "OPC Agent",
+    OPCAGENT_DEEPLINK_SCHEME: process.env.OPCAGENT_DEEPLINK_SCHEME || "opcagent",
+    OPCAGENT_INSTANCE_NUMBER: process.env.OPCAGENT_INSTANCE_NUMBER || "",
+    OPCAGENT_BUN: process.env.OPCAGENT_BUN || process.execPath,
   };
 }
 
 function getElectronCommand(): string[] {
   const configDir = process.env.CONFIG_DIR;
-  const userDataArg = process.env.MKAGENT_INSTANCE_NUMBER && configDir
+  const userDataArg = process.env.OPCAGENT_INSTANCE_NUMBER && configDir
     ? [`--user-data-dir=${join(configDir, "electron-user-data")}`]
     : [];
-  const remoteDebuggingArg = process.env.MKAGENT_REMOTE_DEBUGGING_PORT
-    ? [`--remote-debugging-port=${process.env.MKAGENT_REMOTE_DEBUGGING_PORT}`]
+  const remoteDebuggingArg = process.env.OPCAGENT_REMOTE_DEBUGGING_PORT
+    ? [`--remote-debugging-port=${process.env.OPCAGENT_REMOTE_DEBUGGING_PORT}`]
     : [];
 
   return [ELECTRON_BIN, ...userDataArg, ...remoteDebuggingArg, "apps/electron"];
@@ -347,7 +347,7 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  const vitePort = process.env.MKAGENT_VITE_PORT || "5173";
+  const vitePort = process.env.OPCAGENT_VITE_PORT || "5173";
   const buildDefines = getBuildDefines();
 
   // Kill any existing process on the Vite port

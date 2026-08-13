@@ -1,5 +1,5 @@
-import type { LabelConfig } from '@mkagent/shared/labels'
-import { flattenLabelsWithParentPath } from '@mkagent/shared/labels'
+import type { LabelConfig } from '@opcagent/shared/labels'
+import { flattenLabelsWithParentPath } from '@opcagent/shared/labels'
 
 export interface LabelMenuItem {
   id: string

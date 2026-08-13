@@ -8,11 +8,11 @@
 import {
   PROTOCOL_VERSION,
   type MessageEnvelope,
-} from '@mkagent/shared/protocol'
+} from '@opcagent/shared/protocol'
 import {
   serializeEnvelope,
   deserializeEnvelope,
-} from '@mkagent/server-core/transport'
+} from '@opcagent/server-core/transport'
 
 // ---------------------------------------------------------------------------
 // Types

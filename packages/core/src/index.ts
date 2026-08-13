@@ -1,7 +1,7 @@
 /**
- * @mkagent/core
+ * @opcagent/core
  *
- * Core types and utilities for MkAgent.
+ * Core types and utilities for OPCAgent.
  *
  * NOTE: This package currently only exports types and utilities.
  * Storage, credentials, agent, auth, mcp, and prompts are still

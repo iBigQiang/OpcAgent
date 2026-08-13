@@ -5,8 +5,8 @@
  * Light mode is default, with optional dark mode overrides.
  *
  * Storage locations:
- * - App override:   ~/.mkagent/theme.json
- * - Preset themes:  ~/.mkagent/themes/*.json
+ * - App override:   ~/.opcagent/theme.json
+ * - Preset themes:  ~/.opcagent/themes/*.json
  */
 
 /**

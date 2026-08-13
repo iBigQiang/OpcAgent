@@ -5,7 +5,7 @@
  * are scoped to a workspace.
  *
  * Directory structure:
- * ~/.mkagent/workspaces/{slug}/
+ * ~/.opcagent/workspaces/{slug}/
  *   ├── config.json      - Workspace settings
  *   ├── sources/         - Data sources (MCP, API, local)
  *   ├── sessions/        - Conversation sessions

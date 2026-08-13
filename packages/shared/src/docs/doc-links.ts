@@ -1,6 +1,6 @@
 /** Documentation links and summaries for retained settings and features. */
 
-const DOC_BASE_URL = 'https://mkagent.app/docs';
+const DOC_BASE_URL = 'https://github.com/iBigQiang/OpcAgent/tree/main/docs';
 
 export type DocFeature =
   | 'sources'

@@ -1,5 +1,5 @@
 /**
- * UI primitives for @mkagent/ui
+ * UI primitives for @opcagent/ui
  */
 
 export { Spinner, type SpinnerProps, LoadingIndicator, type LoadingIndicatorProps } from './LoadingIndicator'

@@ -1,12 +1,20 @@
 # Changelog
 
-All notable changes to MkAgent are documented in this file. The format follows
+All notable changes to OPC Agent are documented in this file. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versions follow
 [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
 Add user-visible changes here before running `bun run release:prepare <version>`.
+
+## [0.1.1] - 2026-08-13
+
+### Changed
+
+- Renamed the product, application identifiers, CLI, configuration paths, and release assets from MkAgent to OPC Agent.
+- Changed the Windows installer to an assisted setup flow that lets users choose the installation directory.
+- Moved source, update, and release metadata to `iBigQiang/OpcAgent`.
 
 ## [0.1.0] - 2026-07-30
 
@@ -17,5 +25,6 @@ Add user-visible changes here before running `bun run release:prepare <version>`
 - Local skills, browser tools, document tools, permissions, themes, and workspace settings.
 - Local session search, flags, archives, import, export, and branching.
 
-[Unreleased]: https://github.com/MkThingsHQ/mkagent/releases
-[0.1.0]: https://github.com/MkThingsHQ/mkagent/releases/tag/v0.1.0
+[Unreleased]: https://github.com/iBigQiang/OpcAgent/releases
+[0.1.1]: https://github.com/iBigQiang/OpcAgent/releases/tag/v0.1.1
+[0.1.0]: https://github.com/iBigQiang/OpcAgent/releases/tag/v0.1.0

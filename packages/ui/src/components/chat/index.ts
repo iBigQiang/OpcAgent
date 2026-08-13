@@ -1,5 +1,5 @@
 /**
- * Chat component exports for @mkagent/ui
+ * Chat component exports for @opcagent/ui
  */
 
 // Turn utilities (pure functions, no React)

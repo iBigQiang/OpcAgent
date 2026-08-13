@@ -2,16 +2,16 @@
 
 ## 决策状态
 
-本记录是 MkAgent 在产品基线 `a148f98d9d713814f9424cefdc8eb2d606eaa60b` 之上恢复四个产品域的新版决策。历史 Lite 文档继续作为当时裁剪范围的记录，不原地改写其审批结论。
+本记录是 OPC Agent 在产品基线 `a148f98d9d713814f9424cefdc8eb2d606eaa60b` 之上恢复四个产品域的新版决策。历史 Lite 文档继续作为当时裁剪范围的记录，不原地改写其审批结论。
 
-目标分支为 `craft-sources-auto`，工作目录为 `D:\AiCode\MkAgent-craft-sources-auto`。本轮不 commit、不 push、不部署、不发布。
+目标分支为 `craft-sources-auto`，独立工作目录为 `D:\AiCode\OPCAgent`。
 
 ## 固定来源
 
-- MkAgent 产品基线：`a148f98d9d713814f9424cefdc8eb2d606eaa60b`
+- OPC Agent 产品基线：`a148f98d9d713814f9424cefdc8eb2d606eaa60b`
 - Craft 固定来源：`v0.11.4` 对应提交对象 `50ffa143ab76e44c0e96ea785d03aa67cf942c50`
 - 许可证：Apache-2.0；保留仓库中的 `LICENSE`、`NOTICE` 和来源归属
-- 品牌边界：产品继续使用 MkAgent 名称、图标、bundle id 和更新地址，不复制 Craft 商标资产
+- 品牌边界：产品继续使用 OPC Agent 名称、图标、bundle id 和更新地址，不复制 Craft 商标资产
 
 当前本地仓库可验证固定提交对象、提交主题、版本字段、LICENSE、NOTICE 和源文件树，但没有本地 `refs/tags/v0.11.4`。因此来源证据严格表述为“固定 commit object 已验证”，不声称已验证远端 tag 签名或 release asset。
 
@@ -49,7 +49,7 @@ Pi 不等价于 Claude-only hook 的事件保持明确边界，不伪装为兼�
 
 ## 来源与适配清单
 
-逐文件范围、固定 SHA、必需当前文件、测试锚点和 MkAgent 集成理由记录在 `scripts/craft-restored-sources.json`。该清单由 `scripts/audit-craft-reuse.ts` 强制校验，任何新增或修改文件缺少来源或适配理由时验收失败。
+逐文件范围、固定 SHA、必需当前文件、测试锚点和 OPC Agent 集成理由记录在 `scripts/craft-restored-sources.json`。该清单由 `scripts/audit-craft-reuse.ts` 强制校验，任何新增或修改文件缺少来源或适配理由时验收失败。
 
 ## 验证边界
 

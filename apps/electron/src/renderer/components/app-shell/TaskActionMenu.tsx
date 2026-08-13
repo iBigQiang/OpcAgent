@@ -9,7 +9,7 @@ import {
   StyledDropdownMenuItem,
   StyledDropdownMenuSeparator,
 } from '@/components/ui/styled-dropdown'
-import { Spinner } from '@mkagent/ui'
+import { Spinner } from '@opcagent/ui'
 import { cn } from '@/lib/utils'
 import type { BackgroundTask } from './ActiveTasksBar'
 import { backgroundTasksAtomFamily } from '@/atoms/sessions'

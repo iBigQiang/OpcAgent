@@ -1,7 +1,7 @@
 import log from 'electron-log/main'
 import { appendFileSync, existsSync, mkdirSync, renameSync, rmSync, statSync } from 'node:fs'
 import { dirname, join } from 'node:path'
-import { CONFIG_DIR } from '@mkagent/shared/config'
+import { CONFIG_DIR } from '@opcagent/shared/config'
 import { installStdioEpipeGuard } from './stdio-error-guard'
 
 export default log
@@ -9,7 +9,7 @@ export default log
 function resolveDebugMode(): boolean {
   if (process.argv.includes('--debug')) return true
 
-  const packagedEnv = process.env.MKAGENT_IS_PACKAGED
+  const packagedEnv = process.env.OPCAGENT_IS_PACKAGED
   if (packagedEnv === 'true') return false
   if (packagedEnv === 'false') return true
 

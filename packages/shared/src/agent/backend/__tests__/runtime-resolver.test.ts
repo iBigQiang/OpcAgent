@@ -233,16 +233,16 @@ describe('resolveBundledRuntimePath', () => {
     expect(paths.bundledRuntimePath).toBe(bundled);
   });
 
-  it('honors MKAGENT_BUN when PATH lookup is unavailable', () => {
+  it('honors OPCAGENT_BUN when PATH lookup is unavailable', () => {
     const appRoot = join(tmpBase, 'env-override');
     const binary = process.platform === 'win32' ? 'bun.exe' : 'bun';
     const configured = join(tmpBase, 'configured', binary);
     mkdirSync(join(tmpBase, 'configured'), { recursive: true });
     writeFileSync(configured, 'stub');
 
-    const previousBun = process.env.MKAGENT_BUN;
+    const previousBun = process.env.OPCAGENT_BUN;
     const previousPath = process.env.PATH;
-    process.env.MKAGENT_BUN = configured;
+    process.env.OPCAGENT_BUN = configured;
     process.env.PATH = '';
 
     try {
@@ -250,8 +250,8 @@ describe('resolveBundledRuntimePath', () => {
       expect(paths.bundledRuntimePath).toBe(configured);
       expect(paths.nodeRuntimePath).toBe(configured);
     } finally {
-      if (previousBun === undefined) delete process.env.MKAGENT_BUN;
-      else process.env.MKAGENT_BUN = previousBun;
+      if (previousBun === undefined) delete process.env.OPCAGENT_BUN;
+      else process.env.OPCAGENT_BUN = previousBun;
       if (previousPath === undefined) delete process.env.PATH;
       else process.env.PATH = previousPath;
     }
@@ -259,16 +259,16 @@ describe('resolveBundledRuntimePath', () => {
 
   it('does not fall back to the host process when packaged Bun is unavailable', () => {
     const appRoot = join(tmpBase, 'missing-runtime');
-    const previousBun = process.env.MKAGENT_BUN;
-    delete process.env.MKAGENT_BUN;
+    const previousBun = process.env.OPCAGENT_BUN;
+    delete process.env.OPCAGENT_BUN;
 
     try {
       const paths = resolveBackendRuntimePaths({ appRootPath: appRoot, isPackaged: true });
       expect(paths.bundledRuntimePath).toBeUndefined();
       expect(paths.nodeRuntimePath).toBeUndefined();
     } finally {
-      if (previousBun === undefined) delete process.env.MKAGENT_BUN;
-      else process.env.MKAGENT_BUN = previousBun;
+      if (previousBun === undefined) delete process.env.OPCAGENT_BUN;
+      else process.env.OPCAGENT_BUN = previousBun;
     }
   });
 
@@ -277,8 +277,8 @@ describe('resolveBundledRuntimePath', () => {
     const invalidRuntime = join(tmpBase, process.platform === 'win32' ? 'node.exe' : 'node');
     mkdirSync(tmpBase, { recursive: true });
     writeFileSync(invalidRuntime, 'stub');
-    const previousBun = process.env.MKAGENT_BUN;
-    process.env.MKAGENT_BUN = invalidRuntime;
+    const previousBun = process.env.OPCAGENT_BUN;
+    process.env.OPCAGENT_BUN = invalidRuntime;
 
     try {
       const fromEnvironment = resolveBackendRuntimePaths({ appRootPath: appRoot, isPackaged: true });
@@ -290,8 +290,8 @@ describe('resolveBundledRuntimePath', () => {
       expect(fromEnvironment.nodeRuntimePath).toBeUndefined();
       expect(fromHostOverride.nodeRuntimePath).toBeUndefined();
     } finally {
-      if (previousBun === undefined) delete process.env.MKAGENT_BUN;
-      else process.env.MKAGENT_BUN = previousBun;
+      if (previousBun === undefined) delete process.env.OPCAGENT_BUN;
+      else process.env.OPCAGENT_BUN = previousBun;
     }
   });
 });

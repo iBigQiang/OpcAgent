@@ -12,9 +12,9 @@ function input(overrides: Partial<SdkAutomationInput> = {}): SdkAutomationInput 
 
 describe('sdk-bridge', () => {
   describe('buildEnvFromSdkInput', () => {
-    it('should always include MKAGENT_EVENT', () => {
+    it('should always include OPCAGENT_EVENT', () => {
       const env = buildEnvFromSdkInput('PreToolUse', input());
-      expect(env.MKAGENT_EVENT).toBe('PreToolUse');
+      expect(env.OPCAGENT_EVENT).toBe('PreToolUse');
     });
 
     it('should include process.env variables', () => {
@@ -33,9 +33,9 @@ describe('sdk-bridge', () => {
     });
 
     describe('PreToolUse / PostToolUse', () => {
-      it('should map tool_name to MKAGENT_TOOL_NAME', () => {
+      it('should map tool_name to OPCAGENT_TOOL_NAME', () => {
         const env = buildEnvFromSdkInput('PreToolUse', input({ tool_name: 'Bash' }));
-        expect(env.MKAGENT_TOOL_NAME).toBe('Bash');
+        expect(env.OPCAGENT_TOOL_NAME).toBe('Bash');
       });
 
       it('should map tool_input as sanitized JSON', () => {
@@ -43,8 +43,8 @@ describe('sdk-bridge', () => {
           tool_name: 'Bash',
           tool_input: { command: 'ls -la' },
         }));
-        expect(env.MKAGENT_TOOL_INPUT).toBeDefined();
-        expect(env.MKAGENT_TOOL_INPUT).not.toContain('`');
+        expect(env.OPCAGENT_TOOL_INPUT).toBeDefined();
+        expect(env.OPCAGENT_TOOL_INPUT).not.toContain('`');
       });
 
       it('should map tool_response for PostToolUse', () => {
@@ -52,18 +52,18 @@ describe('sdk-bridge', () => {
           tool_name: 'Bash',
           tool_response: 'file1.txt\nfile2.txt',
         }));
-        expect(env.MKAGENT_TOOL_RESPONSE).toBeDefined();
+        expect(env.OPCAGENT_TOOL_RESPONSE).toBeDefined();
       });
     });
 
     describe('PostToolUseFailure', () => {
-      it('should map error to MKAGENT_ERROR', () => {
+      it('should map error to OPCAGENT_ERROR', () => {
         const env = buildEnvFromSdkInput('PostToolUseFailure', input({
           tool_name: 'Bash',
           error: 'Command failed',
         }));
-        expect(env.MKAGENT_TOOL_NAME).toBe('Bash');
-        expect(env.MKAGENT_ERROR).toBeDefined();
+        expect(env.OPCAGENT_TOOL_NAME).toBe('Bash');
+        expect(env.OPCAGENT_ERROR).toBeDefined();
       });
     });
 
@@ -72,9 +72,9 @@ describe('sdk-bridge', () => {
         const env = buildEnvFromSdkInput('UserPromptSubmit', input({
           prompt: 'Hello `world`',
         }));
-        expect(env.MKAGENT_PROMPT).toBeDefined();
+        expect(env.OPCAGENT_PROMPT).toBeDefined();
         // Backticks should be escaped with backslash
-        expect(env.MKAGENT_PROMPT).toContain('\\`');
+        expect(env.OPCAGENT_PROMPT).toContain('\\`');
       });
     });
 
@@ -84,8 +84,8 @@ describe('sdk-bridge', () => {
           source: 'manual',
           model: 'claude-opus-4-7',
         }));
-        expect(env.MKAGENT_SOURCE).toBe('manual');
-        expect(env.MKAGENT_MODEL).toBe('claude-opus-4-7');
+        expect(env.OPCAGENT_SOURCE).toBe('manual');
+        expect(env.OPCAGENT_MODEL).toBe('claude-opus-4-7');
       });
     });
 
@@ -95,8 +95,8 @@ describe('sdk-bridge', () => {
           agent_id: 'agent-123',
           agent_type: 'research',
         }));
-        expect(env.MKAGENT_AGENT_ID).toBe('agent-123');
-        expect(env.MKAGENT_AGENT_TYPE).toBe('research');
+        expect(env.OPCAGENT_AGENT_ID).toBe('agent-123');
+        expect(env.OPCAGENT_AGENT_TYPE).toBe('research');
       });
     });
 
@@ -106,18 +106,18 @@ describe('sdk-bridge', () => {
           message: 'Test `message`',
           title: 'Test `title`',
         }));
-        expect(env.MKAGENT_MESSAGE).toBeDefined();
-        expect(env.MKAGENT_TITLE).toBeDefined();
+        expect(env.OPCAGENT_MESSAGE).toBeDefined();
+        expect(env.OPCAGENT_TITLE).toBeDefined();
         // Backticks should be escaped
-        expect(env.MKAGENT_MESSAGE).toContain('\\`');
-        expect(env.MKAGENT_TITLE).toContain('\\`');
+        expect(env.OPCAGENT_MESSAGE).toContain('\\`');
+        expect(env.OPCAGENT_TITLE).toContain('\\`');
       });
     });
 
     describe('unknown/default events', () => {
       it('should return minimal env for events with no specific mappings', () => {
         const env = buildEnvFromSdkInput('Stop' as any, input());
-        expect(env.MKAGENT_EVENT).toBe('Stop');
+        expect(env.OPCAGENT_EVENT).toBe('Stop');
         // Should still have all defined process env vars.
         expect(Object.entries(process.env).filter(([, value]) => value !== undefined).every(([key, value]) => env[key] === value)).toBe(true);
       });
@@ -129,7 +129,7 @@ describe('sdk-bridge', () => {
           prompt: '$(rm -rf /)',
         }));
         // $ should be escaped with backslash to prevent command substitution
-        expect(env.MKAGENT_PROMPT).toContain('\\$');
+        expect(env.OPCAGENT_PROMPT).toContain('\\$');
       });
 
       it('should not sanitize internal fields like tool_name', () => {
@@ -137,7 +137,7 @@ describe('sdk-bridge', () => {
           tool_name: 'Bash',
         }));
         // tool_name is internal, should be passed through as-is
-        expect(env.MKAGENT_TOOL_NAME).toBe('Bash');
+        expect(env.OPCAGENT_TOOL_NAME).toBe('Bash');
       });
     });
   });

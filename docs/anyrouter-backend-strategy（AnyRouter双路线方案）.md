@@ -35,7 +35,7 @@ Claude Code 的本地 JSONL 历史只保存会话事件，不保存原始 HTTP h
 
 单轮纯文本已经证明以下链路可行：
 
-`MkAgent -> Pi 后端 -> AnyRouter 专用协议适配器 -> AnyRouter`
+`OPC Agent -> Pi 后端 -> AnyRouter 专用协议适配器 -> AnyRouter`
 
 当前结果证明文本、多轮、一个只读工具闭环、取消、会话恢复、thinking replay 和缓存复用在当前版本、当前时点可用，但不代表 AnyRouter 对 Pi 的正式支持。图片仍被上游限流阻塞；复杂工具链仍需继续验证。
 
@@ -105,10 +105,10 @@ AnyRouter 公开说明要求安装官方 Claude Code，并配置：
 
 - 原始完整请求约 124 KB；
 - system prompt 约 99,503 字符；
-- MkAgent 指令约 30,027 字符，其余主要来自 Pi 默认身份提示；
+- OPC Agent 指令约 30,027 字符，其余主要来自 Pi 默认身份提示；
 - AnyRouter-Pi wire 又会添加 Claude Code 身份块，造成 Pi 身份与 Claude Code 身份重复。
 
-修复后，仅 `anyrouter_pi` 使用 MkAgent system prompt 加版本化 Claude Code wire，不再重复附加 Pi 默认身份。AgentRouter、Generic Custom 和其他 Pi provider 保持原有 prompt 策略。完整文本、多轮和 Read 工具测试随后通过。
+修复后，仅 `anyrouter_pi` 使用 OPC Agent system prompt 加版本化 Claude Code wire，不再重复附加 Pi 默认身份。AgentRouter、Generic Custom 和其他 Pi provider 保持原有 prompt 策略。完整文本、多轮和 Read 工具测试随后通过。
 
 连接测试也由只检查 HTTP 200 改为必须消费 Anthropic SSE 并看到 `message_stop`；200 响应中的 `error` 或 `rate_limit` 不再被误判为成功。
 
@@ -150,8 +150,8 @@ AnyRouter 公开说明要求安装官方 Claude Code，并配置：
 
 ## 5.1 版本升级与稳定性
 
-- `AnyRouter-CC` 依赖用户本机的 Claude Code CLI。MkAgent 会检测、验证和调用 `claude.exe`，但不会替用户自动升级 Claude Code。用户升级 CLI 后，只要命令行参数和 `stream-json` 输出仍兼容，MkAgent 通常无需修改配置。
-- `AnyRouter-Pi` 不依赖本机 Claude Code，但当前 wire 明确固定为 Claude Code 2.1.227 的请求形状。它不会随着用户升级 Claude Code 自动变化；只有 MkAgent 更新 adapter 并重新发布后才会变化。
+- `AnyRouter-CC` 依赖用户本机的 Claude Code CLI。OPC Agent 会检测、验证和调用 `claude.exe`，但不会替用户自动升级 Claude Code。用户升级 CLI 后，只要命令行参数和 `stream-json` 输出仍兼容，OPC Agent 通常无需修改配置。
+- `AnyRouter-Pi` 不依赖本机 Claude Code，但当前 wire 明确固定为 Claude Code 2.1.227 的请求形状。它不会随着用户升级 Claude Code 自动变化；只有 OPC Agent 更新 adapter 并重新发布后才会变化。
 - 因为 AnyRouter 的公开说明以官方 Claude Code 为支持路径，`AnyRouter-CC` 应继续作为默认稳定入口；`AnyRouter-Pi` 的本机依赖更轻，但对 AnyRouter 未公开识别规则的维护风险更高。
 - 每次升级 Pi wire 时，应以同一连接分别执行 CC 与 Pi 的结构化对照测试，再更新 wire 版本；不能只根据 Claude Code 版本号猜测 header、beta、system 或工具清单。
 
@@ -230,16 +230,16 @@ Windows 的 `.cmd` shim 不能在 `shell: false` 下假定可直接执行，必�
 | 本机安装负担         | 更轻                          | 需要安装 Claude Code        |
 | 官方兼容性           | 非官方协议适配                | AnyRouter 官方推荐路径      |
 | 本机 Claude 升级影响 | 不受本机 CLI 升级影响         | 依赖 CLI 参数和输出保持兼容 |
-| 长期稳定性           | 协议变化时需更新 MkAgent 代码 | 当前更稳定                  |
+| 长期稳定性           | 协议变化时需更新 OPC Agent 代码 | 当前更稳定                  |
 | 建议                 | 实验、免安装备用              | 默认推荐                    |
 
 结论：`AnyRouter-Pi` 更轻，但 `AnyRouter-CC` 目前更稳定。
 
-MkAgent 不会自动更新用户电脑里的 Claude Code：
+OPC Agent 不会自动更新用户电脑里的 Claude Code：
 
 - `AnyRouter-CC` 使用本机现有 `claude.exe`。
-- 用户升级 Claude Code 后，只要命令行参数和流式输出格式没变，通常无需修改 MkAgent。
-- `AnyRouter-Pi` 固定模拟 Claude Code 2.1.227 的协议形状，不随本机 Claude Code 升级。AnyRouter 将来修改客户端识别规则时，需要更新 MkAgent 的 wire adapter 并重新发布。
+- 用户升级 Claude Code 后，只要命令行参数和流式输出格式没变，通常无需修改 OPC Agent。
+- `AnyRouter-Pi` 固定模拟 Claude Code 2.1.227 的协议形状，不随本机 Claude Code 升级。AnyRouter 将来修改客户端识别规则时，需要更新 OPC Agent 的 wire adapter 并重新发布。
 
 ## Claude CLI 自动识别
 

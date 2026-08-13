@@ -19,7 +19,7 @@ import {
 import { createSession, loadSession, setSessionProjectId, unbindProjectFromSessions } from '../../sessions/storage'
 
 const roots: string[] = []
-function workspace(): string { const root = mkdtempSync(join(tmpdir(), 'mkagent-projects-')); roots.push(root); return root }
+function workspace(): string { const root = mkdtempSync(join(tmpdir(), 'opcagent-projects-')); roots.push(root); return root }
 
 afterEach(() => { while (roots.length) rmSync(roots.pop()!, { recursive: true, force: true }) })
 

@@ -78,7 +78,7 @@ export function SkillsListPanel({
           <SkillMenu
             skillSlug={skill.slug}
             skillName={skill.metadata.name}
-            onOpenInNewWindow={() => window.electronAPI.openUrl(`mkagent://skills/skill/${skill.slug}?window=focused`)}
+            onOpenInNewWindow={() => window.electronAPI.openUrl(`opcagent://skills/skill/${skill.slug}?window=focused`)}
             onShowInFinder={async () => {
               if (!canRevealLocally) return
               try {

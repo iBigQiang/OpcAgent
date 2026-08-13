@@ -1,7 +1,7 @@
 import { spawn, type ChildProcess } from 'node:child_process';
 import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
-import type { AgentEvent } from '@mkagent/core/types';
+import type { AgentEvent } from '@opcagent/core/types';
 import { BaseAgent } from './base-agent.ts';
 import type { BackendConfig, ChatOptions } from './backend/types.ts';
 import { AbortReason } from './backend/types.ts';
@@ -133,7 +133,7 @@ export class ClaudeCliAgent extends BaseAgent {
       ? await getCredentialManager().getLlmApiKey(this.config.connectionSlug)
       : null;
     const runtime = getBackendRuntime(this.config) as ClaudeCliRuntime;
-    const configDir = join(this.config.workspace.rootPath, '.mkagent', 'claude-cli', this._sessionId);
+    const configDir = join(this.config.workspace.rootPath, '.opcagent', 'claude-cli', this._sessionId);
     mkdirSync(configDir, { recursive: true });
     this.cliEnv = buildClaudeCliEnv({
       baseUrl: runtime.baseUrl,
@@ -355,7 +355,7 @@ export class ClaudeCliAgent extends BaseAgent {
 
   private buildSystemPrompt(includeProjectContext = true): string {
     return [
-      'You are MkAgent, a local coding assistant. Follow workspace instructions and use available tools carefully.',
+      'You are OPCAgent, a local coding assistant. Follow workspace instructions and use available tools carefully.',
       ...this.promptBuilder.buildStableContextParts({ includeProjectContext }),
     ].filter(Boolean).join('\n\n');
   }

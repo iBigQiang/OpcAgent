@@ -1,8 +1,8 @@
 import { normalize, isAbsolute, sep } from 'path'
 import { homedir, tmpdir } from 'os'
 import { realpath } from 'fs/promises'
-import { getClaudeExecutablePath, getWorkspaceByNameOrId, type Workspace } from '@mkagent/shared/config'
-import { loadWorkspaceConfig } from '@mkagent/shared/workspaces'
+import { getClaudeExecutablePath, getWorkspaceByNameOrId, type Workspace } from '@opcagent/shared/config'
+import { loadWorkspaceConfig } from '@opcagent/shared/workspaces'
 import type { PlatformServices } from '../runtime/platform'
 
 /**

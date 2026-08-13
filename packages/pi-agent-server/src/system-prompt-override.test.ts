@@ -37,23 +37,23 @@ function makeFakeSession(): StampedSession {
 describe('applySystemPromptOverride', () => {
   it('stamps state.systemPrompt', () => {
     const session = makeFakeSession();
-    applySystemPromptOverride(session as unknown as AgentSession, 'MKAGENT_PROMPT');
-    expect(session.agent.state.systemPrompt).toBe('MKAGENT_PROMPT');
+    applySystemPromptOverride(session as unknown as AgentSession, 'OPCAGENT_PROMPT');
+    expect(session.agent.state.systemPrompt).toBe('OPCAGENT_PROMPT');
   });
 
   it('stamps the private _baseSystemPrompt field so session.prompt() reset survives', () => {
     const session = makeFakeSession();
-    applySystemPromptOverride(session as unknown as AgentSession, 'MKAGENT_PROMPT');
-    expect(session._baseSystemPrompt).toBe('MKAGENT_PROMPT');
+    applySystemPromptOverride(session as unknown as AgentSession, 'OPCAGENT_PROMPT');
+    expect(session._baseSystemPrompt).toBe('OPCAGENT_PROMPT');
   });
 
   it('replaces _rebuildSystemPrompt with a constant function so tool-change rebuilds survive', () => {
     const session = makeFakeSession();
-    applySystemPromptOverride(session as unknown as AgentSession, 'MKAGENT_PROMPT');
+    applySystemPromptOverride(session as unknown as AgentSession, 'OPCAGENT_PROMPT');
     expect(typeof session._rebuildSystemPrompt).toBe('function');
     // Must return our prompt regardless of which tool names the SDK passes in.
-    expect(session._rebuildSystemPrompt!(['read', 'bash'])).toBe('MKAGENT_PROMPT');
-    expect(session._rebuildSystemPrompt!([])).toBe('MKAGENT_PROMPT');
+    expect(session._rebuildSystemPrompt!(['read', 'bash'])).toBe('OPCAGENT_PROMPT');
+    expect(session._rebuildSystemPrompt!([])).toBe('OPCAGENT_PROMPT');
   });
 
   it('overwrites previously stamped values on a re-application', () => {
@@ -67,15 +67,15 @@ describe('applySystemPromptOverride', () => {
 });
 
 describe('applySystemPromptAppend', () => {
-  it('preserves the Pi default prompt and appends MkAgent instructions', () => {
+  it('preserves the Pi default prompt and appends OPCAgent instructions', () => {
     const session = makeFakeSession();
     session._baseSystemPrompt = 'PI_DEFAULT';
     session.agent.state.systemPrompt = 'PI_DEFAULT';
 
-    applySystemPromptAppend(session as unknown as AgentSession, 'MKAGENT_PROMPT');
+    applySystemPromptAppend(session as unknown as AgentSession, 'OPCAGENT_PROMPT');
 
-    expect(session.agent.state.systemPrompt).toBe('PI_DEFAULT\n\nMKAGENT_PROMPT');
-    expect(session._baseSystemPrompt).toBe('PI_DEFAULT\n\nMKAGENT_PROMPT');
+    expect(session.agent.state.systemPrompt).toBe('PI_DEFAULT\n\nOPCAGENT_PROMPT');
+    expect(session._baseSystemPrompt).toBe('PI_DEFAULT\n\nOPCAGENT_PROMPT');
   });
 
   it('retains tool-aware Pi prompt rebuilds', () => {
@@ -83,10 +83,10 @@ describe('applySystemPromptAppend', () => {
     session._baseSystemPrompt = 'PI_DEFAULT';
     session._rebuildSystemPrompt = toolNames => `PI_TOOLS:${toolNames.join(',')}`;
 
-    applySystemPromptAppend(session as unknown as AgentSession, 'MKAGENT_PROMPT');
+    applySystemPromptAppend(session as unknown as AgentSession, 'OPCAGENT_PROMPT');
 
     expect(session._rebuildSystemPrompt!(['read', 'bash']))
-      .toBe('PI_TOOLS:read,bash\n\nMKAGENT_PROMPT');
+      .toBe('PI_TOOLS:read,bash\n\nOPCAGENT_PROMPT');
   });
 
   it('replaces the appended instructions without duplicating prior values', () => {

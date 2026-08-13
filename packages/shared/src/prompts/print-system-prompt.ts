@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 /**
- * Debug script to print the full MkAgent system prompt with annotations.
+ * Debug script to print the full OPCAgent system prompt with annotations.
  * Shows both the static system prompt and dynamic user message context components.
  *
  * Run with: bun run print:system-prompt
@@ -44,7 +44,7 @@ function printAnnotation(text: string) {
 
 console.log(`
 ${colors.bgMagenta}${colors.bold}                                                                                ${colors.reset}
-${colors.bgMagenta}${colors.bold}                      MKAGENT SYSTEM PROMPT BREAKDOWN                            ${colors.reset}
+${colors.bgMagenta}${colors.bold}                      OPCAGENT SYSTEM PROMPT BREAKDOWN                            ${colors.reset}
 ${colors.bgMagenta}${colors.bold}                                                                                ${colors.reset}
 `);
 
@@ -58,7 +58,7 @@ printAnnotation('The SDK also uses preset: "claude_code" which adds Claude Code\
 printAnnotation('');
 printAnnotation('Composed of:');
 printAnnotation('  1. User Preferences (if set) - formatPreferencesForPrompt()');
-printAnnotation('  2. MkAgent Environment Marker - version, platform, arch');
+printAnnotation('  2. OPCAgent Environment Marker - version, platform, arch');
 printAnnotation('  3. Core Instructions - capabilities, sources, guidelines');
 printAnnotation('  4. Configuration Documentation Refs - permissions, skills, themes, statuses');
 printAnnotation('  5. Permission Modes Documentation - inlined in system prompt');
@@ -68,7 +68,7 @@ printAnnotation('  7. Debug Mode Context (if enabled) - formatDebugModeContext()
 const systemPrompt = getSystemPrompt(
   undefined, // No pinned preferences (use current from disk)
   { enabled: false }, // Debug mode disabled for cleaner output
-  '/Users/example/.mkagent/workspaces/abc123' // Example workspace path
+  '/Users/example/.opcagent/workspaces/abc123' // Example workspace path
 );
 
 printSection('FULL STATIC SYSTEM PROMPT', systemPrompt, colors.green);
@@ -78,8 +78,8 @@ console.log(`\n${colors.bold}Static System Prompt Length: ${systemPrompt.length.
 // Show with debug mode enabled
 const systemPromptWithDebug = getSystemPrompt(
   undefined,
-  { enabled: true, logFilePath: '~/Library/Logs/@mkagent/electron/main.log' },
-  '/Users/example/.mkagent/workspaces/abc123'
+  { enabled: true, logFilePath: '~/Library/Logs/@opcagent/electron/main.log' },
+  '/Users/example/.opcagent/workspaces/abc123'
 );
 console.log(`${colors.dim}With debug mode: ${systemPromptWithDebug.length.toLocaleString()} characters (+${(systemPromptWithDebug.length - systemPrompt.length).toLocaleString()})${colors.reset}`);
 
@@ -105,7 +105,7 @@ printAnnotation('Added first to user message for prompt caching optimization');
 // 2. Session State
 const sessionState = formatSessionState('260121-example-session', {
   plansFolderPath:
-    '/Users/example/.mkagent/workspaces/abc123/sessions/260121-example-session/plans',
+    '/Users/example/.opcagent/workspaces/abc123/sessions/260121-example-session/plans',
 });
 printSection('2. SESSION STATE - formatSessionState()', sessionState, colors.magenta);
 printAnnotation('Contains: sessionId, permissionMode, modeTransition/modeChangedBy/modeChangedAt/modeVersion (when available), plansFolderPath');
@@ -189,11 +189,11 @@ ${colors.bgMagenta}${colors.bold}                                               
 
 ${colors.bold}SDK Configuration:${colors.reset}
   systemPrompt.preset: 'claude_code'     ${colors.dim}// Claude Code's base system prompt${colors.reset}
-  systemPrompt.append: getSystemPrompt() ${colors.dim}// MkAgent additions (static, cacheable)${colors.reset}
+  systemPrompt.append: getSystemPrompt() ${colors.dim}// OPCAgent additions (static, cacheable)${colors.reset}
 
 ${colors.bold}Static System Prompt Components:${colors.reset}
   1. User Preferences (if set)           ${colors.dim}// formatPreferencesForPrompt()${colors.reset}
-  2. MkAgent Environment Marker      ${colors.dim}// Version, platform, arch${colors.reset}
+  2. OPCAgent Environment Marker      ${colors.dim}// Version, platform, arch${colors.reset}
   3. Core Instructions                   ${colors.dim}// Capabilities, sources, guidelines${colors.reset}
   4. Configuration Documentation Refs    ${colors.dim}// Permissions, skills, themes, statuses${colors.reset}
   5. Permission Modes Documentation      ${colors.dim}// Inlined in system prompt${colors.reset}
@@ -215,7 +215,7 @@ ${colors.bold}Dynamic User Message Components (per message):${colors.reset}
 
 ${colors.bold}Key Files:${colors.reset}
   packages/shared/src/prompts/system.ts          ${colors.dim}// Main prompt assembly${colors.reset}
-  packages/shared/src/agent/mkagent.ts       ${colors.dim}// User message building${colors.reset}
+  packages/shared/src/agent/opcagent.ts       ${colors.dim}// User message building${colors.reset}
   packages/shared/src/agent/mode-manager.ts      ${colors.dim}// Permission modes${colors.reset}
   packages/shared/src/config/preferences.ts      ${colors.dim}// User preferences${colors.reset}
 `);

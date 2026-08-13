@@ -19,7 +19,7 @@
         document.documentElement.classList.remove('light', 'dark')
         document.documentElement.classList.add(resolved)
       }
-      window.__MKAGENT_APPLY_BROWSER_THEME__ = applyTheme
+      window.__OPCAGENT_APPLY_BROWSER_THEME__ = applyTheme
       media.addEventListener('change', () => {
         if (document.documentElement.dataset.themeMode === 'system') applyTheme('system')
       })

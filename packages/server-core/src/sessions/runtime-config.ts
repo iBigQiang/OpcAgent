@@ -1,6 +1,6 @@
-import type { AgentProvider, LlmAuthType } from '@mkagent/shared/agent/backend'
-import { isCompatProvider, modelSupportsImages, type LlmConnection } from '@mkagent/shared/config'
-import type { FileAttachment } from '@mkagent/shared/protocol'
+import type { AgentProvider, LlmAuthType } from '@opcagent/shared/agent/backend'
+import { isCompatProvider, modelSupportsImages, type LlmConnection } from '@opcagent/shared/config'
+import type { FileAttachment } from '@opcagent/shared/protocol'
 
 export interface BackendRuntimeSignatureInput {
   connection: LlmConnection | null

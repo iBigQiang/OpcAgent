@@ -6,7 +6,7 @@ import type {
   StoredAttachment,
   ToolDisplayMeta,
   TypedError,
-} from '@mkagent/core/types';
+} from '@opcagent/core/types';
 import type { PermissionMode } from '../agent/mode-types.ts';
 import type { ThinkingLevel } from '../agent/thinking-levels.ts';
 import type { CustomEndpointConfig, LlmPlatformProfile } from '../config/llm-connections.ts';
@@ -14,9 +14,9 @@ import type {
   AuthRequest as SharedAuthRequest,
   CredentialAuthRequest as SharedCredentialAuthRequest,
   CredentialInputMode as SharedCredentialInputMode,
-} from '@mkagent/session-tools-core';
+} from '@opcagent/session-tools-core';
 
-export { generateMessageId } from '@mkagent/core/types';
+export { generateMessageId } from '@opcagent/core/types';
 
 export interface Session {
   id: string;

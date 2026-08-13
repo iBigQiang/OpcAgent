@@ -2,7 +2,7 @@
  * Debug utility for core package
  *
  * This is a stub that can be enhanced to support debug logging.
- * Currently a no-op - use @mkagent/shared debug utilities for full logging.
+ * Currently a no-op - use @opcagent/shared debug utilities for full logging.
  */
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

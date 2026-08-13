@@ -38,7 +38,7 @@ Thumbs.db
 
 pnpm-lock.yaml
 
-.mkagent/
+.opcagent/
 
 *.pem
 *.key

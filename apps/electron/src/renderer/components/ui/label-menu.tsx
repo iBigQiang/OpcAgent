@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Check, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { LabelIcon } from './label-icon'
-import type { LabelConfig } from '@mkagent/shared/labels'
+import type { LabelConfig } from '@opcagent/shared/labels'
 import { createLabelMenuItems, filterItems, filterSessionStatuses, type LabelMenuItem } from './label-menu-utils'
 import { getStatusIconStyle } from '@/config/session-status-config'
 type SessionStatus = { id: string; label: string; icon?: React.ReactNode }

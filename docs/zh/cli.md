@@ -1,6 +1,6 @@
-# MkAgent CLI
+# OPC Agent CLI
 
-CLI 通过 WebSocket 连接到 MkAgent headless server。`run` 还可以临时启动一个本地 server，创建会话、流式完成一轮后清理。
+CLI 通过 WebSocket 连接到 OPC Agent headless server。`run` 还可以临时启动一个本地 server，创建会话、流式完成一轮后清理。
 
 ```bash
 bun run apps/cli/src/index.ts --help
@@ -11,12 +11,12 @@ DEEPSEEK_API_KEY=... bun run apps/cli/src/index.ts run "Summarize this repositor
 
 | 参数 | 环境变量 | 默认值 |
 |---|---|---|
-| `--url <ws-url>` | `MKAGENT_SERVER_URL` | `run` 模式下使用临时 server |
-| `--token <secret>` | `MKAGENT_SERVER_TOKEN` | 为临时 server 自动生成 |
-| `--workspace <id>` | `MKAGENT_WORKSPACE` | 优先 `default`，否则取第一个 workspace |
+| `--url <ws-url>` | `OPCAGENT_SERVER_URL` | `run` 模式下使用临时 server |
+| `--token <secret>` | `OPCAGENT_SERVER_TOKEN` | 为临时 server 自动生成 |
+| `--workspace <id>` | `OPCAGENT_WORKSPACE` | 优先 `default`，否则取第一个 workspace |
 | `--timeout <ms>` | — | `10000` |
 | `--send-timeout <ms>` | — | `300000` |
-| `--tls-ca <path>` | `MKAGENT_TLS_CA` | — |
+| `--tls-ca <path>` | `OPCAGENT_TLS_CA` | — |
 | `--json` | — | `false` |
 
 ## 命令
@@ -44,9 +44,9 @@ listen <channel>
 默认 provider 是 DeepSeek。API key 会按 `--api-key`、`LLM_API_KEY` 或 provider 专属环境变量的顺序解析，并复用已配置的 DeepSeek 连接。
 
 ```bash
-DEEPSEEK_API_KEY=... mkagent run "Explain the failing tests"
-OPENAI_API_KEY=... mkagent --provider openai --model gpt-4o run "Review this project"
-mkagent --provider ollama --base-url http://127.0.0.1:11434/v1 --model llama3.2 run "Hello"
+DEEPSEEK_API_KEY=... opcagent run "Explain the failing tests"
+OPENAI_API_KEY=... opcagent --provider openai --model gpt-4o run "Review this project"
+opcagent --provider ollama --base-url http://127.0.0.1:11434/v1 --model llama3.2 run "Hello"
 ```
 
 运行选项：
@@ -67,9 +67,9 @@ mkagent --provider ollama --base-url http://127.0.0.1:11434/v1 --model llama3.2 
 ## 连接已运行 server
 
 ```bash
-mkagent --url ws://127.0.0.1:9100 --token "$MKAGENT_SERVER_TOKEN" workspace list
-mkagent --url ws://127.0.0.1:9100 --token "$MKAGENT_SERVER_TOKEN" session create --name review
-mkagent --url ws://127.0.0.1:9100 --token "$MKAGENT_SERVER_TOKEN" send <session-id> "Run tests"
+opcagent --url ws://127.0.0.1:9100 --token "$OPCAGENT_SERVER_TOKEN" workspace list
+opcagent --url ws://127.0.0.1:9100 --token "$OPCAGENT_SERVER_TOKEN" session create --name review
+opcagent --url ws://127.0.0.1:9100 --token "$OPCAGENT_SERVER_TOKEN" send <session-id> "Run tests"
 ```
 
 CLI 会在执行会话命令前绑定所选 workspace，确保事件流能正确路由到客户端。通过 TLS 连接时请使用 `wss://` 并提供 `--tls-ca`。

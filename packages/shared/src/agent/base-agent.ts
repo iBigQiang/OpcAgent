@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
-import type { AgentEvent } from '@mkagent/core/types';
+import type { AgentEvent } from '@opcagent/core/types';
 import type { FileAttachment } from '../utils/files.ts';
 import { getDefaultLlmConnection, getLlmConnections } from '../config/storage.ts';
 import type { Workspace } from '../config/storage.ts';

@@ -33,7 +33,7 @@ export default [
       },
     },
     plugins: {
-      'mkagent-styles': {
+      'opcagent-styles': {
         rules: {
           'no-hardcoded-z-index': noHardcodedZIndex,
           'no-floating-z-tokens-in-island': noFloatingZTokensInIsland,
@@ -53,13 +53,13 @@ export default [
       }],
 
       // Enforce centralized z-index token scale
-      'mkagent-styles/no-hardcoded-z-index': 'error',
+      'opcagent-styles/no-hardcoded-z-index': 'error',
 
       // Enforce dedicated island z-index tokens in island components
-      'mkagent-styles/no-floating-z-tokens-in-island': 'error',
+      'opcagent-styles/no-floating-z-tokens-in-island': 'error',
 
       // Enforce approved shadow utility classes/tokens only
-      'mkagent-styles/no-nonstandard-shadows': ['error', {
+      'opcagent-styles/no-nonstandard-shadows': ['error', {
         allowedClasses: [
           'shadow-none',
           'shadow-xs',
@@ -86,7 +86,7 @@ export default [
       'src/components/ui/__tests__/styled-dropdown.test.ts',
     ],
     rules: {
-      'mkagent-styles/no-nonstandard-shadows': 'off',
+      'opcagent-styles/no-nonstandard-shadows': 'off',
     },
   },
 

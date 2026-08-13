@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "description": "Default configuration values for MkAgent",
+  "description": "Default configuration values for OPC Agent",
   "defaults": {
     "notificationsEnabled": true,
     "colorTheme": "default",

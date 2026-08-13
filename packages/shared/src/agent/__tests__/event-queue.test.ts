@@ -6,7 +6,7 @@
  */
 import { describe, it, expect } from 'bun:test';
 import { EventQueue } from '../backend/event-queue.ts';
-import type { AgentEvent } from '@mkagent/core/types';
+import type { AgentEvent } from '@opcagent/core/types';
 
 // Helper: create a minimal AgentEvent
 function textDelta(text: string): AgentEvent {

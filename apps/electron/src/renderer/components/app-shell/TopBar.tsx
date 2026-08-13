@@ -9,7 +9,7 @@
 
 import { useTranslation } from "react-i18next"
 import * as Icons from "lucide-react"
-import { Tooltip, TooltipTrigger, TooltipContent } from "@mkagent/ui"
+import { Tooltip, TooltipTrigger, TooltipContent } from "@opcagent/ui"
 import { PanelLeftRounded } from "../icons/PanelLeftRounded"
 import { TopBarButton } from "../ui/TopBarButton"
 import { cn } from "@/lib/utils"
@@ -28,7 +28,7 @@ import { BrowserTabStrip } from "../browser/BrowserTabStrip"
 import type { Workspace } from "../../../shared/types"
 import { WorkspaceSwitcher } from "./WorkspaceSwitcher"
 import { CompactWorkspaceSwitcher } from "./CompactWorkspaceSwitcher"
-import { getDocUrl } from "@mkagent/shared/docs/doc-links"
+import { getDocUrl } from "@opcagent/shared/docs/doc-links"
 import { AppMenu } from "../AppMenu"
 
 const RIGHT_SLOT_FULL_BADGES_THRESHOLD = 420
@@ -262,7 +262,7 @@ export function TopBar({
               <span className="flex-1">{t("settings.permissions.title")}</span>
               <Icons.ExternalLink className="h-3 w-3 text-muted-foreground" />
             </StyledDropdownMenuItem>
-            <StyledDropdownMenuItem onClick={() => window.electronAPI.openUrl('https://mkagent.app/docs')}>
+            <StyledDropdownMenuItem onClick={() => window.electronAPI.openUrl('https://github.com/iBigQiang/OpcAgent')}>
               <Icons.ExternalLink className="h-3.5 w-3.5" />
               <span className="flex-1">{t("menu.allDocumentation")}</span>
             </StyledDropdownMenuItem>

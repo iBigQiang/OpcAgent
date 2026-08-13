@@ -1,5 +1,5 @@
 import { join } from 'node:path';
-import { getConfigDir } from '@mkagent/shared/config';
+import { getConfigDir } from '@opcagent/shared/config';
 import type { SessionToolContext } from '../context.ts';
 import { errorResponse, successResponse } from '../response.ts';
 import type { ToolResult, ValidationResult } from '../types.ts';

@@ -18,7 +18,7 @@
 
 代理凭证是敏感数据。它们**不**能出现在:
 
-- server 日志(`~/.mkagent/logs/mkagent-server-*.log`)
+- server 日志(`~/.opcagent/logs/opcagent-server-*.log`)
 - Sentry breadcrumbs
 - session JSONL
 - session 导出包
@@ -55,7 +55,7 @@ No proxy:          localhost,127.0.0.1,.local
 | `NO_PROXY` / `no_proxy` | 逗号分隔的 no-proxy 列表 |
 | `ALL_PROXY` | `HTTP_PROXY`/`HTTPS_PROXY` 未设置时的默认 |
 
-Electron 启动时也认这些环境变量。应用启动后,MkAgent 自己发起的连接走应用内设置;只有系统级请求(自动更新、Sentry)继续用环境变量。
+Electron 启动时也认这些环境变量。应用启动后,OPC Agent 自己发起的连接走应用内设置;只有系统级请求(自动更新、Sentry)继续用环境变量。
 
 ## 沙箱提示
 
@@ -69,4 +69,4 @@ macOS 上设置了 NSLocalNetworkUsageDescription,这样 Browser 面板在用户
 - Linux:通过 systemd user environment 设 `HTTP_PROXY`
 - Windows:Settings → Network & Internet → Proxy
 
-这样可以避免把凭证写进 MkAgent 的设置文件,也不会进入未来的 import / export 场景。
+这样可以避免把凭证写进 OPC Agent 的设置文件,也不会进入未来的 import / export 场景。

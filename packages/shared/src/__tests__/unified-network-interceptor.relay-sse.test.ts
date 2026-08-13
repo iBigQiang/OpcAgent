@@ -132,12 +132,12 @@ describe('unified-network-interceptor relay SSE quirks (#613)', () => {
   let sessionDir: string;
 
   beforeAll(async () => {
-    process.env.MKAGENT_INTERCEPTOR_DISABLE_AUTO_INSTALL = '1';
+    process.env.OPCAGENT_INTERCEPTOR_DISABLE_AUTO_INSTALL = '1';
     ({ createOpenAiSseStrippingStream } = await import('../unified-network-interceptor.ts'));
   });
 
   afterAll(() => {
-    delete process.env.MKAGENT_INTERCEPTOR_DISABLE_AUTO_INSTALL;
+    delete process.env.OPCAGENT_INTERCEPTOR_DISABLE_AUTO_INSTALL;
   });
 
   beforeEach(() => {

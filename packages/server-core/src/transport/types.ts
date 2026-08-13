@@ -2,7 +2,7 @@
  * Transport-layer interfaces for the WS-based RPC.
  */
 
-import type { PushTarget } from '@mkagent/shared/protocol'
+import type { PushTarget } from '@opcagent/shared/protocol'
 
 export interface RequestContext {
   clientId: string

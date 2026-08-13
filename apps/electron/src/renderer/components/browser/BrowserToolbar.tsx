@@ -5,7 +5,7 @@
  * Derives control state from BrowserInstanceInfo.
  */
 
-import { BrowserControls } from '@mkagent/ui'
+import { BrowserControls } from '@opcagent/ui'
 import type { BrowserInstanceInfo } from '../../../shared/types'
 
 interface BrowserToolbarProps {

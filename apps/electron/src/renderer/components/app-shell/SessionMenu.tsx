@@ -1,5 +1,5 @@
 /**
- * SessionMenu - retained Craft session actions for MkAgent Lite.
+ * SessionMenu - retained Craft session actions for OPC Agent Lite.
  */
 
 import { useTranslation } from 'react-i18next'

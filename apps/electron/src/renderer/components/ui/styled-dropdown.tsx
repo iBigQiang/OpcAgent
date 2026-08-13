@@ -1,7 +1,7 @@
 /**
  * Styled Dropdown Components
  *
- * Re-exports from @mkagent/ui for shared styling across packages.
+ * Re-exports from @opcagent/ui for shared styling across packages.
  */
 
 export {
@@ -14,4 +14,4 @@ export {
   StyledDropdownMenuSeparator,
   StyledDropdownMenuSubTrigger,
   StyledDropdownMenuSubContent,
-} from '@mkagent/ui'
+} from '@opcagent/ui'

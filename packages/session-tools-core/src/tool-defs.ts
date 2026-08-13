@@ -145,7 +145,7 @@ export const SendAgentMessageSchema = z.object({
 
 export const TOOL_DESCRIPTIONS = {
   SubmitPlan: 'Submit a written plan for user review and pause execution until it is accepted, modified, or rejected.',
-  config_validate: 'Validate MkAgent config, preferences, permissions, tool icons, or all retained configuration.',
+  config_validate: 'Validate OPCAgent config, preferences, permissions, tool icons, or all retained configuration.',
   skill_validate: 'Validate a SKILL.md file discovered from project, workspace, or global scope.',
   mermaid_validate: 'Validate Mermaid syntax and optionally render the diagram.',
   source_test: 'Validate, test, and by default enable and activate a Source in the current session.',
@@ -158,7 +158,7 @@ export const TOOL_DESCRIPTIONS = {
   transform_data: 'Transform session or Skill data into a persisted result using Python, Node, or Bun.',
   script_sandbox: 'Execute a short script with filesystem and network isolation.',
   render_template: 'Render a Source HTML template with data into the session data directory.',
-  send_developer_feedback: 'Send detailed Markdown feedback to the MkAgent development team.',
+  send_developer_feedback: 'Send detailed Markdown feedback to the OPCAgent development team.',
   call_llm: 'Invoke the configured mini model for a focused subtask.',
   spawn_session: 'Create an independent local session using an available Pi connection and model.',
   browser_tool: 'Control the built-in browser with a CLI-like command.',

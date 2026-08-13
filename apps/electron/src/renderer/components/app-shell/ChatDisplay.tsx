@@ -39,12 +39,12 @@ import {
   type ActivityItem,
   type FileChange,
   type DiffViewerSettings,
-} from "@mkagent/ui"
+} from "@opcagent/ui"
 import { useFocusZone } from "@/hooks/keyboard"
 import { useTheme } from "@/hooks/useTheme"
 import type { Session, Message, FileAttachment, StoredAttachment, PermissionRequest, CredentialRequest, CredentialResponse, LoadedSource, LoadedSkill } from "../../../shared/types"
-import type { PermissionMode } from "@mkagent/shared/agent/modes"
-import type { ThinkingLevel } from "@mkagent/shared/agent/thinking-levels"
+import type { PermissionMode } from "@opcagent/shared/agent/modes"
+import type { ThinkingLevel } from "@opcagent/shared/agent/thinking-levels"
 import {
   TurnCard,
   UserMessageBubble,
@@ -62,7 +62,7 @@ import {
   type UserTurn,
   type SystemTurn,
   type AuthRequestTurn,
-} from "@mkagent/ui"
+} from "@opcagent/ui"
 import { MemoizedAuthRequestCard } from "@/components/chat/AuthRequestCard"
 import { ChatInputZone, type StructuredInputState, type StructuredResponse, type PermissionResponse, type AdminApprovalResponse } from "./input"
 import type { RichTextInputHandle } from "@/components/ui/rich-text-input"
@@ -993,7 +993,7 @@ export const ChatDisplay = React.forwardRef<ChatDisplayHandle, ChatDisplayProps>
   const [overlayState, setOverlayState] = useState<OverlayState>(null)
 
   // Diff viewer settings - loaded from user preferences on mount, persisted on change
-  // These settings are stored in ~/.mkagent/preferences.json (not localStorage)
+  // These settings are stored in ~/.opcagent/preferences.json (not localStorage)
   const [diffViewerSettings, setDiffViewerSettings] = useState<Partial<DiffViewerSettings>>({})
 
   // Load diff viewer settings from preferences on mount

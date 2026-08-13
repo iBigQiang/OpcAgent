@@ -329,14 +329,14 @@ describe('BrowserPaneManager', () => {
     const openHandler = instance.pageView.webContents.setWindowOpenHandler.mock.calls[0][0]
 
     const result = openHandler({
-      url: 'mkagent://settings',
+      url: 'opcagent://settings',
       disposition: 'new-popup',
       frameName: '',
     })
 
     expect(result).toEqual({ action: 'deny' })
     await Bun.sleep(0)
-    expect(mockShellOpenExternal).toHaveBeenCalledWith('mkagent://settings')
+    expect(mockShellOpenExternal).toHaveBeenCalledWith('opcagent://settings')
   })
 
   it('destroys child popups when parent instance is destroyed', () => {
@@ -591,10 +591,10 @@ describe('BrowserPaneManager', () => {
 
   it('navigate treats plain text as search query', async () => {
     manager.createInstance('nav-2')
-    await manager.navigate('nav-2', 'mkagent browser tools')
+    await manager.navigate('nav-2', 'opcagent browser tools')
     const instance = (manager as any).instances.get('nav-2')
     expect(instance.pageView.webContents.loadURL).toHaveBeenCalledWith(
-      'https://duckduckgo.com/?q=mkagent%20browser%20tools'
+      'https://duckduckgo.com/?q=opcagent%20browser%20tools'
     )
   })
 
@@ -762,7 +762,7 @@ describe('BrowserPaneManager', () => {
     const instance = (manager as any).instances.get('theme-signal')
     instance.themeObserverToken = 'tok-1'
 
-    instance.pageView.webContents._emit('console-message', 1, '__mkagent_theme_color__:tok-1:#123456')
+    instance.pageView.webContents._emit('console-message', 1, '__opcagent_theme_color__:tok-1:#123456')
 
     expect(manager.listInstances().find(i => i.id === 'theme-signal')?.themeColor).toBe('#123456')
     expect(manager.getConsoleLogs('theme-signal', { level: 'all', limit: 10 })).toHaveLength(0)
@@ -773,10 +773,10 @@ describe('BrowserPaneManager', () => {
     const instance = (manager as any).instances.get('theme-dedupe')
     instance.themeObserverToken = 'tok-2'
 
-    instance.pageView.webContents._emit('console-message', 1, '__mkagent_theme_color__:tok-2:#445566')
+    instance.pageView.webContents._emit('console-message', 1, '__opcagent_theme_color__:tok-2:#445566')
     const sendCallsAfterFirst = instance.toolbarView.webContents.send.mock.calls.length
 
-    instance.pageView.webContents._emit('console-message', 1, '__mkagent_theme_color__:tok-2:#445566')
+    instance.pageView.webContents._emit('console-message', 1, '__opcagent_theme_color__:tok-2:#445566')
     const sendCallsAfterSecond = instance.toolbarView.webContents.send.mock.calls.length
 
     expect(sendCallsAfterSecond).toBe(sendCallsAfterFirst)
@@ -788,7 +788,7 @@ describe('BrowserPaneManager', () => {
     instance.themeObserverToken = 'tok-current'
     instance.themeColor = '#aaaaaa'
 
-    instance.pageView.webContents._emit('console-message', 1, '__mkagent_theme_color__:tok-old:#bbccdd')
+    instance.pageView.webContents._emit('console-message', 1, '__opcagent_theme_color__:tok-old:#bbccdd')
 
     expect(manager.listInstances().find(i => i.id === 'theme-stale-token')?.themeColor).toBe('#aaaaaa')
   })
@@ -798,10 +798,10 @@ describe('BrowserPaneManager', () => {
     const instance = (manager as any).instances.get('theme-null')
     instance.themeObserverToken = 'tok-null'
 
-    instance.pageView.webContents._emit('console-message', 1, '__mkagent_theme_color__:tok-null:#223344')
+    instance.pageView.webContents._emit('console-message', 1, '__opcagent_theme_color__:tok-null:#223344')
     expect(manager.listInstances().find(i => i.id === 'theme-null')?.themeColor).toBe('#223344')
 
-    instance.pageView.webContents._emit('console-message', 1, '__mkagent_theme_color__:tok-null:__NULL__')
+    instance.pageView.webContents._emit('console-message', 1, '__opcagent_theme_color__:tok-null:__NULL__')
     expect(manager.listInstances().find(i => i.id === 'theme-null')?.themeColor).toBeNull()
   })
 

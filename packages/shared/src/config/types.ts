@@ -2,13 +2,13 @@
  * Config Types (Browser-safe)
  *
  * Pure type definitions for configuration.
- * Re-exports from @mkagent/core for compatibility.
+ * Re-exports from @opcagent/core for compatibility.
  */
 
 // Re-export all config types from core (single source of truth)
 export type {
   Workspace,
-} from '@mkagent/core/types';
+} from '@opcagent/core/types';
 
 /** App-level network proxy configuration. */
 export interface NetworkProxySettings {

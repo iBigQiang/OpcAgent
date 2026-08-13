@@ -3,8 +3,8 @@ import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'fs'
 import { join } from 'path'
 import { tmpdir } from 'os'
 import { RPC_CHANNELS } from '../../../shared/types'
-import { registerSessionsHandlers, cleanupSessionFileWatchForClient } from '@mkagent/server-core/handlers/rpc'
-import type { RpcServer } from '@mkagent/server-core/transport'
+import { registerSessionsHandlers, cleanupSessionFileWatchForClient } from '@opcagent/server-core/handlers/rpc'
+import type { RpcServer } from '@opcagent/server-core/transport'
 import type { HandlerDeps } from '../handler-deps'
 
 type HandlerFn = (ctx: { clientId: string }, ...args: any[]) => Promise<any> | any

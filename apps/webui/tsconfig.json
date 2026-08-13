@@ -18,8 +18,8 @@
       "@/*": ["../electron/src/renderer/*"],
       "@webui/*": ["./src/*"],
       "@config/*": ["../../packages/shared/src/config/*"],
-      "@mkagent/shared": ["../../packages/shared/src/index.ts"],
-      "@mkagent/shared/*": ["../../packages/shared/src/*"]
+      "@opcagent/shared": ["../../packages/shared/src/index.ts"],
+      "@opcagent/shared/*": ["../../packages/shared/src/*"]
     },
     "baseUrl": "."
   },

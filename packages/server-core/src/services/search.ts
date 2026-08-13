@@ -7,7 +7,7 @@
 
 import { spawn, ChildProcess } from 'child_process';
 import { existsSync } from 'fs';
-import { resolveBackendHostTooling } from '@mkagent/shared/agent/backend';
+import { resolveBackendHostTooling } from '@opcagent/shared/agent/backend';
 import { createScopedLogger, CONSOLE_LOGGER, type PlatformServices, type Logger } from '../runtime/platform';
 
 /**

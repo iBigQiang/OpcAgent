@@ -8,8 +8,8 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
-import type { CreateLabelInput, LabelConfig, UpdateLabelInput } from '@mkagent/shared/labels'
-import { flattenLabels } from '@mkagent/shared/labels'
+import type { CreateLabelInput, LabelConfig, UpdateLabelInput } from '@opcagent/shared/labels'
+import { flattenLabels } from '@opcagent/shared/labels'
 
 export interface UseLabelsResult {
   /** Label tree (root-level nodes with nested children) */

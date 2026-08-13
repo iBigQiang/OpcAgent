@@ -3,8 +3,8 @@ import { isSenderAllowed } from './access-control'
 import type { Commands } from './commands'
 import type { ChannelBinding, IncomingMessage, MessagingConfig, PlatformAdapter } from './types'
 import type { PendingSenderReason } from './pending-senders'
-import { readFileAttachment } from '@mkagent/shared/utils'
-import type { FileAttachment } from '@mkagent/shared/protocol'
+import { readFileAttachment } from '@opcagent/shared/utils'
+import type { FileAttachment } from '@opcagent/shared/protocol'
 
 export interface MessageRouterDeps {
   bindingStore: BindingStore

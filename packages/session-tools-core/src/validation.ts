@@ -224,7 +224,7 @@ export function validateSourceConfigBasic(config: unknown): ValidationResult {
 
 /**
  * Validate skill SKILL.md content (without filesystem access).
- * Used by all MkAgent surfaces.
+ * Used by all OPCAgent surfaces.
  *
  * @param markdownContent - The full SKILL.md file content
  * @param slug - The skill slug (folder name), used for slug format validation

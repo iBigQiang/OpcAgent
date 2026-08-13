@@ -15,19 +15,19 @@ export function setInterceptorApiHints(
   platformProfile?: string,
 ): void {
   if (!model) {
-    delete process.env.MKAGENT_PI_MODEL_API;
-    delete process.env.MKAGENT_PI_MODEL_PROVIDER;
-    delete process.env.MKAGENT_PI_MODEL_BASE_URL;
-    delete process.env.MKAGENT_PLATFORM_PROFILE;
+    delete process.env.OPCAGENT_PI_MODEL_API;
+    delete process.env.OPCAGENT_PI_MODEL_PROVIDER;
+    delete process.env.OPCAGENT_PI_MODEL_BASE_URL;
+    delete process.env.OPCAGENT_PLATFORM_PROFILE;
     return;
   }
 
-  process.env.MKAGENT_PI_MODEL_API = model.api || '';
-  process.env.MKAGENT_PI_MODEL_PROVIDER = model.provider || '';
-  process.env.MKAGENT_PI_MODEL_BASE_URL = model.baseUrl || '';
+  process.env.OPCAGENT_PI_MODEL_API = model.api || '';
+  process.env.OPCAGENT_PI_MODEL_PROVIDER = model.provider || '';
+  process.env.OPCAGENT_PI_MODEL_BASE_URL = model.baseUrl || '';
   if (platformProfile) {
-    process.env.MKAGENT_PLATFORM_PROFILE = platformProfile;
+    process.env.OPCAGENT_PLATFORM_PROFILE = platformProfile;
   } else {
-    delete process.env.MKAGENT_PLATFORM_PROFILE;
+    delete process.env.OPCAGENT_PLATFORM_PROFILE;
   }
 }

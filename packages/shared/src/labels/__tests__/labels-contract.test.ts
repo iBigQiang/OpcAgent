@@ -11,7 +11,7 @@ import { flattenLabels, sortLabelsForDisplay } from '../tree'
 import { extractLabelId, toggleLabelInList, validateLabelValue } from '../values'
 
 const roots: string[] = []
-function temporaryWorkspace(prefix = 'mkagent-labels-'): string { const root = mkdtempSync(join(tmpdir(), prefix)); roots.push(root); return root }
+function temporaryWorkspace(prefix = 'opcagent-labels-'): string { const root = mkdtempSync(join(tmpdir(), prefix)); roots.push(root); return root }
 function workspace(): string { const root = temporaryWorkspace(); saveLabelConfig(root, { version: 1, labels: [] }); return root }
 afterEach(() => { while (roots.length) rmSync(roots.pop()!, { recursive: true, force: true }) })
 
@@ -50,7 +50,7 @@ describe('labels data contract', () => {
     expect(evaluateAutoLabels('BUG-high', labels)).toEqual([])
   })
   test('read-only access neither initializes nor migrates label config', () => {
-    const root = temporaryWorkspace('mkagent-labels-read-')
+    const root = temporaryWorkspace('opcagent-labels-read-')
     const path = join(root, 'labels', 'config.json')
     expect(loadLabelConfig(root).labels).toHaveLength(4)
     expect(existsSync(path)).toBe(false)
@@ -61,7 +61,7 @@ describe('labels data contract', () => {
     expect(migrateLabelConfig(root).labels[0]?.color).toBe('accent')
   })
   test('malformed label config fails closed and cannot be overwritten by a read', () => {
-    const root = temporaryWorkspace('mkagent-labels-invalid-')
+    const root = temporaryWorkspace('opcagent-labels-invalid-')
     const path = join(root, 'labels', 'config.json')
     mkdirSync(join(root, 'labels'), { recursive: true })
     writeFileSync(path, JSON.stringify({ version: 1, labels: [{ id: 'bad', name: '' }] }))

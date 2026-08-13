@@ -13,7 +13,7 @@
  */
 
 import { RPC_CHANNELS } from './types'
-import { FEATURE_FLAGS } from '@mkagent/shared/feature-flags'
+import { FEATURE_FLAGS } from '@opcagent/shared/feature-flags'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

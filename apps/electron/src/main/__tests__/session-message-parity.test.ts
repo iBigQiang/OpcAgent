@@ -8,8 +8,8 @@
  * Uses centralized core mappers (single source of truth, no Electron imports needed).
  */
 import { describe, it, expect, beforeEach } from 'bun:test'
-import { messageToStored, storedToMessage } from '@mkagent/core'
-import type { Message, StoredMessage, MessageRole } from '@mkagent/core'
+import { messageToStored, storedToMessage } from '@opcagent/core'
+import type { Message, StoredMessage, MessageRole } from '@opcagent/core'
 
 // ============================================================================
 // Test Helpers

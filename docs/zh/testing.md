@@ -48,7 +48,7 @@ bun run lint:craft-test-coverage
 ```bash
 bun run electron:build           # main + preload + renderer + resources + assets
 bun run webui:build              # vite 构建共享 renderer
-bun run cli:build                # 输出 apps/cli/dist/mkagent
+bun run cli:build                # 输出 apps/cli/dist/opcagent
 bun run server:build:subprocess  # packages/pi-agent-server/dist/index.js(约 3,655 个模块)
 bun run electron:dist:dev:mac    # macOS arm64 dev .app,ad-hoc 签名
 ```
@@ -58,8 +58,8 @@ CI 额外在每个平台上跑 macOS、Windows、Linux 的未打包 desktop 构�
 ## 干净 worktree 验证
 
 ```bash
-git clone <this repo> /tmp/mkagent-clean
-cd /tmp/mkagent-clean
+git clone <this repo> /tmp/opcagent-clean
+cd /tmp/opcagent-clean
 bun install --force --frozen-lockfile
 bun run validate:ci
 bun run electron:build

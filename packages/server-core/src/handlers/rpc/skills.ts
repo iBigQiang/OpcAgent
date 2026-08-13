@@ -1,8 +1,8 @@
 import { join } from 'path'
 import { existsSync, readdirSync, statSync } from 'fs'
-import { RPC_CHANNELS, type SkillFile } from '@mkagent/shared/protocol'
-import { getWorkspaceByNameOrId } from '@mkagent/shared/config'
-import type { RpcServer } from '@mkagent/server-core/transport'
+import { RPC_CHANNELS, type SkillFile } from '@opcagent/shared/protocol'
+import { getWorkspaceByNameOrId } from '@opcagent/shared/config'
+import type { RpcServer } from '@opcagent/server-core/transport'
 import type { HandlerDeps } from '../handler-deps'
 
 export const HANDLED_CHANNELS = [
@@ -27,7 +27,7 @@ export function registerSkillsHandlers(server: RpcServer, deps: HandlerDeps): vo
     const effectiveWorkingDir = workingDirectory && existsSync(workingDirectory)
       ? workingDirectory
       : undefined
-    const { loadAllSkills } = await import('@mkagent/shared/skills')
+    const { loadAllSkills } = await import('@opcagent/shared/skills')
     const skills = loadAllSkills(workspace.rootPath, effectiveWorkingDir)
     deps.platform.logger?.info(`SKILLS_GET: Loaded ${skills.length} skills from ${workspace.rootPath}`)
     return skills
@@ -41,7 +41,7 @@ export function registerSkillsHandlers(server: RpcServer, deps: HandlerDeps): vo
       return []
     }
 
-    const { loadAllSkills } = await import('@mkagent/shared/skills')
+    const { loadAllSkills } = await import('@opcagent/shared/skills')
     const skill = loadAllSkills(workspace.rootPath).find(candidate => candidate.slug === skillSlug)
     if (!skill) {
       deps.platform.logger?.warn(`SKILLS_GET_FILES: Skill not found: ${skillSlug}`)
@@ -90,7 +90,7 @@ export function registerSkillsHandlers(server: RpcServer, deps: HandlerDeps): vo
     const workspace = getWorkspaceByNameOrId(workspaceId)
     if (!workspace) throw new Error('Workspace not found')
 
-    const { deleteSkill } = await import('@mkagent/shared/skills')
+    const { deleteSkill } = await import('@opcagent/shared/skills')
     deleteSkill(workspace.rootPath, skillSlug)
     deps.platform.logger?.info(`Deleted skill: ${skillSlug}`)
   })
@@ -100,7 +100,7 @@ export function registerSkillsHandlers(server: RpcServer, deps: HandlerDeps): vo
     const workspace = getWorkspaceByNameOrId(workspaceId)
     if (!workspace) throw new Error('Workspace not found')
 
-    const { getWorkspaceSkillsPath } = await import('@mkagent/shared/workspaces')
+    const { getWorkspaceSkillsPath } = await import('@opcagent/shared/workspaces')
 
     const skillsDir = getWorkspaceSkillsPath(workspace.rootPath)
     const skillFile = join(skillsDir, skillSlug, 'SKILL.md')
@@ -112,7 +112,7 @@ export function registerSkillsHandlers(server: RpcServer, deps: HandlerDeps): vo
     const workspace = getWorkspaceByNameOrId(workspaceId)
     if (!workspace) throw new Error('Workspace not found')
 
-    const { getWorkspaceSkillsPath } = await import('@mkagent/shared/workspaces')
+    const { getWorkspaceSkillsPath } = await import('@opcagent/shared/workspaces')
 
     const skillsDir = getWorkspaceSkillsPath(workspace.rootPath)
     const skillDir = join(skillsDir, skillSlug)

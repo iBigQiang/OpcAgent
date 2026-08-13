@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'bun:test';
 import { createEditToolDefinition } from '@earendil-works/pi-coding-agent';
-import { allowMkAgentMetadataProperties, stripMkAgentMetadata } from './mkagent-metadata-schema.ts';
+import { allowOPCAgentMetadataProperties, stripOPCAgentMetadata } from './opcagent-metadata-schema.ts';
 
-describe('MkAgent metadata schema compatibility for Pi tools', () => {
-  it('widens a strict Edit-like schema with optional MkAgent metadata properties', () => {
+describe('OPCAgent metadata schema compatibility for Pi tools', () => {
+  it('widens a strict Edit-like schema with optional OPCAgent metadata properties', () => {
     const schema = {
       type: 'object',
       additionalProperties: false,
@@ -25,7 +25,7 @@ describe('MkAgent metadata schema compatibility for Pi tools', () => {
       required: ['path', 'edits'],
     };
 
-    const widened = allowMkAgentMetadataProperties(schema);
+    const widened = allowOPCAgentMetadataProperties(schema);
 
     expect(widened).not.toBe(schema);
     expect(widened.additionalProperties).toBe(false);
@@ -40,7 +40,7 @@ describe('MkAgent metadata schema compatibility for Pi tools', () => {
 
   it('widens the actual Pi Edit tool schema without making metadata required', () => {
     const editTool = createEditToolDefinition('/tmp');
-    const widened = allowMkAgentMetadataProperties(editTool.parameters);
+    const widened = allowOPCAgentMetadataProperties(editTool.parameters);
     const widenedSchema = widened as {
       additionalProperties?: unknown;
       properties: Record<string, unknown>;
@@ -71,21 +71,21 @@ describe('MkAgent metadata schema compatibility for Pi tools', () => {
       required: ['path'],
     };
 
-    const widened = allowMkAgentMetadataProperties(schema);
+    const widened = allowOPCAgentMetadataProperties(schema);
 
     expect(widened.properties._displayName).toBe(upstreamDisplayName);
     expect(widened.properties._intent).toBe(upstreamIntent);
   });
 
   it('returns unknown schema shapes unchanged', () => {
-    expect(allowMkAgentMetadataProperties(undefined)).toBeUndefined();
-    expect(allowMkAgentMetadataProperties('schema')).toBe('schema');
+    expect(allowOPCAgentMetadataProperties(undefined)).toBeUndefined();
+    expect(allowOPCAgentMetadataProperties('schema')).toBe('schema');
 
     const noProperties = { type: 'string' };
-    expect(allowMkAgentMetadataProperties(noProperties)).toBe(noProperties);
+    expect(allowOPCAgentMetadataProperties(noProperties)).toBe(noProperties);
   });
 
-  it('strips MkAgent metadata before upstream Pi tool execution', () => {
+  it('strips OPCAgent metadata before upstream Pi tool execution', () => {
     const input = {
       _displayName: 'Edit Lines',
       _intent: 'Add punctuation',
@@ -93,7 +93,7 @@ describe('MkAgent metadata schema compatibility for Pi tools', () => {
       edits: [{ oldText: 'a', newText: 'b' }],
     };
 
-    const clean = stripMkAgentMetadata(input);
+    const clean = stripOPCAgentMetadata(input);
 
     expect(clean).toEqual({
       path: 'random',
@@ -107,6 +107,6 @@ describe('MkAgent metadata schema compatibility for Pi tools', () => {
 
   it('returns the same input object when no metadata is present', () => {
     const input = { path: 'random' };
-    expect(stripMkAgentMetadata(input)).toBe(input);
+    expect(stripOPCAgentMetadata(input)).toBe(input);
   });
 });

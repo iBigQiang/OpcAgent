@@ -1,6 +1,6 @@
 # 开发环境
 
-本节汇总如何搭建 MkAgent 的开发环境,以及每个 release 产物对应的命令。
+本节汇总如何搭建 OPC Agent 的开发环境,以及每个 release 产物对应的命令。
 
 ## 依赖要求
 
@@ -17,8 +17,8 @@
 ## 首次配置
 
 ```bash
-git clone https://github.com/MkThingsHQ/mkagent.git
-cd mkagent
+git clone https://github.com/iBigQiang/OpcAgent.git
+cd opcagent
 bun install --frozen-lockfile
 bun run validate:dev
 ```
@@ -37,7 +37,7 @@ packages/
   shared/              # 配置、凭证、提示词、Skills、theme、i18n
   ui/                  # React primitives、markdown/code/doc 渲染
   server-core/         # Transport、RPC、SessionManager、运行时
-  server/              # headless `MKAGENT_SERVER_TOKEN` server
+  server/              # headless `OPCAGENT_SERVER_TOKEN` server
   pi-agent-server/     # Pi SDK 子进程(Bun,JSONL on stdio)
   session-tools-core/  # Plan / Skill / mini LLM / browser / session info / list
 docs/                  # 英文文档
@@ -58,22 +58,22 @@ migration/             # 迁移计划、audit、UI 历史
 | 从已构建的 `apps/electron/dist/` 启动 Electron | `bun run electron:start` |
 | 启动带 WebUI dev bundle 的 headless server | `bun run server:dev:webui` |
 | 生产 headless server(WebUI 已打包、Pi 已构建) | `bun run server:prod` |
-| 构建 CLI 二进制 | `bun run cli:build`(输出 `apps/cli/dist/mkagent`) |
+| 构建 CLI 二进制 | `bun run cli:build`(输出 `apps/cli/dist/opcagent`) |
 | 构建 Pi 子进程 | `bun run server:build:subprocess` |
 | 构建 macOS arm64 dev 签名的 .app | `bun run electron:dist:dev:mac` |
 | 跑全部 unit + isolated 测试 | `bun run test` |
 | 校验(typecheck + 测试 + shared 套件 + 文档工具 smoke + lint) | `bun run validate:ci` |
-| 审计 MkAgent <-> Craft 复用关系 | `bun run audit:craft-reuse` |
+| 审计 OPC Agent <-> Craft 复用关系 | `bun run audit:craft-reuse` |
 | 审计 Craft 测试覆盖率 | `bun run lint:craft-test-coverage` |
 | 校验中/英文 locale parity | `bun run lint:i18n:parity` |
 | 排序 locales | `bun run sort-locales`(只检查:`bun run lint:i18n:sorted`) |
 
 ## 隔离 config 目录
 
-默认配置根目录为 `~/.mkagent`,但为了并行开发或隔离测试可以重定向:
+默认配置根目录为 `~/.opcagent`,但为了并行开发或隔离测试可以重定向:
 
 ```bash
-CONFIG_DIR=/tmp/mkagent-dev bun run server:dev:webui
+CONFIG_DIR=/tmp/opcagent-dev bun run server:dev:webui
 ```
 
 `CONFIG_DIR` 在模块加载时(`packages/shared/src/config/paths.ts`)读一次,所有下游路径(workspaces、credentials、logs、tool icons)都会跟随。测试通过 `CONFIG_DIR` 显式注入,不会在 `$HOME` 下创建文件。
@@ -82,25 +82,25 @@ CONFIG_DIR=/tmp/mkagent-dev bun run server:dev:webui
 
 | 变量 | 默认值 | 作用 |
 |---|---|---|
-| `CONFIG_DIR` | `~/.mkagent` | 配置根(也叫数据目录)覆盖入口 |
-| `MKAGENT_SERVER_TOKEN` | — | headless server RPC 鉴权必需的 bearer token |
-| `MKAGENT_RPC_HOST` / `MKAGENT_RPC_PORT` | `127.0.0.1` / `9100` | server 绑定地址 / 端口 |
-| `MKAGENT_RPC_TLS_CERT` / `_KEY` / `_CA` | — | 启用 `wss://`,使用 PEM 编码的 cert/key;CA 可选 |
-| `MKAGENT_HEALTH_PORT` | `0`(关闭) | 绑定 sidecar HTTP health 端点 |
-| `MKAGENT_APP_ROOT` | dev 下为 repo 根 | server 读取打包资源的根 |
-| `MKAGENT_RESOURCES_PATH` | 同 app root | 覆盖 resources 目录 |
-| `MKAGENT_BUNDLED_ASSETS_ROOT` | 不设置 | dev 用覆盖,把 headless server 指向 `apps/electron` resources |
-| `MKAGENT_IS_PACKAGED` | `false` | 生产构建内设置为 `true` |
-| `MKAGENT_VERSION` | `package.json#version` | 覆盖 server 上报的版本 |
-| `MKAGENT_DEBUG` | 不设置 | 启用额外 debug 日志 |
-| `MKAGENT_WEBUI_DIR` | 不设置 | 在 RPC 端口上启用 WebUI 资源 |
-| `MKAGENT_WEBUI_PASSWORD` / `_SECURE_COOKIE` / `_WS_URL` | 不设置 | WebUI 登录密码、cookie `Secure` 标志覆盖、浏览器侧 `ws://` URL |
-| `MKAGENT_PI_MODEL_API` | 不设置 | 给 interceptor 的 Pi 模型提示 |
-| `MKAGENT_UV` / `MKAGENT_BUN` / `MKAGENT_NODE` | 不设置 | 覆盖脚本 runtime；打包 launcher 通常注入内置绝对路径，开发期才可回退到 PATH |
-| `MKAGENT_DEV_RUNTIME` | 不设置 | 设为 `1` 在本地打包时跳过代码签名 |
+| `CONFIG_DIR` | `~/.opcagent` | 配置根(也叫数据目录)覆盖入口 |
+| `OPCAGENT_SERVER_TOKEN` | — | headless server RPC 鉴权必需的 bearer token |
+| `OPCAGENT_RPC_HOST` / `OPCAGENT_RPC_PORT` | `127.0.0.1` / `9100` | server 绑定地址 / 端口 |
+| `OPCAGENT_RPC_TLS_CERT` / `_KEY` / `_CA` | — | 启用 `wss://`,使用 PEM 编码的 cert/key;CA 可选 |
+| `OPCAGENT_HEALTH_PORT` | `0`(关闭) | 绑定 sidecar HTTP health 端点 |
+| `OPCAGENT_APP_ROOT` | dev 下为 repo 根 | server 读取打包资源的根 |
+| `OPCAGENT_RESOURCES_PATH` | 同 app root | 覆盖 resources 目录 |
+| `OPCAGENT_BUNDLED_ASSETS_ROOT` | 不设置 | dev 用覆盖,把 headless server 指向 `apps/electron` resources |
+| `OPCAGENT_IS_PACKAGED` | `false` | 生产构建内设置为 `true` |
+| `OPCAGENT_VERSION` | `package.json#version` | 覆盖 server 上报的版本 |
+| `OPCAGENT_DEBUG` | 不设置 | 启用额外 debug 日志 |
+| `OPCAGENT_WEBUI_DIR` | 不设置 | 在 RPC 端口上启用 WebUI 资源 |
+| `OPCAGENT_WEBUI_PASSWORD` / `_SECURE_COOKIE` / `_WS_URL` | 不设置 | WebUI 登录密码、cookie `Secure` 标志覆盖、浏览器侧 `ws://` URL |
+| `OPCAGENT_PI_MODEL_API` | 不设置 | 给 interceptor 的 Pi 模型提示 |
+| `OPCAGENT_UV` / `OPCAGENT_BUN` / `OPCAGENT_NODE` | 不设置 | 覆盖脚本 runtime；打包 launcher 通常注入内置绝对路径，开发期才可回退到 PATH |
+| `OPCAGENT_DEV_RUNTIME` | 不设置 | 设为 `1` 在本地打包时跳过代码签名 |
 | `SENTRY_ELECTRON_INGEST_URL` | 空(不生效) | 启用 Electron Sentry 上报必需 |
-| `MKAGENT_SERVER_URL` / `MKAGENT_TLS_CA` | 不设置 | CLI 连接参数 |
-| `MKAGENT_WORKSPACE` | `default` | CLI 的 workspace 覆盖 |
+| `OPCAGENT_SERVER_URL` / `OPCAGENT_TLS_CA` | 不设置 | CLI 连接参数 |
+| `OPCAGENT_WORKSPACE` | `default` | CLI 的 workspace 覆盖 |
 | `LLM_API_KEY` / provider 环境变量 | 不设置 | CLI 自包含 `--run` 模式的 API 凭证 |
 
 ## 约定
@@ -119,4 +119,4 @@ bun install --force --frozen-lockfile
 bun run validate:ci
 ```
 
-这一组合在全新 checkout 上通过了 MkAgent 完整门禁(见 `migration/migration-features.md` "最终验证结果")。该门禁不启动 GUI,不需要录音/截屏权限。
+这一组合在全新 checkout 上通过了 OPC Agent 完整门禁(见 `migration/migration-features.md` "最终验证结果")。该门禁不启动 GUI,不需要录音/截屏权限。

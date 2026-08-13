@@ -16,7 +16,7 @@ import { homedir } from 'os';
 import { existsSync, realpathSync } from 'fs';
 import { debug } from '../utils/debug.ts';
 import { dirname, isAbsolute, relative, resolve } from 'path';
-import { getSessionSafeAllowedToolNames } from '@mkagent/session-tools-core';
+import { getSessionSafeAllowedToolNames } from '@opcagent/session-tools-core';
 import { FEATURE_FLAGS } from '../feature-flags.ts';
 import { CONFIG_DIR } from '../config/paths.ts';
 import { isBrowserToolNameOrAlias } from './browser-tool-names.ts';
@@ -1706,7 +1706,7 @@ export function getPathHint(targetPath: string, plansFolderPath: string, dataFol
     return 'Hint: Write to the session plans or data folder, not the workspace root.';
   }
 
-  // Case: Writing outside the configured MkAgent data directory entirely
+  // Case: Writing outside the configured OPCAgent data directory entirely
   if (!normalizedTarget.startsWith(`${normalizedConfigDir}/`)) {
     return 'Hint: Files must be written to the session plans or data folder. Use plansFolderPath or dataFolderPath from <session_state>.';
   }
@@ -1950,7 +1950,7 @@ export function shouldAllowToolInMode(
   // Handle MCP tools - allow read-only, block write operations
   if (toolName.startsWith('mcp__')) {
     // Always allow documentation tools (read-only, always available)
-    if (toolName.startsWith('mcp__mkagent-docs__')) {
+    if (toolName.startsWith('mcp__opcagent-docs__')) {
       return { allowed: true };
     }
 

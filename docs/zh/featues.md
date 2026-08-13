@@ -1,6 +1,6 @@
 # 功能矩阵
 
-本文档记录 MkAgent 相对上游基线**刻意**划定的产品边界。与 Craft Agents 的技术侧对比(含安装包体积)见 [`comparison-with-craft.md`](./comparison-with-craft.md)。
+本文档记录 OPC Agent 相对上游基线**刻意**划定的产品边界。与 Craft Agents 的技术侧对比(含安装包体积)见 [`comparison-with-craft.md`](./comparison-with-craft.md)。
 
 ## 保留能力
 
@@ -29,11 +29,11 @@
 
 ## 引用策略
 
-保留模块沿用上游目录布局、公开命名、代码风格与测试。产品专属标识替换为 MkAgent(`@mkagent/*`、`~/.mkagent`、`MKAGENT_*`、`mkagent://`、`app.mkagent.desktop`)。参考仓库只读。
+保留模块沿用上游目录布局、公开命名、代码风格与测试。产品专属标识替换为 OPC Agent(`@opcagent/*`、`~/.opcagent`、`OPCAGENT_*`、`opcagent://`、`app.opcagent.desktop`)。参考仓库只读。
 
 ## 数据锚点
 
-| 指标 | MkAgent | 备注 |
+| 指标 | OPC Agent | 备注 |
 |---|---:|---|
 | 已跟踪 TS/TSX 源码行数 | 190,558 | 排除 `node_modules`、`dist`、`release`、`.git` |
 | 相对 Craft 审计过的源文件数 | 1,163 | 见 [`comparison-with-craft.md`](./comparison-with-craft.md#1-仓库与源码规模) |

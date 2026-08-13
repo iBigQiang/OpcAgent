@@ -1,6 +1,6 @@
 # 架构
 
-MkAgent 是一个 Bun monorepo，三种客户端共用同一套经过鉴权的 WebSocket RPC 协议。唯一注册的 backend 是 `pi`。直接集成的是 `@earendil-works/pi-coding-agent`；`pi-agent-core` 与 `pi-ai` 是更底层的依赖，不是应用层会话 API。
+OPC Agent 是一个 Bun monorepo，三种客户端共用同一套经过鉴权的 WebSocket RPC 协议。唯一注册的 backend 是 `pi`。直接集成的是 `@earendil-works/pi-coding-agent`；`pi-agent-core` 与 `pi-ai` 是更底层的依赖，不是应用层会话 API。
 
 ## 分层拓扑
 
@@ -15,7 +15,7 @@ MkAgent 是一个 Bun monorepo，三种客户端共用同一套经过鉴权的 W
 +---------|----------------|--------------------|-------------+
           v                v                    v
    Browser adapter  ──>  preload Client API  ──> RPC client
-                         (window.MkAgent)        (rpc-client.ts)
+                         (window.OPCAgent)        (rpc-client.ts)
                                                        |
                                                   WebSocket (wss://)
                                                        v
@@ -26,7 +26,7 @@ MkAgent 是一个 Bun monorepo，三种客户端共用同一套经过鉴权的 W
 |   model-fetchers / sessions                               |
 +---------|---------------------------------------|
           v                                       |
-   packages/server (headless `MKAGENT_SERVER_TOKEN` 服务)
+   packages/server (headless `OPCAGENT_SERVER_TOKEN` 服务)
           v                                       |
 +-----------------------------------------------------------+
 | packages/shared                                           |
@@ -61,7 +61,7 @@ MkAgent 是一个 Bun monorepo，三种客户端共用同一套经过鉴权的 W
 ## 共享 package
 
 - `packages/server-core` 负责 transport、handler、`SessionManager` 与跨平台服务,内含子目录: `bootstrap/`、`domain/`、`handlers/`、`model-fetchers/`、`runtime/`、`services/`、`sessions/`、`transport/`、`utils/`、`webui/`。
-- `packages/shared` 负责协议 DTO(`@mkagent/shared/protocol`)、配置、凭证、Skills、提示词、backend registry、workspace 存储与 Pi 客户端。
+- `packages/shared` 负责协议 DTO(`@opcagent/shared/protocol`)、配置、凭证、Skills、提示词、backend registry、workspace 存储与 Pi 客户端。
 - `packages/pi-agent-server` 在独立 Bun 子进程(`packages/pi-agent-server/dist/index.js`)中调用 `@earendil-works/pi-coding-agent` 的 `createAgentSession(...)`,通过 JSONL 通信。开发与打包产物共用同一 SDK 边界;`bun run server:build:subprocess` 负责打包。
 - `packages/ui` 与 `packages/session-tools-core` 提供共享渲染与会话级工具。Electron、WebUI、CLI 都复用它们,和平台无关。
 
@@ -71,10 +71,10 @@ MkAgent 是一个 Bun monorepo，三种客户端共用同一套经过鉴权的 W
 
 ## 鉴权握手
 
-1. server 绑定 `MKAGENT_RPC_HOST:MKAGENT_RPC_PORT`(默认 `127.0.0.1:9100`)。
-2. bearer token 从 `MKAGENT_SERVER_TOKEN` 读取(Electron 启动时会自动生成;headless server 必须显式传入)。
-3. token 兑换为短生命周期 JWT,后续每个 WebSocket 帧都使用(`@mkagent/server-core/webui`)。
-4. WebUI 与 CLI 额外支持 `MKAGENT_WEBUI_PASSWORD`(回退到 `MKAGENT_SERVER_TOKEN`)和可选的 `MKAGENT_TLS_CA` 用于 TLS pinning。
+1. server 绑定 `OPCAGENT_RPC_HOST:OPCAGENT_RPC_PORT`(默认 `127.0.0.1:9100`)。
+2. bearer token 从 `OPCAGENT_SERVER_TOKEN` 读取(Electron 启动时会自动生成;headless server 必须显式传入)。
+3. token 兑换为短生命周期 JWT,后续每个 WebSocket 帧都使用(`@opcagent/server-core/webui`)。
+4. WebUI 与 CLI 额外支持 `OPCAGENT_WEBUI_PASSWORD`(回退到 `OPCAGENT_SERVER_TOKEN`)和可选的 `OPCAGENT_TLS_CA` 用于 TLS pinning。
 5. 握手时绑定 workspace id;后续 RPC 命令都作用域在该 workspace 内,只会看到它自己的会话、Skills、权限与 Views。
 
 ## 子进程边界
@@ -88,17 +88,17 @@ Pi 子进程与主进程隔离:
               Pi SDK <-> provider (HTTPS)
 ```
 
-取消、模型切换、thinking level 调整、权限响应、会话恢复全部走同一 JSONL 流。Pi 恢复文件保存在 `~/.mkagent/workspaces/<slug>/sessions/<id>/` 下。
+取消、模型切换、thinking level 调整、权限响应、会话恢复全部走同一 JSONL 流。Pi 恢复文件保存在 `~/.opcagent/workspaces/<slug>/sessions/<id>/` 下。
 
 ## 打包面
 
 - Desktop 应用:macOS arm64 / x64(DMG + ZIP)、Windows x64(NSIS)、Linux x64(AppImage)。构建入口 `bun run electron:dist[:dev][:mac|:win|:linux]`。
 - Headless server:每个平台的编译 Bun archive;通过 `bun run scripts/build-server.ts` 构建。
-- CLI:`bun run cli:build` 输出 `dist/mkagent`。
+- CLI:`bun run cli:build` 输出 `dist/opcagent`。
 - Pi 子进程:`bun run server:build:subprocess` 输出 `packages/pi-agent-server/dist/index.js`。
 
-主仓库 `MkThingsHQ/mkagent` 直接在 GitHub Releases 中发布 DMG/ZIP/NSIS/AppImage、headless-server archive、Bun CLI archive、manifest、blockmap、checksum 和 release notes。`electron-updater` 读取公开 manifest，客户端不带任何 GitHub token。
+主仓库 `iBigQiang/OpcAgent` 直接在 GitHub Releases 中发布 DMG/ZIP/NSIS/AppImage、headless-server archive、Bun CLI archive、manifest、blockmap、checksum 和 release notes。`electron-updater` 读取公开 manifest，客户端不带任何 GitHub token。
 
 ## 刻意不存在的部分
 
-Craft Agents 自带广泛的 OAuth 与 Sources 集成、Slack/Teams/Lark messaging gateway、基于 Baileys 的 WhatsApp worker、session MCP server、bridge MCP server 和独立 `apps/viewer` Electron 应用。MkAgent 在这一范围内仅保留 ChatGPT 与 Claude 的 LLM OAuth 流程，其余组件仍不打包。Craft 使用的底层 `pi-ai` 依赖虽然包含 OpenRouter 图片生成 API，但 Craft 和 MkAgent 都没有把它注册为 Agent 工具。具体证据与安装包体积差异见 [`comparison-with-craft.md`](./comparison-with-craft.md)。
+Craft Agents 自带广泛的 OAuth 与 Sources 集成、Slack/Teams/Lark messaging gateway、基于 Baileys 的 WhatsApp worker、session MCP server、bridge MCP server 和独立 `apps/viewer` Electron 应用。OPC Agent 在这一范围内仅保留 ChatGPT 与 Claude 的 LLM OAuth 流程，其余组件仍不打包。Craft 使用的底层 `pi-ai` 依赖虽然包含 OpenRouter 图片生成 API，但 Craft 和 OPC Agent 都没有把它注册为 Agent 工具。具体证据与安装包体积差异见 [`comparison-with-craft.md`](./comparison-with-craft.md)。

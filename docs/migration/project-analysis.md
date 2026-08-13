@@ -1,16 +1,16 @@
-# MkAgent Craft Lite 源码复用与裁剪审计报告
+# OPC Agent Craft Lite 源码复用与裁剪审计报告
 
-> 历史快照说明：本文的统计与“OAuth 已删除”结论对应 2026-07-29 的 Lite 边界。2026-07-30 起，MkAgent 在保持 Pi-only 的前提下恢复 ChatGPT Plus 与 Claude Pro/Max 两种 LLM OAuth；Claude Agent SDK、GitHub Copilot 和 Sources/MCP 仍不恢复。当前状态见 [`README.md`](./README.md) 与 [`migration-features.md`](./migration-features.md)。
+> 历史快照说明：本文的统计与“OAuth 已删除”结论对应 2026-07-29 的 Lite 边界。2026-07-30 起，OPC Agent 在保持 Pi-only 的前提下恢复 ChatGPT Plus 与 Claude Pro/Max 两种 LLM OAuth；Claude Agent SDK、GitHub Copilot 和 Sources/MCP 仍不恢复。当前状态见 [`README.md`](./README.md) 与 [`migration-features.md`](./migration-features.md)。
 
 ## Project Thesis
 
-MkAgent 不是一套重新实现的 Agent 产品，而是以 Craft Agents OSS 为固定上游、完整沿用其 Desktop/WebUI/CLI、WebSocket RPC、会话和 UI 组件架构，只保留 Pi Agent 核心能力并删除完整产品功能面的 Lite 发行版。
+OPC Agent 不是一套重新实现的 Agent 产品，而是以 Craft Agents OSS 为固定上游、完整沿用其 Desktop/WebUI/CLI、WebSocket RPC、会话和 UI 组件架构，只保留 Pi Agent 核心能力并删除完整产品功能面的 Lite 发行版。
 
 本轮结论：此前的实现确实以 Craft 大规模源码导入为基础，不是从零重写；但 UI 对齐阶段把许多明确排除的功能“隐藏”而没有删除，并用兼容层为不存在的 RPC 返回空值。当前改动已把这些功能从文件、路由、状态、事件、协议、设置和文案层物理移除，并为后续同步增加可执行的复用边界检查。
 
 | 字段 | 当前值 |
 |---|---|
-| MkAgent 基线 | `5c8308b6b12fa065ed072cb31372608dfda129dc` |
+| OPC Agent 基线 | `5c8308b6b12fa065ed072cb31372608dfda129dc` |
 | Craft 固定上游 | `a60ebc1a5a7cb0a6af7a77d5eed0512c5fc07658`（v0.11.2） |
 | 上游路径 | `../craft-agents-oss` |
 | 主要语言 | TypeScript / React |
@@ -21,7 +21,7 @@ MkAgent 不是一套重新实现的 Agent 产品，而是以 Craft Agents OSS �
 
 ## Repository Shape
 
-MkAgent 是 Bun workspace monorepo，保持 Craft 的应用层、共享层、服务层与运行时分层。
+OPC Agent 是 Bun workspace monorepo，保持 Craft 的应用层、共享层、服务层与运行时分层。
 
 | 层级 | 路径 | 职责 | 复用策略 |
 |---|---|---|---|
@@ -29,7 +29,7 @@ MkAgent 是 Bun workspace monorepo，保持 Craft 的应用层、共享层、服
 | WebUI | `apps/webui` | 浏览器端交互式会话 UI | 复用同一 renderer API 与 WebSocket RPC |
 | CLI | `apps/cli` | 命令行会话客户端 | 复用协议与 server，不建立第二套运行时 |
 | Server | `packages/server`, `packages/server-core` | RPC、会话、工作区、设置 | Craft 服务架构，删除产品功能 handler |
-| Pi runtime | `packages/pi-agent-server` | Pi SDK 子进程与工具执行 | MkAgent 唯一 Agent backend |
+| Pi runtime | `packages/pi-agent-server` | Pi SDK 子进程与工具执行 | OPC Agent 唯一 Agent backend |
 | Shared | `packages/core`, `packages/shared` | 类型、协议、配置、权限、会话 | 尽量原样复用；裁掉排除域的模块与导出 |
 | UI | `packages/ui` | Markdown、TurnCard、附件、预览 | Craft 组件复用；删除未使用的公开 Viewer 入口 |
 
@@ -77,25 +77,25 @@ CLI ──────────────┘                │
 
 ## Craft Source Lineage
 
-`bun run audit:craft-reuse` 对 MkAgent 与 Craft 的 tracked source 做同路径比较，并仅归一化包 scope、URL scheme、数据目录与品牌字符串。
+`bun run audit:craft-reuse` 对 OPC Agent 与 Craft 的 tracked source 做同路径比较，并仅归一化包 scope、URL scheme、数据目录与品牌字符串。
 
 | 指标 | 数量 | 比例/解释 |
 |---|---:|---|
-| MkAgent tracked source | 1,163 | 报告与生成物不计入 |
+| OPC Agent tracked source | 1,163 | 报告与生成物不计入 |
 | 与 Craft 同相对路径 | 1,116 | 96.0% |
-| 归一化后逐字一致 | 686 | 占 MkAgent 源码 59.0% |
+| 归一化后逐字一致 | 686 | 占 OPC Agent 源码 59.0% |
 | Craft 派生但有修改 | 430 | 主要是 Lite 裁剪、品牌、Pi-only 适配和恢复的 Craft 测试 |
-| MkAgent 独有源码 | 47 | CI、文档、品牌、Pi 元数据、集成测试与审计脚本 |
-| Craft 有而 MkAgent 无 | 606 | 主要是被裁掉的完整产品功能 |
+| OPC Agent 独有源码 | 47 | CI、文档、品牌、Pi 元数据、集成测试与审计脚本 |
+| Craft 有而 OPC Agent 无 | 606 | 主要是被裁掉的完整产品功能 |
 
-这组数据支持“基于 Craft 做减法”的定位：96.0% 的 MkAgent 源码沿用 Craft 的文件结构；59.0% 在最小归一化后完全相同。430 个修改文件不等于重写，其中大量改动是删除 import/union 分支、恢复上游测试，以及为 Pi-only 会话运行时接入 Craft 的回调；从 UI 对齐基线起累计变更 389 个文件、增加 6,315 行、删除 56,761 行，整体仍是明确的源码减法。
+这组数据支持“基于 Craft 做减法”的定位：96.0% 的 OPC Agent 源码沿用 Craft 的文件结构；59.0% 在最小归一化后完全相同。430 个修改文件不等于重写，其中大量改动是删除 import/union 分支、恢复上游测试，以及为 Pi-only 会话运行时接入 Craft 的回调；从 UI 对齐基线起累计变更 389 个文件、增加 6,315 行、删除 56,761 行，整体仍是明确的源码减法。
 
 Renderer 另有更严格的边界检查：
 
 - 386 个现存 renderer 文件。
 - 170 个文件必须与 Craft 归一化后完全一致。
 - 211 个文件位于显式登记的 Lite 裁剪缝。
-- 5 个 MkAgent-only 文件是图标/品牌资产。
+- 5 个 OPC-Agent-only 文件是图标/品牌资产。
 - 排除功能路径、OAuth/远程工作区/产品元数据事件关键调用会直接让 lint 失败。
 
 ## Removed Product Surfaces
@@ -133,7 +133,7 @@ Renderer 另有更严格的边界检查：
 
 ### 1. Allowlist-based upstream reuse
 
-不再把“整个 Craft renderer”当成同步目标。现存文件先经过排除面扫描，再按“严格复用区 / Lite 定制缝 / MkAgent-only 品牌资产”分类。这样上游新增完整产品页面不会被静默带回 MkAgent。
+不再把“整个 Craft renderer”当成同步目标。现存文件先经过排除面扫描，再按“严格复用区 / Lite 定制缝 / OPC-Agent-only 品牌资产”分类。这样上游新增完整产品页面不会被静默带回 OPC Agent。
 
 ### 2. Compile errors as dependency discovery
 
@@ -141,7 +141,7 @@ Renderer 另有更严格的边界检查：
 
 ### 3. Background runtime and product Tasks are separate
 
-Pi 的后台 Agent/Shell task chip 属于运行能力，继续保留；Craft 的 Projects/Kanban/Tasks Conductor 是产品组织层，已删除。此前菜单中的“查看输出”依赖 MkAgent 后端未实现的 RPC，已删除死入口而没有伪造实现。
+Pi 的后台 Agent/Shell task chip 属于运行能力，继续保留；Craft 的 Projects/Kanban/Tasks Conductor 是产品组织层，已删除。此前菜单中的“查看输出”依赖 OPC Agent 后端未实现的 RPC，已删除死入口而没有伪造实现。
 
 ### 4. Remote transport and remote workspace product are separate
 
@@ -160,7 +160,7 @@ WebUI 通过远程 WebSocket transport 连接 server 是保留架构；Craft 的
 | Craft Lite boundary | 通过 | 严格复用区、定制缝、排除面扫描 |
 | Electron build | 通过 | main/preload/renderer/resources/assets |
 | WebUI build | 通过 | Vite production build |
-| CLI build | 通过 | `dist/mkagent` |
+| CLI build | 通过 | `dist/opcagent` |
 | Pi subprocess build | 通过 | 3,655 modules bundled |
 
 构建过程中曾发现 Copilot SVG 已删除但 provider map 仍静态 import 的真实闭包问题；清除映射后四条构建链全部通过。

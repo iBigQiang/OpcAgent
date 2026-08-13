@@ -23,7 +23,7 @@ import {
   buildSessionCookie,
   buildLogoutCookie,
 } from './auth'
-import { generateCallbackPage } from '@mkagent/shared/auth'
+import { generateCallbackPage } from '@opcagent/shared/auth'
 import type { PlatformServices } from '../runtime/platform'
 
 // ---------------------------------------------------------------------------
@@ -129,7 +129,7 @@ export interface OAuthCallbackDeps {
 export interface WebuiHandlerOptions {
   /** Path to built web UI dist/ directory. */
   webuiDir: string
-  /** Secret used to sign JWTs — typically MKAGENT_SERVER_TOKEN. */
+  /** Secret used to sign JWTs — typically OPCAGENT_SERVER_TOKEN. */
   secret: string
   /** Optional separate web UI password. Falls back to `secret` for verification. */
   password?: string
@@ -375,7 +375,7 @@ export function createWebuiHandler(options: WebuiHandlerOptions): WebuiHandler {
       if (!configSession) {
         return Response.json({ error: 'Unauthorized' }, { status: 401 })
       }
-      const { getActiveWorkspace } = await import('@mkagent/shared/config/storage')
+      const { getActiveWorkspace } = await import('@opcagent/shared/config/storage')
       const active = getActiveWorkspace()
       return Response.json({
         defaultWorkspaceId: active?.id ?? null,
@@ -420,7 +420,7 @@ export function createWebuiHandler(options: WebuiHandlerOptions): WebuiHandler {
         return Response.json({ error: 'Attachments must be 100 MB or smaller in total' }, { status: 413 })
       }
 
-      const uploadDir = await mkdtemp(join(tmpdir(), 'mkagent-webui-upload-'))
+      const uploadDir = await mkdtemp(join(tmpdir(), 'opcagent-webui-upload-'))
       uploadDirectories.set(uploadDir, Date.now())
       try {
         const paths: string[] = []

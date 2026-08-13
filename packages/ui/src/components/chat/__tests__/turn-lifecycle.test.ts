@@ -8,7 +8,7 @@
 
 import { describe, it, expect } from 'bun:test'
 import { deriveTurnPhase, groupMessagesByTurn, type AssistantTurn } from '../turn-utils'
-import type { Message } from '@mkagent/core'
+import type { Message } from '@opcagent/core'
 
 // ============================================================================
 // Test Helpers

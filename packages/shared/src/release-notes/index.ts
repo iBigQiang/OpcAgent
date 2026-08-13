@@ -1,7 +1,7 @@
 /**
  * Release Notes Utilities
  *
- * Loads release notes from bundled assets and syncs them to ~/.mkagent/release-notes/.
+ * Loads release notes from bundled assets and syncs them to ~/.opcagent/release-notes/.
  * Follows the same pattern as docs/index.ts.
  *
  * Source content lives in apps/electron/resources/release-notes/*.md.
@@ -30,8 +30,8 @@ function loadBundledReleaseNotes(): Record<string, string> {
   const assetsDir = getAssetsDir();
   const notes: Record<string, string> = {};
 
-  // Try bundled assets first, fall back to ~/.mkagent/release-notes/
-  // (Docker/remote server may not have MKAGENT_BUNDLED_ASSETS_ROOT set,
+  // Try bundled assets first, fall back to ~/.opcagent/release-notes/
+  // (Docker/remote server may not have OPCAGENT_BUNDLED_ASSETS_ROOT set,
   // but initializeReleaseNotes() copies files to the config dir at startup)
   let dir = assetsDir;
   if (!existsSync(dir)) {

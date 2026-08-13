@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import type { ActivityItem } from '@mkagent/ui'
+import type { ActivityItem } from '@opcagent/ui'
 import { collectFileChangesFromActivities, getFirstFileChangeIdForActivity } from '../file-changes'
 
 function activity(overrides: Partial<ActivityItem>): ActivityItem {

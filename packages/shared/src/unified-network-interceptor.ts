@@ -43,13 +43,13 @@ import {
 type HeadersInitType = Headers | Record<string, string> | string[][];
 
 /**
- * When `MKAGENT_DEBUG_SSE_RAW=1`, the OpenAI strip streams dump every raw SSE
+ * When `OPCAGENT_DEBUG_SSE_RAW=1`, the OpenAI strip streams dump every raw SSE
  * line they see (in) and emit (out) to interceptor.log. Used to diagnose
  * upstream SSE shape issues (e.g. DeepSeek's two-phase tool_call emission).
  * Independent of the broader DEBUG flag — opt-in only because raw chunks are
  * verbose and may contain user prompts/tool args.
  */
-const DEBUG_SSE_RAW = process.env.MKAGENT_DEBUG_SSE_RAW === '1';
+const DEBUG_SSE_RAW = process.env.OPCAGENT_DEBUG_SSE_RAW === '1';
 
 // ============================================================================
 // PROXY CONFIGURATION (from env vars injected by parent process)
@@ -1837,7 +1837,7 @@ const adapters: ApiAdapter[] = [anthropicAdapter, openAiResponsesAdapter, openAi
  * Example values: anthropic-messages, openai-completions, openai-responses.
  */
 function getPiApiHint(): string | undefined {
-  const hint = process.env.MKAGENT_PI_MODEL_API?.trim();
+  const hint = process.env.OPCAGENT_PI_MODEL_API?.trim();
   return hint || undefined;
 }
 
@@ -1858,7 +1858,7 @@ export function resolveAdapterNameFromPiApiHint(piApiHint?: string): 'anthropic'
 export function isAnyRouterPiMessagesUrl(url: string, configuredBaseUrl?: string): boolean {
   try {
     const parsed = new URL(url);
-    const configured = new URL(configuredBaseUrl || process.env.MKAGENT_PI_MODEL_BASE_URL || '');
+    const configured = new URL(configuredBaseUrl || process.env.OPCAGENT_PI_MODEL_BASE_URL || '');
     return parsed.origin === configured.origin && parsed.pathname === '/v1/messages';
   } catch {
     return false;
@@ -1873,8 +1873,8 @@ export function isAnyRouterPiMessagesUrl(url: string, configuredBaseUrl?: string
  */
 function findAdapter(url: string): ApiAdapter | undefined {
   if (
-    process.env.MKAGENT_PLATFORM_PROFILE === ANYROUTER_PI_PROFILE
-    && isAnyRouterPiMessagesUrl(url, process.env.MKAGENT_PI_MODEL_BASE_URL)
+    process.env.OPCAGENT_PLATFORM_PROFILE === ANYROUTER_PI_PROFILE
+    && isAnyRouterPiMessagesUrl(url, process.env.OPCAGENT_PI_MODEL_BASE_URL)
   ) {
     return anyRouterPiAdapter;
   }
@@ -2170,7 +2170,7 @@ function synthesizeMalformedBodyResponse(
     error: {
       type: 'invalid_request_error',
       code: err.code,
-      message: `MkAgent blocked an outgoing request that the API would reject: ${err.detail}. ` +
+      message: `OPCAgent blocked an outgoing request that the API would reject: ${err.detail}. ` +
         `This typically indicates a streaming-reassembly bug in the upstream endpoint or a stale ` +
         `tool history. Try starting a new session or switching to a different model/endpoint.`,
       param: 'tool_calls',
@@ -2181,7 +2181,7 @@ function synthesizeMalformedBodyResponse(
 
   setStoredError({
     status: 400,
-    statusText: 'Bad Request (blocked by MkAgent)',
+    statusText: 'Bad Request (blocked by OPCAgent)',
     message: err.detail,
     timestamp: Date.now(),
   });
@@ -2337,7 +2337,7 @@ const fetchProxy = new Proxy(interceptedFetch, {
 });
 
 // Auto-install in runtime subprocesses. Tests can disable this side effect.
-if (process.env.MKAGENT_INTERCEPTOR_DISABLE_AUTO_INSTALL !== '1') {
+if (process.env.OPCAGENT_INTERCEPTOR_DISABLE_AUTO_INSTALL !== '1') {
   (globalThis as unknown as { fetch: unknown }).fetch = fetchProxy;
   debugLog('Unified fetch interceptor installed');
 }

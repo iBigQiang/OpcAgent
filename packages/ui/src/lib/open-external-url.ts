@@ -16,7 +16,7 @@
 import {
   classifyExternalUrl,
   type UrlClassification,
-} from '@mkagent/shared/utils/url-safety'
+} from '@opcagent/shared/utils/url-safety'
 
 export type OpenExternalUrlResult =
   | { opened: true }

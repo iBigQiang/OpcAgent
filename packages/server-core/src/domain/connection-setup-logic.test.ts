@@ -56,7 +56,7 @@ describe('branded connection names', () => {
     expect(getDefaultConnectionName('anyrouter', 'Anthropic')).toBe('AnyRouter-CC')
     expect(getDefaultConnectionName('anyrouter_pi', 'Anthropic')).toBe('AnyRouter-Pi')
     expect(getDefaultConnectionName('agentrouter', 'Anthropic')).toBe('AgentRouter')
-    expect(getDefaultConnectionName(undefined, 'Anthropic')).toBe('MkAgent Backend (Anthropic)')
+    expect(getDefaultConnectionName(undefined, 'Anthropic')).toBe('OPC Agent Backend (Anthropic)')
   })
 
   it('preserves a custom name when an existing connection is re-saved', () => {
@@ -168,7 +168,7 @@ describe('createBuiltInConnection seeds midStreamBehavior', () => {
     expect(conn.midStreamBehavior).toBe('steer')
   })
 
-  it("Pi API key (MkAgent Backend) → 'steer'", () => {
+  it("Pi API key (OPC Agent Backend) uses steer", () => {
     const conn = createBuiltInConnection('pi-api-key')
     expect(conn.providerType).toBe('pi')
     expect(conn.midStreamBehavior).toBe('steer')

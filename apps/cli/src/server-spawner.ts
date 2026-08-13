@@ -1,8 +1,8 @@
 /**
- * Server spawner — start a headless MkAgent server as a child process.
+ * Server spawner — start a headless OPC Agent server as a child process.
  *
- * Spawns `bun run <serverEntry>`, reads stdout for the `MKAGENT_SERVER_URL=`
- * and `MKAGENT_SERVER_TOKEN=` lines, and returns a handle to stop the server.
+ * Spawns `bun run <serverEntry>`, reads stdout for the `OPCAGENT_SERVER_URL=`
+ * and `OPCAGENT_SERVER_TOKEN=` lines, and returns a handle to stop the server.
  */
 
 import { resolve, join } from 'node:path'
@@ -61,9 +61,9 @@ export async function spawnServer(opts?: SpawnServerOptions): Promise<SpawnedSer
     env: {
       ...process.env,
       ...opts?.env,
-      MKAGENT_SERVER_TOKEN: token,
-      MKAGENT_RPC_PORT: '0',
-      MKAGENT_RPC_HOST: '127.0.0.1',
+      OPCAGENT_SERVER_TOKEN: token,
+      OPCAGENT_RPC_PORT: '0',
+      OPCAGENT_RPC_HOST: '127.0.0.1',
     },
     stdout: 'pipe',
     stderr: 'pipe',
@@ -86,7 +86,7 @@ export async function spawnServer(opts?: SpawnServerOptions): Promise<SpawnedSer
     })()
   }
 
-  // Read stdout line by line looking for MKAGENT_SERVER_URL=
+  // Read stdout line by line looking for OPCAGENT_SERVER_URL=
   return new Promise<SpawnedServer>((resolve, reject) => {
     const timer = setTimeout(() => {
       proc.kill()
@@ -100,10 +100,10 @@ export async function spawnServer(opts?: SpawnServerOptions): Promise<SpawnedSer
       const lines = buffer.split('\n')
       buffer = lines.pop() ?? '' // keep incomplete last line in buffer
       for (const line of lines) {
-        if (line.startsWith('MKAGENT_SERVER_URL=')) {
-          url = line.slice('MKAGENT_SERVER_URL='.length).trim()
+        if (line.startsWith('OPCAGENT_SERVER_URL=')) {
+          url = line.slice('OPCAGENT_SERVER_URL='.length).trim()
         }
-        if (line.startsWith('MKAGENT_SERVER_TOKEN=')) {
+        if (line.startsWith('OPCAGENT_SERVER_TOKEN=')) {
           // Server echoes the token — we already have it but this confirms ready
         }
         // Once we have the URL, the server is ready
@@ -139,7 +139,7 @@ export async function spawnServer(opts?: SpawnServerOptions): Promise<SpawnedSer
       // If we get here without resolving, the process exited before printing the URL
       clearTimeout(timer)
       if (!url) {
-        reject(new Error('Server process exited before printing MKAGENT_SERVER_URL'))
+        reject(new Error('Server process exited before printing OPCAGENT_SERVER_URL'))
       }
     })()
   })

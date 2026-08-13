@@ -1,4 +1,4 @@
-import type { BrowserEmptyPromptSample } from '@mkagent/ui'
+import type { BrowserEmptyPromptSample } from '@opcagent/ui'
 
 export const EMPTY_STATE_PROMPT_SAMPLES: readonly BrowserEmptyPromptSample[] = [
   {

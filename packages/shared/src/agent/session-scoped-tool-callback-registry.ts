@@ -5,7 +5,7 @@ import type {
   SendAgentMessageResult,
   SessionInfo,
   AuthRequest,
-} from '@mkagent/session-tools-core';
+} from '@opcagent/session-tools-core';
 import { debug } from '../utils/debug.ts';
 import type { BrowserPaneFns } from './browser-tools.ts';
 import type { LLMQueryRequest, LLMQueryResult } from './llm-tool.ts';

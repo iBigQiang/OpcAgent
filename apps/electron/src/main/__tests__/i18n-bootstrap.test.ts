@@ -46,8 +46,8 @@ describe('main-process i18n bootstrap', () => {
       const r = runScript(
         configDir,
         `
-          import { setupI18n, i18n } from '@mkagent/shared/i18n';
-          import { setPersistedUiLanguage, getPersistedUiLanguage } from '@mkagent/shared/config';
+          import { setupI18n, i18n } from '@opcagent/shared/i18n';
+          import { setPersistedUiLanguage, getPersistedUiLanguage } from '@opcagent/shared/config';
           setupI18n();
           setPersistedUiLanguage('zh-Hans');
           const persisted = getPersistedUiLanguage();
@@ -69,8 +69,8 @@ describe('main-process i18n bootstrap', () => {
       const r = runScript(
         configDir,
         `
-          import { setupI18n, i18n } from '@mkagent/shared/i18n';
-          import { getPersistedUiLanguage } from '@mkagent/shared/config';
+          import { setupI18n, i18n } from '@opcagent/shared/i18n';
+          import { getPersistedUiLanguage } from '@opcagent/shared/config';
           setupI18n();
           const persisted = getPersistedUiLanguage();
           console.log(JSON.stringify({ persisted: persisted ?? null, resolved: i18n.resolvedLanguage }));
@@ -98,7 +98,7 @@ describe('main-process i18n bootstrap', () => {
       const r = runScript(
         configDir,
         `
-          import { getPersistedUiLanguage } from '@mkagent/shared/config';
+          import { getPersistedUiLanguage } from '@opcagent/shared/config';
           console.log(JSON.stringify({ value: getPersistedUiLanguage() ?? null }));
         `,
       )

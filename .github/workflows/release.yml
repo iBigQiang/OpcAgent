@@ -142,7 +142,7 @@ jobs:
         run: bun install --frozen-lockfile
       - name: Build desktop application
         env:
-          MKAGENT_AUTO_UPDATE_ENABLED: ${{ matrix.target != 'mac' || needs.release-policy.outputs.mac_signing == 'true' }}
+          OPCAGENT_AUTO_UPDATE_ENABLED: ${{ matrix.target != 'mac' || needs.release-policy.outputs.mac_signing == 'true' }}
         run: bun run electron:build
       - name: Package desktop
         working-directory: apps/electron
@@ -179,7 +179,7 @@ jobs:
           bunx electron-builder "${args[@]}"
       - name: Verify macOS code signature
         if: matrix.target == 'mac'
-        run: codesign --verify --deep --strict --verbose=2 "apps/electron/release/${{ matrix.arch == 'arm64' && 'mac-arm64' || 'mac' }}/MkAgent.app"
+        run: codesign --verify --deep --strict --verbose=2 "apps/electron/release/${{ matrix.arch == 'arm64' && 'mac-arm64' || 'mac' }}/OPC Agent.app"
       - name: Verify Windows Authenticode signature
         if: matrix.target == 'win' && needs.release-policy.outputs.windows_signing == 'true'
         shell: pwsh
@@ -196,13 +196,13 @@ jobs:
         shell: bash
         run: |
           version="${GITHUB_REF_NAME#v}"
-          bun run scripts/build-server.ts --output="dist/MkAgent-server-${version}-${{ matrix.platform }}-${{ matrix.arch }}" --compress
+          bun run scripts/build-server.ts --output="dist/OPC-Agent-server-${version}-${{ matrix.platform }}-${{ matrix.arch }}" --compress
       - name: Compress Windows headless server
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
           $version = "${{ github.ref_name }}".TrimStart("v")
-          Compress-Archive -Path "dist/MkAgent-server-$version-${{ matrix.platform }}-${{ matrix.arch }}/*" -DestinationPath "dist/MkAgent-server-$version-${{ matrix.platform }}-${{ matrix.arch }}.zip"
+          Compress-Archive -Path "dist/OPC-Agent-server-$version-${{ matrix.platform }}-${{ matrix.arch }}/*" -DestinationPath "dist/OPC-Agent-server-$version-${{ matrix.platform }}-${{ matrix.arch }}.zip"
       - uses: actions/upload-artifact@v4
         with:
           name: release-${{ matrix.target }}-${{ matrix.arch }}
@@ -215,8 +215,8 @@ jobs:
             apps/electron/release/*.AppImage
             apps/electron/release/*.blockmap
             apps/electron/release/latest*.yml
-            dist/MkAgent-server-*.tar.gz
-            dist/MkAgent-server-*.zip
+            dist/OPC-Agent-server-*.tar.gz
+            dist/OPC-Agent-server-*.zip
 
   cli:
     needs: verify
@@ -230,11 +230,11 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bun run cli:build
       - name: Package CLI bundle
-        run: tar -czf MkAgent-cli-bun.tar.gz -C apps/cli/dist mkagent
+        run: tar -czf OPC-Agent-cli-bun.tar.gz -C apps/cli/dist opcagent
       - uses: actions/upload-artifact@v4
         with:
           name: release-cli
-          path: MkAgent-cli-bun.tar.gz
+          path: OPC-Agent-cli-bun.tar.gz
           if-no-files-found: error
           retention-days: 7
 
@@ -276,7 +276,7 @@ jobs:
             windows_status="Unsigned; SmartScreen warning may appear"
           fi
           {
-            echo "MkAgent release trust status"
+            echo "OPC Agent release trust status"
             echo "macOS: $mac_status"
             echo "Windows: $windows_status"
             echo "Linux, CLI, and headless server: verified by SHA256SUMS"
@@ -318,9 +318,9 @@ jobs:
             exit 1
           fi
           if [ -z "$state" ]; then
-            gh release create "$TAG" --repo "$RELEASE_REPOSITORY" --verify-tag --title "MkAgent $TAG" --notes-file "$release_notes" --draft
+            gh release create "$TAG" --repo "$RELEASE_REPOSITORY" --verify-tag --title "OPC Agent $TAG" --notes-file "$release_notes" --draft
           else
-            gh release edit "$TAG" --repo "$RELEASE_REPOSITORY" --title "MkAgent $TAG" --notes-file "$release_notes"
+            gh release edit "$TAG" --repo "$RELEASE_REPOSITORY" --title "OPC Agent $TAG" --notes-file "$release_notes"
           fi
           gh release upload "$TAG" release-assets/* --repo "$RELEASE_REPOSITORY" --clobber
       - name: Publish release after successful upload

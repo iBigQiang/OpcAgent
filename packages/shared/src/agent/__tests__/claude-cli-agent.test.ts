@@ -10,11 +10,11 @@ function createConfig(overrides: Partial<BackendConfig> = {}): BackendConfig {
     workspace: {
       id: 'ws-test',
       name: 'Test Workspace',
-      rootPath: '/tmp/mkagent-test',
+      rootPath: '/tmp/opcagent-test',
     } as any,
     session: {
       id: 'session-test',
-      workspaceRootPath: '/tmp/mkagent-test',
+      workspaceRootPath: '/tmp/opcagent-test',
       createdAt: Date.now(),
       lastUsedAt: Date.now(),
       sdkSessionId: 'main-session',
@@ -35,14 +35,14 @@ function createQueue(): { events: Array<{ type: string; message?: string }>; has
 
 describe('ClaudeCliAgent runtime isolation', () => {
   it('uses stream-json, the selected model, and dontAsk without bypassing permissions', () => {
-    expect(buildClaudeCliArgs({ model: 'claude-opus-5[1m]', systemPrompt: 'MkAgent', sessionId: 'session-1' })).toEqual([
+    expect(buildClaudeCliArgs({ model: 'claude-opus-5[1m]', systemPrompt: 'OPCAgent', sessionId: 'session-1' })).toEqual([
       '--print',
       '--input-format', 'text',
       '--output-format', 'stream-json',
       '--verbose',
       '--permission-mode', 'dontAsk',
       '--model', 'claude-opus-5[1m]',
-      '--append-system-prompt', 'MkAgent',
+      '--append-system-prompt', 'OPCAgent',
       '--resume', 'session-1',
     ]);
   });
@@ -75,7 +75,7 @@ describe('ClaudeCliAgent runtime isolation', () => {
     const env = buildClaudeCliEnv({
       baseUrl: 'https://anyrouter.top',
       authToken: 'test-token',
-      configDir: 'C:/tmp/mkagent-claude',
+      configDir: 'C:/tmp/opcagent-claude',
       envOverrides: {
         ANTHROPIC_API_KEY: 'stale',
         CLAUDE_CODE_OAUTH_TOKEN: 'stale',
@@ -90,7 +90,7 @@ describe('ClaudeCliAgent runtime isolation', () => {
 
     expect(env.ANTHROPIC_BASE_URL).toBe('https://anyrouter.top');
     expect(env.ANTHROPIC_AUTH_TOKEN).toBe('test-token');
-    expect(env.CLAUDE_CONFIG_DIR).toBe('C:/tmp/mkagent-claude');
+    expect(env.CLAUDE_CONFIG_DIR).toBe('C:/tmp/opcagent-claude');
     expect(env.ANTHROPIC_API_KEY).toBeUndefined();
     expect(env.CLAUDE_CODE_OAUTH_TOKEN).toBeUndefined();
     expect(env.CLAUDE_CODE_USE_BEDROCK).toBeUndefined();

@@ -16,7 +16,7 @@ import { expandPath, toPortablePath, getBundledAssetsDir } from '../utils/paths.
 import { debug } from '../utils/debug.ts';
 import { readJsonFileSync } from '../utils/files.ts';
 import { CONFIG_DIR } from './paths.ts';
-import type { StoredAttachment, StoredMessage } from '@mkagent/core/types';
+import type { StoredAttachment, StoredMessage } from '@opcagent/core/types';
 import type { Plan } from '../agent/plan-types.ts';
 import type { PermissionMode } from '../agent/mode-manager.ts';
 import type { ThinkingLevel } from '../agent/thinking-levels.ts';
@@ -32,10 +32,10 @@ export { CONFIG_DIR, getConfigDir } from './paths.ts';
 export type {
   WorkspaceInfo,
   Workspace,
-} from '@mkagent/core/types';
+} from '@opcagent/core/types';
 
 // Import for local use
-import type { Workspace } from '@mkagent/core/types';
+import type { Workspace } from '@opcagent/core/types';
 
 // Import LLM connection types and constants
 import type { LlmConnection } from './llm-connections.ts';
@@ -111,7 +111,7 @@ let configDefaultsSynced = false;
 /** Minimal config-defaults used when bundled assets aren't available (CI, standalone server). */
 const FALLBACK_CONFIG_DEFAULTS: ConfigDefaults = {
   version: '1.0',
-  description: 'Default configuration values for MkAgent',
+  description: 'Default configuration values for OPCAgent',
   defaults: {
     notificationsEnabled: true,
     colorTheme: 'default',
@@ -160,7 +160,7 @@ function syncConfigDefaults(): void {
 }
 
 /**
- * Load config defaults from ~/.mkagent/config-defaults.json
+ * Load config defaults from ~/.opcagent/config-defaults.json
  * This file is synced from bundled assets on every launch.
  */
 export function loadConfigDefaults(): ConfigDefaults {
@@ -248,7 +248,7 @@ export function ensureConfigDir(): void {
   // Snapshot an existing config.json (dated, keep last 3) before anything can
   // mutate or — in a failure path — overwrite the workspace registry.
   backupConfigFile();
-  // Initialize bundled docs (creates ~/.mkagent/docs/ with sources.md, agents.md, permissions.md)
+  // Initialize bundled docs (creates ~/.opcagent/docs/ with sources.md, agents.md, permissions.md)
   initializeDocs();
 
   // Initialize config defaults
@@ -553,7 +553,7 @@ export function setRtkEnabled(enabled: boolean): void {
 
 /**
  * Get persisted Git Bash path (Windows only).
- * Used to set MKAGENT_GIT_BASH_PATH for subprocess tools.
+ * Used to set OPCAGENT_GIT_BASH_PATH for subprocess tools.
  */
 export function getGitBashPath(): string | undefined {
   const config = loadStoredConfig();
@@ -897,7 +897,7 @@ function ensureWorkspaceDir(workspaceId: string): string {
 
 
 // Re-export types from core for convenience
-export type { StoredAttachment, StoredMessage } from '@mkagent/core/types';
+export type { StoredAttachment, StoredMessage } from '@opcagent/core/types';
 
 export interface WorkspaceConversation {
   messages: StoredMessage[];
@@ -1217,7 +1217,7 @@ const APP_THEME_FILE = join(CONFIG_DIR, 'theme.json');
 const APP_THEMES_DIR = join(CONFIG_DIR, 'themes');
 
 /**
- * Get the path to the app-level theme override file (~/.mkagent/theme.json).
+ * Get the path to the app-level theme override file (~/.opcagent/theme.json).
  */
 export function getAppThemePath(): string {
   return APP_THEME_FILE;
@@ -1228,7 +1228,7 @@ let presetsInitialized = false;
 
 /**
  * Get the app-level themes directory.
- * Preset themes are stored at ~/.mkagent/themes/
+ * Preset themes are stored at ~/.opcagent/themes/
  */
 export function getAppThemesDir(): string {
   return APP_THEMES_DIR;
@@ -1997,7 +1997,7 @@ import { copyFileSync } from 'fs';
 const TOOL_ICONS_DIR_NAME = 'tool-icons';
 
 /**
- * Returns the path to the tool-icons directory: ~/.mkagent/tool-icons/
+ * Returns the path to the tool-icons directory: ~/.opcagent/tool-icons/
  */
 export function getToolIconsDir(): string {
   return join(CONFIG_DIR, TOOL_ICONS_DIR_NAME);

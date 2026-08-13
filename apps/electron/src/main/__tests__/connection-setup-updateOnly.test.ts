@@ -10,8 +10,8 @@
  * the decision path directly.
  */
 import { describe, it, expect, mock, beforeEach } from 'bun:test'
-import { createBuiltInConnection } from '@mkagent/server-core/domain'
-import type { LlmConnectionSetup } from '@mkagent/shared/protocol'
+import { createBuiltInConnection } from '@opcagent/server-core/domain'
+import type { LlmConnectionSetup } from '@opcagent/shared/protocol'
 
 // ============================================================
 // Simulated updateOnly guard logic

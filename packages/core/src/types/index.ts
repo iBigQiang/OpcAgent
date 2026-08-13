@@ -1,5 +1,5 @@
 /**
- * Re-export all types from @mkagent/core
+ * Re-export all types from @opcagent/core
  */
 
 // Workspace and config types

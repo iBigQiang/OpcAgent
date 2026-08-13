@@ -3,7 +3,7 @@
  *
  * CRUD operations for workspaces.
  * Workspaces can be stored anywhere on disk via rootPath.
- * Default location: ~/.mkagent/workspaces/
+ * Default location: ~/.opcagent/workspaces/
  */
 
 import {
@@ -38,7 +38,7 @@ export const DEFAULT_WORKSPACE_SLUG = 'default';
 // ============================================================
 
 /**
- * Get the default workspaces directory (~/.mkagent/workspaces/)
+ * Get the default workspaces directory (~/.opcagent/workspaces/)
  */
 export function getDefaultWorkspacesDir(): string {
   return DEFAULT_WORKSPACES_DIR;
@@ -268,7 +268,7 @@ export function generateSlug(name: string): string {
  * E.g., "my-workspace", "my-workspace-2", "my-workspace-3", ...
  *
  * @param name - Display name to derive the slug from
- * @param baseDir - Parent directory where workspace folders live (e.g., ~/.mkagent/workspaces/)
+ * @param baseDir - Parent directory where workspace folders live (e.g., ~/.opcagent/workspaces/)
  * @returns Full path to a unique, non-existing folder
  */
 export function generateUniqueWorkspacePath(name: string, baseDir: string): string {
@@ -411,7 +411,7 @@ export function renameWorkspaceFolder(rootPath: string, newName: string): boolea
 
 /**
  * Discover workspace folders in the default location that have valid config.json
- * Returns paths to valid workspaces found in ~/.mkagent/workspaces/
+ * Returns paths to valid workspaces found in ~/.opcagent/workspaces/
  */
 export function discoverWorkspacesInDefaultLocation(): string[] {
   const discovered: string[] = [];
@@ -492,7 +492,7 @@ export function setWorkspaceColorTheme(rootPath: string, themeId: string | undef
  * Environment configuration takes precedence over the workspace setting.
  */
 export function isLocalMcpEnabled(rootPath: string): boolean {
-  const envValue = process.env.MKAGENT_LOCAL_MCP_ENABLED;
+  const envValue = process.env.OPCAGENT_LOCAL_MCP_ENABLED;
   if (envValue !== undefined) return envValue.toLowerCase() === 'true';
   return loadWorkspaceConfig(rootPath)?.localMcpServers?.enabled ?? true;
 }

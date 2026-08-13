@@ -1,8 +1,8 @@
-# MkAgent 迁移文档总览
+# OPC Agent 迁移文档总览
 
 > 归档说明：本目录记录迁移过程中的决策、计划和阶段性审计快照，不是当前实现的唯一事实来源。当前运行方式和能力以 `docs/` 顶层文档、代码与 CI 配置为准；本文中的历史数字不要直接当作今日统计。
 
-本目录记录 MkAgent 从零起步，基于 [Craft Agents OSS](https://github.com/craft-ai-agents/craft-agents-oss) `v0.11.2` / `a60ebc1a5a7c` 派生 Lite 产品的完整迁移过程，包含产品边界、阶段计划、UI 对齐、功能裁剪、代码审计与质量验证。
+本目录记录 OPC Agent 从零起步，基于 [Craft Agents OSS](https://github.com/craft-ai-agents/craft-agents-oss) `v0.11.2` / `a60ebc1a5a7c` 派生 Lite 产品的完整迁移过程，包含产品边界、阶段计划、UI 对齐、功能裁剪、代码审计与质量验证。
 
 - **上游基线**：`craft-agents-oss` `v0.11.2` / `a60ebc1a5a7c`
 - **产品定位**：Pi-only 的本地跨平台 Agent Lite 发行版，保留 Craft 架构、UI 组件和 Pi Agent；恢复 ChatGPT Plus 与 Claude Pro/Max 两种 LLM 订阅 OAuth，但继续删除 Claude Agent SDK、GitHub Copilot、Sources/MCP、外部 Messaging、Automations、Labels、Projects/Kanban、Viewer、图片生成等产品功能面。
@@ -69,15 +69,15 @@
 | --- | --- |
 | Agent backend | 仅注册 `pi`，自定义协议与 Ollama 都是 Pi 连接变体 |
 | 鉴权 | API key、无鉴权 Ollama、ChatGPT Plus OAuth、Claude Pro/Max OAuth；OAuth credential 统一交给 Pi，刷新结果回写安全存储 |
-| 仓库 | 源码与发布产物统一放在 `MkThingsHQ/mkagent`（public） |
-| 数据目录 | `~/.mkagent`，仅 `CONFIG_DIR` 可覆盖，不读取或迁移其他产品 |
+| 仓库 | 源码与发布产物统一放在 `iBigQiang/OpcAgent`（public） |
+| 数据目录 | `~/.opcagent`，仅 `CONFIG_DIR` 可覆盖，不读取或迁移其他产品 |
 | 默认 workspace | slug 为 `default`，首次启动统一 `ensureDefaultWorkspace()` |
-| AppID/Bundle | `app.mkagent.desktop` |
-| 协议 | `mkagent://` |
-| 环境变量前缀 | `MKAGENT_` |
+| AppID/Bundle | `app.opcagent.desktop` |
+| 协议 | `opcagent://` |
+| 环境变量前缀 | `OPCAGENT_` |
 | i18n | 仅 `en` 与 `zh-Hans` |
 | Sentry | 与 craft 对齐；`SENTRY_ELECTRON_INGEST_URL` 存在时启用；不增加设置开关；source map 不上传 |
-| 自动更新 | `electron-updater` + `MkThingsHQ/mkagent` GitHub provider；客户端不含 token |
+| 自动更新 | `electron-updater` + `iBigQiang/OpcAgent` GitHub provider；客户端不含 token |
 | 排除功能 | Claude Agent SDK backend、GitHub Copilot、两种 LLM 订阅以外的 OAuth、外部 Messaging、Automations、Labels、自定义 Statuses、Projects/Kanban、Sources/MCP、Viewer/公开分享、Session transfer、远程 Workspace 产品绑定、图片生成模型 |
 
 ## 复现命令
@@ -114,4 +114,4 @@ CRAFT_AGENT_SOURCE=/Users/javayhu/workspace/agents/craft-agents-oss \
 - `echo` `fc38d0d49166` —— 参考在主架构上增加产品模块的方式；Connectors 不进入 MVP
 - `xagent` `59d1fdf20b16` —— 参考物理删除 Claude/Messaging/MCP、品牌替换、图标生成、默认 workspace 修复
 
-以上仓库仅作只读参考，任何 MkAgent 工作的修改不得触碰这些 checkout。
+以上仓库仅作只读参考，任何 OPC Agent 工作的修改不得触碰这些 checkout。

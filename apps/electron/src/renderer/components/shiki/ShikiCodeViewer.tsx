@@ -1,12 +1,12 @@
 /**
  * ShikiCodeViewer - Electron wrapper for the portable ShikiCodeViewer
  *
- * This thin wrapper imports the portable component from @mkagent/ui
+ * This thin wrapper imports the portable component from @opcagent/ui
  * and connects it to Electron's ThemeContext and preset themes.
  */
 
 import * as React from 'react'
-import { ShikiCodeViewer as BaseShikiCodeViewer, type ShikiCodeViewerProps as BaseProps } from '@mkagent/ui'
+import { ShikiCodeViewer as BaseShikiCodeViewer, type ShikiCodeViewerProps as BaseProps } from '@opcagent/ui'
 import { useTheme } from '@/hooks/useTheme'
 
 export interface ShikiCodeViewerProps extends Omit<BaseProps, 'theme' | 'shikiTheme'> {}

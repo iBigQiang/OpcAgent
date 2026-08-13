@@ -12,7 +12,7 @@ describe('resolveSessionWorkingDirectory', () => {
   })
 
   it('reads the header without parsing the trailing transcript', () => {
-    const workspacePath = mkdtempSync(join(tmpdir(), 'mkagent-skill-helper-'))
+    const workspacePath = mkdtempSync(join(tmpdir(), 'opcagent-skill-helper-'))
     roots.push(workspacePath)
     const sessionDir = join(workspacePath, 'sessions', 'session-1')
     mkdirSync(sessionDir, { recursive: true })

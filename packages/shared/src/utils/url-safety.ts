@@ -30,7 +30,7 @@ const DANGEROUS_SCHEMES: ReadonlyMap<string, string> = new Map([
   ],
 ])
 
-const INTERNAL_DEEPLINK_SCHEME = 'mkagent:'
+const INTERNAL_DEEPLINK_SCHEME = 'opcagent:'
 
 export function classifyExternalUrl(rawUrl: string): UrlClassification {
   if (typeof rawUrl !== 'string' || rawUrl.trim() === '') {

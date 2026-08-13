@@ -14,9 +14,9 @@ describe('validateFilePath', () => {
   })
 
   it('allows paths inside temp directory', async () => {
-    const path = join(tmp, 'mkagent-test.txt')
+    const path = join(tmp, 'opcagent-test.txt')
     const result = await validateFilePath(path)
-    expect(result).toContain('mkagent-test.txt')
+    expect(result).toContain('opcagent-test.txt')
   })
 
   it('denies paths outside all allowed directories', async () => {

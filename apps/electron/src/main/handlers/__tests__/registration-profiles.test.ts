@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, mock } from 'bun:test'
-import type { RpcServer } from '@mkagent/server-core/transport'
+import type { RpcServer } from '@opcagent/server-core/transport'
 import type { HandlerDeps } from '../handler-deps'
 import { CHANNEL_MAP } from '../../../transport/channel-map'
 
@@ -87,22 +87,22 @@ async function getExpectedCoreChannels(): Promise<Set<string>> {
   const [
     auth, automations, files, labels, llm, messaging, oauth, projects, resources, sessions, settings, skills, sources, system, workspace, onboarding,
   ] = await Promise.all([
-    import('@mkagent/server-core/handlers/rpc/auth'),
-    import('@mkagent/server-core/handlers/rpc/automations'),
-    import('@mkagent/server-core/handlers/rpc/files'),
-    import('@mkagent/server-core/handlers/rpc/labels'),
-    import('@mkagent/server-core/handlers/rpc/llm-connections'),
-    import('@mkagent/server-core/handlers/rpc/messaging'),
-    import('@mkagent/server-core/handlers/rpc/oauth'),
-    import('@mkagent/server-core/handlers/rpc/projects'),
-    import('@mkagent/server-core/handlers/rpc/resources'),
-    import('@mkagent/server-core/handlers/rpc/sessions'),
-    import('@mkagent/server-core/handlers/rpc/settings'),
-    import('@mkagent/server-core/handlers/rpc/skills'),
-    import('@mkagent/server-core/handlers/rpc/sources'),
-    import('@mkagent/server-core/handlers/rpc/system'),
-    import('@mkagent/server-core/handlers/rpc/workspace'),
-    import('@mkagent/server-core/handlers/rpc/onboarding'),
+    import('@opcagent/server-core/handlers/rpc/auth'),
+    import('@opcagent/server-core/handlers/rpc/automations'),
+    import('@opcagent/server-core/handlers/rpc/files'),
+    import('@opcagent/server-core/handlers/rpc/labels'),
+    import('@opcagent/server-core/handlers/rpc/llm-connections'),
+    import('@opcagent/server-core/handlers/rpc/messaging'),
+    import('@opcagent/server-core/handlers/rpc/oauth'),
+    import('@opcagent/server-core/handlers/rpc/projects'),
+    import('@opcagent/server-core/handlers/rpc/resources'),
+    import('@opcagent/server-core/handlers/rpc/sessions'),
+    import('@opcagent/server-core/handlers/rpc/settings'),
+    import('@opcagent/server-core/handlers/rpc/skills'),
+    import('@opcagent/server-core/handlers/rpc/sources'),
+    import('@opcagent/server-core/handlers/rpc/system'),
+    import('@opcagent/server-core/handlers/rpc/workspace'),
+    import('@opcagent/server-core/handlers/rpc/onboarding'),
   ])
 
   return new Set([
@@ -188,7 +188,7 @@ describe('RPC handler profile registration', () => {
   }, 15_000)
 
   it('backs every retained client API channel with a handler', async () => {
-    const { HANDLED_CHANNELS: serverChannels } = await import('@mkagent/server-core/handlers/rpc/server')
+    const { HANDLED_CHANNELS: serverChannels } = await import('@opcagent/server-core/handlers/rpc/server')
     const handled = new Set([
       ...await getExpectedCoreChannels(),
       ...await getExpectedGuiChannels(),
