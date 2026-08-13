@@ -32,11 +32,12 @@ afterAll(() => {
 });
 
 describe('AnyRouter Pi interceptor SSE', () => {
-  it('matches only the AnyRouter messages endpoint', () => {
-    expect(isAnyRouterPiMessagesUrl('https://anyrouter.top/v1/messages')).toBe(true);
-    expect(isAnyRouterPiMessagesUrl('https://anyrouter.top/v1/messages?beta=true')).toBe(true);
-    expect(isAnyRouterPiMessagesUrl('https://anyrouter.top/v1/responses')).toBe(false);
-    expect(isAnyRouterPiMessagesUrl('https://example.com/v1/messages')).toBe(false);
+  it('matches only the configured messages endpoint', () => {
+    const configuredBaseUrl = 'https://overseas.example.test';
+    expect(isAnyRouterPiMessagesUrl('https://overseas.example.test/v1/messages', configuredBaseUrl)).toBe(true);
+    expect(isAnyRouterPiMessagesUrl('https://overseas.example.test/v1/messages?beta=true', configuredBaseUrl)).toBe(true);
+    expect(isAnyRouterPiMessagesUrl('https://overseas.example.test/v1/responses', configuredBaseUrl)).toBe(false);
+    expect(isAnyRouterPiMessagesUrl('https://anyrouter.top/v1/messages', configuredBaseUrl)).toBe(false);
   });
 
   it('does not apply the AnyRouter-Pi wire to AgentRouter requests', async () => {

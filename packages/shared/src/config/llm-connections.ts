@@ -16,18 +16,11 @@ export type CustomEndpointApi = 'openai-completions' | 'anthropic-messages';
 export type LlmPlatformProfile = 'agentrouter' | 'anyrouter' | 'anyrouter_pi';
 export type MidStreamBehavior = 'steer' | 'queue';
 
-const PLATFORM_PROFILE_ORIGINS: Readonly<Record<LlmPlatformProfile, string>> = {
-  agentrouter: 'https://agentrouter.org',
-  anyrouter: 'https://anyrouter.top',
-  anyrouter_pi: 'https://anyrouter.top',
-};
-
 export function normalizePlatformProfileBaseUrl(
   platformProfile: LlmPlatformProfile,
   value: string | undefined,
 ): string {
-  const expectedOrigin = PLATFORM_PROFILE_ORIGINS[platformProfile];
-  const errorMessage = `${platformProfile} profile requires ${expectedOrigin}`;
+  const errorMessage = `${platformProfile} profile requires a valid HTTPS endpoint`;
   if (!value?.trim()) throw new Error(errorMessage);
 
   let parsed: URL;
@@ -37,11 +30,12 @@ export function normalizePlatformProfileBaseUrl(
     throw new Error(errorMessage);
   }
 
-  const hasUnexpectedParts = parsed.origin.toLowerCase() !== expectedOrigin
+  const hasUnexpectedParts = parsed.protocol !== 'https:'
+    || !parsed.hostname
     || (parsed.pathname !== '/' && parsed.pathname !== '')
     || Boolean(parsed.username || parsed.password || parsed.search || parsed.hash);
   if (hasUnexpectedParts) throw new Error(errorMessage);
-  return expectedOrigin;
+  return parsed.origin;
 }
 
 export function normalizeApiKeyInput(value: string): string {

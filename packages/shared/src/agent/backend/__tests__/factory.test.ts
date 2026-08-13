@@ -52,19 +52,19 @@ describe('backend registry', () => {
     expect(providerTypeToAgentProvider('pi_compat', 'agentrouter')).toBe('pi');
   });
 
-  it('pins the AnyRouter profile to its HTTPS origin', () => {
+  it('accepts a clean HTTPS endpoint for the AnyRouter profile', () => {
     expect(normalizeAnyRouterBaseUrl('https://anyrouter.top/')).toBe('https://anyrouter.top');
-    expect(() => normalizeAnyRouterBaseUrl('https://example.test')).toThrow('requires https://anyrouter.top');
-    expect(() => normalizeAnyRouterBaseUrl('http://anyrouter.top')).toThrow('requires https://anyrouter.top');
-    expect(() => normalizeAnyRouterBaseUrl('https://anyrouter.top/v1')).toThrow('requires https://anyrouter.top');
-    expect(() => normalizeAnyRouterBaseUrl('https://anyrouter.top:444')).toThrow('requires https://anyrouter.top');
+    expect(normalizeAnyRouterBaseUrl('https://overseas.example.test/')).toBe('https://overseas.example.test');
+    expect(() => normalizeAnyRouterBaseUrl('http://anyrouter.top')).toThrow('requires a valid HTTPS endpoint');
+    expect(() => normalizeAnyRouterBaseUrl('https://anyrouter.top/v1')).toThrow('requires a valid HTTPS endpoint');
+    expect(normalizeAnyRouterBaseUrl('https://anyrouter.top:444')).toBe('https://anyrouter.top:444');
   });
 
-  it('pins the AgentRouter profile to its HTTPS origin', () => {
+  it('accepts a clean HTTPS endpoint for the AgentRouter profile', () => {
     expect(normalizePlatformProfileBaseUrl('agentrouter', 'https://agentrouter.org/'))
       .toBe('https://agentrouter.org');
-    expect(() => normalizePlatformProfileBaseUrl('agentrouter', 'https://example.test'))
-      .toThrow('requires https://agentrouter.org');
+    expect(normalizePlatformProfileBaseUrl('agentrouter', 'https://overseas.example.test'))
+      .toBe('https://overseas.example.test');
   });
 
   it('passes through retained API key auth types', () => {

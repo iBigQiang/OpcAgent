@@ -129,7 +129,7 @@ describe('piDriver.testConnection custom Anthropic endpoint auth', () => {
         provider: 'pi',
         apiKey: 'test-token',
         model: 'pi/claude-opus-test',
-        baseUrl: 'https://anyrouter.top',
+        baseUrl: 'https://overseas.example.test',
         connection: {
           providerType: 'pi_compat',
           platformProfile: 'anyrouter_pi',
@@ -144,7 +144,7 @@ describe('piDriver.testConnection custom Anthropic endpoint auth', () => {
       });
 
       expect(result).toEqual({ success: true });
-      expect(requestUrl).toBe('https://anyrouter.top/v1/messages?beta=true');
+      expect(requestUrl).toBe('https://overseas.example.test/v1/messages?beta=true');
       expect(requestHeaders?.get('authorization')).toBe('Bearer test-token');
       expect(requestHeaders?.has('x-api-key')).toBe(false);
       expect(requestHeaders?.get('x-claude-code-session-id')).toBeTruthy();

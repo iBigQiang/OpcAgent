@@ -53,6 +53,7 @@ async function testAnthropicCompatible(
 
 async function testAnyRouterPiCompatible(
   apiKey: string,
+  baseUrl: string,
   model: string,
   timeoutMs: number,
 ): Promise<{ success: boolean; error?: string }> {
@@ -60,7 +61,7 @@ async function testAnyRouterPiCompatible(
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
     const request = adaptAnyRouterPiRequest({
-      url: 'https://anyrouter.top/v1/messages',
+      url: `${baseUrl}/v1/messages`,
       headers: { 'content-type': 'application/json', 'x-api-key': apiKey },
       body: {
         model: model.startsWith('pi/') ? model.slice(3) : model,
@@ -159,8 +160,8 @@ export const piDriver: ProviderDriver = {
   },
   testConnection: async (args: DriverTestConnectionArgs): Promise<{ success: boolean; error?: string } | null> => {
     if (args.connection?.platformProfile === ANYROUTER_PI_PROFILE) {
-      normalizePlatformProfileBaseUrl(ANYROUTER_PI_PROFILE, args.baseUrl);
-      return testAnyRouterPiCompatible(args.apiKey, args.model, args.timeoutMs);
+      const baseUrl = normalizePlatformProfileBaseUrl(ANYROUTER_PI_PROFILE, args.baseUrl);
+      return testAnyRouterPiCompatible(args.apiKey, baseUrl, args.model, args.timeoutMs);
     }
     const piAuthProvider = args.connection?.piAuthProvider;
     if (!piAuthProvider) {

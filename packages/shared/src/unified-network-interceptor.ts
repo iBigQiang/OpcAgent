@@ -1855,10 +1855,11 @@ export function resolveAdapterNameFromPiApiHint(piApiHint?: string): 'anthropic'
   return undefined;
 }
 
-export function isAnyRouterPiMessagesUrl(url: string): boolean {
+export function isAnyRouterPiMessagesUrl(url: string, configuredBaseUrl?: string): boolean {
   try {
     const parsed = new URL(url);
-    return parsed.origin === 'https://anyrouter.top' && parsed.pathname === '/v1/messages';
+    const configured = new URL(configuredBaseUrl || process.env.MKAGENT_PI_MODEL_BASE_URL || '');
+    return parsed.origin === configured.origin && parsed.pathname === '/v1/messages';
   } catch {
     return false;
   }
@@ -1873,7 +1874,7 @@ export function isAnyRouterPiMessagesUrl(url: string): boolean {
 function findAdapter(url: string): ApiAdapter | undefined {
   if (
     process.env.MKAGENT_PLATFORM_PROFILE === ANYROUTER_PI_PROFILE
-    && isAnyRouterPiMessagesUrl(url)
+    && isAnyRouterPiMessagesUrl(url, process.env.MKAGENT_PI_MODEL_BASE_URL)
   ) {
     return anyRouterPiAdapter;
   }

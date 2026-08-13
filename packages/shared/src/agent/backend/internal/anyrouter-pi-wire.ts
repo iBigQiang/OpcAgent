@@ -7,7 +7,6 @@
  */
 
 export const ANYROUTER_PI_PROFILE = 'anyrouter_pi' as const;
-export const ANYROUTER_PI_ORIGIN = 'https://anyrouter.top';
 export const ANYROUTER_PI_WIRE_VERSION = 'claude-code-2.1.227';
 
 type WireHeadersInit = ConstructorParameters<typeof Headers>[0];
@@ -150,7 +149,7 @@ export function adaptAnyRouterPiRequest(request: AnyRouterPiWireRequest): AnyRou
   });
   body.tools = claudeCodeTools(body.tools);
 
-  const target = new URL('/v1/messages', ANYROUTER_PI_ORIGIN);
+  const target = new URL('/v1/messages', request.url);
   target.searchParams.set('beta', 'true');
   return { url: target.toString(), headers, body };
 }

@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import {
   adaptAnyRouterPiRequest,
-  ANYROUTER_PI_ORIGIN,
   ANYROUTER_PI_PROFILE,
   adaptAnyRouterPiToolInput,
   adaptAnyRouterPiToolName,
@@ -35,7 +34,7 @@ describe('AnyRouter Pi wire', () => {
       deviceId: 'device-456',
     });
 
-    expect(result.url).toBe(`${ANYROUTER_PI_ORIGIN}/v1/messages?beta=true`);
+    expect(result.url).toBe('https://gateway.example.test/v1/messages?beta=true');
     expect(result.headers.get('authorization')).toBe('Bearer test-token');
     expect(result.headers.has('x-api-key')).toBe(false);
     expect(result.headers.has('content-length')).toBe(false);

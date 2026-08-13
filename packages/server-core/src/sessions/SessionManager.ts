@@ -1725,6 +1725,7 @@ export class SessionManager implements ISessionManager {
       runtime: connection ? {
         baseUrl: connection.baseUrl,
         piAuthProvider: connection.piAuthProvider,
+        platformProfile: connection.platformProfile,
         customEndpoint: connection.customEndpoint,
         customModels: connection.models?.map(model => typeof model === 'string' ? model : ({ id: model.id, contextWindow: model.contextWindow, supportsImages: model.supportsImages })),
       } : {},

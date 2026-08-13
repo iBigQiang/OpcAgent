@@ -205,13 +205,18 @@ describe('isDeniedMiniModelId()', () => {
 });
 
 describe('AnyRouter platform profiles', () => {
-  it('pins both AnyRouter profiles to the shared endpoint', () => {
+  it('normalizes clean HTTPS endpoints for both AnyRouter profiles', () => {
     expect(normalizePlatformProfileBaseUrl('anyrouter', 'https://anyrouter.top/')).toBe('https://anyrouter.top');
-    expect(normalizePlatformProfileBaseUrl('anyrouter_pi', 'https://anyrouter.top/')).toBe('https://anyrouter.top');
+    expect(normalizePlatformProfileBaseUrl('anyrouter_pi', 'https://overseas.example.test/'))
+      .toBe('https://overseas.example.test');
   });
 
-  it('rejects an AnyRouter-Pi endpoint override', () => {
-    expect(() => normalizePlatformProfileBaseUrl('anyrouter_pi', 'https://example.test'))
-      .toThrow('requires https://anyrouter.top');
+  it('rejects unsafe or non-root AnyRouter-Pi endpoints', () => {
+    expect(() => normalizePlatformProfileBaseUrl('anyrouter_pi', 'http://anyrouter.top'))
+      .toThrow('requires a valid HTTPS endpoint');
+    expect(() => normalizePlatformProfileBaseUrl('anyrouter_pi', 'https://user:pass@anyrouter.top'))
+      .toThrow('requires a valid HTTPS endpoint');
+    expect(() => normalizePlatformProfileBaseUrl('anyrouter_pi', 'https://anyrouter.top/v1'))
+      .toThrow('requires a valid HTTPS endpoint');
   });
 });
