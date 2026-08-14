@@ -20,7 +20,9 @@ export function getPlatformConnectionDescription(
 export function getEndpointProtocolLabel(
   api: CustomEndpointApi | undefined,
   t: Translate,
+  preserveBaseUrl = false,
 ): string | undefined {
+  if (preserveBaseUrl) return t('apiSetup.protocol.customBaseUrl')
   switch (api) {
     case 'openai-completions': return t('apiSetup.protocol.openAiChat')
     case 'openai-responses': return t('apiSetup.protocol.openAiResponses')

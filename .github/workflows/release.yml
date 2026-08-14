@@ -281,20 +281,20 @@ jobs:
         shell: bash
         run: |
           if [ "$MAC_SIGNING" = "true" ]; then
-            mac_status="Developer ID signed and notarized"
+            mac_status="已使用 Developer ID 签名并完成公证"
           else
-            mac_status="Ad-hoc signed; Gatekeeper warning expected; manual updates required"
+            mac_status="仅临时签名；Gatekeeper 可能提示警告；需要手动更新"
           fi
           if [ "$WINDOWS_SIGNING" = "true" ]; then
-            windows_status="Authenticode signed"
+            windows_status="已使用 Authenticode 签名"
           else
-            windows_status="Unsigned; SmartScreen warning may appear"
+            windows_status="未签名；SmartScreen 可能提示警告"
           fi
           {
-            echo "OPC Agent release trust status"
+            echo "OPC Agent 发布信任状态"
             echo "macOS: $mac_status"
             echo "Windows: $windows_status"
-            echo "Linux, CLI, and headless server: verified by SHA256SUMS"
+            echo "Linux、CLI 和无头服务器：请使用 SHA256SUMS 校验"
           } > release-assets/SIGNING_STATUS.txt
           shasum -a 256 release-assets/SIGNING_STATUS.txt | sed 's#release-assets/##' >> release-assets/SHA256SUMS
       - name: Create draft release and upload all assets
@@ -310,22 +310,22 @@ jobs:
           release_notes="$RUNNER_TEMP/release-notes.md"
           cp "$notes" "$release_notes"
           if [ "$MAC_SIGNING" = "true" ]; then
-            mac_status="Developer ID signed and notarized"
+            mac_status="已使用 Developer ID 签名并完成公证"
           else
-            mac_status="Ad-hoc signed; Gatekeeper warning expected; update by downloading the next DMG manually"
+            mac_status="仅临时签名；Gatekeeper 可能提示警告；后续版本需要手动下载 DMG 更新"
           fi
           if [ "$WINDOWS_SIGNING" = "true" ]; then
-            windows_status="Authenticode signed"
+            windows_status="已使用 Authenticode 签名"
           else
-            windows_status="Unsigned; SmartScreen warning may appear"
+            windows_status="未签名；SmartScreen 可能提示警告"
           fi
           {
             echo
-            echo "## Installation trust"
+            echo "## 安装信任状态"
             echo
-            echo "- macOS: $mac_status."
-            echo "- Windows: $windows_status."
-            echo "- Verify downloads with \`SHA256SUMS\`; machine-readable details are in \`SIGNING_STATUS.txt\`."
+            echo "- macOS：$mac_status。"
+            echo "- Windows：$windows_status。"
+            echo "- 请使用 \`SHA256SUMS\` 校验下载文件；机器可读的详细信息见 \`SIGNING_STATUS.txt\`。"
           } >> "$release_notes"
           state="$(gh release view "$TAG" --repo "$RELEASE_REPOSITORY" --json isDraft --jq .isDraft 2>/dev/null || true)"
           if [ "$state" = "false" ]; then

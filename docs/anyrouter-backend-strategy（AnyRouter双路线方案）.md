@@ -1,8 +1,8 @@
 # AnyRouter 后端兼容与分发策略
 
-更新日期：2026-08-11
+更新日期：2026-08-14
 
-状态：双路由实现完成；AnyRouter-CC 已验证；AnyRouter-Pi 已通过单轮文本、多轮上下文、只读工具、取消、会话恢复、thinking replay 和缓存复用，仍按实验能力发布。图片能力因 AnyRouter 持续返回 429 尚未验证，当前保持关闭。
+状态：双路由实现完成；AnyRouter-CC 已验证；AnyRouter-Pi 已通过单轮文本、多轮上下文、只读工具、取消、会话恢复、thinking replay、缓存复用和打包版真实 UI 会话，仍按实验能力发布。图片能力因 AnyRouter 持续返回 429 尚未验证，当前保持关闭。
 
 ## 1. 结论
 
@@ -32,12 +32,41 @@ Claude Code 的本地 JSONL 历史只保存会话事件，不保存原始 HTTP h
 | AnyRouter-Pi 会话恢复 | 新 Pi 子进程打开已有私有会话记录，恢复后的 SDK Session ID 与原记录一致，`ready=true`；该检查未发送新的 API 请求 |
 | AnyRouter-Pi 缓存 | 相同上下文首轮创建 2,225 个缓存输入 token；第二轮读取 2,225 个缓存输入 token，两轮均 HTTP 200 且 `message_stop` 正常 |
 | AnyRouter-Pi 图片 | 三次最小图片请求均在约 2.3–3.3 秒收到 HTTP 429，SSE 未开始；属于上游限流阻塞，不能判定兼容成功或失败，当前不开放图片入口 |
+| 0.1.6 打包版真实 UI 主会话 | `claude-opus-5[1m]` 经 AnyRouter-Pi 返回 HTTP 200；约 4.1 秒收到响应头，约 46.9 秒完成 UI 会话，回答正常显示 |
+| UI 会话后的后台标题请求 | 主回答完成后，标题生成使用 `claude-opus-4-8[1m]`，首请求及 2/4/8 秒重试共四次收到 HTTP 429；该失败被静默隔离，不会把成功主回答改成 429 |
 
 单轮纯文本已经证明以下链路可行：
 
 `OPC Agent -> Pi 后端 -> AnyRouter 专用协议适配器 -> AnyRouter`
 
 当前结果证明文本、多轮、一个只读工具闭环、取消、会话恢复、thinking replay 和缓存复用在当前版本、当前时点可用，但不代表 AnyRouter 对 Pi 的正式支持。图片仍被上游限流阻塞；复杂工具链仍需继续验证。
+
+本次打包版 UI 实测同时证明，OPC Agent 展示的 `429 status code (no body)` 来自上游 HTTP 响应，不是本地等待超时被转换成 429。主请求成功后出现的四次短请求属于 Pi 后台标题生成的自动重试，与主聊天请求是两条独立链路。
+
+### 2.1 安全诊断与单变量 A/B
+
+0.1.6 增加默认关闭的 AnyRouter-Pi 安全诊断。设置以下环境变量后，Pi 会话目录中会生成 `anyrouter-pi-diagnostics-<pid>.jsonl`：
+
+```text
+OPCAGENT_ANYROUTER_PI_DIAGNOSTICS=1
+```
+
+日志只允许记录时间、事件、随机关联 ID、由 `x-stainless-retry-count` 推导的 SDK attempt、HTTP 状态、耗时、解析后的 Retry-After、配置模型、出站模型、请求路径、A/B 变体、token 上限和 retry header。日志不记录 API key、Authorization、Cookie、用户正文、响应正文、完整 URL、host、query 或原始错误文本。
+
+该 attempt 只表示 Anthropic SDK retry header，不会把 Pi AgentSession 的外层自动重试关联为同一调用。外层 2/4/8 秒重试会产生不同关联 ID，且每条都可能显示 `attempt=1`。
+
+诊断文件按 Pi 子进程和会话隔离，单文件上限 256 KiB，只保留当前文件与一个轮转文件。文件写入使用非阻塞队列；I/O 失败后仅停止诊断，不影响模型请求。
+
+可用的单变量 A/B 开关如下：
+
+```text
+OPCAGENT_ANYROUTER_PI_WIRE_VARIANT=baseline
+OPCAGENT_ANYROUTER_PI_WIRE_VARIANT=preserve-model-alias
+OPCAGENT_ANYROUTER_PI_WIRE_VARIANT=preserve-max-tokens
+OPCAGENT_ANYROUTER_PI_WIRE_VARIANT=preserve-retry-count
+```
+
+默认值为 `baseline`。每个实验值只改变一个请求字段，不能同时组合；它们用于定位 AnyRouter 的未公开路由和限流行为，不代表公开稳定配置。
 
 ## 3. 真实 Claude Code 请求结构
 

@@ -227,7 +227,11 @@ function ConnectionRow({ connection, isLastConnection, onRenameClick, onDelete, 
     if (validationState === 'error') return validationError || t("settings.ai.validationFailed")
 
     const platformDescription = getPlatformConnectionDescription(connection.platformProfile, t)
-    const protocolDescription = getEndpointProtocolLabel(connection.customEndpoint?.api, t)
+    const protocolDescription = getEndpointProtocolLabel(
+      connection.customEndpoint?.api,
+      t,
+      connection.customEndpoint?.urlNormalization === 'preserve',
+    )
     if (platformDescription) {
       const endpointHost = (() => {
         try {
@@ -613,6 +617,7 @@ export default function AiSettingsPage() {
     activePreset?: string
     models?: string[]
     customApi?: CustomEndpointApi
+    preserveCustomBaseUrl?: boolean
     platformProfile?: import('@config/llm-connections').LlmPlatformProfile
   } | undefined>(undefined)
   const setFullscreenOverlayOpen = useSetAtom(fullscreenOverlayOpenAtom)
@@ -801,6 +806,7 @@ export default function AiSettingsPage() {
       activePreset: connection.platformProfile ?? (isCustomEndpointConnection ? 'custom' : (connection.piAuthProvider || undefined)),
       models: modelIds,
       customApi: connection.customEndpoint?.api,
+      preserveCustomBaseUrl: connection.customEndpoint?.urlNormalization === 'preserve',
       platformProfile: connection.platformProfile,
     })
 

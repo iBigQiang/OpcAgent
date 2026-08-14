@@ -23,7 +23,7 @@ These two fields come from `LlmConnection` in `packages/shared/src/config/llm-co
 |---|---|---|
 | `providerType` | `pi`, `pi_compat` | Which transport Pi uses to talk to the model |
 | `authType` | `oauth`, `api_key`, `api_key_with_endpoint`, `none` | How the credential is supplied |
-| `customEndpoint.api` | `openai-completions`, `anthropic-messages` | Which HTTP protocol `pi_compat` speaks |
+| `customEndpoint.api` | `openai-completions`, `openai-responses`, `anthropic-messages`, `google-generative-ai` | Which HTTP protocol `pi_compat` speaks |
 
 `pi` is Pi's native transport: the Pi SDK already knows OpenAI, Anthropic, Google, DeepSeek, xAI, Mistral, Groq, and OpenRouter. `pi_compat` is used for everything else (Ollama, vLLM, DashScope, an Azure OpenAI deployment, a private gateway) — you must give Pi a `baseUrl` and tell it which generic protocol to use. `authType` only describes the credential that accompanies the request. The four "forms" above map onto those three fields as follows.
 
@@ -34,7 +34,23 @@ These two fields come from `LlmConnection` in `packages/shared/src/config/llm-co
 | Pi provider preset | `pi` | `api_key` | — |
 | Custom `openai-completions` | `pi_compat` | `api_key_with_endpoint` | `openai-completions` |
 | Custom `anthropic-messages` | `pi_compat` | `api_key_with_endpoint` | `anthropic-messages` |
+| Custom Google Gemini | `pi_compat` | `api_key_with_endpoint` | `google-generative-ai` |
 | Local Ollama | `pi_compat` | `none` | `openai-completions` |
+
+### Google Gemini endpoints
+
+The built-in Google AI Studio preset uses the SDK base URL
+`https://generativelanguage.googleapis.com/v1beta`. OPC Agent supplements the
+Pi 0.80.x catalog with the stable Gemini 3.5 Flash-Lite, Gemini 3.6 Flash, and
+Gemini 3.7 Flash definitions so the selector and runtime registry stay aligned.
+
+For a custom Google Gemini connection, enter an origin, a versioned base URL,
+or a complete `generateContent`/`streamGenerateContent` request URL. OPC Agent
+stores the SDK base ending in `/v1beta`; the Google SDK then sends streaming
+agent requests to `/v1beta/models/{model}:streamGenerateContent?alt=sse`.
+Google's non-streaming `:generateContent` endpoint is valid, but the Pi agent
+uses the streaming endpoint intentionally for incremental responses and tool
+events.
 
 ### Example connection records
 

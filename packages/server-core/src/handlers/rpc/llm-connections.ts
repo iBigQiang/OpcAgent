@@ -79,7 +79,12 @@ export function createConnection(setup: LlmConnectionSetup): LlmConnection {
   const baseUrl = inputBaseUrl && isAnyRouterProfile
     ? normalizePlatformProfileBaseUrl(setup.platformProfile!, inputBaseUrl)
     : inputBaseUrl && customEndpoint
-      ? normalizeCustomEndpointUrl(customEndpoint.api, inputBaseUrl, setup.defaultModel ?? setup.models?.[0] ?? undefined).baseUrl
+      ? normalizeCustomEndpointUrl(
+          customEndpoint.api,
+          inputBaseUrl,
+          setup.defaultModel ?? setup.models?.[0] ?? undefined,
+          customEndpoint.urlNormalization === 'preserve',
+        ).baseUrl
       : inputBaseUrl
   const baseSlug = setup.slug.replace(/-\d+$/, '')
   if (!baseUrl && (baseSlug === 'chatgpt-plus' || baseSlug === 'claude-max')) {
@@ -192,6 +197,7 @@ export function registerLlmConnectionsHandlers(server: RpcServer, deps: HandlerD
             params.customEndpoint.api,
             params.baseUrl,
             params.model,
+            params.customEndpoint.urlNormalization === 'preserve',
           ).baseUrl,
         }
       } catch (error) {

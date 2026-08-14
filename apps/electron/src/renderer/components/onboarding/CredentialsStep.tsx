@@ -25,6 +25,7 @@ interface CredentialsStepProps {
     activePreset?: string
     models?: string[]
     customApi?: CustomEndpointApi
+    preserveCustomBaseUrl?: boolean
   }
 }
 
@@ -111,6 +112,7 @@ export function CredentialsStep({
     editInitialValues?.connectionDefaultModel ?? '',
     (editInitialValues?.models ?? []).join('|'),
     editInitialValues?.customApi ?? '',
+    editInitialValues?.preserveCustomBaseUrl ? 'preserve' : '',
   ].join('::')
 
   return (

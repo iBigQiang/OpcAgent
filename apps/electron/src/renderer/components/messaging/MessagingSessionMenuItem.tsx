@@ -21,7 +21,7 @@ export function useMessagingConnect({ sessionId, onPlatformNotConfigured, classi
   const setMessagingDialog = useSetAtom(messagingDialogAtom)
   return React.useCallback(async (platform: MessagingPlatform) => {
     try {
-      const runtime = (await window.electronAPI.getMessagingConfig())?.runtime?.[platform]
+      const runtime = (await window.electronAPI.getMessagingRuntime()).find(item => item.platform === platform)
       if (!runtime?.connected) {
         if (platform === 'whatsapp') setMessagingDialog({ kind: 'wa_connect', continueToPairingSessionId: sessionId })
         else if (onPlatformNotConfigured) onPlatformNotConfigured()

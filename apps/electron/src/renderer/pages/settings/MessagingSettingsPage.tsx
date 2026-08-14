@@ -61,7 +61,7 @@ import {
   type PlatformAccessMode,
   type PlatformOwner,
 } from '@/components/messaging/access'
-import { useActiveWorkspace } from '@/context/AppShellContext'
+import { useActiveWorkspace, useAppShellContext } from '@/context/AppShellContext'
 import { useNavigation } from '@/contexts/NavigationContext'
 import {
   messagingBindingsAtom,
@@ -70,6 +70,7 @@ import {
 } from '@/atoms/messaging'
 import { sessionMetaMapAtom, type SessionMeta } from '@/atoms/sessions'
 import { getSessionTitle } from '@/utils/session'
+import { getDirectSessionDisplay } from './messaging-display'
 import type { DetailsPageMeta } from '@/lib/navigation-registry'
 import type { MessagingPlatformRuntimeInfo } from '../../../shared/types'
 
@@ -81,6 +82,7 @@ export const meta: DetailsPageMeta = {
 export default function MessagingSettingsPage() {
   const { t } = useTranslation()
   const activeWorkspace = useActiveWorkspace()
+  const { llmConnections, workspaceDefaultLlmConnection } = useAppShellContext()
   const setBindings = useSetAtom(setMessagingBindingsAtom)
   const workspaceId = activeWorkspace?.id
 
@@ -116,13 +118,28 @@ export default function MessagingSettingsPage() {
         <div className="space-y-6 p-6">
           <SettingsSection title={t('settings.messaging.title')}>
             <SettingsCard>
-              <PlatformRow platform="telegram" workspaceId={activeWorkspace.id} />
+              <PlatformRow
+                platform="telegram"
+                workspaceId={activeWorkspace.id}
+                llmConnections={llmConnections}
+                workspaceDefaultLlmConnection={workspaceDefaultLlmConnection}
+              />
             </SettingsCard>
             <SettingsCard>
-              <PlatformRow platform="whatsapp" workspaceId={activeWorkspace.id} />
+              <PlatformRow
+                platform="whatsapp"
+                workspaceId={activeWorkspace.id}
+                llmConnections={llmConnections}
+                workspaceDefaultLlmConnection={workspaceDefaultLlmConnection}
+              />
             </SettingsCard>
             <SettingsCard>
-              <PlatformRow platform="lark" workspaceId={activeWorkspace.id} />
+              <PlatformRow
+                platform="lark"
+                workspaceId={activeWorkspace.id}
+                llmConnections={llmConnections}
+                workspaceDefaultLlmConnection={workspaceDefaultLlmConnection}
+              />
             </SettingsCard>
           </SettingsSection>
         </div>
@@ -187,7 +204,23 @@ function CardSeparator() {
   return <div className="mx-4 h-px bg-border/50" />
 }
 
-function PlatformRow({ platform, workspaceId }: { platform: Platform; workspaceId: string }) {
+function PlatformRow({
+  platform,
+  workspaceId,
+  llmConnections,
+  workspaceDefaultLlmConnection,
+}: {
+  platform: Platform
+  workspaceId: string
+  llmConnections: Array<{
+    slug: string
+    name: string
+    providerType: string
+    defaultModel?: string
+    isDefault?: boolean
+  }>
+  workspaceDefaultLlmConnection?: string
+}) {
   const { t } = useTranslation()
   const allBindings = useAtomValue(messagingBindingsAtom)
   const sessionMetaMap = useAtomValue(sessionMetaMapAtom)
@@ -416,8 +449,10 @@ function PlatformRow({ platform, workspaceId }: { platform: Platform; workspaceI
             </DropdownMenu>
           ) : (
             <Button variant="outline" size="sm" onClick={handleConnect}>
-              <Plus className="h-3.5 w-3.5" />
-              {platform === 'lark' ? t('settings.messaging.lark.connect') : t('auth.connect')}
+              {runtime.configured ? <Settings2 className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
+              {runtime.configured
+                ? t(`settings.messaging.${platform}.configure`, { defaultValue: 'Configure' })
+                : platform === 'lark' ? t('settings.messaging.lark.connect') : t('auth.connect')}
             </Button>
           )}
         </div>
@@ -433,6 +468,8 @@ function PlatformRow({ platform, workspaceId }: { platform: Platform; workspaceI
             <TelegramBindingsBody
               bindings={platformBindings}
               sessionMetaMap={sessionMetaMap}
+              llmConnections={llmConnections}
+              workspaceDefaultLlmConnection={workspaceDefaultLlmConnection}
               supergroup={supergroup}
               onPairSupergroup={() => setSupergroupDialogOpen(true)}
               onUnpairSupergroup={async () => {
@@ -503,6 +540,14 @@ function PlatformRow({ platform, workspaceId }: { platform: Platform; workspaceI
 interface TelegramBindingsBodyProps {
   bindings: MessagingBinding[]
   sessionMetaMap: Map<string, SessionMeta>
+  llmConnections: Array<{
+    slug: string
+    name: string
+    providerType: string
+    defaultModel?: string
+    isDefault?: boolean
+  }>
+  workspaceDefaultLlmConnection?: string
   supergroup: { chatId: string; title: string } | null
   onPairSupergroup: () => void
   onUnpairSupergroup: () => void
@@ -520,6 +565,8 @@ function bindingToAccess(binding: MessagingBinding): BindingAccess {
 function TelegramBindingsBody({
   bindings,
   sessionMetaMap,
+  llmConnections,
+  workspaceDefaultLlmConnection,
   supergroup,
   onPairSupergroup,
   onUnpairSupergroup,
@@ -575,6 +622,8 @@ function TelegramBindingsBody({
                 key={binding.id}
                 binding={binding}
                 sessionMetaMap={sessionMetaMap}
+                llmConnections={llmConnections}
+                workspaceDefaultLlmConnection={workspaceDefaultLlmConnection}
                 workspaceOwners={workspaceOwners}
                 onOpen={() => onOpenSession(binding)}
                 onUnbind={() => onUnbind(binding)}
@@ -607,6 +656,8 @@ function TelegramBindingsBody({
 function DirectSessionRow({
   binding,
   sessionMetaMap,
+  llmConnections,
+  workspaceDefaultLlmConnection,
   workspaceOwners,
   onOpen,
   onUnbind,
@@ -614,27 +665,34 @@ function DirectSessionRow({
 }: {
   binding: MessagingBinding
   sessionMetaMap: TelegramBindingsBodyProps['sessionMetaMap']
+  llmConnections: TelegramBindingsBodyProps['llmConnections']
+  workspaceDefaultLlmConnection: TelegramBindingsBodyProps['workspaceDefaultLlmConnection']
   workspaceOwners: PlatformOwner[]
   onOpen: () => void
   onUnbind: () => void
   onAccessChange: (next: BindingAccess) => void
 }) {
-  const { t } = useTranslation()
   const meta = sessionMetaMap.get(binding.sessionId)
   const sessionLabel = meta ? getSessionTitle(meta) : binding.channelName || binding.channelId
-  // Layout convention here matches the Supergroup row: the binding *type*
-  // ("Direct message session") is the primary label, the session name drops
-  // to the subtitle. Keeps Direct and Supergroup rows visually parallel.
+  const display = getDirectSessionDisplay({
+    sessionLabel,
+    channelLabel: binding.channelName || binding.channelId,
+    llmConnection: meta?.llmConnection,
+    model: meta?.model,
+    workspaceDefaultLlmConnection,
+  }, llmConnections)
   return (
     <div className="flex items-center gap-3 px-4 py-2.5">
       <SubRowIcon icon={MessageSquare} />
       <div className="min-w-0 flex-1">
         <div className="truncate text-sm">
-          {t('settings.messaging.telegram.directSessionSubtitle', {
-            defaultValue: 'Direct message session',
-          })}
+          {display.title}
         </div>
-        <div className="mt-0.5 truncate text-xs text-foreground/50">{sessionLabel}</div>
+        {display.details.length > 0 && (
+          <div className="mt-0.5 truncate text-xs text-foreground/50">
+            {display.details.join(' · ')}
+          </div>
+        )}
       </div>
       <BindingAllowListPopover
         access={bindingToAccess(binding)}
@@ -883,7 +941,9 @@ function buildDescription(
     return t('dialog.whatsapp.starting', { defaultValue: 'Connecting…' })
   }
   if (runtime.state === 'error' && runtime.lastError) {
-    return runtime.lastError
+    return runtime.configured && platform === 'telegram'
+      ? t('settings.messaging.telegram.savedConnectionFailed', { error: runtime.lastError })
+      : runtime.lastError
   }
   return t(`settings.messaging.${platform}.notConnected`, { defaultValue: 'Not connected' })
 }

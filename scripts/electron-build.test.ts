@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 const CLAUDE_SDK = '@anthropic-ai/claude-agent-sdk'
+const TELEGRAM_SDK = 'grammy'
 
 describe('Electron CJS build configuration', () => {
   it('keeps the removed Claude SDK out of main-process bundles', () => {
@@ -37,5 +38,18 @@ describe('Electron CJS build configuration', () => {
     expect(sharedPackage.exports['./auth/chatgpt-oauth-config']).toBe(
       './src/auth/chatgpt-oauth-config.ts',
     )
+  })
+
+  it('bundles the Telegram SDK into the packaged main process', () => {
+    const adapter = readFileSync(
+      resolve(
+        import.meta.dir,
+        '../packages/messaging-gateway/src/adapters/telegram/index.ts',
+      ),
+      'utf-8',
+    )
+
+    expect(adapter).toContain(`from '${TELEGRAM_SDK}'`)
+    expect(adapter).not.toContain(`dynamicImport('${TELEGRAM_SDK}')`)
   })
 })

@@ -2,7 +2,8 @@ import { randomUUID } from 'node:crypto'
 import { writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { extname, join } from 'node:path'
-import type { ButtonPress, IncomingMessage, InlineButton, MessagingPlatformConfig, PlatformAdapter, SentMessage } from '../../types'
+import { Bot } from 'grammy'
+import type { ButtonPress, IncomingMessage, InlineButton, MessagingPlatformConfig, PlatformAdapter, PlatformRuntimeInfo, SentMessage } from '../../types'
 
 const MAX_ATTACHMENT_BYTES = 20 * 1024 * 1024
 
@@ -11,8 +12,21 @@ type GrammyBot = {
   on(event: string, handler: (ctx: any) => Promise<void>): void
   api: { sendMessage(chatId: string, text: string, options?: Record<string, unknown>): Promise<{ message_id?: string | number }>; editMessageText(chatId: string, messageId: string, text: string, options?: Record<string, unknown>): Promise<unknown>; sendChatAction(chatId: string, action: string, options?: Record<string, unknown>): Promise<unknown>; sendDocument(chatId: string, document: { filename: string; source: Buffer }, options?: Record<string, unknown>): Promise<{ message_id?: string | number }>; editMessageReplyMarkup(chatId: string, messageId: string, options?: Record<string, unknown>): Promise<unknown>; getFile(fileId: string): Promise<{ file_path?: string; file_size?: number }>; getChat(chatId: string): Promise<{ id: string | number; title?: string; type?: string; is_forum?: boolean }>; createForumTopic(chatId: string, name: string): Promise<{ message_thread_id: number; name?: string }>; deleteWebhook(options?: Record<string, unknown>): Promise<unknown> }
   init(): Promise<void>
-  start(options?: Record<string, unknown>): Promise<void>
+  start(options?: { drop_pending_updates?: boolean; onStart?: (botInfo: { username?: string }) => void | Promise<void> }): Promise<void>
   stop(): void
+}
+
+type TelegramConnectStage = 'verify_bot' | 'start_polling' | 'polling'
+
+export class TelegramConnectionError extends Error {
+  constructor(
+    message: string,
+    readonly stage: TelegramConnectStage,
+    readonly code?: number | string,
+  ) {
+    super(message)
+    this.name = 'TelegramConnectionError'
+  }
 }
 
 /** Actual grammY polling adapter. It is inert until registry.connect explicitly invokes initialize. */
@@ -23,15 +37,16 @@ export class TelegramAdapter implements PlatformAdapter {
   private connected = false
   private handler: ((message: IncomingMessage) => Promise<void>) | null = null
   private buttonHandler: ((press: ButtonPress) => Promise<void>) | null = null
+  private statusHandler: ((patch: Partial<PlatformRuntimeInfo>) => void) | null = null
   private acceptedSupergroupChatId: string | undefined
   private token = ''
   onMessage(handler: (message: IncomingMessage) => Promise<void>): void { this.handler = handler }
   onButtonPress(handler: (press: ButtonPress) => Promise<void>): void { this.buttonHandler = handler }
+  onStatus(handler: (patch: Partial<PlatformRuntimeInfo>) => void): void { this.statusHandler = handler }
   async initialize(input: { credential: string; config: MessagingPlatformConfig }): Promise<void> {
-    const mod = await dynamicImport('grammy') as { Bot: new (token: string) => GrammyBot }
     this.acceptedSupergroupChatId = input.config.acceptedSupergroupChatId
     this.token = input.credential
-    const bot = new mod.Bot(input.credential)
+    const bot = new Bot(input.credential, { client: { fetch: globalThis.fetch } }) as unknown as GrammyBot
     bot.on('message:text', async (ctx: any) => {
       const chat = ctx.chat; const message = ctx.message; const from = ctx.from
       if (!chat || !message || !from || from.is_bot || !isAccepted(chat, this.acceptedSupergroupChatId)) return
@@ -50,12 +65,32 @@ export class TelegramAdapter implements PlatformAdapter {
         } catch {}
       })
     }
-    await bot.api.deleteWebhook({ drop_pending_updates: false })
-    await bot.init()
-    this.bot = bot; this.connected = true
-    void bot.start({ drop_pending_updates: false }).catch(() => { this.connected = false })
+    this.bot = bot
+    try {
+      await bot.init()
+    } catch (error) {
+      this.bot = null
+      throw classifyTelegramConnectionError(error, 'verify_bot')
+    }
+    let started = false
+    await new Promise<void>((resolve, reject) => {
+      void bot.start({
+        drop_pending_updates: false,
+        onStart: botInfo => {
+          started = true
+          this.connected = true
+          this.statusHandler?.({ connected: true, state: 'connected', identity: botInfo.username })
+          resolve()
+        },
+      }).catch(error => {
+        this.connected = false
+        const classified = classifyTelegramConnectionError(error, started ? 'polling' : 'start_polling')
+        this.statusHandler?.({ connected: false, state: 'error', lastError: classified.message })
+        if (!started) reject(classified)
+      })
+    })
   }
-  async destroy(): Promise<void> { this.bot?.stop(); this.bot = null; this.connected = false; this.handler = null; this.buttonHandler = null; this.token = '' }
+  async destroy(): Promise<void> { this.bot?.stop(); this.bot = null; this.connected = false; this.handler = null; this.buttonHandler = null; this.statusHandler = null; this.token = '' }
   isConnected(): boolean { return this.connected }
   async sendText(channelId: string, text: string, options?: { threadId?: number }): Promise<SentMessage> { if (!this.bot) throw new Error('Telegram adapter is not connected'); const sent = await this.bot.api.sendMessage(channelId, text, options?.threadId === undefined ? undefined : { message_thread_id: options.threadId }); return { platform: 'telegram', channelId, messageId: String(sent.message_id ?? '') } }
   async editMessage(channelId: string, messageId: string, text: string, options?: { threadId?: number }): Promise<void> { if (!this.bot) throw new Error('Telegram adapter is not connected'); await this.bot.api.editMessageText(channelId, messageId, text, options?.threadId === undefined ? undefined : { message_thread_id: options.threadId }) }
@@ -91,4 +126,27 @@ const attachmentSpecs: Array<{ field: 'photo' | 'document' | 'voice' | 'video' |
   { field: 'audio', type: 'audio', defaultName: 'audio.mp3', mimeType: 'audio/mpeg' },
 ]
 function mimeExtension(mimeType?: string): string { if (mimeType === 'image/jpeg') return '.jpg'; if (mimeType === 'image/png') return '.png'; if (mimeType === 'audio/ogg') return '.ogg'; if (mimeType === 'audio/mpeg') return '.mp3'; if (mimeType === 'video/mp4') return '.mp4'; return '.bin' }
-async function dynamicImport(name: string): Promise<unknown> { return Function('name', 'return import(name)')(name) as Promise<unknown> }
+
+export function classifyTelegramConnectionError(error: unknown, stage: TelegramConnectStage): TelegramConnectionError {
+  const value = error && typeof error === 'object' ? error as Record<string, unknown> : {}
+  const errorCode = typeof value.error_code === 'number' ? value.error_code : undefined
+  const method = typeof value.method === 'string' ? value.method : undefined
+  const nested = value.error && typeof value.error === 'object' ? value.error as Record<string, unknown> : {}
+  const networkCode = typeof nested.code === 'string'
+    ? nested.code
+    : typeof value.code === 'string' ? value.code : undefined
+  if (errorCode === 401) return new TelegramConnectionError('Telegram rejected the saved bot token.', stage, errorCode)
+  if (errorCode === 409) return new TelegramConnectionError('Telegram bot polling is already active in another application or service.', stage, errorCode)
+  if (errorCode === 429) return new TelegramConnectionError('Telegram rate-limited the connection. Please wait and try again.', stage, errorCode)
+  if (networkCode) return new TelegramConnectionError(`Telegram network request failed during ${stageLabel(stage)} (${networkCode}).`, stage, networkCode)
+  if (method === 'deleteWebhook') return new TelegramConnectionError('Telegram could not prepare the bot for long polling.', stage, errorCode)
+  if (method === 'getMe') return new TelegramConnectionError('Telegram could not verify the saved bot token.', stage, errorCode)
+  if (method === 'getUpdates') return new TelegramConnectionError('Telegram long polling could not start.', stage, errorCode)
+  return new TelegramConnectionError(`Telegram connection failed during ${stageLabel(stage)}.`, stage, errorCode)
+}
+
+function stageLabel(stage: TelegramConnectStage): string {
+  if (stage === 'verify_bot') return 'bot verification'
+  if (stage === 'start_polling') return 'polling setup'
+  return 'long polling'
+}

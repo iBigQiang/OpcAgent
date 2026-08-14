@@ -93,6 +93,7 @@ nsis:
   oneClick: false
   allowToChangeInstallationDirectory: true
   perMachine: false
+  runAfterFinish: false
   deleteAppDataOnUninstall: false
   include: installer.nsh
 

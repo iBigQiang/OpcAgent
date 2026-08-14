@@ -105,6 +105,7 @@ export function normalizeCustomEndpointUrl(
   api: CustomEndpointApi,
   input: string,
   modelId?: string,
+  preserveBaseUrl = false,
 ): NormalizedCustomEndpointUrl {
   if (!CUSTOM_ENDPOINT_APIS.has(api)) {
     throw new Error(`Unsupported custom endpoint API: ${api as string}`);
@@ -112,6 +113,12 @@ export function normalizeCustomEndpointUrl(
   const parsed = toEndpointUrl(input);
   const origin = parsed.origin;
   const pathname = trimTrailingSlashes(parsed.pathname);
+
+  if (preserveBaseUrl) {
+    const trimmed = input.trim();
+    const baseUrl = /^[a-z][a-z\d+.-]*:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+    return { baseUrl, requestPreviewUrl: baseUrl };
+  }
 
   if (api === 'openai-completions' || api === 'openai-responses') {
     const operationPath = api === 'openai-completions' ? '/chat/completions' : '/responses';
@@ -134,12 +141,16 @@ export function normalizeCustomEndpointUrl(
     '/v1beta',
   );
   const basePrefix = removeTerminalPath(withoutKnownVersion, '/v1');
-  const basePath = appendToBasePath(basePrefix, '/v1beta/models');
+  // @google/genai expects an API-version base and appends
+  // `models/{model}:streamGenerateContent` itself. Including `/models` here
+  // produces `/v1beta/models/models/{model}` at runtime.
+  const basePath = appendToBasePath(basePrefix, '/v1beta');
   const baseUrl = appendPath(origin, basePath);
-  const encodedModelId = encodeURIComponent(modelId || '{modelId}');
+  const bareModelId = (modelId || '{modelId}').replace(/^models\//, '');
+  const encodedModelId = encodeURIComponent(bareModelId);
   return {
     baseUrl,
-    requestPreviewUrl: `${baseUrl}/${encodedModelId}:streamGenerateContent?alt=sse`,
+    requestPreviewUrl: `${baseUrl}/models/${encodedModelId}:streamGenerateContent?alt=sse`,
   };
 }
 
@@ -178,6 +189,8 @@ export function normalizeApiKeyInput(value: string): string {
 export interface CustomEndpointConfig {
   api: CustomEndpointApi;
   supportsImages?: boolean;
+  /** Keep the validated user-entered Base URL instead of deriving a protocol Base URL. */
+  urlNormalization?: 'preserve';
 }
 
 export interface LlmConnection {
@@ -357,7 +370,15 @@ export const PI_PREFERRED_DEFAULTS: Record<string, string[]> = {
   ],
   'openai-codex': ['gpt-5.6-sol', 'gpt-5.6-terra', 'gpt-5.6-luna', 'gpt-5.5', 'gpt-5.2', 'gpt-5.1'],
   openai: ['gpt-5.6-sol', 'gpt-5.6-terra', 'gpt-5.6-luna', 'gpt-5.5', 'gpt-5.2', 'gpt-5.1'],
-  google: ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-3-flash-preview'],
+  google: [
+    'gemini-2.5-flash',
+    'gemini-3.7-flash',
+    'gemini-3.6-flash',
+    'gemini-3.5-flash',
+    'gemini-3.5-flash-lite',
+    'gemini-2.5-pro',
+    'gemini-3-flash-preview',
+  ],
   deepseek: ['deepseek-v4-pro', 'deepseek-v4-flash'],
 };
 

@@ -4,6 +4,7 @@ import {
   ANYROUTER_PI_PROFILE,
   adaptAnyRouterPiToolInput,
   adaptAnyRouterPiToolName,
+  resolveAnyRouterPiWireVariant,
 } from './anyrouter-pi-wire.ts';
 
 describe('AnyRouter Pi wire', () => {
@@ -95,6 +96,75 @@ describe('AnyRouter Pi wire', () => {
       type: 'text', text: 'Continue', cache_control: { type: 'ephemeral' },
     });
     expect(messages[3]).toMatchObject({ role: 'system' });
+  });
+
+  it('changes exactly one request field for each diagnostic A/B variant', () => {
+    const makeRequest = (variant: Parameters<typeof adaptAnyRouterPiRequest>[0]['variant']) =>
+      adaptAnyRouterPiRequest({
+        url: 'https://gateway.example.test/v1/messages',
+        headers: {
+          'content-type': 'application/json',
+          'x-api-key': 'test-token',
+          'x-stainless-retry-count': '2',
+        },
+        body: {
+          model: 'claude-opus-test[1m]',
+          max_tokens: 8192,
+          messages: [{ role: 'user', content: 'Hello' }],
+        },
+        sessionId: 'session-ab',
+        deviceId: 'device-ab',
+        variant,
+      });
+
+    const baseline = makeRequest('baseline');
+    const modelAlias = makeRequest('preserve-model-alias');
+    const maxTokens = makeRequest('preserve-max-tokens');
+    const retryCount = makeRequest('preserve-retry-count');
+    const bodyWith = (
+      body: Record<string, unknown>,
+      overrides: Record<string, unknown> = {},
+    ): Record<string, unknown> => ({ ...body, ...overrides });
+    const headerRecord = (headers: Headers): Record<string, string> =>
+      Object.fromEntries(headers);
+
+    expect(baseline.body.model).toBe('claude-opus-test');
+    expect(baseline.body.max_tokens).toBe(64_000);
+    expect(baseline.headers.get('x-stainless-retry-count')).toBe('0');
+
+    expect(modelAlias.body.model).toBe('claude-opus-test[1m]');
+    expect(modelAlias.body.max_tokens).toBe(64_000);
+    expect(modelAlias.headers.get('x-stainless-retry-count')).toBe('0');
+
+    expect(maxTokens.body.model).toBe('claude-opus-test');
+    expect(maxTokens.body.max_tokens).toBe(8192);
+    expect(maxTokens.headers.get('x-stainless-retry-count')).toBe('0');
+
+    expect(retryCount.body.model).toBe('claude-opus-test');
+    expect(retryCount.body.max_tokens).toBe(64_000);
+    expect(retryCount.headers.get('x-stainless-retry-count')).toBe('2');
+
+    expect(bodyWith(modelAlias.body, { model: baseline.body.model })).toEqual(baseline.body);
+    expect(headerRecord(modelAlias.headers)).toEqual(headerRecord(baseline.headers));
+    expect(bodyWith(maxTokens.body, { max_tokens: baseline.body.max_tokens })).toEqual(baseline.body);
+    expect(headerRecord(maxTokens.headers)).toEqual(headerRecord(baseline.headers));
+    expect(retryCount.body).toEqual(baseline.body);
+    const normalizedRetryHeaders = headerRecord(retryCount.headers);
+    normalizedRetryHeaders['x-stainless-retry-count'] =
+      baseline.headers.get('x-stainless-retry-count') ?? '';
+    expect(normalizedRetryHeaders).toEqual(headerRecord(baseline.headers));
+  });
+
+  it('falls back safely for invalid variants and max token inputs', () => {
+    expect(resolveAnyRouterPiWireVariant('unknown')).toBe('baseline');
+    const result = adaptAnyRouterPiRequest({
+      url: 'https://gateway.example.test/v1/messages',
+      body: { model: 'test[1m]', max_tokens: -1, messages: [] },
+      sessionId: 'session-safe',
+      deviceId: 'device-safe',
+      variant: 'preserve-max-tokens',
+    });
+    expect(result.body.max_tokens).toBe(64_000);
   });
 
   it('is enabled only by the explicit Pi profile identifier', () => {

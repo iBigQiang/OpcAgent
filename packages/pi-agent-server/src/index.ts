@@ -67,6 +67,7 @@ import {
   type CustomEndpointModelEntry,
   type CustomEndpointModelOverrides,
 } from './custom-endpoint-models.ts';
+import { registerGoogleModelCatalog } from './google-model-registration.ts';
 import {
   isCompatibleCustomEndpointModelProvider,
   resolveCustomEndpointAuthProvider,
@@ -130,7 +131,7 @@ interface InitMessage {
   branchFromSdkSessionId?: string;
   branchFromSessionPath?: string;
   branchFromSdkTurnId?: string;
-  customEndpoint?: { api: CustomEndpointApi; supportsImages?: boolean };
+  customEndpoint?: { api: CustomEndpointApi; supportsImages?: boolean; urlNormalization?: 'preserve' };
   customModels?: Array<string | { id: string; contextWindow?: number; supportsImages?: boolean }>;
   piAuth?: { provider: string; credential: PiCredential };
 }
@@ -143,7 +144,7 @@ interface RuntimeConfigUpdateMessage {
   authType?: string;
   baseUrl?: string;
   platformProfile?: string | null;
-  customEndpoint?: { api: CustomEndpointApi; supportsImages?: boolean };
+  customEndpoint?: { api: CustomEndpointApi; supportsImages?: boolean; urlNormalization?: 'preserve' };
   customModels?: Array<string | { id: string; contextWindow?: number; supportsImages?: boolean }>;
 }
 
@@ -491,7 +492,10 @@ function applyOPCAgentSystemPrompt(session: AgentSession, prompt: string): void 
  * This gives the interceptor a robust routing hint (instead of brittle URL-only matching).
  */
 function setInterceptorApiHints(model: { api?: string; provider?: string; baseUrl?: string } | undefined): void {
-  applyInterceptorApiHints(model, initConfig?.platformProfile);
+  const exactRequestUrl = initConfig?.customEndpoint?.urlNormalization === 'preserve'
+    ? initConfig.baseUrl
+    : undefined;
+  applyInterceptorApiHints(model, initConfig?.platformProfile, exactRequestUrl);
   if (!model) return;
 
   debugLog(
@@ -600,6 +604,15 @@ function createAuthenticatedRegistry(): {
   }
 
   const modelRegistry = PiModelRegistry.inMemory(authStorage);
+
+  if (
+    initConfig?.piAuth?.provider === 'google'
+    && initConfig.piAuth.credential.type === 'api_key'
+    && !initConfig.customEndpoint
+  ) {
+    registerGoogleModelCatalog(modelRegistry, initConfig.piAuth.credential.key);
+    debugLog('Registered Google model catalog compatibility additions');
+  }
 
   // Register custom endpoint models dynamically via Pi SDK's registerProvider API.
   // This makes arbitrary OpenAI/Anthropic-compatible endpoints work through the Pi SDK

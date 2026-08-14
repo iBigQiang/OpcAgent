@@ -13,6 +13,7 @@ describe("Windows installer configuration", () => {
       nsis?: {
         oneClick?: boolean;
         allowToChangeInstallationDirectory?: boolean;
+        runAfterFinish?: boolean;
         deleteAppDataOnUninstall?: boolean;
         include?: string;
       };
@@ -24,6 +25,7 @@ describe("Windows installer configuration", () => {
     expect(config.productName).toBe("OPC Agent");
     expect(config.nsis?.oneClick).toBe(false);
     expect(config.nsis?.allowToChangeInstallationDirectory).toBe(true);
+    expect(config.nsis?.runAfterFinish).toBe(false);
     expect(config.nsis?.deleteAppDataOnUninstall).toBe(false);
     expect(config.nsis?.include).toBe("installer.nsh");
     expect(config.files).toContain("!release{,/**/*}");

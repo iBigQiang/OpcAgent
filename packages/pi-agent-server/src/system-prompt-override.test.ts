@@ -129,4 +129,17 @@ describe('shouldPreservePiSystemPrompt', () => {
       'anyrouter_pi',
     )).toBe(false);
   });
+
+  it('preserves Pi identity for both official AgentRouter provider protocols', () => {
+    expect(shouldPreservePiSystemPrompt(
+      'https://agentrouter.org/v1',
+      { api: 'openai-completions' },
+      'agentrouter',
+    )).toBe(true);
+    expect(shouldPreservePiSystemPrompt(
+      'https://agentrouter.org',
+      { api: 'anthropic-messages' },
+      'agentrouter',
+    )).toBe(true);
+  });
 });

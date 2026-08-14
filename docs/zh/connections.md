@@ -23,7 +23,7 @@ GitHub Copilot、Craft gateway、Sources OAuth 与通用 OAuth 连接仍不支�
 |---|---|---|
 | `providerType` | `pi`、`pi_compat` | Pi 用哪种传输方式去访问模型 |
 | `authType` | `oauth`、`api_key`、`api_key_with_endpoint`、`none` | 凭证如何提供 |
-| `customEndpoint.api` | `openai-completions`、`anthropic-messages` | `pi_compat` 用哪种 HTTP 协议 |
+| `customEndpoint.api` | `openai-completions`、`openai-responses`、`anthropic-messages`、`google-generative-ai` | `pi_compat` 用哪种 HTTP 协议 |
 
 `pi` 是 Pi 的原生传输:Pi SDK 内置认识 OpenAI、Anthropic、Google、DeepSeek、xAI、Mistral、Groq、OpenRouter 等 provider。`pi_compat` 给其他所有情况(Ollama、vLLM、DashScope、Azure OpenAI 部署、私有网关)用,必须额外给一个 `baseUrl`,并指定走哪种通用协议。`authType` 只描述随请求一起带过去的凭证。上面那张"支持的连接形式"表格里的 4 种形式,可以重新对应到这三个字段:
 
@@ -34,7 +34,22 @@ GitHub Copilot、Craft gateway、Sources OAuth 与通用 OAuth 连接仍不支�
 | Pi provider 预设 | `pi` | `api_key` | — |
 | 自定义 `openai-completions` | `pi_compat` | `api_key_with_endpoint` | `openai-completions` |
 | 自定义 `anthropic-messages` | `pi_compat` | `api_key_with_endpoint` | `anthropic-messages` |
+| 自定义 Google Gemini | `pi_compat` | `api_key_with_endpoint` | `google-generative-ai` |
 | 本地 Ollama | `pi_compat` | `none` | `openai-completions` |
+
+### Google Gemini 端点
+
+内置 Google AI Studio 预设使用 SDK Base URL
+`https://generativelanguage.googleapis.com/v1beta`。OPC Agent 在 Pi 0.80.x
+目录基础上补充了稳定版 Gemini 3.5 Flash-Lite、Gemini 3.6 Flash 和 Gemini
+3.7 Flash，确保模型选择器与 Pi 运行时注册表一致。
+
+自定义 Google Gemini 连接可以填写根域名、带版本的 Base URL，或完整的
+`generateContent` / `streamGenerateContent` 请求地址。OPC Agent 最终保存以
+`/v1beta` 结尾的 SDK Base URL；Google SDK 再将 Agent 流式请求拼成
+`/v1beta/models/{model}:streamGenerateContent?alt=sse`。Google 官方的非流式
+`:generateContent` 地址同样有效，但 Pi Agent 为了增量响应和工具事件会有意使用
+流式端点。
 
 ### 连接记录示例
 

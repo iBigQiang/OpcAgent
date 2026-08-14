@@ -3,12 +3,38 @@ import { mkdtempSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { MessagingGatewayRegistry } from '../registry'
+import { TelegramConnectionError } from '../adapters/telegram'
 import type { IncomingMessage, PlatformAdapter } from '../types'
+import type { MessagingSession } from '../session-manager'
 
 function adapter(platform: 'telegram' | 'whatsapp' | 'lark' = 'telegram'): PlatformAdapter & { receive(message: IncomingMessage): Promise<void>; initialized: number } {
   let handler: (message: IncomingMessage) => Promise<void> = async () => {}
   let connected = false
   return { platform, initialized: 0, async initialize() { this.initialized++; connected = true }, async destroy() { connected = false }, isConnected: () => connected, onMessage(next) { handler = next }, async sendText() {}, receive: message => handler(message) }
+}
+
+function interactiveTelegramAdapter() {
+  let handler: (message: IncomingMessage) => Promise<void> = async () => {}
+  let buttonHandler: (press: import('../types').ButtonPress) => Promise<void> = async () => {}
+  let connected = false
+  const buttons: Array<{ channelId: string; text: string; rows: Array<{ id: string; label: string; data?: string }> }> = []
+  const cleared: Array<{ channelId: string; messageId: string }> = []
+  return {
+    platform: 'telegram' as const,
+    async initialize() { connected = true }, async destroy() { connected = false }, isConnected: () => connected,
+    onMessage(next: (message: IncomingMessage) => Promise<void>) { handler = next },
+    onButtonPress(next: (press: import('../types').ButtonPress) => Promise<void>) { buttonHandler = next },
+    async sendText() {},
+    async sendButtons(channelId: string, text: string, rows: Array<{ id: string; label: string; data?: string }>) {
+      buttons.push({ channelId, text, rows })
+      return { platform: 'telegram' as const, channelId, messageId: String(buttons.length) }
+    },
+    async clearButtons(channelId: string, messageId: string) { cleared.push({ channelId, messageId }) },
+    receive: (message: IncomingMessage) => handler(message),
+    press: (press: import('../types').ButtonPress) => buttonHandler(press),
+    buttons,
+    cleared,
+  }
 }
 
 function setup() {
@@ -97,6 +123,114 @@ test('pending queue is bounded and connected adapters are not initialized twice'
   expect(registry.getPendingSenders('one').some(value => value.senderId === 'user-0')).toBe(false)
 })
 
+test('an authorised unbound Telegram message can create a session and delivers only its in-memory original after confirmation', async () => {
+  const root = mkdtempSync(join(tmpdir(), 'messaging-unbound-telegram-'))
+  const telegram = interactiveTelegramAdapter()
+  const delivered: Array<{ sessionId: string; text: string }> = []
+  const sessions: MessagingSession[] = []
+  const registry = new MessagingGatewayRegistry({
+    getMessagingDir: () => root,
+    adapters: { telegram },
+    credentialManager: { async get() { return { value: 'test-only' } }, async set() {}, async delete() { return true } },
+    sessionManager: {
+      getSessions: (workspaceId?: string) => sessions.filter(session => session.workspaceId === workspaceId),
+      getSession: async (id: string) => sessions.find(session => session.id === id) ?? null,
+      createSession: async (workspaceId: string) => { const session: MessagingSession = { id: 'created-session', workspaceId, name: 'New chat', lastMessageAt: 1 }; sessions.push(session); return session },
+      sendMessage: async (sessionId: string, text: string) => { delivered.push({ sessionId, text }) },
+    } as never,
+  })
+  registry.setPlatformAccessMode('one', 'telegram', 'owner-only')
+  registry.setPlatformOwners('one', 'telegram', [{ userId: 'owner', addedAt: 1 }])
+  await registry.connect('one', 'telegram')
+
+  const secretCanary = 'original-message-must-not-persist'
+  await telegram.receive({ platform: 'telegram', chatType: 'private', channelId: 'owner-chat', messageId: 'm1', senderId: 'owner', text: secretCanary, timestamp: 1 })
+  await telegram.receive({ platform: 'telegram', chatType: 'private', channelId: 'guest-chat', messageId: 'm2', senderId: 'guest', text: 'guest message', timestamp: 1 })
+
+  expect(telegram.buttons).toHaveLength(1)
+  expect(telegram.buttons[0]?.rows.map(row => row.id)).toEqual(['unbound:new', 'unbound:choose'])
+  expect(telegram.buttons[0]?.text).toContain('使用默认模型新建会话')
+  expect(JSON.stringify({ config: registry.getConfig('one'), bindings: registry.getBindings('one') })).not.toContain(secretCanary)
+
+  await telegram.press({ platform: 'telegram', channelId: 'owner-chat', messageId: 'prompt-1', senderId: 'owner', buttonId: telegram.buttons[0]!.rows[0]!.data! })
+
+  expect(registry.getBindings('one')).toMatchObject([{ sessionId: 'created-session', platform: 'telegram', channelId: 'owner-chat' }])
+  expect(delivered).toEqual([{ sessionId: 'created-session', text: secretCanary }])
+})
+
+test('an authorised unbound Telegram message can select an existing session and newer input replaces the pending message', async () => {
+  const root = mkdtempSync(join(tmpdir(), 'messaging-unbound-telegram-existing-'))
+  const telegram = interactiveTelegramAdapter()
+  const delivered: Array<{ sessionId: string; text: string }> = []
+  const sessions: MessagingSession[] = [{ id: 'existing-session', workspaceId: 'one', name: 'Existing chat', lastMessageAt: 2 }]
+  const registry = new MessagingGatewayRegistry({
+    getMessagingDir: () => root,
+    adapters: { telegram },
+    credentialManager: { async get() { return { value: 'test-only' } }, async set() {}, async delete() { return true } },
+    sessionManager: {
+      getSessions: (workspaceId?: string) => sessions.filter(session => session.workspaceId === workspaceId),
+      getSession: async (id: string) => sessions.find(session => session.id === id) ?? null,
+      createSession: async () => { throw new Error('new session must not be selected') },
+      sendMessage: async (sessionId: string, text: string) => { delivered.push({ sessionId, text }) },
+    } as never,
+  })
+  registry.setPlatformAccessMode('one', 'telegram', 'owner-only')
+  registry.setPlatformOwners('one', 'telegram', [{ userId: 'owner', addedAt: 1 }])
+  await registry.connect('one', 'telegram')
+
+  await telegram.receive({ platform: 'telegram', chatType: 'private', channelId: 'owner-chat', messageId: 'm1', senderId: 'owner', text: 'discard this earlier message', timestamp: 1 })
+  await telegram.receive({ platform: 'telegram', chatType: 'private', channelId: 'owner-chat', messageId: 'm2', senderId: 'owner', text: 'deliver this newer message', timestamp: 2 })
+  await telegram.receive({ platform: 'telegram', chatType: 'private', channelId: 'guest-chat', messageId: 'm3', senderId: 'guest', text: 'guest must not be prompted', timestamp: 3 })
+  expect(telegram.buttons).toHaveLength(2)
+
+  const staleChoose = telegram.buttons[0]!.rows[1]!.data!
+  const activeChoose = telegram.buttons[1]!.rows[1]!.data!
+  await telegram.press({ platform: 'telegram', channelId: 'owner-chat', messageId: 'prompt-old', senderId: 'owner', buttonId: staleChoose })
+  expect(telegram.buttons).toHaveLength(2)
+  await telegram.press({ platform: 'telegram', channelId: 'owner-chat', messageId: 'prompt-2', senderId: 'owner', buttonId: activeChoose })
+  const option = telegram.buttons.at(-1)!.rows[0]!.data!
+  expect(option).toMatch(/^unbound:session:[a-f0-9]{16}:[a-f0-9]{16}$/)
+  expect(option).not.toContain('existing-session')
+  await telegram.press({ platform: 'telegram', channelId: 'other-chat', messageId: 'forged', senderId: 'owner', buttonId: option })
+  await telegram.press({ platform: 'telegram', channelId: 'owner-chat', messageId: 'choice-1', senderId: 'guest', buttonId: option })
+  expect(delivered).toEqual([])
+  await telegram.press({ platform: 'telegram', channelId: 'owner-chat', messageId: 'choice-1', senderId: 'owner', buttonId: option })
+  await telegram.press({ platform: 'telegram', channelId: 'owner-chat', messageId: 'choice-2', senderId: 'owner', buttonId: option })
+
+  expect(registry.getBindings('one')).toMatchObject([{ sessionId: 'existing-session', channelId: 'owner-chat' }])
+  expect(delivered).toEqual([{ sessionId: 'existing-session', text: 'deliver this newer message' }])
+  expect(JSON.stringify({ config: registry.getConfig('one'), bindings: registry.getBindings('one') })).not.toContain('deliver this newer message')
+  expect(telegram.cleared).toHaveLength(3)
+})
+
+test('unbound Telegram prompt tokens expire without binding or delivering the original message', async () => {
+  const root = mkdtempSync(join(tmpdir(), 'messaging-unbound-telegram-expiry-'))
+  const telegram = interactiveTelegramAdapter()
+  const delivered: string[] = []
+  let now = 1
+  const registry = new MessagingGatewayRegistry({
+    getMessagingDir: () => root,
+    adapters: { telegram },
+    credentialManager: { async get() { return { value: 'test-only' } }, async set() {}, async delete() { return true } },
+    now: () => now,
+    sessionManager: {
+      getSessions: () => [], getSession: async () => null,
+      createSession: async () => ({ id: 'late-session', workspaceId: 'one', lastMessageAt: 1 }),
+      sendMessage: async (_sessionId: string, text: string) => { delivered.push(text) },
+    } as never,
+  })
+  registry.setPlatformAccessMode('one', 'telegram', 'owner-only')
+  registry.setPlatformOwners('one', 'telegram', [{ userId: 'owner', addedAt: 1 }])
+  await registry.connect('one', 'telegram')
+  await telegram.receive({ platform: 'telegram', chatType: 'private', channelId: 'owner-chat', messageId: 'm1', senderId: 'owner', text: 'expired original', timestamp: 1 })
+  const buttonId = telegram.buttons[0]!.rows[0]!.data!
+  now += 10 * 60_000 + 1
+  await telegram.press({ platform: 'telegram', channelId: 'owner-chat', messageId: 'expired-prompt', senderId: 'owner', buttonId })
+  expect(registry.getBindings('one')).toEqual([])
+  expect(delivered).toEqual([])
+  expect(telegram.cleared).toEqual([{ channelId: 'owner-chat', messageId: '1' }])
+})
+
 test('WhatsApp enablement persists and reconnects during workspace initialization', async () => {
   const root = mkdtempSync(join(tmpdir(), 'messaging-restart-'))
   const firstAdapter = adapter('whatsapp')
@@ -128,6 +262,38 @@ test('legacy platform credentials are enabled and reconnected without exposing t
   expect(telegram.initialized).toBe(1)
   expect(JSON.stringify(registry.getConfig('one'))).not.toContain('test-only-secret')
   await registry.dispose()
+})
+
+test('saving a Telegram token reports a safe connection failure while retaining configuration', async () => {
+  const root = mkdtempSync(join(tmpdir(), 'messaging-telegram-save-'))
+  const secret = 'secret-canary-telegram-token'
+  const telegram = adapter('telegram')
+  telegram.initialize = async () => {
+    throw new TelegramConnectionError('Telegram connection failed during bot verification.', 'verify_bot', 'ETIMEDOUT')
+  }
+  const credentials = {
+    value: null as string | null,
+    async get() { return this.value ? { value: this.value } : null },
+    async set(_id: unknown, credential: { value: string }) { this.value = credential.value },
+    async delete() { this.value = null; return true },
+  }
+  const registry = new MessagingGatewayRegistry({
+    getMessagingDir: () => root,
+    sendToSession: async () => {},
+    credentialManager: credentials,
+    adapters: { telegram },
+  })
+
+  await expect(registry.saveTelegramToken('one', secret))
+    .rejects.toThrow('Telegram connection failed during bot verification.')
+  expect(registry.getConfig('one')).toMatchObject({ enabled: true, platforms: { telegram: { enabled: true } } })
+  expect(registry.getRuntime('one').find(value => value.platform === 'telegram')).toMatchObject({
+    configured: true,
+    connected: false,
+    state: 'error',
+    lastError: 'Telegram connection failed during bot verification.',
+  })
+  expect(JSON.stringify({ config: registry.getConfig('one'), runtime: registry.getRuntime('one') })).not.toContain(secret)
 })
 
 test('a supplied adapter cannot cross workspace boundaries', async () => {

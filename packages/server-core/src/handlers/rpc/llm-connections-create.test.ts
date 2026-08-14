@@ -21,7 +21,24 @@ describe('createConnection custom endpoint normalization', () => {
     })
   })
 
-  it('normalizes Gemini full request URLs to the SDK models base', () => {
+  it('preserves a custom Base URL when automatic completion is disabled', () => {
+    const connection = createConnection({
+      slug: 'custom-preserved-url',
+      credential: 'test-key',
+      baseUrl: 'https://gateway.example.test/tenant/full-request/',
+      defaultModel: 'custom-model',
+      models: ['custom-model'],
+      customEndpoint: { api: 'openai-completions', urlNormalization: 'preserve' },
+    })
+
+    expect(connection).toMatchObject({
+      baseUrl: 'https://gateway.example.test/tenant/full-request/',
+      piAuthProvider: 'openai',
+      customEndpoint: { api: 'openai-completions', urlNormalization: 'preserve' },
+    })
+  })
+
+  it('normalizes Gemini full request URLs to the SDK API-version base', () => {
     const connection = createConnection({
       slug: 'custom-gemini',
       credential: 'test-key',
@@ -32,7 +49,7 @@ describe('createConnection custom endpoint normalization', () => {
     })
 
     expect(connection).toMatchObject({
-      baseUrl: 'https://gateway.example.test/v1beta/models',
+      baseUrl: 'https://gateway.example.test/v1beta',
       piAuthProvider: 'google',
       customEndpoint: { api: 'google-generative-ai' },
     })

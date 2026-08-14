@@ -14,7 +14,9 @@ function createHarness() {
   const saveTelegramToken = mock(async () => {})
   const saveLarkCredentials = mock(async () => {})
   const generateOwnerPairingCode = mock(async () => ({ code: '123456', expiresAt: 1 }))
-  const registry = new Proxy({ testTelegramToken, testLarkCredentials, saveTelegramToken, saveLarkCredentials, generateOwnerPairingCode }, {
+  const getConfig = mock(() => ({ version: 1 as const, enabled: true, platforms: { telegram: { enabled: true } } }))
+  const getRuntime = mock(() => [{ platform: 'telegram' as const, configured: true, connected: true, state: 'connected' as const, updatedAt: 1 }])
+  const registry = new Proxy({ testTelegramToken, testLarkCredentials, saveTelegramToken, saveLarkCredentials, generateOwnerPairingCode, getConfig, getRuntime }, {
     get(target, key) {
       if (key in target) return target[key as keyof typeof target]
       return () => undefined
@@ -28,7 +30,7 @@ function createHarness() {
     findClientsWithCapability() { return [] },
   }
   registerMessagingHandlers(server, { messagingRegistry: registry } as unknown as HandlerDeps)
-  return { handlers, testTelegramToken, testLarkCredentials, saveTelegramToken, saveLarkCredentials, generateOwnerPairingCode }
+  return { handlers, testTelegramToken, testLarkCredentials, saveTelegramToken, saveLarkCredentials, generateOwnerPairingCode, getConfig, getRuntime }
 }
 
 describe('messaging credential test RPC', () => {
@@ -43,6 +45,18 @@ describe('messaging credential test RPC', () => {
 
     expect(result).toEqual({ code: '123456', expiresAt: 1 })
     expect(generateOwnerPairingCode).toHaveBeenCalledWith('workspace-one', 'telegram')
+  })
+
+  test('messaging config includes the runtime promised by the desktop contract', async () => {
+    const { handlers, getConfig, getRuntime } = createHarness()
+    const result = await handlers.get(RPC_CHANNELS.messaging.GET_CONFIG)!({ ...context, workspaceId: 'workspace-one' })
+
+    expect(result).toMatchObject({
+      enabled: true,
+      runtime: { telegram: { configured: true, connected: true, state: 'connected' } },
+    })
+    expect(getConfig).toHaveBeenCalledWith('workspace-one')
+    expect(getRuntime).toHaveBeenCalledWith('workspace-one')
   })
 
   test('Telegram test delegates without workspace access or persistence', async () => {

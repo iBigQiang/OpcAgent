@@ -9,6 +9,21 @@
 export const ANYROUTER_PI_PROFILE = 'anyrouter_pi' as const;
 export const ANYROUTER_PI_WIRE_VERSION = 'claude-code-2.1.227';
 
+export const ANYROUTER_PI_WIRE_VARIANTS = [
+  'baseline',
+  'preserve-model-alias',
+  'preserve-max-tokens',
+  'preserve-retry-count',
+] as const;
+
+export type AnyRouterPiWireVariant = typeof ANYROUTER_PI_WIRE_VARIANTS[number];
+
+export function resolveAnyRouterPiWireVariant(value?: string): AnyRouterPiWireVariant {
+  return ANYROUTER_PI_WIRE_VARIANTS.includes(value as AnyRouterPiWireVariant)
+    ? value as AnyRouterPiWireVariant
+    : 'baseline';
+}
+
 type WireHeadersInit = ConstructorParameters<typeof Headers>[0];
 
 const CLAUDE_CODE_BETA = 'claude-code-20250219,context-1m-2025-08-07,interleaved-thinking-2025-05-14,mid-conversation-system-2026-04-07,effort-2025-11-24,fallback-credit-2026-06-01';
@@ -32,6 +47,8 @@ export interface AnyRouterPiWireRequest {
   body: Record<string, unknown>;
   sessionId: string;
   deviceId: string;
+  /** Hidden diagnostic A/B switch. Exactly one request field may vary at a time. */
+  variant?: AnyRouterPiWireVariant;
 }
 
 export interface AnyRouterPiWireResult {
@@ -86,6 +103,8 @@ function claudeCodeTools(tools: unknown): Array<Record<string, unknown>> {
 
 /** Build the explicit, versioned upstream request used by the Pi profile. */
 export function adaptAnyRouterPiRequest(request: AnyRouterPiWireRequest): AnyRouterPiWireResult {
+  const variant = request.variant
+    ?? resolveAnyRouterPiWireVariant(process.env.OPCAGENT_ANYROUTER_PI_WIRE_VARIANT);
   const headers = new Headers(request.headers);
   const apiKey = headers.get('x-api-key');
   if (!headers.has('authorization') && apiKey) headers.set('authorization', `Bearer ${apiKey}`);
@@ -98,7 +117,9 @@ export function adaptAnyRouterPiRequest(request: AnyRouterPiWireRequest): AnyRou
   headers.set('user-agent', CLAUDE_CODE_USER_AGENT);
   headers.set('x-app', 'cli');
   headers.set('x-claude-code-session-id', request.sessionId);
-  headers.set('x-stainless-retry-count', '0');
+  if (variant !== 'preserve-retry-count') {
+    headers.set('x-stainless-retry-count', '0');
+  }
   headers.set('x-stainless-timeout', '600');
   headers.set('x-stainless-lang', 'js');
   headers.set('x-stainless-package-version', '0.94.0');
@@ -108,9 +129,19 @@ export function adaptAnyRouterPiRequest(request: AnyRouterPiWireRequest): AnyRou
   headers.set('x-stainless-runtime-version', 'v26.3.0');
 
   const body = { ...request.body };
-  body.model = String(body.model ?? '').replace(/\[1m\]$/i, '');
+  const configuredModel = String(body.model ?? '');
+  body.model = variant === 'preserve-model-alias'
+    ? configuredModel
+    : configuredModel.replace(/\[1m\]$/i, '');
   body.stream = true;
-  body.max_tokens = 64_000;
+  const configuredMaxTokens = typeof body.max_tokens === 'number'
+    && Number.isFinite(body.max_tokens)
+    && body.max_tokens > 0
+    ? body.max_tokens
+    : undefined;
+  body.max_tokens = variant === 'preserve-max-tokens' && configuredMaxTokens !== undefined
+    ? configuredMaxTokens
+    : 64_000;
   body.metadata = {
     user_id: JSON.stringify({
       device_id: request.deviceId,

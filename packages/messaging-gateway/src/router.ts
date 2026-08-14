@@ -1,5 +1,5 @@
 import type { BindingStore } from './binding-store'
-import { isSenderAllowed } from './access-control'
+import { isPlatformSenderAllowed, isSenderAllowed } from './access-control'
 import type { Commands } from './commands'
 import type { ChannelBinding, IncomingMessage, MessagingConfig, PlatformAdapter } from './types'
 import type { PendingSenderReason } from './pending-senders'
@@ -14,6 +14,7 @@ export interface MessageRouterDeps {
   commands?: Commands
   logger?: { warn(message: string): void }
   onUnauthorized?: (message: IncomingMessage, binding: ChannelBinding, reason: PendingSenderReason) => void
+  onUnboundAuthorized?: (message: IncomingMessage, adapter: PlatformAdapter) => Promise<void>
 }
 
 /** Routes only already-bound, authorised user input. Unbound inbound traffic is intentionally ignored. */
@@ -23,7 +24,14 @@ export class MessageRouter {
     if ((!message.text.trim() && !message.attachments?.length) || message.senderIsBot) return false
     if (message.text.trim() && adapter && await this.deps.commands?.handle(adapter, message)) return true
     const binding = this.deps.bindingStore.findByChannel(message.platform, message.channelId, message.threadId)
-    if (!binding) return false
+    if (!binding) {
+      if (!adapter || !isPlatformSenderAllowed(this.deps.getConfig(), message.platform, message.senderId)) return false
+      if (this.deps.onUnboundAuthorized) {
+        await this.deps.onUnboundAuthorized(message, adapter)
+        return true
+      }
+      return false
+    }
     if (this.deps.isSessionInWorkspace && !await this.deps.isSessionInWorkspace(binding.sessionId)) {
       this.deps.logger?.warn('Messaging binding targets a session outside its workspace')
       return false

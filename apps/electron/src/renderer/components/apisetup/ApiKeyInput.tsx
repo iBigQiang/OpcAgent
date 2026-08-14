@@ -83,6 +83,8 @@ export interface ApiKeyInputProps {
     models?: string[]
     /** Pre-fill the protocol toggle for custom endpoints */
     customApi?: CustomEndpointApi
+    /** Keep a custom Base URL unchanged instead of deriving an SDK Base URL. */
+    preserveCustomBaseUrl?: boolean
     /** Pre-fill a branded platform endpoint. */
     platformProfile?: LlmPlatformProfile
   }
@@ -181,6 +183,7 @@ export function ApiKeyInput({
   )
   const [connectionDefaultModel, setConnectionDefaultModel] = useState(initialValues?.connectionDefaultModel ?? '')
   const [customApi, setCustomApi] = useState<CustomEndpointApi>(initialValues?.customApi ?? 'openai-completions')
+  const [preserveCustomBaseUrl, setPreserveCustomBaseUrl] = useState(initialValues?.preserveCustomBaseUrl ?? false)
   const [endpointError, setEndpointError] = useState<string | null>(null)
   const [modelError, setModelError] = useState<string | null>(null)
   const [claudeCliStatus, setClaudeCliStatus] = useState<ClaudeCliStatus | null>(null)
@@ -318,7 +321,10 @@ export function ApiKeyInput({
     }
     setModelError(null)
     setEndpointError(null)
-    if (preset.key === 'agentrouter') setCustomApi('openai-completions')
+    if (preset.key === 'agentrouter') {
+      setCustomApi('openai-completions')
+      setPreserveCustomBaseUrl(false)
+    }
     // Pre-fill recommended model for Ollama; clear for all others
     // (Default provider presets hide the field entirely, others default to provider model IDs when empty)
     if (preset.key === 'ollama') {
@@ -417,6 +423,7 @@ export function ApiKeyInput({
       activePreset,
       baseUrl: effectiveBaseUrl,
       customApi,
+      preserveCustomBaseUrl,
       brandedOpenAiCompatPresets: OPENAI_COMPAT_CUSTOM_URL_PRESETS,
       fallbackPiAuthProvider: effectivePiAuthProvider,
     })
@@ -428,6 +435,7 @@ export function ApiKeyInput({
           customEndpoint.api,
           effectiveBaseUrl,
           parsedModels[0],
+          customEndpoint.urlNormalization === 'preserve',
         ).baseUrl
       } catch {
         setEndpointError(t('apiSetup.endpointInvalid'))
@@ -453,16 +461,24 @@ export function ApiKeyInput({
     { id: 'fast', label: t('apiSetup.tiers.fast'), desc: t('apiSetup.tiers.fastDesc'), value: cheapModel, onChange: setCheapModel },
   ]
   const activeTierConfig = openTier ? tierConfigs.find(tier => tier.id === openTier) : null
-  const protocolOptions: Array<{ value: CustomEndpointApi; label: string; description: string }> = [
+  type ProtocolOptionValue = CustomEndpointApi | 'custom-base-url'
+  const selectedProtocol: ProtocolOptionValue = preserveCustomBaseUrl ? 'custom-base-url' : customApi
+  const protocolOptions: Array<{ value: ProtocolOptionValue; label: string; description: string }> = [
     { value: 'openai-completions', label: t('apiSetup.protocol.openAiChat'), description: '/chat/completions' },
     { value: 'openai-responses', label: t('apiSetup.protocol.openAiResponses'), description: '/responses' },
     { value: 'anthropic-messages', label: t('apiSetup.protocol.anthropicMessages'), description: '/v1/messages' },
     { value: 'google-generative-ai', label: t('apiSetup.protocol.googleGemini'), description: '/models/{model}:streamGenerateContent' },
+    { value: 'custom-base-url', label: t('apiSetup.protocol.customBaseUrl'), description: t('apiSetup.protocol.customBaseUrlDescription') },
   ]
   const endpointPreview = (() => {
     if (!baseUrl.trim() || !showsEditableProtocol) return null
     try {
-      return normalizeCustomEndpointUrl(customApi, baseUrl, parseModelList(connectionDefaultModel)[0])
+      return normalizeCustomEndpointUrl(
+        customApi,
+        baseUrl,
+        parseModelList(connectionDefaultModel)[0],
+        preserveCustomBaseUrl,
+      )
     } catch {
       return null
     }
@@ -636,7 +652,7 @@ export function ApiKeyInput({
                 isDisabled && "opacity-50 pointer-events-none",
               )}
             >
-              <span>{protocolOptions.find(option => option.value === customApi)?.label}</span>
+              <span>{protocolOptions.find(option => option.value === selectedProtocol)?.label}</span>
               <ChevronDown className="size-3 opacity-50" />
             </DropdownMenuTrigger>
             <StyledDropdownMenuContent align="start" className="z-floating-menu min-w-[280px]">
@@ -644,7 +660,13 @@ export function ApiKeyInput({
                 <StyledDropdownMenuItem
                   key={option.value}
                   onClick={() => {
-                    setCustomApi(option.value)
+                    if (option.value === 'custom-base-url') {
+                      setCustomApi('openai-completions')
+                      setPreserveCustomBaseUrl(true)
+                    } else {
+                      setCustomApi(option.value)
+                      setPreserveCustomBaseUrl(false)
+                    }
                     setEndpointError(null)
                   }}
                   className="justify-between gap-4"
@@ -653,7 +675,7 @@ export function ApiKeyInput({
                     <span>{option.label}</span>
                     <span className="font-mono text-[10px] font-normal text-foreground/40">{option.description}</span>
                   </span>
-                  <Check className={cn("size-3 shrink-0", customApi === option.value ? "opacity-100" : "opacity-0")} />
+                  <Check className={cn("size-3 shrink-0", selectedProtocol === option.value ? "opacity-100" : "opacity-0")} />
                 </StyledDropdownMenuItem>
               ))}
             </StyledDropdownMenuContent>

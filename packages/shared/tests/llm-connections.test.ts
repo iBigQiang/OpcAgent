@@ -309,13 +309,23 @@ describe('normalizeCustomEndpointUrl()', () => {
       },
     },
     {
-      name: 'normalizes Gemini full stream URL and encodes the preview model',
+      name: 'normalizes Gemini full stream URL to the SDK API-version base',
       api: 'google-generative-ai',
       input: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:streamGenerateContent',
       modelId: 'models/gemini 2.5 flash',
       expected: {
-        baseUrl: 'https://generativelanguage.googleapis.com/v1beta/models',
-        requestPreviewUrl: 'https://generativelanguage.googleapis.com/v1beta/models/models%2Fgemini%202.5%20flash:streamGenerateContent?alt=sse',
+        baseUrl: 'https://generativelanguage.googleapis.com/v1beta',
+        requestPreviewUrl: 'https://generativelanguage.googleapis.com/v1beta/models/gemini%202.5%20flash:streamGenerateContent?alt=sse',
+      },
+    },
+    {
+      name: 'normalizes the official non-streaming Gemini URL while keeping the Pi streaming preview',
+      api: 'google-generative-ai',
+      input: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent',
+      modelId: 'gemini-3.6-flash',
+      expected: {
+        baseUrl: 'https://generativelanguage.googleapis.com/v1beta',
+        requestPreviewUrl: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:streamGenerateContent?alt=sse',
       },
     },
     {
@@ -324,7 +334,7 @@ describe('normalizeCustomEndpointUrl()', () => {
       input: 'https://gateway.example.test/tenant/',
       modelId: 'gemini-2.5-flash',
       expected: {
-        baseUrl: 'https://gateway.example.test/tenant/v1beta/models',
+        baseUrl: 'https://gateway.example.test/tenant/v1beta',
         requestPreviewUrl: 'https://gateway.example.test/tenant/v1beta/models/gemini-2.5-flash:streamGenerateContent?alt=sse',
       },
     },
@@ -334,7 +344,7 @@ describe('normalizeCustomEndpointUrl()', () => {
       input: 'https://gateway.example.test/tenant/v1/chat/completions',
       modelId: 'gemini-2.5-flash',
       expected: {
-        baseUrl: 'https://gateway.example.test/tenant/v1beta/models',
+        baseUrl: 'https://gateway.example.test/tenant/v1beta',
         requestPreviewUrl: 'https://gateway.example.test/tenant/v1beta/models/gemini-2.5-flash:streamGenerateContent?alt=sse',
       },
     },
@@ -344,7 +354,7 @@ describe('normalizeCustomEndpointUrl()', () => {
       input: 'https://gateway.example.test/tenant/models/gemini-2.5-flash:streamGenerateContent',
       modelId: 'gemini-2.5-flash',
       expected: {
-        baseUrl: 'https://gateway.example.test/tenant/v1beta/models',
+        baseUrl: 'https://gateway.example.test/tenant/v1beta',
         requestPreviewUrl: 'https://gateway.example.test/tenant/v1beta/models/gemini-2.5-flash:streamGenerateContent?alt=sse',
       },
     },
@@ -354,7 +364,7 @@ describe('normalizeCustomEndpointUrl()', () => {
       input: 'https://generativelanguage.googleapis.com/',
       modelId: 'gemini-2.5-flash',
       expected: {
-        baseUrl: 'https://generativelanguage.googleapis.com/v1beta/models',
+        baseUrl: 'https://generativelanguage.googleapis.com/v1beta',
         requestPreviewUrl: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:streamGenerateContent?alt=sse',
       },
     },
@@ -384,6 +394,18 @@ describe('normalizeCustomEndpointUrl()', () => {
   it('rejects unsupported protocol values at runtime', () => {
     expect(() => normalizeCustomEndpointUrl('unsupported' as CustomEndpointApi, 'https://api.example.test'))
       .toThrow('Unsupported custom endpoint API');
+  });
+
+  it('preserves a validated custom Base URL without deriving a protocol path', () => {
+    expect(normalizeCustomEndpointUrl(
+      'openai-completions',
+      'https://gateway.example.test/tenant/full-request/',
+      undefined,
+      true,
+    )).toEqual({
+      baseUrl: 'https://gateway.example.test/tenant/full-request/',
+      requestPreviewUrl: 'https://gateway.example.test/tenant/full-request/',
+    });
   });
 });
 

@@ -37,7 +37,9 @@ import {
   adaptAnyRouterPiToolInput,
   adaptAnyRouterPiToolName,
   ANYROUTER_PI_PROFILE,
+  resolveAnyRouterPiWireVariant,
 } from './agent/backend/internal/anyrouter-pi-wire.ts';
+import { writeAnyRouterPiDiagnostic } from './anyrouter-pi-diagnostics.ts';
 
 // Type alias for fetch's HeadersInit
 type HeadersInitType = Headers | Record<string, string> | string[][];
@@ -1887,6 +1889,16 @@ function findAdapter(url: string): ApiAdapter | undefined {
   return adapters.find(a => a.shouldIntercept(url));
 }
 
+/** Replace the SDK-generated operation URL when full-URL mode is active. */
+export function resolveExactCustomRequestUrl(generatedUrl: string, exactRequestUrl?: string): string {
+  if (!exactRequestUrl?.trim()) return generatedUrl;
+  try {
+    return new URL(exactRequestUrl.trim()).toString();
+  } catch {
+    return generatedUrl;
+  }
+}
+
 // ============================================================================
 // ERROR CAPTURE (shared across all adapters)
 // ============================================================================
@@ -2225,6 +2237,7 @@ async function interceptedFetch(
 
   // Find matching adapter for this URL
   const adapter = findAdapter(url);
+  let anyRouterPiFetchStarted = false;
 
   if (
     adapter &&
@@ -2259,7 +2272,15 @@ async function interceptedFetch(
 
         // Adapter-specific request modifications (e.g., fast mode)
         let modifiedInit = normalizedInit;
-        let requestUrl = url;
+        let requestUrl = resolveExactCustomRequestUrl(url, process.env.OPCAGENT_EXACT_REQUEST_URL);
+        const anyRouterPiDiagnostic = adapter === anyRouterPiAdapter
+          ? {
+              correlationId: crypto.randomUUID(),
+              sdkRetryHeader: new Headers(normalizedInit.headers).get('x-stainless-retry-count'),
+              configuredModel: parsed.model,
+              variant: resolveAnyRouterPiWireVariant(process.env.OPCAGENT_ANYROUTER_PI_WIRE_VARIANT),
+            }
+          : undefined;
         if (adapter.modifyRequest) {
           const result = adapter.modifyRequest(url, normalizedInit, parsed);
           modifiedInit = result.init;
@@ -2281,7 +2302,50 @@ async function interceptedFetch(
         rememberLastOutgoingRequest(requestUrl, parsed, adapter);
 
         debugLog(`[${adapter.name}] Intercepted request to ${requestUrl}`);
-        const response = await originalFetch(requestUrl, finalInit);
+        if (anyRouterPiDiagnostic) {
+          writeAnyRouterPiDiagnostic({
+            event: 'request_start',
+            ...anyRouterPiDiagnostic,
+            durationMs: 0,
+            outboundModel: parsed.model,
+            requestUrl,
+            maxTokens: parsed.max_tokens,
+            outboundRetryHeader: new Headers(finalInit.headers).get('x-stainless-retry-count'),
+          });
+        }
+
+        let response: Response;
+        try {
+          anyRouterPiFetchStarted = Boolean(anyRouterPiDiagnostic);
+          response = await originalFetch(requestUrl, finalInit);
+        } catch (error) {
+          if (anyRouterPiDiagnostic) {
+            writeAnyRouterPiDiagnostic({
+              event: 'request_error',
+              ...anyRouterPiDiagnostic,
+              durationMs: Date.now() - startTime,
+              outboundModel: parsed.model,
+              requestUrl,
+              maxTokens: parsed.max_tokens,
+              outboundRetryHeader: new Headers(finalInit.headers).get('x-stainless-retry-count'),
+            });
+          }
+          throw error;
+        }
+
+        if (anyRouterPiDiagnostic) {
+          writeAnyRouterPiDiagnostic({
+            event: 'request_end',
+            ...anyRouterPiDiagnostic,
+            status: response.status,
+            durationMs: Date.now() - startTime,
+            retryAfterHeader: response.headers.get('retry-after'),
+            outboundModel: parsed.model,
+            requestUrl,
+            maxTokens: parsed.max_tokens,
+            outboundRetryHeader: new Headers(finalInit.headers).get('x-stainless-retry-count'),
+          });
+        }
 
         // Process SSE response through adapter's stream processor
         const contentType = response.headers.get('content-type') ?? '';
@@ -2311,6 +2375,7 @@ async function interceptedFetch(
         return logResponse(response, requestUrl, startTime, adapter);
       }
     } catch (e) {
+      if (anyRouterPiFetchStarted) throw e;
       debugLog(`[${adapter?.name}] FETCH modification failed:`, e);
     }
   }

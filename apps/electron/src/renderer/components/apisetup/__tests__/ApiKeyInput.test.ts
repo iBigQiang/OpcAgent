@@ -201,6 +201,48 @@ describe('resolveCustomEndpointPayload', () => {
     }
   })
 
+  it('persists the custom Base URL mode without changing AgentRouter routing', () => {
+    expect(resolveCustomEndpointPayload({
+      activePreset: 'agentrouter',
+      baseUrl: 'https://agentrouter.org/v1',
+      customApi: 'openai-completions',
+      preserveCustomBaseUrl: true,
+      brandedOpenAiCompatPresets: BRANDED,
+      fallbackPiAuthProvider: undefined,
+    })).toEqual({
+      customEndpoint: { api: 'openai-completions', urlNormalization: 'preserve' },
+      piAuthProvider: 'openai',
+      platformProfile: 'agentrouter',
+    })
+  })
+
+  it('does not leak custom Base URL mode into other provider presets', () => {
+    expect(resolveCustomEndpointPayload({
+      activePreset: 'manifest',
+      baseUrl: 'https://app.manifest.build/v1',
+      customApi: 'openai-completions',
+      preserveCustomBaseUrl: true,
+      brandedOpenAiCompatPresets: BRANDED,
+      fallbackPiAuthProvider: undefined,
+    })).toEqual({
+      customEndpoint: { api: 'openai-completions' },
+      piAuthProvider: 'openai',
+    })
+
+    expect(resolveCustomEndpointPayload({
+      activePreset: 'anyrouter',
+      baseUrl: 'https://anyrouter.top',
+      customApi: 'openai-completions',
+      preserveCustomBaseUrl: true,
+      brandedOpenAiCompatPresets: BRANDED,
+      fallbackPiAuthProvider: undefined,
+    })).toEqual({
+      customEndpoint: { api: 'anthropic-messages' },
+      piAuthProvider: 'anthropic',
+      platformProfile: 'anyrouter',
+    })
+  })
+
   it('pins AnyRouter to Anthropic Messages and persists its platform profile', () => {
     expect(resolveCustomEndpointPayload({
       activePreset: 'anyrouter',

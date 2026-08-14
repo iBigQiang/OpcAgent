@@ -6,6 +6,7 @@ const hintVariables = [
   'OPCAGENT_PI_MODEL_PROVIDER',
   'OPCAGENT_PI_MODEL_BASE_URL',
   'OPCAGENT_PLATFORM_PROFILE',
+  'OPCAGENT_EXACT_REQUEST_URL',
 ] as const;
 
 const originalEnvironment = Object.fromEntries(
@@ -45,5 +46,12 @@ describe('setInterceptorApiHints', () => {
     for (const name of hintVariables) {
       expect(process.env[name]).toBeUndefined();
     }
+  });
+
+  it('sets and clears an exact custom request URL', () => {
+    setInterceptorApiHints(model, undefined, 'https://example.test/complete');
+    expect(process.env.OPCAGENT_EXACT_REQUEST_URL).toBe('https://example.test/complete');
+    setInterceptorApiHints(model);
+    expect(process.env.OPCAGENT_EXACT_REQUEST_URL).toBeUndefined();
   });
 });

@@ -98,6 +98,7 @@ export function resolveCustomEndpointPayload(params: {
   activePreset: PresetKey
   baseUrl: string
   customApi: CustomEndpointApi
+  preserveCustomBaseUrl?: boolean
   brandedOpenAiCompatPresets: ReadonlySet<string>
   fallbackPiAuthProvider: string | undefined
 }): {
@@ -105,12 +106,14 @@ export function resolveCustomEndpointPayload(params: {
   piAuthProvider: string | undefined
   platformProfile?: LlmPlatformProfile
 } {
-  const { activePreset, baseUrl, customApi, brandedOpenAiCompatPresets, fallbackPiAuthProvider } = params
+  const { activePreset, baseUrl, customApi, preserveCustomBaseUrl, brandedOpenAiCompatPresets, fallbackPiAuthProvider } = params
 
   const platformProfile = PLATFORM_PROFILE_BY_PRESET[activePreset]
   const isBrandedOpenAiCompat = brandedOpenAiCompatPresets.has(activePreset) && !!baseUrl
   const isPlatformProfileEndpoint = !!platformProfile && !!baseUrl
   const isCustomEndpoint = (activePreset === 'custom' && !!baseUrl) || isBrandedOpenAiCompat || isPlatformProfileEndpoint
+  const preservesCustomBaseUrl = preserveCustomBaseUrl
+    && (activePreset === 'custom' || platformProfile === 'agentrouter')
   const effectiveApi: CustomEndpointApi = isPlatformProfileEndpoint
     ? (platformProfile === 'agentrouter' ? customApi : 'anthropic-messages')
     : isBrandedOpenAiCompat
@@ -118,7 +121,9 @@ export function resolveCustomEndpointPayload(params: {
       : customApi
 
   return {
-    customEndpoint: isCustomEndpoint ? { api: effectiveApi } : undefined,
+    customEndpoint: isCustomEndpoint
+      ? { api: effectiveApi, ...(preservesCustomBaseUrl ? { urlNormalization: 'preserve' as const } : {}) }
+      : undefined,
     piAuthProvider: isCustomEndpoint
       ? getPiAuthProviderForCustomEndpointApi(effectiveApi)
       : fallbackPiAuthProvider,

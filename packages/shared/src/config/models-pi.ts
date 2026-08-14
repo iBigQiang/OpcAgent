@@ -16,6 +16,7 @@
 import { getProviders, getModels } from '@earendil-works/pi-ai/compat';
 import type { KnownProvider, Model, Api } from '@earendil-works/pi-ai';
 import type { ModelDefinition } from './models.ts';
+import { GOOGLE_MODEL_CATALOG_ADDITIONS } from './google-model-catalog.ts';
 
 // ============================================
 // PI MODEL DISCOVERY
@@ -37,6 +38,17 @@ function piModelToDefinition(m: Model<Api>): ModelDefinition {
     contextWindow: m.contextWindow,
     supportsThinking: m.reasoning,
   };
+}
+
+function getPiProviderModels(provider: KnownProvider): Model<Api>[] {
+  const models = [...getModels(provider)] as Model<Api>[];
+  if (provider !== 'google') return models;
+
+  const byId = new Map(models.map(model => [model.id, model]));
+  for (const model of GOOGLE_MODEL_CATALOG_ADDITIONS) {
+    if (!byId.has(model.id)) byId.set(model.id, model as Model<Api>);
+  }
+  return [...byId.values()];
 }
 
 /**
@@ -99,7 +111,7 @@ function isBareBedrockClaudeModel(modelId: string): boolean {
  */
 export function getPiModelsForAuthProvider(piAuthProvider: string): ModelDefinition[] {
   try {
-    const models = getModels(piAuthProvider as KnownProvider);
+    const models = getPiProviderModels(piAuthProvider as KnownProvider);
     if (models.length > 0) {
       return models
         .filter(m => !isExcludedPiModel(m.id))
@@ -122,7 +134,7 @@ export function getAllPiModels(): ModelDefinition[] {
   const allModels: ModelDefinition[] = [];
   for (const provider of getProviders()) {
     try {
-      const models = getModels(provider);
+      const models = getPiProviderModels(provider);
       allModels.push(...models
         .filter(m => !isExcludedPiModel(m.id))
         .map(piModelToDefinition)

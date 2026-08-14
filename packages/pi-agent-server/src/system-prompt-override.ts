@@ -22,8 +22,8 @@ export function shouldPreservePiSystemPrompt(
   customEndpoint?: { api?: string },
   platformProfile?: string,
 ): boolean {
-  return platformProfile !== 'anyrouter_pi'
-    && Boolean(baseUrl?.trim() && customEndpoint?.api === 'anthropic-messages');
+  if (!baseUrl?.trim() || !customEndpoint?.api || platformProfile === 'anyrouter_pi') return false;
+  return platformProfile === 'agentrouter' || customEndpoint.api === 'anthropic-messages';
 }
 
 /**

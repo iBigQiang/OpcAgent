@@ -47,7 +47,7 @@ export function registerMessagingHandlers(server: RpcServer, deps: HandlerDeps &
     if (!value) throw new Error('Workspace context is required')
     return value
   }
-  server.handle(CHANNEL.getConfig, async ctx => registry.getConfig(workspaceId(ctx.workspaceId)))
+  server.handle(CHANNEL.getConfig, async ctx => { const id = workspaceId(ctx.workspaceId); return { ...registry.getConfig(id), runtime: Object.fromEntries(registry.getRuntime(id).map(value => [value.platform, value])) } })
   server.handle(CHANNEL.updateConfig, async (ctx, patch: Partial<MessagingConfig>) => registry.updateConfig(workspaceId(ctx.workspaceId), patch))
   server.handle(CHANNEL.getBindings, async ctx => registry.getBindings(workspaceId(ctx.workspaceId)))
   server.handle(CHANNEL.bind, async (ctx, input) => registry.bind(workspaceId(ctx.workspaceId), input as Parameters<IMessagingGatewayRegistry['bind']>[1]))

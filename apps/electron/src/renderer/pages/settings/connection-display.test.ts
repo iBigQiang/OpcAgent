@@ -31,6 +31,7 @@ describe('getEndpointProtocolLabel', () => {
     'apiSetup.protocol.openAiChat': 'OpenAI Chat Completions',
     'apiSetup.protocol.openAiResponses': 'OpenAI Responses',
     'apiSetup.protocol.anthropicMessages': 'Anthropic Messages',
+    'apiSetup.protocol.customBaseUrl': 'Custom Base URL (no auto-completion)',
     'apiSetup.protocol.googleGemini': 'Google Gemini',
   }
   const t = (key: string) => translations[key] ?? key
@@ -46,5 +47,10 @@ describe('getEndpointProtocolLabel', () => {
 
   it('omits a protocol label when none is stored', () => {
     expect(getEndpointProtocolLabel(undefined, t)).toBeUndefined()
+  })
+
+  it('shows the custom Base URL label for preserved endpoints', () => {
+    expect(getEndpointProtocolLabel('openai-completions', t, true))
+      .toBe('Custom Base URL (no auto-completion)')
   })
 })

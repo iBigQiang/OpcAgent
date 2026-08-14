@@ -1,9 +1,21 @@
 import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
+import { mkdtempSync, readFileSync, rmdirSync, unlinkSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
+import {
+  _flushAnyRouterPiDiagnosticsForTesting,
+  _resetAnyRouterPiDiagnosticsForTesting,
+  createAnyRouterPiDiagnosticRecord,
+  getAnyRouterPiDiagnosticsPath,
+  writeAnyRouterPiDiagnostic,
+} from '../anyrouter-pi-diagnostics.ts';
 
 let createAnyRouterPiSseProcessor: typeof import('../unified-network-interceptor.ts').createAnyRouterPiSseProcessor;
 let isAnyRouterPiMessagesUrl: typeof import('../unified-network-interceptor.ts').isAnyRouterPiMessagesUrl;
 let originalFetch: typeof globalThis.fetch;
 let observedRequest: { url: string; init?: RequestInit } | undefined;
+let observedFetchError: Error | undefined;
+let observedFetchCalls = 0;
 
 function getObservedRequest(): { url: string; init?: RequestInit } | undefined {
   return observedRequest;
@@ -12,10 +24,12 @@ function getObservedRequest(): { url: string; init?: RequestInit } | undefined {
 beforeAll(async () => {
   originalFetch = globalThis.fetch;
   globalThis.fetch = (async (input: string | URL | Request, init?: RequestInit) => {
+    observedFetchCalls += 1;
     observedRequest = {
       url: typeof input === 'string' ? input : input.toString(),
       init,
     };
+    if (observedFetchError) throw observedFetchError;
     return new Response('', { status: 200, headers: { 'content-type': 'application/json' } });
   }) as typeof globalThis.fetch;
   delete process.env.OPCAGENT_INTERCEPTOR_DISABLE_AUTO_INSTALL;
@@ -29,6 +43,9 @@ afterAll(() => {
   delete process.env.OPCAGENT_PI_MODEL_API;
   delete process.env.OPCAGENT_PI_MODEL_PROVIDER;
   delete process.env.OPCAGENT_PI_MODEL_BASE_URL;
+  delete process.env.OPCAGENT_ANYROUTER_PI_DIAGNOSTICS;
+  delete process.env.OPCAGENT_ANYROUTER_PI_WIRE_VARIANT;
+  delete process.env.OPCAGENT_SESSION_DIR;
 });
 
 describe('AnyRouter Pi interceptor SSE', () => {
@@ -115,5 +132,202 @@ describe('AnyRouter Pi interceptor SSE', () => {
 
     expect(output).toContain('"name":"read"');
     expect(output).toContain('"partial_json":"{\\"path\\":\\"/tmp/a\\"}"');
+  });
+
+  it('writes only the allowlisted privacy-safe diagnostic fields', async () => {
+    const root = mkdtempSync(join(tmpdir(), 'opcagent-anyrouter-diagnostics-'));
+    const filePath = join(root, 'diagnostics.jsonl');
+    _resetAnyRouterPiDiagnosticsForTesting();
+
+    writeAnyRouterPiDiagnostic({
+      event: 'request_end',
+      correlationId: '12345678-1234-1234-1234-123456789abc',
+      sdkRetryHeader: '2',
+      status: 429,
+      durationMs: 3456,
+      retryAfterHeader: '7',
+      configuredModel: 'claude-opus-5[1m]',
+      outboundModel: 'claude-opus-5',
+      requestUrl: 'https://secret-host.example/v1/messages?token=must-not-leak',
+      variant: 'baseline',
+      maxTokens: 64_000,
+      outboundRetryHeader: '0',
+    }, { enabled: true, filePath, nowMs: 0 });
+    await _flushAnyRouterPiDiagnosticsForTesting();
+
+    const text = readFileSync(filePath, 'utf8');
+    const record = JSON.parse(text) as Record<string, unknown>;
+    expect(Object.keys(record)).toEqual([
+      'timestamp', 'event', 'correlationId', 'attempt', 'status', 'durationMs',
+      'retryAfter', 'configuredModel', 'outboundModel', 'requestPath', 'variant',
+      'maxTokens', 'retryHeader',
+    ]);
+    expect(record).toEqual(createAnyRouterPiDiagnosticRecord({
+      event: 'request_end',
+      correlationId: '12345678-1234-1234-1234-123456789abc',
+      sdkRetryHeader: '2',
+      status: 429,
+      durationMs: 3456,
+      retryAfterHeader: '7',
+      configuredModel: 'claude-opus-5[1m]',
+      outboundModel: 'claude-opus-5',
+      requestUrl: 'https://secret-host.example/v1/messages?token=must-not-leak',
+      variant: 'baseline',
+      maxTokens: 64_000,
+      outboundRetryHeader: '0',
+    }, 0) as unknown as Record<string, unknown>);
+    expect(text).not.toContain('secret-host');
+    expect(text).not.toContain('must-not-leak');
+    expect(text).not.toContain('Authorization');
+    expect(text).not.toContain('Bearer');
+    expect(record.requestPath).toBe('/v1/messages');
+    expect(record.attempt).toBe(3);
+    expect(record.retryAfter).toBe(7);
+    unlinkSync(filePath);
+    rmdirSync(root);
+  });
+
+  it('rotates per-process diagnostics without changing the request schema', async () => {
+    const root = mkdtempSync(join(tmpdir(), 'opcagent-anyrouter-rotation-'));
+    const filePath = join(root, 'diagnostics.jsonl');
+    _resetAnyRouterPiDiagnosticsForTesting();
+    const input = {
+      event: 'request_start' as const,
+      correlationId: '12345678-1234-1234-1234-123456789abc',
+      durationMs: 0,
+      configuredModel: 'claude-opus-5[1m]',
+      outboundModel: 'claude-opus-5',
+      requestUrl: 'https://example.test/v1/messages?beta=true',
+      variant: 'baseline' as const,
+      maxTokens: 64_000,
+      outboundRetryHeader: '0',
+    };
+    writeAnyRouterPiDiagnostic(input, { enabled: true, filePath, maxBytes: 1 });
+    writeAnyRouterPiDiagnostic(input, { enabled: true, filePath, maxBytes: 1 });
+    await _flushAnyRouterPiDiagnosticsForTesting();
+    expect(JSON.parse(readFileSync(filePath, 'utf8')).requestPath).toBe('/v1/messages');
+    expect(JSON.parse(readFileSync(`${filePath}.1`, 'utf8')).requestPath).toBe('/v1/messages');
+    unlinkSync(filePath);
+    unlinkSync(`${filePath}.1`);
+    rmdirSync(root);
+  });
+
+  it('records the selected A/B variant through the real interceptor boundary', async () => {
+    const root = mkdtempSync(join(tmpdir(), 'opcagent-anyrouter-integration-'));
+    process.env.OPCAGENT_SESSION_DIR = root;
+    process.env.OPCAGENT_ANYROUTER_PI_DIAGNOSTICS = '1';
+    process.env.OPCAGENT_ANYROUTER_PI_WIRE_VARIANT = 'preserve-max-tokens';
+    process.env.OPCAGENT_PLATFORM_PROFILE = 'anyrouter_pi';
+    process.env.OPCAGENT_PI_MODEL_API = 'anthropic-messages';
+    process.env.OPCAGENT_PI_MODEL_BASE_URL = 'https://gateway.example.test';
+    observedRequest = undefined;
+    _resetAnyRouterPiDiagnosticsForTesting();
+
+    const requestInit = {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-api-key': 'must-not-leak-key',
+        'x-stainless-retry-count': '1',
+      },
+      body: JSON.stringify({
+        model: 'claude-opus-5[1m]',
+        max_tokens: 8192,
+        messages: [{ role: 'user', content: 'must-not-leak-prompt' }],
+      }),
+    } satisfies RequestInit;
+    await globalThis.fetch('https://gateway.example.test/v1/messages?private=query', requestInit);
+    await globalThis.fetch('https://gateway.example.test/v1/messages?private=query', requestInit);
+    await _flushAnyRouterPiDiagnosticsForTesting();
+
+    const capturedRequest = getObservedRequest();
+    if (!capturedRequest) throw new Error('Expected the AnyRouter-Pi request to reach the fetch stub');
+    const outboundBody = JSON.parse(capturedRequest.init?.body as string);
+    expect(outboundBody.model).toBe('claude-opus-5');
+    expect(outboundBody.max_tokens).toBe(8192);
+
+    const diagnosticPath = getAnyRouterPiDiagnosticsPath();
+    const diagnosticText = readFileSync(diagnosticPath, 'utf8');
+    const records = diagnosticText.trim().split('\n').map(line => JSON.parse(line));
+    expect(records).toHaveLength(4);
+    expect(records[0]).toMatchObject({
+      event: 'request_start', attempt: 2, variant: 'preserve-max-tokens', maxTokens: 8192,
+    });
+    expect(records[1]).toMatchObject({
+      event: 'request_end', attempt: 2, status: 200, variant: 'preserve-max-tokens', maxTokens: 8192,
+    });
+    expect(records[0].correlationId).toBe(records[1].correlationId);
+    expect(records[2].correlationId).toBe(records[3].correlationId);
+    expect(records[0].correlationId).not.toBe(records[2].correlationId);
+    expect(diagnosticText).not.toContain('must-not-leak');
+    expect(diagnosticText).not.toContain('gateway.example.test');
+    expect(diagnosticText).not.toContain('?private=query');
+
+    delete process.env.OPCAGENT_SESSION_DIR;
+    delete process.env.OPCAGENT_ANYROUTER_PI_DIAGNOSTICS;
+    delete process.env.OPCAGENT_ANYROUTER_PI_WIRE_VARIANT;
+    delete process.env.OPCAGENT_PLATFORM_PROFILE;
+    delete process.env.OPCAGENT_PI_MODEL_API;
+    delete process.env.OPCAGENT_PI_MODEL_BASE_URL;
+    unlinkSync(diagnosticPath);
+    rmdirSync(root);
+  });
+
+  it('does not resend an unmodified AnyRouter-Pi request after a network failure', async () => {
+    process.env.OPCAGENT_PLATFORM_PROFILE = 'anyrouter_pi';
+    process.env.OPCAGENT_PI_MODEL_API = 'anthropic-messages';
+    process.env.OPCAGENT_PI_MODEL_BASE_URL = 'https://gateway.example.test';
+    observedFetchError = new Error('simulated network failure');
+    const callsBefore = observedFetchCalls;
+
+    try {
+      await expect(globalThis.fetch('https://gateway.example.test/v1/messages', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', 'x-api-key': 'test-only-key' },
+        body: JSON.stringify({
+          model: 'claude-opus-5[1m]',
+          max_tokens: 8192,
+          messages: [{ role: 'user', content: 'Hello' }],
+        }),
+      })).rejects.toThrow('simulated network failure');
+      expect(observedFetchCalls - callsBefore).toBe(1);
+    } finally {
+      observedFetchError = undefined;
+      delete process.env.OPCAGENT_PLATFORM_PROFILE;
+      delete process.env.OPCAGENT_PI_MODEL_API;
+      delete process.env.OPCAGENT_PI_MODEL_BASE_URL;
+    }
+  });
+
+  it('silently disables diagnostics after an I/O failure', async () => {
+    const root = mkdtempSync(join(tmpdir(), 'opcagent-anyrouter-io-failure-'));
+    const blockingFile = join(root, 'not-a-directory');
+    writeFileSync(blockingFile, 'block');
+    _resetAnyRouterPiDiagnosticsForTesting();
+    const input = {
+      event: 'request_start' as const,
+      correlationId: '12345678-1234-1234-1234-123456789abc',
+      durationMs: 0,
+      configuredModel: 'claude-opus-5[1m]',
+      outboundModel: 'claude-opus-5',
+      requestUrl: 'https://example.test/v1/messages',
+      variant: 'baseline' as const,
+      maxTokens: 64_000,
+      outboundRetryHeader: '0',
+    };
+    expect(() => writeAnyRouterPiDiagnostic(input, {
+      enabled: true,
+      filePath: join(blockingFile, 'diagnostics.jsonl'),
+    })).not.toThrow();
+    await _flushAnyRouterPiDiagnosticsForTesting();
+    expect(() => writeAnyRouterPiDiagnostic(input, {
+      enabled: true,
+      filePath: join(root, 'would-have-been-created.jsonl'),
+    })).not.toThrow();
+    await _flushAnyRouterPiDiagnosticsForTesting();
+    expect(() => readFileSync(join(root, 'would-have-been-created.jsonl'))).toThrow();
+    _resetAnyRouterPiDiagnosticsForTesting();
+    unlinkSync(blockingFile);
+    rmdirSync(root);
   });
 });

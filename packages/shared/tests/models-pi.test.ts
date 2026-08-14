@@ -31,4 +31,15 @@ describe('models-pi filtering', () => {
     expect(ids).toContain('pi/deepseek-v4-flash');
     expect(ids).toContain('pi/deepseek-v4-pro');
   });
+
+  it('supplements the bundled Google catalog with current stable Flash models', () => {
+    const ids = getPiModelsForAuthProvider('google').map(model => model.id);
+
+    expect(ids).toContain('pi/gemini-2.5-flash');
+    expect(ids).toContain('pi/gemini-3.5-flash');
+    expect(ids).toContain('pi/gemini-3.5-flash-lite');
+    expect(ids).toContain('pi/gemini-3.6-flash');
+    expect(ids).toContain('pi/gemini-3.7-flash');
+    expect(ids).not.toContain('pi/gemini-2.0-flash');
+  });
 });
