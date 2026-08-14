@@ -1,6 +1,6 @@
 {
   "name": "@opcagent/server",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Standalone headless OPC Agent server (Bun runtime)",
   "type": "module",
   "main": "src/index.ts",

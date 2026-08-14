@@ -8,19 +8,25 @@ All notable changes to OPC Agent are documented in this file. The format follows
 
 Add user-visible changes here before running `bun run release:prepare <version>`.
 
+## [0.1.8] - 2026-08-15
+
+### 修复
+
+- 恢复自动化任务列表右上角的新增按钮。新增入口继续使用现有自动化编辑器，并复用普通会话的 `@` Skill 输入能力。
+
 ## [0.1.7] - 2026-08-14
 
-### Added
+### 新增
 
-- Added Skill autocomplete and multi-Skill binding to the automation editor, using the same `@` menu and Skill chips as regular conversations.
-- Added a bundled OPC Agent automation configuration guide covering schedules, events, actions, conditions, variables, and credential boundaries.
+- 自动化编辑器支持 Skill 自动补全和多 Skill 绑定。输入 `@` 即可使用与普通会话相同的 Skill 选择菜单，已绑定的 Skill 会以标签显示。
+- 内置 OPC Agent 自动化配置指南，涵盖定时任务、事件触发、执行动作、条件、变量及凭据安全边界。
 
-### Fixed
+### 修复
 
-- Fixed first-time automation creation failing when the optional workspace `automations.json` file did not exist.
-- Reloaded automation configuration and refreshed the automation list after the file is created, edited, or removed.
-- Recorded successful and failed scheduled prompt runs in automation history with their resulting session IDs or errors.
-- Resolved both legacy `@skill` references and qualified Skill or Source mentions when scheduled prompts execute, including required Source activation.
+- 首次创建自动化时，如果工作区还没有 `automations.json`，现在可以直接生成有效配置。
+- 创建、编辑或删除 `automations.json` 后，自动重新加载配置并刷新任务列表。
+- 定时提示词任务无论成功还是失败，都会把结果写入自动化历史记录。成功时记录会话 ID，失败时记录错误信息。
+- 执行定时提示词时，支持旧版 `@skill` 引用及带类型的 Skill 或 Source 引用，并会提前启用所需的 Source。
 
 ## [0.1.6] - 2026-08-14
 
@@ -104,6 +110,7 @@ Internal test build; not published to GitHub. All changes are included in 0.1.6.
 - Local session search, flags, archives, import, export, and branching.
 
 [Unreleased]: https://github.com/iBigQiang/OpcAgent/releases
+[0.1.8]: https://github.com/iBigQiang/OpcAgent/releases/tag/v0.1.8
 [0.1.7]: https://github.com/iBigQiang/OpcAgent/releases/tag/v0.1.7
 [0.1.6]: https://github.com/iBigQiang/OpcAgent/releases/tag/v0.1.6
 [0.1.4]: https://github.com/iBigQiang/OpcAgent/releases/tag/v0.1.4

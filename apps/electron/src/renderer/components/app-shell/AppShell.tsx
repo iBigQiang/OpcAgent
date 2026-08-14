@@ -1464,6 +1464,12 @@ function AppShellContent({
                       {...getEditConfig('add-skill', activeWorkspace.rootPath)}
                     />
                   )}
+                  {isAutomationsNavigation(navState) && activeWorkspace && (
+                    <EditPopover
+                      trigger={<HeaderIconButton icon={<Plus className="h-4 w-4" />} tooltip={t('automations.addAutomation')} />}
+                      {...getEditConfig('automation-config', activeWorkspace.rootPath)}
+                    />
+                  )}
                   {isProjectsNavigation(navState) && activeWorkspace && (
                     <HeaderIconButton icon={<Plus className="h-4 w-4" />} tooltip={t('projectsList.addProject')} onClick={() => setCreateProjectDialogOpen(true)} />
                   )}
