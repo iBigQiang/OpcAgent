@@ -2333,7 +2333,7 @@
       "reason": "OPC Agent lineage, build, or validation guard required by the derivative release workflow"
     },
     "scripts/run-tests.ts": {
-      "sha256": "e4da6971ad7bab981ce0acb74aa9aabfa4ffeacc62055d84c256b919c0cb57f7",
+      "sha256": "c8e5e59467a8757ecabca028ca1d7385c3902772c42767f5ccfa4eb2f44a66e6",
       "reason": "OPC Agent test discovery excludes generated artifacts and vendored submodule tests from CI"
     },
     "apps\\cli\\package.json": {
