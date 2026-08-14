@@ -17,7 +17,7 @@ import { Popover, PopoverTrigger, PopoverContent } from './popover'
 import { Button } from './button'
 import { cn } from '@/lib/utils'
 import { usePlatform } from '@opcagent/ui'
-import type { ContentBadge, Session, CreateSessionOptions } from '../../../shared/types'
+import type { ContentBadge, Session, CreateSessionOptions, FileAttachment } from '../../../shared/types'
 import { useActiveWorkspace, useAppShellContext, useSession, usePendingPermission, usePendingCredential } from '@/context/AppShellContext'
 import { useEscapeInterrupt } from '@/context/EscapeInterruptContext'
 import { ChatDisplay } from '../app-shell/ChatDisplay'
@@ -119,7 +119,13 @@ const EDIT_CONFIGS: Record<EditContextKey, (location: string) => EditConfig> = {
     context: {
       label: 'Automation Configuration',
       filePath: `${location}/automations.json`,
-      context: 'Edit the workspace automation configuration. Preserve valid JSON and do not add credentials.',
+      context:
+        'The user is editing the optional workspace automations.json configuration. ' +
+        'If it does not exist, create it directly without reading it first, using the valid root { "version": 2, "automations": {} }. ' +
+        'Each automation event maps to an array of matcher entries. A matcher can include name, matcher, cron, timezone, permissionMode, labels, enabled, conditions, telegramTopic, and a non-empty actions array. ' +
+        'Actions are { type: "prompt", prompt } or, for app events only, { type: "webhook", url, method?, headers?, bodyFormat?, body?, captureResponse?, auth? }. ' +
+        'Use cron only for SchedulerTick. Read ~/.opcagent/docs/automations.md for the implemented schema, events, and examples. ' +
+        'Preserve valid JSON and do not add credentials, tokens, or secrets to automations.json. Confirm clearly what changed.',
     },
     example: 'Add a scheduled automation',
     model: 'default',
@@ -635,7 +641,14 @@ export function EditPopover({
   }
 
   // Use App context for session management (same code path as main chat)
-  const { onCreateSession, onSendMessage, onRespondToPermission, onRespondToCredential } = useAppShellContext()
+  const {
+    onCreateSession,
+    onSendMessage,
+    onRespondToPermission,
+    onRespondToCredential,
+    skills,
+    activeWorkspaceId,
+  } = useAppShellContext()
 
   // Session ID for inline execution (created on first message)
   const [inlineSessionId, setInlineSessionId] = useState<string | null>(null)
@@ -829,7 +842,11 @@ export function EditPopover({
 
   // Handle sending message from ChatDisplay (inline mode)
   // Creates hidden session on first message, then uses App context for sending
-  const handleInlineSendMessage = useCallback(async (message: string) => {
+  const handleInlineSendMessage = useCallback(async (
+    message: string,
+    attachments?: FileAttachment[],
+    skillSlugs?: string[],
+  ) => {
     const { prompt, badges } = buildEditPrompt(context, message, displayLabel)
 
     // Create session on first message
@@ -850,7 +867,7 @@ export function EditPopover({
     // Send message via App context (includes optimistic user message update)
     // Pass badges to hide the <edit_request> XML metadata in the user message bubble
     if (sessionId) {
-      onSendMessage(sessionId, prompt, undefined, undefined, badges)
+      onSendMessage(sessionId, prompt, attachments, skillSlugs, badges)
     }
   }, [context, displayLabel, inlineSessionId, workspace?.id, model, systemPromptPreset, permissionMode, workingDirectory, onCreateSession, onSendMessage])
 
@@ -938,6 +955,8 @@ export function EditPopover({
                   pendingCredential={pendingCredential}
                   onRespondToCredential={onRespondToCredential}
                   compactMode={true}
+                  skills={skills}
+                  workspaceId={activeWorkspaceId || workspace?.id}
                   placeholder={placeholder}
                   emptyStateLabel={displayLabel || context.label}
                 />

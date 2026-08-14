@@ -70,7 +70,12 @@ function updateLineageManifest(paths: string[]): void {
     mkOnly: Record<string, { sha256: string; reason: string }>;
   };
   for (const absolutePath of paths) {
-    const relativePath = absolutePath.slice(root.length + 1);
+    // Git and lineage manifests use repository-relative POSIX paths on every OS.
+    // Without normalization, Windows writes duplicate backslash keys that the
+    // release audit cannot match against `git ls-files` output.
+    const relativePath = absolutePath
+      .slice(root.length + 1)
+      .replaceAll("\\", "/");
     const content = readFileSync(absolutePath);
     const text = content.toString("utf8");
     const normalized = !content.includes(0) && Buffer.from(text, "utf8").equals(content)

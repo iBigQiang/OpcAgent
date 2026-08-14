@@ -8,6 +8,20 @@ All notable changes to OPC Agent are documented in this file. The format follows
 
 Add user-visible changes here before running `bun run release:prepare <version>`.
 
+## [0.1.7] - 2026-08-14
+
+### Added
+
+- Added Skill autocomplete and multi-Skill binding to the automation editor, using the same `@` menu and Skill chips as regular conversations.
+- Added a bundled OPC Agent automation configuration guide covering schedules, events, actions, conditions, variables, and credential boundaries.
+
+### Fixed
+
+- Fixed first-time automation creation failing when the optional workspace `automations.json` file did not exist.
+- Reloaded automation configuration and refreshed the automation list after the file is created, edited, or removed.
+- Recorded successful and failed scheduled prompt runs in automation history with their resulting session IDs or errors.
+- Resolved both legacy `@skill` references and qualified Skill or Source mentions when scheduled prompts execute, including required Source activation.
+
 ## [0.1.6] - 2026-08-14
 
 This is the first public release after 0.1.4. It includes the changes from the
@@ -90,6 +104,7 @@ Internal test build; not published to GitHub. All changes are included in 0.1.6.
 - Local session search, flags, archives, import, export, and branching.
 
 [Unreleased]: https://github.com/iBigQiang/OpcAgent/releases
+[0.1.7]: https://github.com/iBigQiang/OpcAgent/releases/tag/v0.1.7
 [0.1.6]: https://github.com/iBigQiang/OpcAgent/releases/tag/v0.1.6
 [0.1.4]: https://github.com/iBigQiang/OpcAgent/releases/tag/v0.1.4
 [0.1.3]: https://github.com/iBigQiang/OpcAgent/releases/tag/v0.1.3

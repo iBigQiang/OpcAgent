@@ -22,6 +22,7 @@ import {
 import type { LoadedSource, SourceGuide } from '../sources/types.ts';
 import { expandPath } from '../utils/paths.ts';
 import { getWorkspacePath } from '../workspaces/storage.ts';
+import { AUTOMATIONS_CONFIG_FILE } from '../automations/constants.ts';
 import { CONFIG_DIR } from './paths.ts';
 import {
   getAppThemesDir,
@@ -61,6 +62,8 @@ export interface ConfigWatcherCallbacks {
   onDefaultPermissionsChange?: () => void;
   onWorkspacePermissionsChange?: (workspaceId: string) => void;
   onSourcePermissionsChange?: (sourceSlug: string) => void;
+  /** Called when workspace automations.json is created, changed, or deleted. */
+  onAutomationsConfigChange?: (workspaceId: string) => void;
   onSessionMetadataChange?: (sessionId: string, header: SessionHeader) => void;
   onAppThemeChange?: (theme: ThemeOverrides | null) => void;
   onPresetThemesListChange?: (themes: PresetTheme[]) => void;
@@ -240,6 +243,10 @@ export class ConfigWatcher {
     if (normalized === 'permissions.json') {
       permissionsConfigCache.invalidateWorkspace(this.workspacePath);
       this.callbacks.onWorkspacePermissionsChange?.(this.workspaceId);
+      return;
+    }
+    if (normalized === AUTOMATIONS_CONFIG_FILE) {
+      this.callbacks.onAutomationsConfigChange?.(this.workspaceId);
       return;
     }
     if (normalized.startsWith('sources/')) {

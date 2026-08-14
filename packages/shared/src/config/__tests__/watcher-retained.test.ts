@@ -26,6 +26,33 @@ function runWatcherScript(source: string): unknown {
 }
 
 describe('ConfigWatcher retained behavior', () => {
+  it('notifies for workspace automations.json creates, changes, and deletes', () => {
+    const result = runWatcherScript(`
+      import { rmSync, writeFileSync } from 'node:fs';
+      import { join } from 'node:path';
+      const { ConfigWatcher } = await import(${JSON.stringify(watcherUrl)});
+      const root = process.env.TEST_ROOT;
+      const workspace = join(root, 'workspace');
+      const events = [];
+      const watcher = new ConfigWatcher(workspace, {
+        onAutomationsConfigChange: workspaceId => events.push(workspaceId),
+      });
+      watcher.start();
+      const configPath = join(workspace, 'automations.json');
+      writeFileSync(configPath, '{}');
+      await new Promise(resolve => setTimeout(resolve, 250));
+      writeFileSync(configPath, '{"automations":{}}');
+      await new Promise(resolve => setTimeout(resolve, 250));
+      rmSync(configPath);
+      await new Promise(resolve => setTimeout(resolve, 250));
+      watcher.stop();
+      console.log('RESULT:' + JSON.stringify(events));
+    `) as string[];
+
+    expect(result).toHaveLength(3);
+    expect(result.every(id => id === 'workspace')).toBe(true);
+  });
+
   it('watches nested preset themes and default permissions directories', () => {
     const result = runWatcherScript(`
       import { existsSync, rmSync, writeFileSync } from 'node:fs';

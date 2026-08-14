@@ -49,10 +49,16 @@ import {
   resolveTitleLanguageName,
   type ConfigWatcherCallbacks,
 } from '@opcagent/shared/config'
-import { loadSkillBySlug, type LoadedSkill } from '@opcagent/shared/skills'
+import { loadAllSkills, loadSkillBySlug, type LoadedSkill } from '@opcagent/shared/skills'
 import { loadWorkspaceConfig } from '@opcagent/shared/workspaces'
 import { loadProjectPromptContext } from '@opcagent/shared/projects'
-import { AutomationSystem, type PendingPrompt } from '@opcagent/shared/automations'
+import {
+  appendAutomationHistoryEntry,
+  AutomationSystem,
+  createPromptHistoryEntry,
+  type PendingPrompt,
+} from '@opcagent/shared/automations'
+import { WS_ID_CHARS } from '@opcagent/shared/mentions'
 import { evaluateAutoLabels } from '@opcagent/shared/labels/auto/evaluator'
 import { formatLabelEntry } from '@opcagent/shared/labels'
 import { listLabels } from '@opcagent/shared/labels/storage'
@@ -362,6 +368,76 @@ export interface AutoRetryPendingHost {
     content: string
     deadlineMs: number
     committed: boolean
+  }
+}
+
+export interface AutomationPromptContext {
+  prompt: string
+  sourceSlugs?: string[]
+  skillSlugs?: string[]
+  unknownMentions: string[]
+}
+
+/**
+ * Resolve prompt-automation references without stripping bracket mentions.
+ * Legacy @skill references are rewritten only when the matching Skill exists,
+ * because BaseAgent uses [skill:slug] to register its SKILL.md prerequisite.
+ */
+export function resolveAutomationPromptContext(
+  prompt: string,
+  mentions: string[] | undefined,
+  sources: LoadedSource[],
+  skills: LoadedSkill[],
+): AutomationPromptContext {
+  const sourceByMention = new Map(sources.map(source => [source.config.slug.toLowerCase(), source.config.slug]))
+  const skillByMention = new Map(skills.map(skill => [skill.slug.toLowerCase(), skill.slug]))
+  const sourceSlugs = new Set<string>()
+  const skillSlugs = new Set<string>()
+  const unknownMentions = new Set<string>()
+
+  const resolveLegacyMention = (rawSlug: string): 'source' | 'skill' | undefined => {
+    const slug = rawSlug.toLowerCase()
+    const sourceSlug = sourceByMention.get(slug)
+    if (sourceSlug) {
+      sourceSlugs.add(sourceSlug)
+      return 'source'
+    }
+    const skillSlug = skillByMention.get(slug)
+    if (skillSlug) {
+      skillSlugs.add(skillSlug)
+      return 'skill'
+    }
+    unknownMentions.add(rawSlug)
+    return undefined
+  }
+
+  for (const mention of mentions ?? []) resolveLegacyMention(mention)
+
+  const rewrittenPrompt = prompt.replace(/(^|[\s(])@([a-zA-Z][a-zA-Z0-9-]*)/g, (match, prefix: string, rawSlug: string) => {
+    const kind = resolveLegacyMention(rawSlug)
+    if (kind !== 'skill') return match
+    return `${prefix}[skill:${skillByMention.get(rawSlug.toLowerCase())!}]`
+  })
+
+  const skillPattern = new RegExp(`\\[skill:(?:${WS_ID_CHARS}+:)?([\\w-]+)\\]`, 'g')
+  for (const match of rewrittenPrompt.matchAll(skillPattern)) {
+    const rawSlug = match[1]!
+    const skillSlug = skillByMention.get(rawSlug.toLowerCase())
+    if (skillSlug) skillSlugs.add(skillSlug)
+    else unknownMentions.add(rawSlug)
+  }
+  for (const match of rewrittenPrompt.matchAll(/\[source:([\w-]+)\]/g)) {
+    const rawSlug = match[1]!
+    const sourceSlug = sourceByMention.get(rawSlug.toLowerCase())
+    if (sourceSlug) sourceSlugs.add(sourceSlug)
+    else unknownMentions.add(rawSlug)
+  }
+
+  return {
+    prompt: rewrittenPrompt,
+    sourceSlugs: sourceSlugs.size > 0 ? [...sourceSlugs] : undefined,
+    skillSlugs: skillSlugs.size > 0 ? [...skillSlugs] : undefined,
+    unknownMentions: [...unknownMentions],
   }
 }
 
@@ -2345,8 +2421,19 @@ export class SessionManager implements ISessionManager {
         this.broadcastSkillsChanged(workspaceId, skills)
       },
       onSkillChange: async () => {
-        const { loadAllSkills } = await import('@opcagent/shared/skills')
         this.broadcastSkillsChanged(workspaceId, loadAllSkills(workspaceRootPath))
+      },
+      onAutomationsConfigChange: () => {
+        const automationSystem = this.automationSystems.get(workspaceRootPath)
+        if (automationSystem) {
+          try {
+            const result = automationSystem.reloadConfig()
+            if (!result.success) log.error(`Failed to reload automations config: ${result.errors.join('; ')}`)
+          } catch (error) {
+            log.error('Failed to reload automations config', error)
+          }
+        }
+        this.eventSink(RPC_CHANNELS.automations.CHANGED, { to: 'workspace', workspaceId }, workspaceId)
       },
       onSessionMetadataChange: (sessionId, header) => {
         const managed = this.sessions.get(sessionId)
@@ -2402,20 +2489,43 @@ export class SessionManager implements ISessionManager {
   }
 
   private async executeAutomationPrompts(workspaceId: string, workspaceRootPath: string, prompts: PendingPrompt[]): Promise<void> {
-    await Promise.allSettled(prompts.map(prompt => this.executePromptAutomation({
+    const settled = await Promise.allSettled(prompts.map(prompt => this.executePromptAutomation({
       workspaceId, workspaceRootPath, prompt: prompt.prompt, labels: prompt.labels, permissionMode: prompt.permissionMode,
       mentions: prompt.mentions, llmConnection: prompt.llmConnection, model: prompt.model,
       thinkingLevel: prompt.thinkingLevel, automationName: prompt.automationName,
       telegramTopic: prompt.telegramTopic,
       sourceEvent: prompt.sourceEvent,
     })))
+
+    await Promise.all(settled.map(async (result, index) => {
+      const pending = prompts[index]!
+      if (!pending.matcherId) return
+
+      const entry = createPromptHistoryEntry({
+        matcherId: pending.matcherId,
+        ok: result.status === 'fulfilled',
+        sessionId: result.status === 'fulfilled' ? result.value.sessionId : undefined,
+        prompt: pending.prompt,
+        error: result.status === 'rejected' ? String(result.reason) : undefined,
+      })
+      await appendAutomationHistoryEntry(workspaceRootPath, entry)
+        .catch(error => log.warn('Failed to write automation prompt history', error))
+    }))
   }
 
   async executePromptAutomation(input: ExecutePromptAutomationInput): Promise<{ sessionId: string }> {
+    const context = resolveAutomationPromptContext(
+      input.prompt,
+      input.mentions,
+      loadWorkspaceSources(input.workspaceRootPath),
+      loadAllSkills(input.workspaceRootPath),
+    )
+    for (const mention of context.unknownMentions) log.warn(`Unknown automation mention: ${mention}`)
     const session = await this.createSession(input.workspaceId, {
       name: input.automationName ?? `Automation: ${input.prompt.slice(0, 50)}`,
       labels: input.labels, permissionMode: input.permissionMode, llmConnection: input.llmConnection,
       model: input.model, thinkingLevel: input.thinkingLevel,
+      enabledSourceSlugs: context.sourceSlugs,
     })
     const managed = this.sessions.get(session.id)
     if (managed) {
@@ -2430,7 +2540,7 @@ export class SessionManager implements ISessionManager {
         log.warn('Automation topic binding failed', error)
       }
     }
-    const send = this.sendMessage(session.id, input.prompt)
+    const send = this.sendMessage(session.id, context.prompt, undefined, undefined, { skillSlugs: context.skillSlugs })
     if (input.waitForCompletion === false) void send.catch(error => log.error('Automation prompt dispatch failed', error))
     else await send
     return { sessionId: session.id }
