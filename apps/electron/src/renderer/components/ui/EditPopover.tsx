@@ -719,6 +719,12 @@ export function EditPopover({
   // Handle click outside during generation:
   // Show the ESC overlay via context, prevent closing
   const handleInteractOutside = useCallback((e: Event) => {
+    const target = e.target
+    if (target instanceof Element && target.closest('[data-inline-menu]')) {
+      e.preventDefault()
+      return
+    }
+
     if (isProcessing) {
       // Prevent close during processing
       e.preventDefault()

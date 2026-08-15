@@ -25,7 +25,7 @@ describe("Windows installer configuration", () => {
     expect(config.productName).toBe("OPC Agent");
     expect(config.nsis?.oneClick).toBe(false);
     expect(config.nsis?.allowToChangeInstallationDirectory).toBe(true);
-    expect(config.nsis?.runAfterFinish).toBe(false);
+    expect(config.nsis?.runAfterFinish).toBe(true);
     expect(config.nsis?.deleteAppDataOnUninstall).toBe(false);
     expect(config.nsis?.include).toBe("installer.nsh");
     expect(config.files).toContain("!release{,/**/*}");
@@ -52,5 +52,41 @@ describe("Windows installer configuration", () => {
     expect(installer).toContain('RMDir /r "$1"');
     expect(installer).not.toContain("$INSTDIR\\.opcagent");
     expect(installer).not.toContain("$APPDATA\\.opcagent");
+  });
+
+  it("launches the newly installed executable directly after Finish", () => {
+    const installer = readFileSync(
+      resolve(import.meta.dir, "../resources/installer.nsh"),
+      "utf8",
+    );
+    const installSection = readFileSync(
+      resolve(
+        import.meta.dir,
+        "../../../node_modules/app-builder-lib/templates/nsis/installSection.nsh",
+      ),
+      "utf8",
+    );
+
+    const installOnlyStart = installer.indexOf("!ifndef BUILD_UNINSTALLER");
+    const installOnlyEnd = installer.indexOf("!endif", installOnlyStart);
+    const customMacroStart = installer.indexOf("!macro customInstall");
+    const customMacroEnd = installer.indexOf("!macroend", customMacroStart);
+    const directLaunchTarget = installer.indexOf(
+      'StrCpy $launchLink "$INSTDIR\\${APP_EXECUTABLE_FILENAME}"',
+      customMacroStart,
+    );
+
+    expect(installOnlyStart).toBeGreaterThanOrEqual(0);
+    expect(customMacroStart).toBeGreaterThan(installOnlyStart);
+    expect(directLaunchTarget).toBeGreaterThan(customMacroStart);
+    expect(customMacroEnd).toBeGreaterThan(directLaunchTarget);
+    expect(installOnlyEnd).toBeGreaterThan(customMacroEnd);
+
+    const defaultShortcutTarget = installSection.indexOf(
+      'StrCpy $launchLink "$newStartMenuLink"',
+    );
+    const customInstallHook = installSection.indexOf("!insertmacro customInstall");
+    expect(defaultShortcutTarget).toBeGreaterThanOrEqual(0);
+    expect(customInstallHook).toBeGreaterThan(defaultShortcutTarget);
   });
 });

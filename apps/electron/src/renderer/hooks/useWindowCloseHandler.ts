@@ -8,7 +8,8 @@ import type { WindowCloseRequest } from '../../shared/types'
 /**
  * Hook to handle window close requests with source-aware behavior.
  *
- * - `window-button` closes the window directly.
+ * - On Windows, the main process handles `window-button` by minimizing to the taskbar.
+ * - Remaining `window-button` requests close the window directly.
  * - `keyboard-shortcut` (Cmd/Ctrl+W) uses layered dismissal:
  *   1. Close top modal
  *   2. Else close focused panel

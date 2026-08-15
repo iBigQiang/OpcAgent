@@ -47,6 +47,7 @@ describe('automation config edit context', () => {
     expect(editPopover).toContain('onSendMessage(sessionId, prompt, attachments, skillSlugs, badges)')
     expect(editPopover).toContain('skills={skills}')
     expect(editPopover).toContain('workspaceId={activeWorkspaceId || workspace?.id}')
+    expect(editPopover).toContain("target.closest('[data-inline-menu]')")
   })
 
   it('guides a first-time configuration to create a version 2 root and read the OPC docs', () => {

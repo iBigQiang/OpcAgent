@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 import { FadingText } from '@/components/ui/fading-text'
@@ -217,10 +218,10 @@ export function InlineMentionMenu({
   const filteredSections = filterSections(sections, filter, t('mention.results'))
   const flatItems = flattenItems(filteredSections)
 
-  // Reset selection when filter changes
+  // Reset selection when the menu opens or its filter changes.
   React.useEffect(() => {
     setSelectedIndex(0)
-  }, [filter])
+  }, [filter, open])
 
   // Keyboard navigation
   // Don't attach listener when no items - allows Enter to propagate to input handler
@@ -279,18 +280,18 @@ export function InlineMentionMenu({
     }
   }, [selectedIndex])
 
-  if (!open) return null
+  if (!open || typeof document === 'undefined') return null
 
   // Calculate bottom position from window height (menu appears above cursor)
   const bottomPosition = typeof window !== 'undefined'
     ? window.innerHeight - Math.round(position.y) + 8
     : 0
 
-  return (
+  const menu = (
     <div
       ref={menuRef}
       data-inline-menu
-      className={cn('fixed z-dropdown', MENU_CONTAINER_STYLE, className)}
+      className={cn('fixed z-floating-menu pointer-events-auto', MENU_CONTAINER_STYLE, className)}
       style={{
         left: Math.round(position.x) - 10,
         bottom: bottomPosition,
@@ -371,6 +372,9 @@ export function InlineMentionMenu({
       </div>
     </div>
   )
+
+  // Keep viewport-based caret coordinates stable inside transformed or draggable parents.
+  return createPortal(menu, document.body)
 }
 
 // ============================================================================
@@ -495,6 +499,34 @@ export function useInlineMention({
   // Store current input state for handleSelect
   const currentInputRef = React.useRef({ value: '', cursorPosition: 0 })
 
+  const updatePositionFromCaret = React.useCallback(() => {
+    const input = inputRef.current
+    if (!input) return
+
+    const caretRect = input.getCaretRect?.()
+    let nextPosition: { x: number; y: number }
+
+    if (caretRect && caretRect.x > 0) {
+      nextPosition = { x: caretRect.x, y: caretRect.y }
+    } else {
+      const rect = input.getBoundingClientRect()
+      const { value, cursorPosition } = currentInputRef.current
+      const textBeforeCursor = value.slice(0, cursorPosition)
+      const lineHeight = 20
+      const linesBeforeCursor = textBeforeCursor.split('\n').length - 1
+      nextPosition = {
+        x: rect.left,
+        y: rect.top + (linesBeforeCursor + 1) * lineHeight,
+      }
+    }
+
+    setPosition(previous => (
+      previous.x === nextPosition.x && previous.y === nextPosition.y
+        ? previous
+        : nextPosition
+    ))
+  }, [inputRef])
+
   // Cleanup pending timeout on unmount
   React.useEffect(() => {
     return () => {
@@ -503,6 +535,19 @@ export function useInlineMention({
       }
     }
   }, [])
+
+  // The editor can move while this menu is open. Re-read the viewport caret rect
+  // only for the lifetime of the menu so the portaled menu follows that movement.
+  React.useEffect(() => {
+    if (!isOpen || typeof window === 'undefined') return
+
+    let frameId = window.requestAnimationFrame(function syncPosition() {
+      updatePositionFromCaret()
+      frameId = window.requestAnimationFrame(syncPosition)
+    })
+
+    return () => window.cancelAnimationFrame(frameId)
+  }, [isOpen, updatePositionFromCaret])
 
   // Build sections from available data (skills, sources, and file search results)
   const sections = React.useMemo((): MentionSection[] => {
@@ -638,27 +683,7 @@ export function useInlineMention({
         setCommittedFilter(filterText)
       }
 
-      if (inputRef.current) {
-        // Try to get actual caret position from the input element
-        const caretRect = inputRef.current.getCaretRect?.()
-
-        if (caretRect && caretRect.x > 0) {
-          // Use actual caret position
-          setPosition({
-            x: caretRect.x,
-            y: caretRect.y,
-          })
-        } else {
-          // Fallback: position at input element's left edge
-          const rect = inputRef.current.getBoundingClientRect()
-          const lineHeight = 20
-          const linesBeforeCursor = textBeforeCursor.split('\n').length - 1
-          setPosition({
-            x: rect.left,
-            y: rect.top + (linesBeforeCursor + 1) * lineHeight,
-          })
-        }
-      }
+      updatePositionFromCaret()
 
       setIsOpen(true)
     } else {
@@ -674,7 +699,7 @@ export function useInlineMention({
       setFileResults([])
       fileCache.current = []
     }
-  }, [inputRef, basePath])
+  }, [basePath, updatePositionFromCaret])
 
   const handleSelect = React.useCallback((item: MentionItem): { value: string; cursorPosition: number } => {
     let result = ''

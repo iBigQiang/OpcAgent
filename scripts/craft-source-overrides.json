@@ -35,8 +35,8 @@
       "reason": "Craft CLI reduced to retained commands and the Pi-only OPC Agent runtime"
     },
     "apps/electron/electron-builder.yml": {
-      "sha256": "42678fa1f54ba404f30db1809f827e50eeec8ca61f90ee2818ad793a5211d8de",
-      "reason": "Craft file reviewed and adapted for the locked OPC Agent Lite product boundary"
+      "sha256": "62bd9b343efdb2b71ce1f7bf42b4f04d7cf21c7696036a967ddfd089782f0562",
+      "reason": "Craft file reviewed and adapted for OPC Agent packaging, including launching the Windows app after assisted installation."
     },
     "apps/electron/eslint-rules/no-direct-navigation-state.cjs": {
       "sha256": "2cd16d5590f14f4f282228712f2e1dafd7dbc09c6eb4557447f342d6f47425f4",
@@ -355,8 +355,8 @@
       "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
     },
     "apps/electron/src/main/window-manager.ts": {
-      "sha256": "a3b9fec87f31d3b0427177a1398fd035f80ee4a1e8bed1f77d3d3870d7d83135",
-      "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
+      "sha256": "4d70a66f4ce34c04d006cd9123f7e5167094a6877db752af4f8eae55aaf5c405",
+      "reason": "Craft Sources window management is preserved while only the Windows native title-bar close button minimizes OPC Agent to the taskbar."
     },
     "apps/electron/src/main/window-state.ts": {
       "sha256": "68a4883faf55ba4e22208b66dbe02cf0c31ac96a1e4fe1cb3e2661a690c48543",
@@ -611,20 +611,24 @@
       "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
     },
     "apps/electron/src/renderer/components/ui/__tests__/edit-popover.test.ts": {
-      "sha256": "905637b8931a211b196c23620039d8fa4c11ce1097e15796db49331bd895de57",
-      "reason": "Covers the OPC Agent automation edit context for first-file creation, version 2, and bundled documentation guidance."
+      "sha256": "fb9a38c8d4ab5bb949a57ba24567d79b0f25537c76adbf37293b4cb221b7c958",
+      "reason": "Covers the OPC Agent automation edit context, shared Skill input plumbing, and portaled inline-menu interaction safety."
+    },
+    "apps/electron/src/renderer/components/ui/__tests__/mention-menu.test.ts": {
+      "sha256": "9b632beda31f4c3bf6f3fad211bb0d0af9b0d8d678af2c2015e230dc3228f203",
+      "reason": "Covers viewport-relative Skill mention positioning inside the draggable OPC Agent automation editor."
     },
     "apps/electron/src/renderer/components/ui/EditPopover.tsx": {
-      "sha256": "e38cbf107df0e1fc4e2a2b32c61bd81a690bcc8cdc04d1c786a6cf58420e73ab",
-      "reason": "Restored edit flow keeps OPC Agent branding while forwarding workspace-qualified Skill mentions, attachments, and automation configuration context."
+      "sha256": "77f0bfcd35d420f27df1ac24487b1561572bf35f995f98ed1364fce59c6cecae",
+      "reason": "Restored edit flow keeps OPC Agent branding, forwards workspace-qualified Skill mentions, and preserves portaled inline-menu interactions."
     },
     "apps/electron/src/renderer/components/ui/mention-badge.tsx": {
       "sha256": "f3c73488248414d6f2bdd8de326890d1d26dfbb77e579c1b27da8c97c404056d",
       "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
     },
     "apps/electron/src/renderer/components/ui/mention-menu.tsx": {
-      "sha256": "eb3a1cb45431aae7ea534577026dae7c2c75291071d84d9cadd61be0aab4b295",
-      "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
+      "sha256": "1db7dcde7e068203945fa015d97100ea4d2273ee3628b0d28d0d98c0628d8744",
+      "reason": "Craft Sources mention handling is preserved while keeping the Skill menu anchored to the caret inside draggable OPC Agent editors."
     },
     "apps/electron/src/renderer/components/ui/rich-text-input.tsx": {
       "sha256": "dc4e082c10b84edbad45acdab3a781fc4d4593d9d34546270b36df77509cccda",
@@ -709,6 +713,10 @@
     "apps/electron/src/renderer/hooks/useSessionSearch.ts": {
       "sha256": "1bb553cfa508134835c744a271cf088fa8621cd73e4780d21c3dabc4111099e5",
       "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
+    },
+    "apps/electron/src/renderer/hooks/useWindowCloseHandler.ts": {
+      "sha256": "6a69967baf15702df5d940091af55cc6d86a22e3731f1946b3b4a15b1e65cd09",
+      "reason": "Documents the OPC Agent Windows taskbar-minimize policy while retaining layered keyboard close handling."
     },
     "apps/electron/src/renderer/index.css": {
       "sha256": "1c638e689c5fc94983958e7b1920146a3ee0e900e10c5185b7db6bd0d83f39cc",
@@ -2160,6 +2168,10 @@
       "sha256": "4e83005b488059849ac4aa916e6d35ed4dd1527061c81001b7e7a67a2a11a1f4",
       "reason": "Regression test for retained OPC Agent behavior not covered at the same Craft path"
     },
+    "apps/electron/src/main/__tests__/window-close-policy.test.ts": {
+      "sha256": "3e349dcbff32caf86eeaa8c83b7293297a3de8296bf7d27dc199eee5f6e9934c",
+      "reason": "Regression test distinguishing the Windows native title-bar close button from other close requests."
+    },
     "apps/electron/src/main/__tests__/stdio-error-guard.test.ts": {
       "sha256": "2be873cf963face338675dec2e2eb7a4c992dd306cafad917f9df824ce15d13c",
       "reason": "Regression coverage for Windows development stdout and stderr EPIPE handling"
@@ -2197,7 +2209,7 @@
       "reason": "Regression test for retained OPC Agent behavior not covered at the same Craft path"
     },
     "CHANGELOG.md": {
-      "sha256": "8ea8cdc7f1ba1cded6bcd752435511f7bafe7a8680f74ba170034b3bad0b3538",
+      "sha256": "50d6d217837634b042684618f605ed111f785736af10871e3531bdb495a6fbec",
       "reason": "OPC-Agent-specific release metadata required by the public artifact workflow"
     },
     "packages/pi-agent-server/src/opcagent-metadata-schema.test.ts": {
@@ -4033,8 +4045,8 @@
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "apps/electron/scripts/installer-config.test.ts": {
-      "sha256": "4b8b60dde52a5e4fbd9f393c2d7471af70e0d2a266ffbe5578108e66e2dc932e",
-      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+      "sha256": "9c99918048bc6ba1a0f9b79c6d1f433e2178fd5d181b61e58e66b109c2f112f6",
+      "reason": "Verifies OPC Agent assisted installer behavior, including direct launch from the new installation directory."
     },
     "packages/shared/src/version/manifest.test.ts": {
       "sha256": "73baff486a1d6f5310d89fe55f9dcd7f16083932fd4f6c225dab91985d74669b",
@@ -4069,8 +4081,8 @@
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "apps/electron/resources/installer.nsh": {
-      "sha256": "8f9651d9d5bc6c394904d09a1b65956d154670d6b4ac5fae4f4f6a262bf856fc",
-      "reason": "OPC Agent Windows uninstall policy defaults to retaining user data, requires explicit deletion, and skips upgrade-internal uninstall."
+      "sha256": "69e73392af7fc9ca040eb8fa057adf1b88c0a051367ba863c33b093c415e177b",
+      "reason": "OPC Agent Windows installer launches the new executable directly, while uninstall defaults to retaining user data and skips upgrade-internal removal."
     },
     "apps/electron/scripts/release-notes-assets.test.ts": {
       "sha256": "d6379b8ead039937b5867c6dd68b3dda38417294b9ef32f782a1f51e675387c5",
@@ -4821,7 +4833,7 @@
       "reason": "OPC-Agent-specific release metadata required by the release workflow"
     },
     "apps/electron/resources/release-notes/0.1.8.md": {
-      "sha256": "e4d991da17a3f18fe2e669e77f6b7f319c398ff23dfcf822c4e9f73a7a82ff08",
+      "sha256": "7fa6a141875c1545362fa82804829406e4fc4d73f2bf903006ca919620deb829",
       "reason": "OPC-Agent-specific release metadata required by the release workflow"
     }
   },

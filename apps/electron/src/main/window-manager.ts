@@ -1,4 +1,5 @@
 import { BrowserWindow, shell, nativeTheme, Menu, app } from 'electron'
+import { isUpdating } from './auto-update'
 import { windowLog } from './logger'
 import { join, resolve, sep } from 'path'
 import { existsSync } from 'fs'
@@ -11,6 +12,8 @@ import type { SavedWindow } from './window-state'
 
 // Vite dev server URL for hot reload
 const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL
+const WM_NCLBUTTONUP = 0x00A2
+const HT_CLOSE = 20
 
 /**
  * Get the appropriate background material for Windows transparency effects
@@ -51,6 +54,18 @@ export interface CreateWindowOptions {
   initialDeepLink?: string
   /** Full URL to restore from saved state (preserves route/query params) */
   restoreUrl?: string
+}
+
+export function isNativeTitlebarCloseHit(platform: NodeJS.Platform, wParam: Buffer): boolean {
+  return platform === 'win32' && wParam.length >= 4 && wParam.readUInt32LE(0) === HT_CLOSE
+}
+
+export function shouldMinimizeWindowClose(
+  platform: NodeJS.Platform,
+  source: WindowCloseRequestSource,
+  nativeTitlebarClose: boolean
+): boolean {
+  return platform === 'win32' && source === 'window-button' && nativeTitlebarClose
 }
 
 export class WindowManager {
@@ -262,6 +277,16 @@ export class WindowManager {
       }
     })
 
+    // Electron's close event does not expose whether Windows initiated it from
+    // the title-bar X, Alt+F4, or the taskbar menu. Track the native close-button
+    // hit so only the actual X minimizes the window.
+    let pendingNativeTitlebarClose = false
+    if (isWindows) {
+      window.hookWindowMessage(WM_NCLBUTTONUP, (wParam) => {
+        pendingNativeTitlebarClose = isNativeTitlebarCloseHit(process.platform, wParam)
+      })
+    }
+
     // Show window when first paint is ready (faster perceived startup)
     window.once('ready-to-show', () => {
       window.show()
@@ -450,7 +475,7 @@ export class WindowManager {
     window.on('close', (event) => {
       // During app quit, bypass layered close behavior and allow native close flow.
       // This preserves expected Cmd+Q semantics (quit app instead of closing overlays/panels first).
-      if (this.isAppQuitting) {
+      if (this.isAppQuitting || isUpdating()) {
         return
       }
 
@@ -458,6 +483,8 @@ export class WindowManager {
       if (!window.webContents.isDestroyed() && window.webContents.mainFrame) {
         event.preventDefault()
         const wcId = window.webContents.id
+        const nativeTitlebarClose = pendingNativeTitlebarClose
+        pendingNativeTitlebarClose = false
         let source: WindowCloseRequestSource = 'window-button'
         if (this.keyboardCloseIntents.has(wcId)) {
           source = 'keyboard-shortcut'
@@ -467,6 +494,11 @@ export class WindowManager {
             clearTimeout(keyboardIntentTimeout)
             this.keyboardCloseIntentTimeouts.delete(wcId)
           }
+        }
+
+        if (shouldMinimizeWindowClose(process.platform, source, nativeTitlebarClose)) {
+          window.minimize()
+          return
         }
 
         // Send close request to renderer - it will either close a modal/panel or confirm close.

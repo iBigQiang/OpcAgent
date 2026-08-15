@@ -2,6 +2,17 @@
 !include "MUI2.nsh"
 !include "nsDialogs.nsh"
 
+!ifndef BUILD_UNINSTALLER
+
+!macro customInstall
+  ; The assisted finish page must launch the newly installed executable
+  ; directly. The default launchLink prefers a Start Menu shortcut, which can
+  ; still be unavailable during an in-place upgrade.
+  StrCpy $launchLink "$INSTDIR\${APP_EXECUTABLE_FILENAME}"
+!macroend
+
+!endif
+
 !ifdef BUILD_UNINSTALLER
 
 Var /GLOBAL OpcAgentDeleteData

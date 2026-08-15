@@ -6,6 +6,8 @@
  */
 
 import { describe, it, expect, mock, beforeAll } from 'bun:test';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 // mention-menu.tsx transitively imports pdfjs-dist via renderer component chain.
 // Vite's ?url suffix isn't supported by bun — mock before dynamic import.
@@ -20,6 +22,17 @@ beforeAll(async () => {
 });
 
 describe('isValidMentionTrigger', () => {
+  it('portals the fixed menu so caret coordinates stay viewport-relative in draggable editors', () => {
+    const source = readFileSync(resolve(import.meta.dir, '../mention-menu.tsx'), 'utf8');
+
+    expect(source).toContain("import { createPortal } from 'react-dom'");
+    expect(source).toContain('return createPortal(menu, document.body)');
+    expect(source).toContain("className={cn('fixed z-floating-menu pointer-events-auto'");
+    expect(source).toContain('}, [filter, open])');
+    expect(source).toContain('window.requestAnimationFrame(function syncPosition()');
+    expect(source).toContain('updatePositionFromCaret()');
+  });
+
   describe('valid triggers (should open menu)', () => {
     it('returns true when @ is at the start of input', () => {
       expect(isValidMentionTrigger('@', 0)).toBe(true);
