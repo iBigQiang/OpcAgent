@@ -622,6 +622,7 @@
   "navigation.sub": "Sub navigation",
   "notifications.newMessage": "New message",
   "notifications.newMessageBody": "The agent has a new message for you",
+  "notifications.taskCompleted": "Task completed",
   "onboarding.apiSetup.apiKey": "API Key",
   "onboarding.apiSetup.apiKeyDesc": "Use provider presets (Anthropic, OpenAI, Google, etc.) via the Pi backend.",
   "onboarding.apiSetup.description": "Select how you'd like to power your AI agents. You can add more connections later.",

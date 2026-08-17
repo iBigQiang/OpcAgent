@@ -131,7 +131,7 @@ interface UseNotificationsResult {
   /** Whether the window is currently focused */
   isWindowFocused: boolean
   /** Show a notification for a session */
-  showSessionNotification: (session: Session, messagePreview?: string) => void
+  showSessionNotification: (session: Session, messagePreview?: string, titleOverride?: string) => void
 }
 
 export function useNotifications({
@@ -217,7 +217,7 @@ export function useNotifications({
   }, [hasGuiChannels])
 
   // Show notification for a session
-  const showSessionNotification = useCallback((session: Session, messagePreview?: string) => {
+  const showSessionNotification = useCallback((session: Session, messagePreview?: string, titleOverride?: string) => {
     // Don't show notification if disabled in settings
     if (!enabled) return
     // Don't show notification if window is focused
@@ -227,8 +227,8 @@ export function useNotifications({
     // Don't show if server doesn't have GUI notification handlers
     if (!hasGuiChannels) return
 
-    // Get session title for notification
-    const title = session.name || t('notifications.newMessage')
+    // 通知标题：优先使用调用方指定的覆盖标题（如“任务执行完毕”），否则回退到会话名称
+    const title = titleOverride || session.name || t('notifications.newMessage')
 
     // Get message preview (truncate if needed)
     let body = messagePreview || t('notifications.newMessageBody')

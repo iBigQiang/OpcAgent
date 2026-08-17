@@ -1016,7 +1016,7 @@ export default function App() {
             // Strip markdown so OS notifications display clean plain text
             const rawPreview = lastMessage?.content?.substring(0, 200) || undefined
             const preview = rawPreview ? stripMarkdown(rawPreview).substring(0, 100) || undefined : undefined
-            showSessionNotification(updatedSession, preview)
+            showSessionNotification(updatedSession, preview, t('notifications.taskCompleted'))
 
             // In-app complement to the OS notification: when a *background*
             // session (one not shown in any open panel) finishes, queue a chip
@@ -1078,6 +1078,7 @@ export default function App() {
     syncSessionOptionsFromSession,
     applyPermissionModeState,
     reconcilePermissionModeState,
+    t,
   ])
 
   // Transport reconnect recovery — refresh session metadata plus active/processing

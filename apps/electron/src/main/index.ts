@@ -46,6 +46,11 @@ setupI18n()
 const persistedUiLanguage = getPersistedUiLanguage()
 if (persistedUiLanguage) void i18n.changeLanguage(persistedUiLanguage)
 app.setName(process.env.OPCAGENT_APP_NAME || 'OPC Agent')
+// Windows 通知需显式注册 AppUserModelID（与 electron-builder 的 appId 一致），
+// 否则通知左上角会显示 Electron 默认身份（如 electron.app.OPC Agent）
+if (process.platform === 'win32') {
+  app.setAppUserModelId('app.opcagent.desktop')
+}
 if (process.env.OPCAGENT_USER_DATA_DIR) {
   app.setPath('userData', process.env.OPCAGENT_USER_DATA_DIR)
 }

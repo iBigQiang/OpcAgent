@@ -622,6 +622,7 @@
   "navigation.sub": "子导航",
   "notifications.newMessage": "新消息",
   "notifications.newMessageBody": "智能体有一条新消息待查看",
+  "notifications.taskCompleted": "任务执行完毕",
   "onboarding.apiSetup.apiKey": "API 密钥",
   "onboarding.apiSetup.apiKeyDesc": "通过 Pi 后端使用提供商预设 (Anthropic、OpenAI、Google 等)。",
   "onboarding.apiSetup.description": "选择 AI 智能体的驱动方式。稍后可以添加更多连接。",
