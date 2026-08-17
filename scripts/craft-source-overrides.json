@@ -2169,7 +2169,7 @@
       "reason": "Regression test for retained OPC Agent behavior not covered at the same Craft path"
     },
     "apps/electron/src/main/__tests__/window-close-policy.test.ts": {
-      "sha256": "3e349dcbff32caf86eeaa8c83b7293297a3de8296bf7d27dc199eee5f6e9934c",
+      "sha256": "adadad06ef08171e55874db06e0b00d1799eb0b401bb6a10b546f2a190b11887",
       "reason": "Regression test distinguishing the Windows native title-bar close button from other close requests."
     },
     "apps/electron/src/main/__tests__/stdio-error-guard.test.ts": {
@@ -4853,7 +4853,7 @@
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "apps/electron/src/main/app-icon.ts": {
-      "sha256": "b6ad8a7eece84577d0b249b118c97864359057337c22574d091394396c3af614",
+      "sha256": "28326f01f39a8441c97a22c00ebe48a2a038d15517d47f76572ff1691c7dc4c2",
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "docs/assets/OPC-Agent-icons/ChatGPT Image 2026年8月18日 01_19_43.png": {
