@@ -159,23 +159,23 @@
       "reason": "Craft documentation adapted to the retained OPC Agent feature set and product identifiers"
     },
     "apps/electron/resources/icon.icns": {
-      "sha256": "8c898867eccc0f728b342b9c3a46bc42549a2e637a6875c1250f4b6dad746598",
+      "sha256": "cea9808968997bbd1e98cfe69a131396b9206132f45187e9492893e1f465c965",
       "reason": "Craft packaged resource adapted to OPC Agent branding or the retained Lite asset set"
     },
     "apps/electron/resources/icon.ico": {
-      "sha256": "53d574484742a05e619425c8ef02e4d9765496c43971e9913fd2b687ad1155cd",
+      "sha256": "fb38260327cc3ddceae4fd38768f4b83dde5055f3ba9cb1b4e5fd809f9521682",
       "reason": "Craft packaged resource adapted to OPC Agent branding or the retained Lite asset set"
     },
     "apps/electron/resources/icon.icon/Assets/icon.svg": {
-      "sha256": "f9b92899e747f6a2e0624b4495616cf94ec1cc303f1baab4ff92f31e68ccffc8",
+      "sha256": "c17389568fe61ca05b4ac3e5b84bfd302d7630bfa09757f6bcd238b76b84445c",
       "reason": "Craft packaged resource adapted to OPC Agent branding or the retained Lite asset set"
     },
     "apps/electron/resources/icon.png": {
-      "sha256": "a6fa7f89c455da3494fa53715a78f109c592dd9140241768c7f002f0b039bb7c",
+      "sha256": "830ffd1fca61dba8c4a305061eb0cf1f2cc21337c65d5868d08a24636c6bf24f",
       "reason": "Craft packaged resource adapted to OPC Agent branding or the retained Lite asset set"
     },
     "apps/electron/resources/icon.svg": {
-      "sha256": "f9b92899e747f6a2e0624b4495616cf94ec1cc303f1baab4ff92f31e68ccffc8",
+      "sha256": "c17389568fe61ca05b4ac3e5b84bfd302d7630bfa09757f6bcd238b76b84445c",
       "reason": "Craft packaged resource adapted to OPC Agent branding or the retained Lite asset set"
     },
     "apps/electron/resources/permissions/default.json": {
@@ -207,7 +207,7 @@
       "reason": "Craft packaged resource adapted to OPC Agent branding or the retained Lite asset set"
     },
     "apps/electron/resources/source.png": {
-      "sha256": "c7d8043bb1c5e8ac66ae04ec7d8dc10b6c8b32231f3d5bc9467c98fda3e7f496",
+      "sha256": "3c24e5f196a001c4cb74e1ef5ab7ed0d6b062c65d4d1c51a5565c548559a34ef",
       "reason": "Craft packaged resource adapted to OPC Agent branding or the retained Lite asset set"
     },
     "apps/electron/resources/themes/default.json": {
@@ -239,7 +239,7 @@
       "reason": "Craft file reviewed and adapted for the locked OPC Agent Lite product boundary"
     },
     "apps/electron/scripts/copy-assets.ts": {
-      "sha256": "133f2c6d5f31625f0fda55cb1479869da63d79fe891f29459b841dc3be9a0883",
+      "sha256": "3dd1d1343043e80fda46a0f54c42147ba339b4c91da18477ea5d64e3cd56cee0",
       "reason": "Craft file reviewed and adapted for the locked OPC Agent Lite product boundary"
     },
     "apps/electron/src/__tests__/transport.test.ts": {
@@ -343,7 +343,7 @@
       "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
     },
     "apps/electron/src/main/index.ts": {
-      "sha256": "ecb84ffc73f05ccaa660fd91aef8c21c8a700872d15f76d598fdd110c336b055",
+      "sha256": "2f33b3be902a62ab3885fbe171b58789850ef520515942f41eb730222e517772",
       "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
     },
     "apps/electron/src/main/logger.ts": {
@@ -355,7 +355,7 @@
       "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
     },
     "apps/electron/src/main/window-manager.ts": {
-      "sha256": "4d70a66f4ce34c04d006cd9123f7e5167094a6877db752af4f8eae55aaf5c405",
+      "sha256": "eb07e20afad6f76edbce71c15bbe3133b1da536abd7a73e4e9db3b48a119c302",
       "reason": "Craft Sources window management is preserved while only the Windows native title-bar close button minimizes OPC Agent to the taskbar."
     },
     "apps/electron/src/main/window-state.ts": {
@@ -371,7 +371,7 @@
       "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
     },
     "apps/electron/src/renderer/App.tsx": {
-      "sha256": "3268b9093817d43f88dac8f98a7e9e44c4dcc27d7d5de28e01423f5aad918a12",
+      "sha256": "ee48ee4a01792efb8b88172b89b10ec94b356fa2dd3f54d011a4b509d34db7b9",
       "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
     },
     "apps/electron/src/renderer/atoms/__tests__/browser-pane.test.ts": {
@@ -699,7 +699,7 @@
       "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
     },
     "apps/electron/src/renderer/hooks/useNotifications.ts": {
-      "sha256": "763ae528f5fe36ce441c7081282e13f5c5951f04c17ee4f96bd9dc8f3d55c820",
+      "sha256": "ad07e66e3b76cb43218d0d11def3653fd7080c41897847e63031a7b7454fc26b",
       "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
     },
     "apps/electron/src/renderer/hooks/useOnboarding.ts": {
@@ -859,23 +859,23 @@
       "reason": "Craft Sources WebUI protocol support restored through the existing OPC Agent web adapter."
     },
     "apps/webui/src/public/apple-touch-icon.png": {
-      "sha256": "5482a924f44e047e35d43b192167a0521baf3068cf78482c8307f33112f9913e",
+      "sha256": "3913f3f9fc93e3052da07318ba7b4c5182c6758db350ece86ef97d8881310830",
       "reason": "Craft Sources WebUI protocol support restored through the existing OPC Agent web adapter."
     },
     "apps/webui/src/public/favicon.ico": {
-      "sha256": "acf6f7ce2679df06133e94c965dad1e50f4e5318487b475ce79c3ec9b4977851",
+      "sha256": "4a0259f643527fb3c03697fef482ae1a376066fb1aa4689df357dc3451b2e5be",
       "reason": "Craft Sources WebUI protocol support restored through the existing OPC Agent web adapter."
     },
     "apps/webui/src/public/favicon.svg": {
-      "sha256": "f9b92899e747f6a2e0624b4495616cf94ec1cc303f1baab4ff92f31e68ccffc8",
+      "sha256": "c17389568fe61ca05b4ac3e5b84bfd302d7630bfa09757f6bcd238b76b84445c",
       "reason": "Craft Sources WebUI protocol support restored through the existing OPC Agent web adapter."
     },
     "apps/webui/src/public/icon-192.png": {
-      "sha256": "8ed238fa2e773390eb4a87241d7bc36988c8fb98c4c0f0dcb8b51e9aa32e072e",
+      "sha256": "0b2e23441a384482411553a30a0724995ae0e7d49e97da454ee5068817da33eb",
       "reason": "Craft Sources WebUI protocol support restored through the existing OPC Agent web adapter."
     },
     "apps/webui/src/public/icon-512.png": {
-      "sha256": "1ac2d9282ff2a91eb3cb07fee8ea71e9f56bda14411ec1564acfc231d8373e52",
+      "sha256": "830ffd1fca61dba8c4a305061eb0cf1f2cc21337c65d5868d08a24636c6bf24f",
       "reason": "Craft Sources WebUI protocol support restored through the existing OPC Agent web adapter."
     },
     "apps/webui/src/public/manifest.json": {
@@ -1663,7 +1663,7 @@
       "reason": "Craft source auth types restored with OPC Agent package names and retained LLM auth boundary."
     },
     "packages/shared/src/branding.ts": {
-      "sha256": "43682a5418ee74b3ee479e9a3051729c7e5c4bfd8cb69fcab79740c64e160481",
+      "sha256": "64b998032954952b3b5fa0890b64d0c6270b0bee75139bbc80dff5f2e9608fec",
       "reason": "Craft callback branding is replaced with the embedded OPC Agent mark"
     },
     "packages/shared/src/config/__tests__/default-thinking-level.test.ts": {
@@ -1775,11 +1775,11 @@
       "reason": "Craft Sources locale strings restored and synchronized with OPC Agent product wording."
     },
     "packages/shared/src/i18n/locales/en.json": {
-      "sha256": "9963a9b92664b40cc356c1dda51a21f106e02d5109a5a6ad1ec4a6a6b0671fd0",
+      "sha256": "7dfc64279f60a0ddb4a4a76c189d50cecd39b02970f84cc88530dd01aa6b3f7b",
       "reason": "Craft Sources locale strings restored and synchronized with OPC Agent product wording."
     },
     "packages/shared/src/i18n/locales/zh-Hans.json": {
-      "sha256": "e7a2bd3ba1c1bd90891e1609f271520f6a541797105bce9552af99d1c30f5ab9",
+      "sha256": "098a23097e4a8caa47b81b736357d93988030b0432c44013fad79b7c5a4eb36a",
       "reason": "Craft Sources locale strings restored and synchronized with OPC Agent product wording."
     },
     "packages/shared/src/i18n/registry.ts": {
@@ -2149,7 +2149,7 @@
       "reason": "OPC-Agent-specific file required by branding, packaging, or the locked Lite boundary"
     },
     "apps/electron/resources/mark-source.png": {
-      "sha256": "7ab54137b8b7ab251a521ea1903a02dcb7f27598beabff8dca1d4a3fcd75906b",
+      "sha256": "3c24e5f196a001c4cb74e1ef5ab7ed0d6b062c65d4d1c51a5565c548559a34ef",
       "reason": "OPC Agent brand source asset used to generate platform icons"
     },
     "apps/electron/resources/release-notes/0.1.0.md": {
@@ -2157,11 +2157,11 @@
       "reason": "OPC-Agent-specific file required by branding, packaging, or the locked Lite boundary"
     },
     "apps/electron/resources/tool-icons/opcagent.svg": {
-      "sha256": "f9b92899e747f6a2e0624b4495616cf94ec1cc303f1baab4ff92f31e68ccffc8",
+      "sha256": "c17389568fe61ca05b4ac3e5b84bfd302d7630bfa09757f6bcd238b76b84445c",
       "reason": "OPC-Agent-specific file required by branding, packaging, or the locked Lite boundary"
     },
     "apps/electron/scripts/validate-assets.ts": {
-      "sha256": "cc9465dda3491024148dd96a3d0ed990bf8c0106943383af87b9ac1ef438771b",
+      "sha256": "5e26e862b2b6a9045e34b89a7a262ffb5c7b1262c1874efd822ef951c7621d8b",
       "reason": "OPC-Agent-specific file required by branding, packaging, or the locked Lite boundary"
     },
     "apps/electron/src/main/__tests__/deep-link.test.ts": {
@@ -2181,19 +2181,19 @@
       "reason": "Windows development guard prevents broken stdout and stderr pipes from crashing Electron"
     },
     "apps/electron/src/renderer/assets/opcagent_app_icon.png": {
-      "sha256": "8ef2d656c2eb9bbef8d0d8abb646e1ded0e4143046434866d541aaf9e3da6dc5",
+      "sha256": "dfabbaaee5590c1ee9a016a18f4f3d02c532d0333041d6da1b83ac870007238b",
       "reason": "OPC Agent trademark-safe replacement asset"
     },
     "apps/electron/src/renderer/assets/opcagent_app_icon.svg": {
-      "sha256": "672b0caa3a32ef3a5ebfd941e777c9a598eac40dec66a72817a03973e564ffd3",
+      "sha256": "cbbaaf6cb7cc9066958ec34903e518d911a8640eb1551361ab62f5b5c36844b0",
       "reason": "OPC Agent trademark-safe replacement asset"
     },
     "apps/electron/src/renderer/assets/opcagent_mark.png": {
-      "sha256": "7ab54137b8b7ab251a521ea1903a02dcb7f27598beabff8dca1d4a3fcd75906b",
+      "sha256": "c9119419ca989d00e184350f09d45ff624f7d6a8c5ea14339bf69675bacaf67d",
       "reason": "OPC Agent trademark-safe replacement asset"
     },
     "apps/electron/src/renderer/assets/opcagent_mark.svg": {
-      "sha256": "e397e9bbdc12b626a9a1a332dd99f939422de45ab23b8ebe8f433453949a2d4a",
+      "sha256": "4ab2a160fb73b02054036f38da55ee6064e219aa4d375b5c4aaa6220c1058ad4",
       "reason": "OPC Agent trademark-safe replacement asset"
     },
     "apps/electron/src/renderer/components/icons/OPCAgentAppIcon.tsx": {
@@ -2473,7 +2473,7 @@
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "apps/electron/src/main/notifications.ts": {
-      "sha256": "29ef23db80cc233f03459211a9d078baa55c3dd965cfc4256734663341cd550b",
+      "sha256": "c2d7b57aec671f6efda09f3b75594733abac87ec8f1b8f9ec146b51df99f57fb",
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "apps/electron/src/main/power-manager.ts": {
@@ -4843,6 +4843,306 @@
     "apps/electron/resources/release-notes/0.1.10.md": {
       "sha256": "ce5aecd4d0be247655f34e0bb54ff581c4c93bf7f495b71e37a7441d758262f9",
       "reason": "OPC-Agent-specific release metadata required by the release workflow"
+    },
+    "apps/electron/resources/OPC_Agent_icon.png": {
+      "sha256": "9ff4522d8644b7d610739330939578a6318a7d3082d60c6f49d6419eee224316",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "apps/electron/resources/OPC_Agent_icon.svg": {
+      "sha256": "4b043d102c52965fac0031273f7547084624a3fd340442478f0ad03b32b5ca71",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "apps/electron/src/main/app-icon.ts": {
+      "sha256": "b6ad8a7eece84577d0b249b118c97864359057337c22574d091394396c3af614",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/ChatGPT Image 2026年8月18日 01_19_43.png": {
+      "sha256": "20f2301b5d026c58cf66becc5f100a09c2cffbc130a6cda94256ca10026f3ea6",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/ChatGPT Image 2026年8月18日 01_20_32.png": {
+      "sha256": "0868c68cb230741dbf9ef23783ed7e2df7c0af7c721f3c41f5576bc9954fad19",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/ChatGPT Image 2026年8月18日 01_30_46.png": {
+      "sha256": "33d96a05b285bb4988c6343606dec24809c77ea11fcad3fb377ba1d3ec4799de",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/README.md": {
+      "sha256": "db728e3807ff38f2cb5d0d8412130104d32f035e8517724f6f27acc69ff14a9c",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/android/mipmap-anydpi-v26/ic_launcher.xml": {
+      "sha256": "4695650219221a8a70d9aa16e683ddfc6587c52ebb465aa43508c94bc9fd6d34",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/android/mipmap-anydpi-v26/ic_launcher_round.xml": {
+      "sha256": "4695650219221a8a70d9aa16e683ddfc6587c52ebb465aa43508c94bc9fd6d34",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/android/mipmap-hdpi/ic_launcher.png": {
+      "sha256": "58db5cd62102a8d21a397a291a181b36bda1a81e61da2e726f165a581658c70c",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/android/mipmap-hdpi/ic_launcher_background.png": {
+      "sha256": "3c43d4eb84f1b6f45294ee8da8b33122356ee7237e4f8522721b9bb05828112a",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/android/mipmap-hdpi/ic_launcher_foreground.png": {
+      "sha256": "740f1b3efb720aa4699ae8628e371b0d4cbe5309f7678a771a8048242b5a1ed2",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/android/mipmap-hdpi/ic_launcher_monochrome.png": {
+      "sha256": "2996d2b19828a2b316e929caa95c2303d4352fd56d9a3b91f9702a2fba85de5a",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/android/mipmap-hdpi/ic_launcher_round.png": {
+      "sha256": "ad3a69f74393233734ec1b889d04542c5daeae3c17b406d458676ea54c244396",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/android/mipmap-mdpi/ic_launcher.png": {
+      "sha256": "73eefb40d88885d86bf14935a470449ac289842be817c88869e0a1e979ff0fa2",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/android/mipmap-mdpi/ic_launcher_background.png": {
+      "sha256": "d939315e08d83488a82dcfb2da0b948d5448b222bd60e5f1a75272f3c3e67b8e",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/android/mipmap-mdpi/ic_launcher_foreground.png": {
+      "sha256": "cd8c10c3aa3df084310e7d0a40e5a7dca07a157e8ede306123174c01cd388d01",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/android/mipmap-mdpi/ic_launcher_monochrome.png": {
+      "sha256": "3645ceacad61c1d9f57424600219ba7f2f302e844b6c79331d549f9e4f7eb708",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/android/mipmap-mdpi/ic_launcher_round.png": {
+      "sha256": "544997149feb3a6a3f0cdb7178552e34c6b738db47f90c3efe3f9124ef034670",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/android/mipmap-xhdpi/ic_launcher.png": {
+      "sha256": "6a497d6f4ca990ada747762665c278a00ef4d8e8c3b818c0b98670e84291b620",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/android/mipmap-xhdpi/ic_launcher_background.png": {
+      "sha256": "536fdd88915358e497ba0e8ac62634e4d54cf9824844a4a2cf8dc53fa6e5d494",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/android/mipmap-xhdpi/ic_launcher_foreground.png": {
+      "sha256": "26bf8e681b7db6138d947f64ffb0ba22d971dc47ffa4c0bf6205a5a0ccda3076",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/android/mipmap-xhdpi/ic_launcher_monochrome.png": {
+      "sha256": "5dc81919d7d0a7b17f3ecfe8550082a5e62bc67f7ef59c85bbc407ef8952beaa",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/android/mipmap-xhdpi/ic_launcher_round.png": {
+      "sha256": "2fe25182584ce3ae184961def498d05852cc7051e5113b3f7802723c7bac49a4",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/android/mipmap-xxhdpi/ic_launcher.png": {
+      "sha256": "ea5094b22cf304ee8c62148c2f1102234770d25fcc47aabe269bf81f30e09460",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/android/mipmap-xxhdpi/ic_launcher_background.png": {
+      "sha256": "4a78b51be7e60710df1d553217651aa211f746301e25f2dcb1b12210058b59f9",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/android/mipmap-xxhdpi/ic_launcher_foreground.png": {
+      "sha256": "c05fa9551788ff981f10ba946c88279c03868b1fc5e377ba92f78343b6f00e50",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/android/mipmap-xxhdpi/ic_launcher_monochrome.png": {
+      "sha256": "a0090ad2b54104f5c5d368b70408831a66f242b987f4e0b1111bfd128728b84c",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/android/mipmap-xxhdpi/ic_launcher_round.png": {
+      "sha256": "09438e20c5211af2049c95cfd44382d99b92d9a2de056b3dfac783261c868c4a",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/android/mipmap-xxxhdpi/ic_launcher.png": {
+      "sha256": "ce54d5efb15b5e9d755b03b59e62016c2b3bff29420b851f6540e99dd1a1a555",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/android/mipmap-xxxhdpi/ic_launcher_background.png": {
+      "sha256": "7978c236c4732eed42f918c13083dade106030ed709ca770a250d68d206d815a",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/android/mipmap-xxxhdpi/ic_launcher_foreground.png": {
+      "sha256": "b2abba34bf59d057ae8311d7b78e4158e4d83b25f66dec6da83e6311d46f3ecc",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/android/mipmap-xxxhdpi/ic_launcher_monochrome.png": {
+      "sha256": "dd32e49cd57fedd5db152fa2c724642e797d84f35393698024885e93d94bee3e",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/android/mipmap-xxxhdpi/ic_launcher_round.png": {
+      "sha256": "fe8444d2868009e169ca63c9bdbc26913949c852a26751b55f3865da3f16603d",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/android/playstore-icon-512.png": {
+      "sha256": "ee865910a18985747a66a2767cb25dcb49798af49660a958c9f3154a3bac3a4d",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/custom/icon-1024x1024.png": {
+      "sha256": "2e475e155833eee374bf77e23f53cce21ad65afda60840e67cc1b7f302aa84be",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/extra/OPC_Agent_icon.svg": {
+      "sha256": "4b043d102c52965fac0031273f7547084624a3fd340442478f0ad03b32b5ca71",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/extra/icon-192.webp": {
+      "sha256": "c5a868345d2d1b9784d437eccdd94dc292d44e55145cc09b831ce340e3b1fcf3",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/extra/icon-512.webp": {
+      "sha256": "fe19075f47e69d67fbe15c13fe601ca90fd9289b692bd72c5e3b8dea957fde31",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/ios/AppIcon.appiconset/Contents.json": {
+      "sha256": "f8eea0abeac4dac4cdf0d2fbfc6953aec63d3529949ca14f99af81275b825a35",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/ios/AppIcon.appiconset/Icon-1024.png": {
+      "sha256": "4f089d39709f6b7a966001c24adfdaf49fcefdb6ae33236426a0d260f18633b2",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/ios/AppIcon.appiconset/Icon-20.png": {
+      "sha256": "7ddfdd4e5ab5b24c121fed85caef20b01081e09822413f064cb29c2c9c5c6c08",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/ios/AppIcon.appiconset/Icon-20@2x.png": {
+      "sha256": "1503ffab5594611aa591cb6c1ca74d4d8fb679020d1b4d390ae575733fed1229",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/ios/AppIcon.appiconset/Icon-20@3x.png": {
+      "sha256": "1e3ceec84c4c0d85ecefe8d126fb00bb88c2283255b5da1264370d882e37e1fd",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/ios/AppIcon.appiconset/Icon-29.png": {
+      "sha256": "4dee9bceda91df22df30a95709033ea5557b92cc06f632dfbf89663b26a60539",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/ios/AppIcon.appiconset/Icon-29@2x.png": {
+      "sha256": "2b70ce118f3d636d176588b4c419bbc75934f9efad9a223069b46aba30a69bf7",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/ios/AppIcon.appiconset/Icon-29@3x.png": {
+      "sha256": "bcc6da84fb921435f5580e2baeab2d5cc9f1f959e7290a6f39e331ee753e2755",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/ios/AppIcon.appiconset/Icon-40.png": {
+      "sha256": "1503ffab5594611aa591cb6c1ca74d4d8fb679020d1b4d390ae575733fed1229",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/ios/AppIcon.appiconset/Icon-40@2x.png": {
+      "sha256": "7cfa48253c5212689d043d735ebb6e06e180169400996d91ab1ecd5a3ce92887",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/ios/AppIcon.appiconset/Icon-40@3x.png": {
+      "sha256": "2fd2bc8231b8584138b6c0c74c5a7186024c8df2bfaae4b5c26ae95763956ace",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/ios/AppIcon.appiconset/Icon-60@2x.png": {
+      "sha256": "2fd2bc8231b8584138b6c0c74c5a7186024c8df2bfaae4b5c26ae95763956ace",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/ios/AppIcon.appiconset/Icon-60@3x.png": {
+      "sha256": "a5bf8fcc4fb176aff3ca7c1cd5e1ae503e9fe45dacc6a62e16246dbb728f3ec3",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/ios/AppIcon.appiconset/Icon-76.png": {
+      "sha256": "0197616e104b30e19d1f923cffb7d0a9e269f54b05f887f0ba2ac1534288d396",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/ios/AppIcon.appiconset/Icon-76@2x.png": {
+      "sha256": "6c62b3790b84f1ea4ee99f90dc7755e30cc30b2ec14172af40512c4352b94b64",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/ios/AppIcon.appiconset/Icon-83.5@2x.png": {
+      "sha256": "4668b41e8c0e3ebdf3e9eeb7312eaa82e34d98d0fd58392540f8b0e445de4f0a",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/macos/AppIcon.icns": {
+      "sha256": "cea9808968997bbd1e98cfe69a131396b9206132f45187e9492893e1f465c965",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/macos/OPC_Agent_icon.png": {
+      "sha256": "9ff4522d8644b7d610739330939578a6318a7d3082d60c6f49d6419eee224316",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/macos/icon_512x512.png": {
+      "sha256": "1eebc649952dbea33c313cab9ee38b22fdbe8f47c04463ea66ca2dad51c1a7c5",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/qm-icon-config.json": {
+      "sha256": "efdc4cbc93dce4a950a6e8679402db7778faaf633a9676e4f8704dbbad932547",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/web/apple-touch-icon.png": {
+      "sha256": "a5bf8fcc4fb176aff3ca7c1cd5e1ae503e9fe45dacc6a62e16246dbb728f3ec3",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/web/favicon-16x16.png": {
+      "sha256": "78725912899441cf1b88bacef7a09e9cd486aa1b6992ed78fd3253751ee2a08a",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/web/favicon-32x32.png": {
+      "sha256": "386e55ae4814c16af9034c4efb1ee7e37176d8e739ddb6d7fa84b83c155da3dd",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/web/favicon-96x96.png": {
+      "sha256": "b0f90d931cee6353927413ac86ff46bd73603c0f5b98e58d245ae617cb5f33e0",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/web/favicon.ico": {
+      "sha256": "1a00431a72c2e7cb85aa069f92f227da6192c68a9939aad495a48911c76cb44f",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/web/icon-192x192.png": {
+      "sha256": "cdc188c97c9f9c5ba742a795f1299148691bb24f93b07bcd4f2012dc14b6f756",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/web/icon-512x512.png": {
+      "sha256": "d06f7f4e0f74f86749200a72d4c542f5bdcaab433adcc250c939334330676e6b",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/web/icon-maskable-512x512.png": {
+      "sha256": "ee865910a18985747a66a2767cb25dcb49798af49660a958c9f3154a3bac3a4d",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/web/manifest.json": {
+      "sha256": "058d8f8edd4a29a0f45b11506efb11d8e99fbfdf668ac0b1c2cf1d48fe5dc4e4",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/web/og-image.png": {
+      "sha256": "8b38b008dad2b37d7a4c4ad8506b4e318d83973971ed9b714b5158f174aa6947",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/web/snippet.html": {
+      "sha256": "abadc409dced15a4221e891ca0512a12e54b5a8a31b3999b5c1e27a1fdd7d9ce",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/windows/Square150x150Logo.png": {
+      "sha256": "e7227f3bbd7ec095d1093a81385224eb6a70d6fdd1d35b4aab7dba47032943a2",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/windows/Square310x310Logo.png": {
+      "sha256": "10c6b07dca2e863816919141dafb29b4118017040d661dc653e59bb5c06c7b8b",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/windows/Square44x44Logo.png": {
+      "sha256": "ac05a15e65ada561e612ba445ea5176de025345b84447664b76327aa8899ff5c",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/windows/Square71x71Logo.png": {
+      "sha256": "e27486cdb4927b3534f3dfc7bfbaa0154a6666580e9b87a9064c1efd7b8101a7",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "docs/assets/OPC-Agent-icons/windows/app.ico": {
+      "sha256": "7a87f783826e33e5d36c597f81dd06206075566230aa114474e3c14fae71b805",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     }
   },
   "deleted": {
