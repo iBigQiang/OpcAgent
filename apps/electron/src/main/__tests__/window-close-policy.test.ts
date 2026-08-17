@@ -15,6 +15,9 @@ mock.module('electron', () => ({
     getName: () => 'OPC Agent',
     getVersion: () => '0.1.8',
   },
+  nativeImage: {
+    createFromPath: () => ({ isEmpty: () => true }),
+  },
 }))
 mock.module('../auto-update', () => ({ isUpdating: () => false }))
 

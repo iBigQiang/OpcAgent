@@ -8,7 +8,7 @@
 
 import { existsSync } from 'fs'
 import { join } from 'path'
-import { nativeImage, type NativeImage } from 'electron'
+import type { NativeImage } from 'electron'
 
 /** 各平台窗口/打包图标文件名 */
 function getIconFileName(): string {
@@ -37,6 +37,8 @@ export function getAppIconPath(): string | null {
  */
 export function getAppNotificationIcon(): NativeImage | null {
   const pngPath = resolveIconPath('icon.png')
+  // 延迟加载，避免测试环境的 electron mock 缺少 nativeImage 导出
+  const { nativeImage } = require('electron') as typeof import('electron')
   if (pngPath) return nativeImage.createFromPath(pngPath)
   const fallbackPath = getAppIconPath()
   return fallbackPath ? nativeImage.createFromPath(fallbackPath) : null
