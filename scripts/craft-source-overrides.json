@@ -11,7 +11,7 @@
       "reason": "Craft file reviewed and adapted for the locked OPC Agent Lite product boundary"
     },
     "apps/cli/package.json": {
-      "sha256": "a5730e17b86400c4c45d0522e65b2717521215229b982a7332f3484f75b40def",
+      "sha256": "a34365cd23b031b4dfc8c1b090aec4f4e754b80e4911f02cc81079ba4085c408",
       "reason": "Craft CLI reduced to retained commands and the Pi-only OPC Agent runtime"
     },
     "apps/cli/src/client.ts": {
@@ -51,7 +51,7 @@
       "reason": "Craft file reviewed and adapted for the locked OPC Agent Lite product boundary"
     },
     "apps/electron/package.json": {
-      "sha256": "938c45372bc00779cc5c93395bf72dfa6bdca5a37278b905860f3c57233da946",
+      "sha256": "758ba1b01ff073ad3c4d8b8fc45d18e892924b84a4f4b89ee392f1d31a46695a",
       "reason": "Craft file reviewed and adapted for the locked OPC Agent Lite product boundary"
     },
     "apps/electron/resources/bin/doc-diff": {
@@ -839,7 +839,7 @@
       "reason": "Craft file reviewed and adapted for the locked OPC Agent Lite product boundary"
     },
     "apps/webui/package.json": {
-      "sha256": "dd1b84c542d881ac08df801e8fc6fb6747e674ab2e03728b4a53408595dfa5f6",
+      "sha256": "1883bcf6036d9b67396613fa0409f90d5c4f3ad489c82b372b17dd5660f69029",
       "reason": "Craft Sources WebUI protocol support restored through the existing OPC Agent web adapter."
     },
     "apps/webui/src/adapter/web-api.ts": {
@@ -891,7 +891,7 @@
       "reason": "Craft Sources WebUI protocol support restored through the existing OPC Agent web adapter."
     },
     "bun.lock": {
-      "sha256": "304519ad2d907f7cc4af3619d3ab853960d00122b41cb6dcdc8378cd5a6c5bfc",
+      "sha256": "d6d0150ebee4da2141b6926cc8fc39797f5e6254d323e33516a32d8b875692a1",
       "reason": "Craft Sources runtime dependencies and validation scripts restored within the existing OPC Agent package layout."
     },
     "NOTICE": {
@@ -899,11 +899,11 @@
       "reason": "Craft file reviewed and adapted for the locked OPC Agent Lite product boundary"
     },
     "package.json": {
-      "sha256": "710e28eb1a864f832b8fb46ac75934e458582c1388087abb2bd7ea83c180c7f2",
+      "sha256": "dba14495f264587f2897ac513019d4ea365fb427503078f58a20150e1e961343",
       "reason": "Craft Sources runtime dependencies and validation scripts restored within the existing OPC Agent package layout."
     },
     "packages/core/package.json": {
-      "sha256": "4afcfff8009cd43d7d81fb8fa66cad5b4defb176ac75835e0e27144f7acbcdff",
+      "sha256": "04aacec423cac7b6d15cb657a46d6363b793a7b2f3004116eb0e7906067ea8bc",
       "reason": "Craft Sources event and message contracts restored while retaining OPC Agent core session types."
     },
     "packages/core/README.md": {
@@ -935,7 +935,7 @@
       "reason": "Craft Sources event and message contracts restored while retaining OPC Agent core session types."
     },
     "packages/pi-agent-server/package.json": {
-      "sha256": "1e814b3a55e0048e25ad7ec524e2c62a4c157f78190452e0ba4a0dfa052c49dc",
+      "sha256": "258c45f8cf3f6f19c2120ec21ac95465a0f557f3a586695cbf1c914860789cc3",
       "reason": "Craft Pi subprocess adapted to the retained provider and session-tool contract"
     },
     "packages/pi-agent-server/src/index.ts": {
@@ -999,7 +999,7 @@
       "reason": "Craft Pi subprocess adapted to the retained provider and session-tool contract"
     },
     "packages/server-core/package.json": {
-      "sha256": "7700706077990cbc3c4a54b4fad8668f59f430e5217d4cd6838b5771e40db782",
+      "sha256": "586244c633b31e58e6b07ee5ce72e6f43a0f1e7141d8259d3e67e6e9de23987a",
       "reason": "Craft Sources server integration restored with OPC Agent Pi sessions, RPC transport, Browser, and queued-message behavior preserved."
     },
     "packages/server-core/src/bootstrap/headless-start.ts": {
@@ -1187,7 +1187,7 @@
       "reason": "Craft WebUI source and OAuth exports restored while retaining OPC Agent server composition."
     },
     "packages/server/package.json": {
-      "sha256": "78863e6903aab2e0e3104433896fd53e05ec7f946fc6a303b85b2c4320e18649",
+      "sha256": "67b4e8a8ef3cc95c43d0b0dff02d6212c11ac2388e5f128c8be95a2f3620d48c",
       "reason": "Craft server module reduced to retained local workspace, session, and WebUI behavior"
     },
     "packages/server/src/__tests__/smoke.test.ts": {
@@ -1199,7 +1199,7 @@
       "reason": "Craft Sources server integration restored with OPC Agent Pi sessions, RPC transport, Browser, and queued-message behavior preserved."
     },
     "packages/session-tools-core/package.json": {
-      "sha256": "bb2657dbcf46b92e23abc5f8c327157da160ce3d7a1303fcb73c722a2a29800a",
+      "sha256": "71f30890a554089ff57c243146498668dd0b34d1bac0fa6d4407a0b4b3542a1e",
       "reason": "Craft source session tools restored with OPC Agent package names and retained Browser and session-management contracts."
     },
     "packages/session-tools-core/src/context.ts": {
@@ -1331,7 +1331,7 @@
       "reason": "Craft shared module reduced to retained Pi, session, configuration, Skill, and UI behavior"
     },
     "packages/shared/package.json": {
-      "sha256": "a263386790fb89d7ad1b1eb5e6336104db074952cf787e91c81128c3d36e0dc4",
+      "sha256": "3697bb224c1e663e2876695c55eb8d596120ddda47e6923d4e39e05fde2dcdb8",
       "reason": "Craft Sources runtime dependencies are restored with narrow OAuth exports required by the Electron preload boundary."
     },
     "packages/shared/src/__tests__/feature-flags.test.ts": {
@@ -1999,7 +1999,7 @@
       "reason": "Craft source activation event handling restored in the retained OPC Agent shared chat UI."
     },
     "packages/ui/package.json": {
-      "sha256": "83473bcfe97592c42c087736ad4ba60d744ba9a9e9a24f08bfee3807e1ae98f5",
+      "sha256": "1a6d05b9cda9eb58adc9c8a11a32d8642b432e5106050802675ba30f0a545e09",
       "reason": "Craft source activation event handling restored in the retained OPC Agent shared chat UI."
     },
     "packages/ui/src/components/annotations/block-markers.ts": {
@@ -2209,7 +2209,7 @@
       "reason": "Regression test for retained OPC Agent behavior not covered at the same Craft path"
     },
     "CHANGELOG.md": {
-      "sha256": "475d19d94bfb0667f25c76b3ae2ae2645f4ff409b6c9e63224cddb22937cde77",
+      "sha256": "e5d5513e6df1352bc42931d1f527158bab2062fc132fb404ff724493e086eae1",
       "reason": "OPC-Agent-specific release metadata required by the public artifact workflow"
     },
     "packages/pi-agent-server/src/opcagent-metadata-schema.test.ts": {
@@ -3045,7 +3045,7 @@
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "packages/messaging-gateway/package.json": {
-      "sha256": "57828641e6f1cef7686ed7b5dfbb15fab19b55fbacade36df19360dd91fe77d5",
+      "sha256": "88c309e18a981256b4ded11040bf5e77728b24b732d5fcdca5590ec1cddc552a",
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "packages/messaging-gateway/src/__tests__/binding-access-router.test.ts": {
@@ -3089,7 +3089,7 @@
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "packages/messaging-whatsapp-worker/package.json": {
-      "sha256": "0f1e879db308ba6dcb6ebe7d68ef03aadc6deccf0678fb4dac75a7b782acaefe",
+      "sha256": "9897a033512a1250758ba80878aadd114b8beac24799358e1662036ae996996f",
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "packages/messaging-whatsapp-worker/src/media.ts": {
@@ -4838,6 +4838,10 @@
     },
     "apps/electron/resources/release-notes/0.1.9.md": {
       "sha256": "3da2d30d3a229a3ddf055b9cee678747f21eda894b2dd5562867d35275310cf0",
+      "reason": "OPC-Agent-specific release metadata required by the release workflow"
+    },
+    "apps/electron/resources/release-notes/0.1.10.md": {
+      "sha256": "ce5aecd4d0be247655f34e0bb54ff581c4c93bf7f495b71e37a7441d758262f9",
       "reason": "OPC-Agent-specific release metadata required by the release workflow"
     }
   },

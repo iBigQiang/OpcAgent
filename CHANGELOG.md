@@ -8,6 +8,12 @@ All notable changes to OPC Agent are documented in this file. The format follows
 
 Add user-visible changes here before running `bun run release:prepare <version>`.
 
+## [0.1.10] - 2026-08-17
+
+### 修复
+
+- 安装包与安装界面的图标改为从 1024 源图重绘的多尺寸版本（16 至 256 共 9 档），安装界面标题栏和向导头图不再模糊。
+
 ## [0.1.9] - 2026-08-17
 
 ### 新增
@@ -124,6 +130,7 @@ Internal test build; not published to GitHub. All changes are included in 0.1.6.
 - Local session search, flags, archives, import, export, and branching.
 
 [Unreleased]: https://github.com/iBigQiang/OpcAgent/releases
+[0.1.10]: https://github.com/iBigQiang/OpcAgent/releases/tag/v0.1.10
 [0.1.9]: https://github.com/iBigQiang/OpcAgent/releases/tag/v0.1.9
 [0.1.8]: https://github.com/iBigQiang/OpcAgent/releases/tag/v0.1.8
 [0.1.7]: https://github.com/iBigQiang/OpcAgent/releases/tag/v0.1.7

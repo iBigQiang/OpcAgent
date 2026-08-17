@@ -1,6 +1,6 @@
 {
   "name": "@opcagent/server-core",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "license": "Apache-2.0",
   "description": "Reusable headless server infrastructure for OPC Agent",
   "type": "module",
