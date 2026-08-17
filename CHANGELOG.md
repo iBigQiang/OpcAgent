@@ -8,6 +8,17 @@ All notable changes to OPC Agent are documented in this file. The format follows
 
 Add user-visible changes here before running `bun run release:prepare <version>`.
 
+## [0.1.9] - 2026-08-17
+
+### 新增
+
+- 启用全新品牌图标：应用安装包、窗口、系统通知、界面 Logo、WebUI favicon 等所有展示位置统一换为新设计，并全部从单一源图生成，后续换图只需替换源图后重新生成。
+
+### 修复
+
+- Windows 任务完成通知的标题改为“任务执行完毕”，通知归属修正为 OPC Agent 应用名，不再显示 electron.app.OPC Agent。
+- Windows 通知显式携带应用图标，不再显示系统默认的空白文档图标。
+
 ## [0.1.8] - 2026-08-15
 
 ### 修复
@@ -113,6 +124,7 @@ Internal test build; not published to GitHub. All changes are included in 0.1.6.
 - Local session search, flags, archives, import, export, and branching.
 
 [Unreleased]: https://github.com/iBigQiang/OpcAgent/releases
+[0.1.9]: https://github.com/iBigQiang/OpcAgent/releases/tag/v0.1.9
 [0.1.8]: https://github.com/iBigQiang/OpcAgent/releases/tag/v0.1.8
 [0.1.7]: https://github.com/iBigQiang/OpcAgent/releases/tag/v0.1.7
 [0.1.6]: https://github.com/iBigQiang/OpcAgent/releases/tag/v0.1.6

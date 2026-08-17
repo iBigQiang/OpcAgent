@@ -110,7 +110,7 @@
     },
     "apps/cli": {
       "name": "@opcagent/cli",
-      "version": "0.1.8",
+      "version": "0.1.9",
       "bin": {
         "opcagent": "dist/opcagent",
       },
@@ -126,7 +126,7 @@
     },
     "apps/electron": {
       "name": "@opcagent/electron",
-      "version": "0.1.8",
+      "version": "0.1.9",
       "devDependencies": {
         "@opcagent/core": "workspace:*",
         "@opcagent/messaging-gateway": "workspace:*",
@@ -171,7 +171,7 @@
     },
     "apps/webui": {
       "name": "@opcagent/webui",
-      "version": "0.1.8",
+      "version": "0.1.9",
       "dependencies": {
         "@opcagent/shared": "workspace:*",
         "@opcagent/ui": "workspace:*",
@@ -186,14 +186,14 @@
     },
     "packages/core": {
       "name": "@opcagent/core",
-      "version": "0.1.8",
+      "version": "0.1.9",
       "devDependencies": {
         "@types/uuid": "^11.0.0",
       },
     },
     "packages/messaging-gateway": {
       "name": "@opcagent/messaging-gateway",
-      "version": "0.1.8",
+      "version": "0.1.9",
       "dependencies": {
         "@larksuiteoapi/node-sdk": "^1.62.1",
         "@opcagent/messaging-whatsapp-worker": "workspace:*",
@@ -208,7 +208,7 @@
     },
     "packages/messaging-whatsapp-worker": {
       "name": "@opcagent/messaging-whatsapp-worker",
-      "version": "0.1.8",
+      "version": "0.1.9",
       "dependencies": {
         "@whiskeysockets/baileys": "^6.7.0",
       },
@@ -219,7 +219,7 @@
     },
     "packages/pi-agent-server": {
       "name": "@opcagent/pi-agent-server",
-      "version": "0.1.8",
+      "version": "0.1.9",
       "bin": {
         "pi-agent-server": "./dist/index.js",
       },
@@ -239,7 +239,7 @@
     },
     "packages/server": {
       "name": "@opcagent/server",
-      "version": "0.1.8",
+      "version": "0.1.9",
       "bin": {
         "opcagent-server": "src/index.ts",
       },
@@ -256,7 +256,7 @@
     },
     "packages/server-core": {
       "name": "@opcagent/server-core",
-      "version": "0.1.8",
+      "version": "0.1.9",
       "dependencies": {
         "@earendil-works/pi-ai": "0.80.6",
         "@opcagent/core": "workspace:*",
@@ -272,7 +272,7 @@
     },
     "packages/session-tools-core": {
       "name": "@opcagent/session-tools-core",
-      "version": "0.1.8",
+      "version": "0.1.9",
       "dependencies": {
         "beautiful-mermaid": "*",
         "gray-matter": "^4.0.3",
@@ -285,7 +285,7 @@
     },
     "packages/shared": {
       "name": "@opcagent/shared",
-      "version": "0.1.8",
+      "version": "0.1.9",
       "dependencies": {
         "@earendil-works/pi-agent-core": "0.80.6",
         "@earendil-works/pi-ai": "0.80.6",
@@ -314,7 +314,7 @@
     },
     "packages/ui": {
       "name": "@opcagent/ui",
-      "version": "0.1.8",
+      "version": "0.1.9",
       "dependencies": {
         "@opcagent/core": "workspace:*",
         "@opcagent/shared": "workspace:*",
