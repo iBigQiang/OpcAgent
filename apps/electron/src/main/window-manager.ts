@@ -1,8 +1,8 @@
 import { BrowserWindow, shell, nativeTheme, Menu, app } from 'electron'
 import { isUpdating } from './auto-update'
+import { getAppIconPath } from './app-icon'
 import { windowLog } from './logger'
 import { join, resolve, sep } from 'path'
-import { existsSync } from 'fs'
 import { release } from 'os'
 import { fileURLToPath } from 'url'
 import { getWorkspaceByNameOrId } from '@opcagent/shared/config'
@@ -210,24 +210,10 @@ export class WindowManager {
   createWindow(options: CreateWindowOptions): BrowserWindow {
     const { workspaceId, focused = false, initialDeepLink, restoreUrl } = options
 
-    // Load platform-specific app icon
-    // In packaged app, resources are at dist/resources/ (same level as __dirname)
-    // In dev, resources are at ../resources/ (sibling of dist/)
-    const getIconPath = () => {
-      const iconName = process.platform === 'darwin' ? 'icon.icns'
-        : process.platform === 'win32' ? 'icon.ico'
-        : 'icon.png'
-      return [
-        join(__dirname, 'resources', iconName),
-        join(__dirname, '../resources', iconName),
-      ].find(p => existsSync(p)) ?? join(__dirname, '../resources', iconName)
-    }
-
-    const iconPath = getIconPath()
-    const iconExists = existsSync(iconPath)
-
-    if (!iconExists) {
-      windowLog.warn('App icon not found at:', iconPath)
+    // 应用图标统一从 app-icon 模块解析（打包后位于 dist/resources/，开发时位于 ../resources/）
+    const iconPath = getAppIconPath()
+    if (!iconPath) {
+      windowLog.warn('App icon not found')
     }
 
     // Use smaller window size for focused mode (single session view)
@@ -246,7 +232,7 @@ export class WindowManager {
       minHeight: 600,
       show: false, // Don't show until ready-to-show event (faster perceived startup)
       title: '',
-      icon: iconExists ? iconPath : undefined,
+      icon: iconPath ?? undefined,
       // macOS-specific: hidden title bar with inset traffic lights
       ...(isMac && {
         titleBarStyle: 'hiddenInset',

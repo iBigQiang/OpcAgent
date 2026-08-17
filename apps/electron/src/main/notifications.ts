@@ -10,6 +10,7 @@
 import { Notification, app, BrowserWindow, nativeImage } from 'electron'
 import { join } from 'path'
 import { readFileSync } from 'fs'
+import { getAppNotificationIcon } from './app-icon'
 import { mainLog } from './logger'
 import { RPC_CHANNELS } from '../shared/types'
 import type { WindowManager } from './window-manager'
@@ -67,8 +68,9 @@ export function showNotification(
     body,
     // macOS-specific options
     silent: false,
-    // Use the app icon
-    icon: undefined,  // Will use app icon by default on macOS
+    // Windows/Linux 通知显式传入应用 logo（toast 的 appLogoOverride），
+    // 避免依赖快捷方式图标解析；macOS 始终使用应用自身图标，无需传入
+    icon: process.platform === 'darwin' ? undefined : getAppNotificationIcon() ?? undefined,
   })
 
   notification.on('click', () => {

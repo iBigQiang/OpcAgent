@@ -59,6 +59,10 @@ for (const name of toolNames) {
 }
 
 copyFileSync(join(source, 'config-defaults.json'), join(destination, 'config-defaults.json'))
+// 运行时应用图标：窗口与系统通知从 dist/resources 读取（见 src/main/app-icon.ts）
+for (const name of ['icon.png', 'icon.ico']) {
+  copyFileSync(join(source, name), join(destination, name))
+}
 copyFileSync(
   join(rootDir, 'packages', 'shared', 'src', 'agent', 'powershell-parser.ps1'),
   join(destination, 'powershell-parser.ps1'),

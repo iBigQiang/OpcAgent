@@ -14,6 +14,8 @@ const required = [
   'dist/interceptor.cjs',
   'dist/renderer/index.html',
   'dist/resources/config-defaults.json',
+  'dist/resources/icon.png',
+  'dist/resources/icon.ico',
   `dist/resources/release-notes/${version}.md`,
   'dist/resources/pi-agent-server/index.js',
   `dist/resources/bin/${platformKey}/uv${executable}`,
