@@ -68,9 +68,10 @@ export function showNotification(
     body,
     // macOS-specific options
     silent: false,
-    // Windows/Linux 通知显式传入应用 logo（toast 的 appLogoOverride），
-    // 避免依赖快捷方式图标解析；macOS 始终使用应用自身图标，无需传入
-    icon: process.platform === 'darwin' ? undefined : getAppNotificationIcon() ?? undefined,
+    // Windows 不传 icon：toast 左侧大图会把它渲染为 appLogoOverride，
+    // 顶部标题栏的小图标由 AppUserModelID 关联的应用图标提供，无需重复。
+    // Linux 通知没有顶部应用图标，仍需显式传入 PNG；macOS 始终使用应用自身图标。
+    icon: process.platform === 'linux' ? getAppNotificationIcon() ?? undefined : undefined,
   })
 
   notification.on('click', () => {
