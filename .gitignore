@@ -23,6 +23,7 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 .eslintcache
 .cache
 tmp
+.tmp/
 *.tsbuildinfo
 
 .idea
@@ -36,7 +37,10 @@ Thumbs.db
 
 ~/
 
+# pnpm 残留：本项目使用 Bun（见 bun.lock / bunfig.toml），勿用 pnpm install
 pnpm-lock.yaml
+pnpm-workspace.yaml
+.pnpm-store/
 
 .opcagent/
 
