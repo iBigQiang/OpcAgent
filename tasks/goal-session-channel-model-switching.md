@@ -406,3 +406,9 @@ tasks/goal-session-channel-model-switching.md
 测试只在隔离进程最早启动处拦截系统协议注册和自动更新请求，未替换聊天 RPC、SessionManager 或 Pi。调试注入的早期方案及受限环境 GPU 启动曾失败；最终在授权的正常宿主环境完成，不更改产品 GPU 设置。系统协议注册表前后相等，原有 OPC Agent 进程持续运行。
 
 最终记录位于 `D:\AiCode\OPCAgent\.tmp\session-channel-release\electron-run-2026-09-28T01-37-21-024Z\electron-results.json`；同目录有 `electron-model-requests.json`、`electron-rpc-frames.json` 和 `electron-restart.png`。这些是合成测试数据；没有实际运行安装向导覆盖当前已安装的应用，也没有验证真实服务商所有账户或跨平台安装包。
+
+### 12.5 提交与推送结果
+
+功能、修复、版本及已审查文档共 61 个文件提交为 `f0db0a972ef412d8edcb6158d9d768958f153331`，提交说明为“feat: 支持 Pi 会话跨渠道续聊并准备 0.1.11”。`git push origin HEAD:refs/heads/craft-sources-auto` 成功，随后通过直连 `git ls-remote` 确认远端该分支与本地提交完全相同。原有工程基线提交也随正常分支推送保留，未改写历史。
+
+此后仅追加本段验收记录及任务完成标记，不改变安装包对应的产品代码。安装包及 SHA256SUMS 留在本地版本目录，没有提交二进制到 Git，也没有创建 v0.1.11 tag 或公开 GitHub Release。GitHub 自动 CI 的结果须以 Actions 实际运行状态为准，不与本地通过结论混用。

@@ -16,7 +16,7 @@
 - [x] 准备 0.1.11 版本与中文发布说明，Electron 构建通过。
 - [x] 生成 Windows x64 安装包，并使用打包后的真实主进程完成隔离桌面验收。
 - [x] 完成最终 validate:ci、lint、Craft 审计和版本检查。
-- [ ] 审查提交内容，推送 origin/craft-sources-auto 并核对远端 SHA。
+- [x] 审查提交内容，推送 origin/craft-sources-auto 并核对远端 SHA，功能提交为 f0db0a9。
 
 详细证据与执行边界见 `tasks/goal-session-channel-model-switching.md` 第十二节。
 

@@ -5189,7 +5189,7 @@
       "reason": "已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
     },
     "tasks/goal-session-channel-model-switching.md": {
-      "sha256": "54fc834670c165d93b36a0c02fe49e7aad7eb859b94221644b7503cf63d0eee0",
+      "sha256": "63bba48b5e09acf0145559f234d0cdcac9a001c51200fbc1577d2b77da63603f",
       "reason": "本轮用户要求的会话渠道模型切换 Goal、范围约束、自动化隔离与验证证据。"
     },
     "packages/server-core/src/sessions/session-channel-switch.integration.isolated.ts": {
@@ -5217,7 +5217,7 @@
       "reason": "已审查行尾、依赖隔离、验证证据和上游融合的历史教训；内容属于开发记录，不引入运行时代码或用户配置变更。"
     },
     "tasks/todo.md": {
-      "sha256": "f8c936216ac105551151d86bd8f96c4f7774a368de1357af78b80000ba6fd639",
+      "sha256": "ce2f075dc5ad219cac03637c6cd3d35440411fba189fc33b11997f2bebe41b32",
       "reason": "已审查 253aba1 工程基线任务及结果复盘，记录已完成验证和 Windows 既有问题，作为历史工作记录保留。"
     },
     "docs/开发及迭代方案调研报告/2026-08-26-上游mkagent增量比对报告.md": {
