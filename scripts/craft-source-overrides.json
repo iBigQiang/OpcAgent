@@ -2145,7 +2145,7 @@
   },
   "mkOnly": {
     ".github/workflows/ci.yml": {
-      "sha256": "4805a75aaa5057108c444e025e8d24ca5122af3df24623f28c1626620dd73086",
+      "sha256": "12424293a892cc0975ecf6521fbfa0f37e41d575c0126292f4c01bd5653d60e4",
       "reason": "OPC-Agent-specific file required by branding, packaging, or the locked Lite boundary"
     },
     ".github/workflows/release.yml": {
@@ -2365,7 +2365,7 @@
       "reason": "OPC Agent lineage, build, or validation guard required by the derivative release workflow"
     },
     "scripts/run-tests.ts": {
-      "sha256": "c8e5e59467a8757ecabca028ca1d7385c3902772c42767f5ccfa4eb2f44a66e6",
+      "sha256": "e297be46adbb97d6c5caf6da84acb94cce05d223ad0e58182b1a24090dab667e",
       "reason": "OPC Agent test discovery excludes generated artifacts and vendored submodule tests from CI"
     },
     "apps\\cli\\package.json": {
@@ -2945,7 +2945,7 @@
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "docs/releases.md": {
-      "sha256": "0479bbcd60e85b9221d67f197bce3c8170366d0843f4517b65d32c47428f72e1",
+      "sha256": "2564efcabb715837f6f13a1a4a5fdb160c6390bee4f527bff465b2b5687fd89c",
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "docs/sessions.md": {
@@ -3025,7 +3025,7 @@
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "docs/zh/releases.md": {
-      "sha256": "69fca8b60f87f1c9744bbb32d2802b9119169fa7450c3270f7e31be856980b4e",
+      "sha256": "a88284b5db79eb45483520dd9b0bf7895551300509b5d4687fee3ba7e01ee429",
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "docs/zh/sessions.md": {
@@ -5209,7 +5209,7 @@
       "reason": "已审查 253aba1 新增的 OPC Agent 项目约定，记录 Bun、隔离 CONFIG_DIR、双语文案、Craft 审计和正式验证入口。"
     },
     "docs/DEVLOG.md": {
-      "sha256": "730f1b21e8e25c77b2c490f1f7c1fce036b273d60a157367b58d119cc2e2bfe6",
+      "sha256": "b9878615ffb09a5a8611b93aeb1997c2ae7a5c74114a914cee85c2031895315d",
       "reason": "已审查工程基线与上游 dialog 回退链的历史开发记录；保留验证结果、失败对照及未解决边界，不作为新的运行时配置。"
     },
     "tasks/lessons.md": {
@@ -5217,7 +5217,7 @@
       "reason": "已审查行尾、依赖隔离、验证证据和上游融合的历史教训；内容属于开发记录，不引入运行时代码或用户配置变更。"
     },
     "tasks/todo.md": {
-      "sha256": "ce2f075dc5ad219cac03637c6cd3d35440411fba189fc33b11997f2bebe41b32",
+      "sha256": "58414a030c9e56d5dc6f16e11842efb0c34be3a8700f4380882d0280d48fd401",
       "reason": "已审查 253aba1 工程基线任务及结果复盘，记录已完成验证和 Windows 既有问题，作为历史工作记录保留。"
     },
     "docs/开发及迭代方案调研报告/2026-08-26-上游mkagent增量比对报告.md": {
@@ -5227,6 +5227,22 @@
     "apps/electron/resources/release-notes/0.1.11.md": {
       "sha256": "3a56913c24ec59667496284f27f033ad22952c0f3c736e68c8ad2c98d59b4545",
       "reason": "OPC-Agent-specific release metadata required by the release workflow"
+    },
+    "scripts/collect-ci-build-metadata.ts": {
+      "sha256": "3967ac23c474a223bf62976d07ce2c1a258156394197f75c8a012e6ad58ecf0c",
+      "reason": "推送后构建制品收集与 README 托管区块更新，包含失败边界及幂等性验证。"
+    },
+    "scripts/collect-ci-build-metadata.test.ts": {
+      "sha256": "5e1f5e95bc0cb6ea22bf1d3a1999a58f161fb4b1375851a0b127e7777ea006ef",
+      "reason": "推送后构建制品收集与 README 托管区块更新，包含失败边界及幂等性验证。"
+    },
+    "scripts/update-ci-readme.ts": {
+      "sha256": "fce644f281c60bdb9abf3fb6ffab23db86261d87503dd1af72a011408c55d9af",
+      "reason": "推送后构建制品收集与 README 托管区块更新，包含失败边界及幂等性验证。"
+    },
+    "scripts/update-ci-readme.test.ts": {
+      "sha256": "1b9c5f598dcc9f17eb6f1a4391c89f741bec89a84089d0846a655cb729e1fc5b",
+      "reason": "推送后构建制品收集与 README 托管区块更新，包含失败边界及幂等性验证。"
     }
   },
   "deleted": {

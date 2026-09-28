@@ -23,7 +23,17 @@
 
 安装包、manifest（如 `latest-mac.yml`、`latest.yml`、`latest-linux.yml`）、blockmap、checksum 和版本说明统一放在主仓库的 GitHub Releases 中，不提交进 Git；不再使用单独的 release-only 仓库。
 
-Pull Request 和推送到 `main` 的提交会运行未签名打包矩阵，覆盖 macOS arm64、Windows x64 和 Linux x64。对应的验证安装包与 headless server 压缩包会作为 GitHub Actions artifacts 保留 7 天。只有经过审核的 `v*` tag 才会将完整且校验通过的产物矩阵长期发布到 GitHub Release；配置某个平台的完整凭证后会自动升级为签名构建。
+Pull Request 和推送到 `main`、`craft-sources-auto` 的提交会先通过质量检查，再自动打包 macOS arm64、Windows x64 和 Linux x64。对应的验证安装包与 headless server 压缩包会作为 GitHub Actions artifacts 保留 30 天，下载时需要登录 GitHub。只有经过审核的 `v*` tag 才会将完整且校验通过的产物矩阵长期发布到 GitHub Release；配置某个平台的完整凭证后会自动升级为签名构建。
+
+## 推送后的 README 自动更新
+
+三平台打包全部成功后，CI 从当前运行中读取真实制品链接，并更新**收到推送的分支**上的 `README.md`：源码版本、构建提交、运行链接、三平台下载入口，以及内置中文版本说明中的最多五条更新。仓库默认分支继续保持 `main`；开发分支的 README 不会覆盖 `main`。这套行为需要对应分支包含新版 `.github/workflows/ci.yml`。
+
+自动内容只位于 `<!-- opcagent:ci-build:start -->` 与 `<!-- opcagent:ci-build:end -->` 之间；标记外的手写内容保留。首次成功构建会在 `Current release` 前插入该区块。维护功能说明时仍需更新 `apps/electron/resources/release-notes/<version>.md`，自动化据此生成摘要，不根据提交消息猜测产品能力。
+
+README 写回使用单独 job 的 `contents: write` 权限，并同步它在 Craft 审计清单中的哈希。使用仓库 `GITHUB_TOKEN` 提交，不会递归触发新的 push 构建。PR 不写回；检查或打包失败不写回；远端分支已有更新时跳过旧构建的写回，禁止强推。分支保护若阻止机器人提交，会明确报错，不会自动放宽保护规则。
+
+日常推送不创建版本 tag、不发布正式 Release，也不更换 Latest。验证制品过期后，可在 Actions 中**重新运行所有作业**，从该运行页面下载新制品；重新运行单个失败作业不会复用旧轮次的制品来伪造完整构建。如果分支已经包含后续提交（包括 README 机器人提交），旧运行重跑也不会覆盖 README；要刷新 README 下载入口，需要当前分支的新推送构建。普通用户的长期下载入口仍为 GitHub Releases。
 
 ## 版本与 Changelog 规范
 

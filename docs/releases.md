@@ -24,7 +24,9 @@ Tagged releases in the open-source repository build macOS DMG/ZIP, Windows NSIS,
 
 Installers, manifest files (for example `latest-mac.yml`, `latest.yml`, and `latest-linux.yml`), blockmaps, checksums, and release notes live in the main repository's GitHub Releases rather than being committed to Git. A separate release-only repository is no longer used.
 
-Pull requests and pushes to `main` run the unsigned packaging matrix for macOS arm64, Windows x64, and Linux x64. Those validation packages and matching headless-server archives are retained as GitHub Actions artifacts for 7 days. Only a reviewed `v*` tag promotes the verified asset matrix to a durable GitHub Release; signing is upgraded automatically when the complete credentials for a platform are configured.
+Pull requests and pushes to `main` or `craft-sources-auto` run the quality gate followed by packaging for macOS arm64, Windows x64, and Linux x64. Those validation packages and matching headless-server archives are retained as GitHub Actions artifacts for 30 days; downloading requires a GitHub login. Only a reviewed `v*` tag promotes the verified asset matrix to a durable GitHub Release; signing is upgraded automatically when the complete credentials for a platform are configured.
+
+After all three packages succeed, trusted pushes update the receiving branch's managed README block with the source version, commit, actual artifact links, and up to five entries from the bundled Chinese release notes. The default branch stays `main`; each branch needs this version of `.github/workflows/ci.yml` to enable write-back. Content outside `opcagent:ci-build:start` / `opcagent:ci-build:end` remains untouched. Only the README and its Craft audit hash are committed, using a job-scoped write token. PRs, failed builds, and superseded commits do not update the README. The bot never force-pushes or changes branch protection, and its `GITHUB_TOKEN` commit does not trigger recursive push runs. To replace expired artifacts, re-run **all jobs**; artifacts from different run attempts are not combined. See [the Chinese workflow guide](./zh/releases.md) for details.
 
 ## Version and changelog policy
 

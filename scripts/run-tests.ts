@@ -13,6 +13,8 @@ if (tracked.exitCode !== 0) {
 const files = tracked.stdout.toString().split('\0').filter(Boolean)
 const SERIAL_TESTS = new Set([
   'apps/electron/src/main/__tests__/browser-cdp.test.ts',
+  // Electron mock 的导出会在 Bun 同进程中相互污染，BrowserView 必须在独立进程内注册。
+  'apps/electron/src/main/__tests__/browser-pane-manager.test.ts',
   'packages/shared/src/__tests__/anyrouter-pi-interceptor.test.ts',
   'packages/shared/src/agent/__tests__/pi-conversation-flow.integration.test.ts',
 ])

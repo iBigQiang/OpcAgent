@@ -6,6 +6,20 @@
 
 ---
 
+## 2026-09-28 · CI 测试隔离与推送后构建文档自动更新
+
+GitHub run `36367008439` 在 quality 的完整测试阶段失败：`window-close-policy.test.ts` 注册了不含 `BrowserView` 的 Electron mock，后续 `browser-pane-manager.test.ts` 在同一 Bun 进程加载时无法取得该导出。邮件中的 Package skipped 是质量依赖失败的结果，并非未开启打包。原组合在本机复现为 2 pass / 1 fail / 1 error；把浏览器测试加入已有独立进程列表后，真实测试 runner 执行这两个文件共 80 pass / 176 assertions。没有删除断言、跳过测试或放宽门禁。
+
+CI 继续监听 PR，以及 `main`、`craft-sources-auto` 的推送。三平台验证制品按源码 SHA 与 run attempt 命名，保留 30 天。全部打包成功后，独立 job 使用当前运行的真实制品 API 数据，在收到推送的分支 README 中写入有限范围的中文摘要及下载入口。仅该 job 获得仓库写权限；机器人只提交 README 和其 Craft 审计哈希，避免后续源码审计误报。默认分支仍为 main，不自动合并开发分支。
+
+写回固定在经过验证的源码 SHA 上进行；如果分支已前进则跳过，不强推。PR、失败构建和不完整制品不得写入成功信息。机器人使用 GITHUB_TOKEN，不递归触发 push CI。手写 README 内容保留，版本摘要来自已有的中文内置版本说明；正式 Release 仍由人工准备的版本 tag 触发。配置只有进入某分支后才在该分支生效。
+
+范围外审查发现：headless server 的独立分发可能漏带 Sharp 原生库，图片处理功能需另做隔离成品验证。本轮不改变产品运行时代码，也不把打包成功作为所有成品功能均已验证的证据。
+
+本地 validate:ci、lint 和 Craft 审计通过；两份自动化脚本 37 项测试、122 个断言及独立严格类型检查通过。Windows 全量测试首轮出现 51 项失败，其中两项是开发过程中的新测试夹具问题（非 ASCII HTTP 假令牌、临时空日志目录清理）并已修复，其他失败及 CLI 超时异常继续与旧提交对照；不能据此声称 Windows 全量已通过。GitHub Linux 门禁与实际三平台打包结果待推送后核对。
+
+---
+
 ## 2026-09-28 · Pi 会话跨渠道续聊与 0.1.11 收尾
 
 完整需求、设计、修改清单及验收矩阵见 `tasks/goal-session-channel-model-switching.md`。渠道和模型现由 SessionManager 作为单次事务提交，Pi 执行实例按目标连接重建，沿用原 SDK 日志、分支切点、压缩摘要和授权工具。自动化定义及调度代码未变，明确保存的任务绑定不会被普通聊天或默认模型变更覆盖。Pi 与 Claude CLI 迁移仍留待下一阶段。
