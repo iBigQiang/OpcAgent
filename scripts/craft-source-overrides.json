@@ -2095,7 +2095,7 @@
       "reason": "Craft source activation event handling restored in the retained OPC Agent shared chat UI."
     },
     "README.md": {
-      "sha256": "bf38c0f57463df4ce26499fe1b63d6a9f4fa849cb665e93f754f6ad51a23b506",
+      "sha256": "3c4d67e79a9afdea7526ad852bee07e0b90b8722ed773174154e84c6f15b759c",
       "reason": "保留 OPC Agent 品牌、功能边界及来源署名；已审查 253aba1 将当前版本说明更新为 0.1.10 图标和 Windows 通知修复。"
     },
     "scripts/browser-tool.ts": {
@@ -2945,7 +2945,7 @@
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "docs/releases.md": {
-      "sha256": "2564efcabb715837f6f13a1a4a5fdb160c6390bee4f527bff465b2b5687fd89c",
+      "sha256": "d631d551f9205dd336ce9cf7a7f690b0be14d69f6b4e05474f8c730c2fb1904a",
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "docs/sessions.md": {
@@ -3025,7 +3025,7 @@
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "docs/zh/releases.md": {
-      "sha256": "31ff59a4a39a19dbcaca532f96ed662f8c935ea2e1dd1ed833535be6310fb55a",
+      "sha256": "75497d5b1708101b31e46843d4e09d3d1b9b91d95dfae7e73157125fa33c035d",
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "docs/zh/sessions.md": {
@@ -5209,7 +5209,7 @@
       "reason": "已审查 253aba1 新增的 OPC Agent 项目约定，记录 Bun、隔离 CONFIG_DIR、双语文案、Craft 审计和正式验证入口。"
     },
     "docs/DEVLOG.md": {
-      "sha256": "2fea214f1855c6bd411f9fc34eb7951eae46cca39c2f61ae3d05557d18e935f8",
+      "sha256": "c6877c0875fe376d64ae580b56c1b486d8e85c0381be918c93901a707f8de319",
       "reason": "已审查工程基线与上游 dialog 回退链的历史开发记录；保留验证结果、失败对照及未解决边界，不作为新的运行时配置。"
     },
     "tasks/lessons.md": {
@@ -5217,7 +5217,7 @@
       "reason": "已审查行尾、依赖隔离、验证证据和上游融合的历史教训；内容属于开发记录，不引入运行时代码或用户配置变更。"
     },
     "tasks/todo.md": {
-      "sha256": "171eddbfabb8ba8c81ae775048f4408ad082c7142a30c66c3c6be0ab47c94075",
+      "sha256": "3a3132938ee74bcd0bce5cd67fd3182fd2db3e90f6006be9bbccf3a22bc54032",
       "reason": "已审查 253aba1 工程基线任务及结果复盘，记录已完成验证和 Windows 既有问题，作为历史工作记录保留。"
     },
     "docs/开发及迭代方案调研报告/2026-08-26-上游mkagent增量比对报告.md": {

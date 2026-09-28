@@ -8,6 +8,12 @@
 
 ## 2026-09-28 · CI 测试隔离与推送后构建文档自动更新
 
+### 0.1.11 正式发布流程纠正
+
+此前把“保留 main 默认分支”和“只能从 main 正式发布”混为一谈，导致 0.1.11 只完成验证制品与分支 README 写回，没有创建注解标签和公开 Release。正确边界是：GitHub Release 属于整个仓库，但其标签可以直接指向 `craft-sources-auto` 的提交；本次完整收尾不要求合并 main。目标分支推送并完成 CI、三平台验证构建和 README 写回后，应同步机器人提交，在该分支最新提交创建 `v0.1.11` 注解标签，再由 Release workflow 构建完整正式产物并发布 Latest。
+
+当前版本一致性检查已通过，远端不存在 `v0.1.11` 标签或同名 Release。分支头验收提交包含 `[skip ci]`，直接以它触发 `push` 类型的标签工作流存在被跳过的风险，因此先提交本段流程纠正和 README 正式版本说明，使用不带跳过指令的新提交重新完成分支门禁，再在 README 写回后的最新提交上打标签。
+
 GitHub run `36367008439` 在 quality 的完整测试阶段失败：`window-close-policy.test.ts` 注册了不含 `BrowserView` 的 Electron mock，后续 `browser-pane-manager.test.ts` 在同一 Bun 进程加载时无法取得该导出。邮件中的 Package skipped 是质量依赖失败的结果，并非未开启打包。原组合在本机复现为 2 pass / 1 fail / 1 error；把浏览器测试加入已有独立进程列表后，真实测试 runner 执行这两个文件共 80 pass / 176 assertions。没有删除断言、跳过测试或放宽门禁。
 
 CI 继续监听 PR，以及 `main`、`craft-sources-auto` 的推送。三平台验证制品按源码 SHA 与 run attempt 命名，保留 30 天。全部打包成功后，独立 job 使用当前运行的真实制品 API 数据，在收到推送的分支 README 中写入有限范围的中文摘要及下载入口。仅该 job 获得仓库写权限；机器人只提交 README 和其 Craft 审计哈希，避免后续源码审计误报。默认分支仍为 main，不自动合并开发分支。

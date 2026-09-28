@@ -22,6 +22,14 @@
 
 验收链接：https://github.com/iBigQiang/OpcAgent/actions/runs/36416806387 。Windows 既有平台测试差异没有扩展修复，最终全量结果来自 GitHub Linux runner。此配置已在 craft-sources-auto 生效，合并到 main 后 main 使用同样流程。
 
+### 0.1.11 正式发布补充收尾
+
+- [x] 纠正发布边界：目标分支可直接承载正式版本，无需先合并 main；Release 由指向该分支提交的注解标签触发。
+- [x] `bun run release:check v0.1.11` 验证版本、Changelog 与中文内置说明一致。
+- [ ] 推送不带跳过标记的发布收尾提交，等待分支 CI 与 README 再次写回。
+- [ ] 在同步后的 `craft-sources-auto` 最新提交创建并推送注解标签 `v0.1.11`。
+- [ ] 等待 Release workflow 完整构建、校验并发布 `0.1.11` 为 Latest。
+
 ---
 
 ## 2026-09-28 · 会话跨渠道切换与 0.1.11 交付

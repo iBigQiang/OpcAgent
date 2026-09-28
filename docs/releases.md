@@ -32,7 +32,7 @@ After all three packages succeed, trusted pushes update the receiving branch's m
 
 OPC Agent uses semantic versions and `v<major>.<minor>.<patch>` Git tags. [`CHANGELOG.md`](../CHANGELOG.md) is the canonical cumulative changelog; `apps/electron/resources/release-notes/<version>.md` is the user-facing note bundled into the app and copied verbatim to the public GitHub Release.
 
-Prepare a release only from a clean `main` branch:
+Prepare a release from the clean branch that owns the version. A GitHub Release is repository-wide, while its annotated tag can point directly to a commit on that branch; merging to `main` is not required. Push the branch first, wait for its validation packages and managed README write-back, fast-forward locally to the bot commit, and tag that latest branch commit:
 
 ```bash
 # First replace the Unreleased placeholder in CHANGELOG.md with real entries.
@@ -42,8 +42,14 @@ git diff --check
 git add CHANGELOG.md package.json bun.lock apps/*/package.json packages/*/package.json \
   apps/electron/resources/release-notes/0.2.0.md scripts/craft-source-overrides.json
 git commit -m "chore(release): prepare v0.2.0"
+release_branch="$(git branch --show-current)"
+git push origin "$release_branch"
+
+# Wait for branch CI, all validation packages, and README write-back to succeed.
+git pull --ff-only origin "$release_branch"
+bun run release:check v0.2.0
 git tag -a v0.2.0 -m "OPC Agent v0.2.0"
-git push origin main v0.2.0
+git push origin v0.2.0
 ```
 
 `release:prepare` updates every workspace package version, refreshes `bun.lock`, moves the Unreleased changelog entries into a dated version section, and creates the bundled release-note file. The tag workflow independently rejects missing or inconsistent metadata.

@@ -56,11 +56,10 @@ AES-256-GCM encrypted credential store rather than written into configuration or
 
 ## Current release
 
-Version **0.1.10** completes the brand icon refresh that began in 0.1.9. Every icon surface —
-installer, application window, system notifications, in-app logo, and WebUI favicon — is now
-generated from a single 1024px source image. Installer and setup-wizard icons are redrawn into nine
-sizes (16 through 256), so the wizard title bar and header graphic are no longer blurry, and Windows
-completion toasts drop the redundant hero logo while keeping the small app icon in the title bar.
+Version **0.1.11** lets an existing Pi conversation switch between different AI connections and
+models while preserving its context, summaries, tool history, and enabled tools. The selected
+connection and model persist across windows and restarts, failed switches keep the previous choice,
+and automation schedules continue using the connection and model saved in each task.
 
 See the [changelog](./CHANGELOG.md) and [GitHub Releases](https://github.com/iBigQiang/OpcAgent/releases)
 for complete release notes and downloads.

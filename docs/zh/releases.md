@@ -5,7 +5,10 @@
 ## 发布流水线
 
 ```text
-  main ──▶ release:prepare ──▶ 审核版本提交 ──▶ 带注释的 v* tag
+  本次发布分支 ──▶ release:prepare ──▶ 推送并通过 CI ──▶ README 自动写回
+                                                               │
+                                                               ▼
+                                                   带注释的 v* tag
                                                    │
                                                    ▼
                                           校验 + 多平台构建
@@ -35,13 +38,15 @@ README 写回使用单独 job 的 `contents: write` 权限，并同步它在 Cra
 
 机器人会在该分支增加一个文档提交。下一轮本地开发前先执行 `git pull --ff-only` 同步，再提交并推送代码，避免本地落后于远端的 README 更新。不要为同步而强推。
 
-日常推送不创建版本 tag、不发布正式 Release，也不更换 Latest。验证制品过期后，可在 Actions 中**重新运行所有作业**，从该运行页面下载新制品；重新运行单个失败作业不会复用旧轮次的制品来伪造完整构建。如果分支已经包含后续提交（包括 README 机器人提交），旧运行重跑也不会覆盖 README；要刷新 README 下载入口，需要当前分支的新推送构建。普通用户的长期下载入口仍为 GitHub Releases。
+日常推送不创建版本 tag、不发布正式 Release，也不更换 Latest。完整版本收尾则应在目标分支的验证构建和 README 写回全部成功后，同步机器人提交，并在该分支最新提交上创建、推送带注释的 `v*` tag。GitHub Release 属于整个仓库，不存在独立的“分支 Release”；标签指向哪个分支提交，就以该提交作为 Release 的源码和构建输入，不要求先合并到 `main`。
+
+验证制品过期后，可在 Actions 中**重新运行所有作业**，从该运行页面下载新制品；重新运行单个失败作业不会复用旧轮次的制品来伪造完整构建。如果分支已经包含后续提交（包括 README 机器人提交），旧运行重跑也不会覆盖 README；要刷新 README 下载入口，需要当前分支的新推送构建。普通用户的长期下载入口仍为 GitHub Releases。
 
 ## 版本与 Changelog 规范
 
 OPC Agent 使用语义化版本和 `v<major>.<minor>.<patch>` tag。[`CHANGELOG.md`](../../CHANGELOG.md) 是累计变更记录的唯一来源；`apps/electron/resources/release-notes/<version>.md` 是随应用内置、并原样发布到公开 GitHub Release 的用户版说明。
 
-只从干净的 `main` 分支准备版本：
+只从本次目标分支的干净工作树准备版本。下面的顺序保证标签落在 README 机器人写回后的分支最新提交上：
 
 ```bash
 # 先把 CHANGELOG.md 中 Unreleased 的占位文字替换为真实变更。
@@ -51,8 +56,14 @@ git diff --check
 git add CHANGELOG.md package.json bun.lock apps/*/package.json packages/*/package.json \
   apps/electron/resources/release-notes/0.2.0.md scripts/craft-source-overrides.json
 git commit -m "chore(release): prepare v0.2.0"
+release_branch="$(git branch --show-current)"
+git push origin "$release_branch"
+
+# 等待该分支的 CI、三平台验证构建和 README 写回全部成功，再同步机器人提交。
+git pull --ff-only origin "$release_branch"
+bun run release:check v0.2.0
 git tag -a v0.2.0 -m "OPC Agent v0.2.0"
-git push origin main v0.2.0
+git push origin v0.2.0
 ```
 
 `release:prepare` 会同步所有 workspace package 版本、刷新 `bun.lock`、把 Unreleased 内容移入带日期的版本段，并创建应用内置的 release notes。tag workflow 会再次独立检查这些元数据是否一致。
