@@ -26,9 +26,11 @@
 
 - [x] 纠正发布边界：目标分支可直接承载正式版本，无需先合并 main；Release 由指向该分支提交的注解标签触发。
 - [x] `bun run release:check v0.1.11` 验证版本、Changelog 与中文内置说明一致。
-- [ ] 推送不带跳过标记的发布收尾提交，等待分支 CI 与 README 再次写回。
-- [ ] 在同步后的 `craft-sources-auto` 最新提交创建并推送注解标签 `v0.1.11`。
-- [ ] 等待 Release workflow 完整构建、校验并发布 `0.1.11` 为 Latest。
+- [x] 推送不带跳过标记的发布收尾提交；CI 36420500156 与 README 机器人写回全部成功。
+- [x] 在同步后的 `craft-sources-auto` 最新提交 `b11cd0f` 创建并推送注解标签 `v0.1.11`。
+- [x] Release workflow 36422082890 全部成功，`0.1.11` 已发布为非草稿、非预发布的 Latest。
+
+正式 Release 共 22 个资产，覆盖 Windows x64、macOS arm64/x64、Linux x64、CLI、四个平台无头服务器、更新 manifest、`SHA256SUMS` 与 `SIGNING_STATUS.txt`。标签对象解引用到 `b11cd0f7b894d030af0d7d749c1d4eea65601e35`，未合并或修改 main。
 
 ---
 

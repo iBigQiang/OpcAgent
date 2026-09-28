@@ -14,6 +14,10 @@
 
 当前版本一致性检查已通过，远端不存在 `v0.1.11` 标签或同名 Release。分支头验收提交包含 `[skip ci]`，直接以它触发 `push` 类型的标签工作流存在被跳过的风险，因此先提交本段流程纠正和 README 正式版本说明，使用不带跳过指令的新提交重新完成分支门禁，再在 README 写回后的最新提交上打标签。
 
+最终发布按纠正后的流程完成：`798b2bb` 推送后，[分支 CI 36420500156](https://github.com/iBigQiang/OpcAgent/actions/runs/36420500156) 的质量、三平台验证构建和 README 写回全部成功；同步机器人提交 `b11cd0f` 后，再次通过 `release:check v0.1.11` 与 Craft 审计，并在该提交创建注解标签 `v0.1.11`。[Release workflow 36422082890](https://github.com/iBigQiang/OpcAgent/actions/runs/36422082890) 的验证、签名策略、CLI、macOS arm64/x64、Windows x64、Linux x64 和 publish 作业全部成功。
+
+[OPC Agent v0.1.11](https://github.com/iBigQiang/OpcAgent/releases/tag/v0.1.11) 已是非草稿、非预发布的 Latest，中文说明和 22 个正式资产齐全。远端标签类型为 annotated tag，解引用到 `b11cd0f7b894d030af0d7d749c1d4eea65601e35`；GitHub Release API 的 `target_commitish` 仍显示默认分支名，但实际源码与归档由这个已验证标签对象决定。仓库无签名 secret，本版按工作流明确发布 macOS 临时签名包和 Windows 未签名包，并附 `SIGNING_STATUS.txt` 与 `SHA256SUMS`。
+
 GitHub run `36367008439` 在 quality 的完整测试阶段失败：`window-close-policy.test.ts` 注册了不含 `BrowserView` 的 Electron mock，后续 `browser-pane-manager.test.ts` 在同一 Bun 进程加载时无法取得该导出。邮件中的 Package skipped 是质量依赖失败的结果，并非未开启打包。原组合在本机复现为 2 pass / 1 fail / 1 error；把浏览器测试加入已有独立进程列表后，真实测试 runner 执行这两个文件共 80 pass / 176 assertions。没有删除断言、跳过测试或放宽门禁。
 
 CI 继续监听 PR，以及 `main`、`craft-sources-auto` 的推送。三平台验证制品按源码 SHA 与 run attempt 命名，保留 30 天。全部打包成功后，独立 job 使用当前运行的真实制品 API 数据，在收到推送的分支 README 中写入有限范围的中文摘要及下载入口。仅该 job 获得仓库写权限；机器人只提交 README 和其 Craft 审计哈希，避免后续源码审计误报。默认分支仍为 main，不自动合并开发分支。

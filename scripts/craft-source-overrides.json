@@ -5209,7 +5209,7 @@
       "reason": "已审查 253aba1 新增的 OPC Agent 项目约定，记录 Bun、隔离 CONFIG_DIR、双语文案、Craft 审计和正式验证入口。"
     },
     "docs/DEVLOG.md": {
-      "sha256": "c6877c0875fe376d64ae580b56c1b486d8e85c0381be918c93901a707f8de319",
+      "sha256": "1bbd8e97c3556b9eef367d882bb9478d2b046164932cc58cdba8959bd7b9e7f4",
       "reason": "已审查工程基线与上游 dialog 回退链的历史开发记录；保留验证结果、失败对照及未解决边界，不作为新的运行时配置。"
     },
     "tasks/lessons.md": {
@@ -5217,7 +5217,7 @@
       "reason": "已审查行尾、依赖隔离、验证证据和上游融合的历史教训；内容属于开发记录，不引入运行时代码或用户配置变更。"
     },
     "tasks/todo.md": {
-      "sha256": "3a3132938ee74bcd0bce5cd67fd3182fd2db3e90f6006be9bbccf3a22bc54032",
+      "sha256": "897e82acc5a284c8726cacd2828941d676cacd772fc7853fb32247958c43e718",
       "reason": "已审查 253aba1 工程基线任务及结果复盘，记录已完成验证和 Windows 既有问题，作为历史工作记录保留。"
     },
     "docs/开发及迭代方案调研报告/2026-08-26-上游mkagent增量比对报告.md": {
