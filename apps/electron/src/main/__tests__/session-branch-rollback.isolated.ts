@@ -15,8 +15,8 @@ describe('session branch rollback on preflight failure', () => {
       const script = `
         import { mkdirSync, writeFileSync } from 'node:fs';
         import { join } from 'node:path';
-        import { SessionManager } from ${JSON.stringify(SESSION_MANAGER_URL)};
-        import { createSession, listSessions, loadSession, saveSession } from '@opcagent/shared/sessions';
+        import { SessionManager, savePiTurnAnchor } from ${JSON.stringify(SESSION_MANAGER_URL)};
+        import { createSession, getSessionPath, listSessions, loadSession, saveSession } from '@opcagent/shared/sessions';
 
         const configDir = process.env.CONFIG_DIR;
         const workspaceRoot = join(configDir, 'workspaces', 'default');
@@ -34,10 +34,12 @@ describe('session branch rollback on preflight failure', () => {
         const source = loadSession(workspaceRoot, sourceConfig.id);
         source.sdkSessionId = 'pi-session-parent';
         source.messages = [
-          { id: 'user-1', role: 'user', content: 'first', timestamp: 1 },
-          { id: 'assistant-1', role: 'assistant', content: 'answer', timestamp: 2 },
+          { id: 'user-1', type: 'user', content: 'first', timestamp: 1 },
+          { id: 'assistant-1', type: 'assistant', content: 'answer', timestamp: 2 },
         ];
         await saveSession(source);
+        // 提供有效切点，让用例进入 SDK 预热失败后的回滚路径。
+        await savePiTurnAnchor(getSessionPath(workspaceRoot, source.id), 'assistant-1', 'pi-entry-1');
 
         const manager = new SessionManager();
         await manager.initialize();

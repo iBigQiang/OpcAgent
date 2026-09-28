@@ -267,7 +267,7 @@
       "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
     },
     "apps/electron/src/main/__tests__/session-branch-rollback.isolated.ts": {
-      "sha256": "189cb92968247fb52d3e75b3df72650de59d85e63744102cef0f92882ad5ef02",
+      "sha256": "1f7d848707044b3ceb2c5ef6c7da886f06a4417eeb7d92df4f19c7ead5fcd3b3",
       "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
     },
     "apps/electron/src/main/__tests__/session-branching-validation.test.ts": {
@@ -5209,7 +5209,7 @@
       "reason": "已审查 253aba1 新增的 OPC Agent 项目约定，记录 Bun、隔离 CONFIG_DIR、双语文案、Craft 审计和正式验证入口。"
     },
     "docs/DEVLOG.md": {
-      "sha256": "b7aa682858f7c0560e6b815c98814c79d24f63ae28420083128017437aba8901",
+      "sha256": "269c6b373edd6b2187960b988762b4bfe7881c4c24e9b8be353a6b74de4962a0",
       "reason": "已审查工程基线与上游 dialog 回退链的历史开发记录；保留验证结果、失败对照及未解决边界，不作为新的运行时配置。"
     },
     "tasks/lessons.md": {
