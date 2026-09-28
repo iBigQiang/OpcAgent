@@ -33,15 +33,15 @@ AES-256-GCM encrypted credential store rather than written into configuration or
 <!-- opcagent:ci-build:start -->
 ## 最新验证构建
 
-源码版本：**0.1.11**；分支：`craft-sources-auto`；提交：[46ce629](https://github.com/iBigQiang/OpcAgent/commit/46ce629b9662750c1c58dc65338a50e4bddc207f)。
+源码版本：**0.1.11**；分支：`craft-sources-auto`；提交：[798b2bb](https://github.com/iBigQiang/OpcAgent/commit/798b2bbb4b0001e319c4b944161bf46f159b9040)。
 
-构建时间：2026-09-28T11:51:56.678Z；[CI #36416806387 · 第 1 次运行](https://github.com/iBigQiang/OpcAgent/actions/runs/36416806387/attempts/1)。
+构建时间：2026-09-28T12:26:27.822Z；[CI #36420500156 · 第 1 次运行](https://github.com/iBigQiang/OpcAgent/actions/runs/36420500156/attempts/1)。
 
 | 平台 | 验证构建下载 |
 | --- | --- |
-| Windows x64 | [下载 Artifact](https://github.com/iBigQiang/OpcAgent/actions/runs/36416806387/artifacts/10967443111) |
-| macOS Apple Silicon | [下载 Artifact](https://github.com/iBigQiang/OpcAgent/actions/runs/36416806387/artifacts/10967852728) |
-| Linux x64 | [下载 Artifact](https://github.com/iBigQiang/OpcAgent/actions/runs/36416806387/artifacts/10967722327) |
+| Windows x64 | [下载 Artifact](https://github.com/iBigQiang/OpcAgent/actions/runs/36420500156/artifacts/10969666682) |
+| macOS Apple Silicon | [下载 Artifact](https://github.com/iBigQiang/OpcAgent/actions/runs/36420500156/artifacts/10969761277) |
+| Linux x64 | [下载 Artifact](https://github.com/iBigQiang/OpcAgent/actions/runs/36420500156/artifacts/10970250277) |
 
 本版用户改动：
 
