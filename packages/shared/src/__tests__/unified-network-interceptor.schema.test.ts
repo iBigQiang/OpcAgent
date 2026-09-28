@@ -1,7 +1,12 @@
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'bun:test';
 import { writeFileSync, unlinkSync, mkdirSync } from 'node:fs';
-import { join } from 'node:path';
-import { homedir } from 'node:os';
+import { join, resolve } from 'node:path';
+import { CONFIG_DIR } from '../config/paths.ts';
+
+// 与 interceptor-common 使用同一模块常量；必须在启动 Bun 前注入隔离目录。
+if (!process.env.CONFIG_DIR?.trim() || resolve(CONFIG_DIR) !== resolve(process.env.CONFIG_DIR)) {
+  throw new Error('运行此测试前必须设置独立 CONFIG_DIR，禁止使用真实用户配置或在模块加载后修改路径');
+}
 
 let injectMetadataIntoToolSchema: typeof import('../unified-network-interceptor.ts').injectMetadataIntoToolSchema;
 let sanitizeEmptyTextCacheControl: typeof import('../unified-network-interceptor.ts').sanitizeEmptyTextCacheControl;
@@ -123,11 +128,11 @@ describe('sanitizeEmptyTextCacheControl', () => {
 });
 
 describe('upgradePromptCacheTtl', () => {
-  const configFile = join(homedir(), '.opcagent', 'config.json');
+  const configFile = join(CONFIG_DIR, 'config.json');
   let originalConfig: string | null = null;
 
   beforeEach(() => {
-    // Save original config if it exists
+    // 保存隔离目录中可能已有的夹具配置。
     try {
       originalConfig = require('node:fs').readFileSync(configFile, 'utf-8');
     } catch {
@@ -136,26 +141,24 @@ describe('upgradePromptCacheTtl', () => {
   });
 
   afterEach(() => {
-    // Restore original config
+    // 仅恢复隔离目录中的夹具配置。
     if (originalConfig !== null) {
       writeFileSync(configFile, originalConfig);
     } else {
-      try { unlinkSync(configFile); } catch { /* ignore */ }
+      try { unlinkSync(configFile); } catch { /* 文件不存在时无需清理。 */ }
     }
     _resetConfigCacheForTesting();
   });
 
   function enableExtendedCache() {
-    const dir = join(homedir(), '.opcagent');
-    mkdirSync(dir, { recursive: true });
+    mkdirSync(CONFIG_DIR, { recursive: true });
     const existing = originalConfig ? JSON.parse(originalConfig) : {};
     writeFileSync(configFile, JSON.stringify({ ...existing, extendedPromptCache: true }));
     _resetConfigCacheForTesting();
   }
 
   function disableExtendedCache() {
-    const dir = join(homedir(), '.opcagent');
-    mkdirSync(dir, { recursive: true });
+    mkdirSync(CONFIG_DIR, { recursive: true });
     const existing = originalConfig ? JSON.parse(originalConfig) : {};
     writeFileSync(configFile, JSON.stringify({ ...existing, extendedPromptCache: false }));
     _resetConfigCacheForTesting();

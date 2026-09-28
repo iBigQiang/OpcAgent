@@ -1355,7 +1355,7 @@
       "reason": "Craft test adapted to the retained Lite feature set or strengthened for retained behavior"
     },
     "packages/shared/src/__tests__/unified-network-interceptor.schema.test.ts": {
-      "sha256": "24105a379d334caa7ac91d5ec10a3f1e4452643371d95056f208eb397b70d436",
+      "sha256": "ebd0ff9abed1680e1de7a943f06a98fa737656b0a3acbb700f5f0c9f6b95498e",
       "reason": "Craft test adapted to the retained Lite feature set or strengthened for retained behavior"
     },
     "packages/shared/src/__tests__/unified-network-interceptor.sse.test.ts": {
@@ -2149,7 +2149,7 @@
       "reason": "OPC-Agent-specific file required by branding, packaging, or the locked Lite boundary"
     },
     ".github/workflows/release.yml": {
-      "sha256": "58afaedf38150b7ccf8486e1a9a4f2c6a7df770e97c7bf48940b109508f07ec3",
+      "sha256": "5bff0acf707165d58b94860958a062d4694f045c5f2bf21c97c9b8289b344cb9",
       "reason": "OPC-Agent-specific file required by branding, packaging, or the locked Lite boundary"
     },
     ".github/workflows/upstream-drift.yml": {
@@ -5209,7 +5209,7 @@
       "reason": "已审查 253aba1 新增的 OPC Agent 项目约定，记录 Bun、隔离 CONFIG_DIR、双语文案、Craft 审计和正式验证入口。"
     },
     "docs/DEVLOG.md": {
-      "sha256": "b9878615ffb09a5a8611b93aeb1997c2ae7a5c74114a914cee85c2031895315d",
+      "sha256": "b7aa682858f7c0560e6b815c98814c79d24f63ae28420083128017437aba8901",
       "reason": "已审查工程基线与上游 dialog 回退链的历史开发记录；保留验证结果、失败对照及未解决边界，不作为新的运行时配置。"
     },
     "tasks/lessons.md": {
