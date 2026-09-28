@@ -13,10 +13,14 @@
 - [x] 三平台制品保留期设为 30 天，名称绑定源码 SHA 和运行轮次。
 - [x] 完成真实制品收集、README 局部更新及审计哈希同步的边界测试：37 项、122 个断言通过。
 - [x] 完成本地 validate:ci、lint、Craft 审计与对抗式审查。
-- [ ] 推送当前开发分支。
-- [ ] 等待 GitHub 质量检查、三平台打包及 README 机器人写回，并核对远端结果。
+- [x] 推送当前开发分支，最终验证源码提交为 46ce629。
+- [x] GitHub run 36416806387 全部成功：4395 项测试通过、11 项跳过、0 失败，三平台制品真实上传。
+- [x] README 机器人提交 40b8901 已生成，只改 README 和对应审计哈希；未递归触发新 CI。
+- [x] 快进同步机器人提交到本地，保留 main 默认分支与现有内容。
 
 普通推送只产生验证安装包，不自动发布正式 Release 或创建版本 tag。详细使用说明见 `docs/zh/releases.md`。
+
+验收链接：https://github.com/iBigQiang/OpcAgent/actions/runs/36416806387 。Windows 既有平台测试差异没有扩展修复，最终全量结果来自 GitHub Linux runner。此配置已在 craft-sources-auto 生效，合并到 main 后 main 使用同样流程。
 
 ---
 

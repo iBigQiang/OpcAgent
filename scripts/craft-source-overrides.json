@@ -3025,7 +3025,7 @@
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "docs/zh/releases.md": {
-      "sha256": "a88284b5db79eb45483520dd9b0bf7895551300509b5d4687fee3ba7e01ee429",
+      "sha256": "31ff59a4a39a19dbcaca532f96ed662f8c935ea2e1dd1ed833535be6310fb55a",
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "docs/zh/sessions.md": {
@@ -5209,7 +5209,7 @@
       "reason": "已审查 253aba1 新增的 OPC Agent 项目约定，记录 Bun、隔离 CONFIG_DIR、双语文案、Craft 审计和正式验证入口。"
     },
     "docs/DEVLOG.md": {
-      "sha256": "269c6b373edd6b2187960b988762b4bfe7881c4c24e9b8be353a6b74de4962a0",
+      "sha256": "2fea214f1855c6bd411f9fc34eb7951eae46cca39c2f61ae3d05557d18e935f8",
       "reason": "已审查工程基线与上游 dialog 回退链的历史开发记录；保留验证结果、失败对照及未解决边界，不作为新的运行时配置。"
     },
     "tasks/lessons.md": {
@@ -5217,7 +5217,7 @@
       "reason": "已审查行尾、依赖隔离、验证证据和上游融合的历史教训；内容属于开发记录，不引入运行时代码或用户配置变更。"
     },
     "tasks/todo.md": {
-      "sha256": "58414a030c9e56d5dc6f16e11842efb0c34be3a8700f4380882d0280d48fd401",
+      "sha256": "171eddbfabb8ba8c81ae775048f4408ad082c7142a30c66c3c6be0ab47c94075",
       "reason": "已审查 253aba1 工程基线任务及结果复盘，记录已完成验证和 Windows 既有问题，作为历史工作记录保留。"
     },
     "docs/开发及迭代方案调研报告/2026-08-26-上游mkagent增量比对报告.md": {
