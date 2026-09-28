@@ -7,12 +7,12 @@
       "reason": "Craft file reviewed and adapted for the locked OPC Agent Lite product boundary"
     },
     ".gitignore": {
-      "sha256": "2c7d00ff724a868ff4e45d4f424a85707978289f825cdfeae792da4247e21a7a",
-      "reason": "Craft file reviewed and adapted for the locked OPC Agent Lite product boundary"
+      "sha256": "685a272b49d53a1963687092006da9a0676b0bd72ceb22e23259dec3fb360651",
+      "reason": "保留 OPC Agent 数据与凭据排除规则；已审查 253aba1 新增 .tmp 和 pnpm 残留忽略，防止测试产物与其他包管理器文件进入仓库。"
     },
     "apps/cli/package.json": {
-      "sha256": "a34365cd23b031b4dfc8c1b090aec4f4e754b80e4911f02cc81079ba4085c408",
-      "reason": "Craft CLI reduced to retained commands and the Pi-only OPC Agent runtime"
+      "sha256": "9c94abd8bc27a888591a431fda69e21b65def780de9d3e7dfe18fa92640c3a63",
+      "reason": "保留 OPC Agent CLI 命名与工作区依赖；已审查 253aba1 将 @types/bun 固定为 1.3.14，消除 latest 引起的重复类型与锁文件漂移。"
     },
     "apps/cli/src/client.ts": {
       "sha256": "bb873a879a0abac27556152e387c91a7520728c94dfe86435d91ef2c7715f103",
@@ -51,7 +51,7 @@
       "reason": "Craft file reviewed and adapted for the locked OPC Agent Lite product boundary"
     },
     "apps/electron/package.json": {
-      "sha256": "758ba1b01ff073ad3c4d8b8fc45d18e892924b84a4f4b89ee392f1d31a46695a",
+      "sha256": "847c1c7d6b6bf08e7da4c79f9923ee5c1066ce029c5afd8b418726233c1b1e85",
       "reason": "Craft file reviewed and adapted for the locked OPC Agent Lite product boundary"
     },
     "apps/electron/resources/bin/doc-diff": {
@@ -343,8 +343,8 @@
       "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
     },
     "apps/electron/src/main/index.ts": {
-      "sha256": "2f33b3be902a62ab3885fbe171b58789850ef520515942f41eb730222e517772",
-      "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
+      "sha256": "ed6aa42f3c9399a186c0930c3e6279f86281cbed900bb3aa81ca94901dcb8cf9",
+      "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved; native dialog bridge reuses WindowManager live-window resolution when the requesting window is gone or already destroyed."
     },
     "apps/electron/src/main/logger.ts": {
       "sha256": "8604f3185e9219305bbc9d2e6a3551baa7d13d87dc4f1c7a0f3f6c43ce5fca45",
@@ -371,8 +371,8 @@
       "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
     },
     "apps/electron/src/renderer/App.tsx": {
-      "sha256": "ee48ee4a01792efb8b88172b89b10ec94b356fa2dd3f54d011a4b509d34db7b9",
-      "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
+      "sha256": "72d4224c56921873c01469224cac370614136ebf7bf0af054fa9eb4113fe95d1",
+      "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved. 已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
     },
     "apps/electron/src/renderer/atoms/__tests__/browser-pane.test.ts": {
       "sha256": "2dab68f4f82baf7e90b06ab68b5c0692161649760820f38cb7314898a0bb3468",
@@ -395,8 +395,8 @@
       "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
     },
     "apps/electron/src/renderer/atoms/sessions.ts": {
-      "sha256": "cd5e1e23d93d7b80cc7a93615bee5b6afa2afc7c9e267ad863c3bbe9dbf14ac6",
-      "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
+      "sha256": "ede976d932dbd104d40372a6f739b7ac70a1a6f667f606c58bfc0d9508f7352e",
+      "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved. 已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
     },
     "apps/electron/src/renderer/browser-empty-state.html": {
       "sha256": "ad5f1730dcd1a2b785f54bbe864ca3c6f7c78935984bd4eff5d517c9b94e2781",
@@ -443,8 +443,8 @@
       "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
     },
     "apps/electron/src/renderer/components/app-shell/ChatDisplay.tsx": {
-      "sha256": "20824a797e92c35444251ea138cfb487837ca6f0fccd545ee41e2ede1774bb95",
-      "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
+      "sha256": "ae7f20dac6a4e0f82791f1b72e72b515dfee428bf2074b4c3cdaa093ccfe0650",
+      "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved. 已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
     },
     "apps/electron/src/renderer/components/app-shell/CompactSessionMenu.tsx": {
       "sha256": "3d1b93cf39f33596543c24a660592ef3abfba339c4411bdd81633cacc15e86e2",
@@ -455,24 +455,24 @@
       "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
     },
     "apps/electron/src/renderer/components/app-shell/input/__tests__/model-picker-helpers.test.ts": {
-      "sha256": "a28ee753b1677a753205b8912c3484478f429cb2ef0056aacb9fbc534cd9f50e",
-      "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
+      "sha256": "af6bd1f758bc1dc447577060fb2a6d5d8cf891c26bdb26bb22a4b9d8bcb04506",
+      "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved. 已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
     },
     "apps/electron/src/renderer/components/app-shell/input/ChatInputZone.tsx": {
       "sha256": "ef295e491e132b7ac9529310c000fdb9f9daa43707dadeb1827f0aa9ec2f809e",
       "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
     },
     "apps/electron/src/renderer/components/app-shell/input/FreeFormInput.tsx": {
-      "sha256": "baa6c9c92f01e425b068707ee493bfc7c6168fd6926ff15ac2fb1b19d5effa9a",
-      "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
+      "sha256": "ade31d85e7af14587aa8647ea402811f8039c1fc7d02aa4e45c5da953a40f0d9",
+      "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved. 已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
     },
     "apps/electron/src/renderer/components/app-shell/input/FreeFormInputContextBadge.tsx": {
       "sha256": "d424a63923164a8dc3412701522e39577dbc24d82921dc4032c983c5b567fcff",
       "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
     },
     "apps/electron/src/renderer/components/app-shell/input/model-picker-helpers.ts": {
-      "sha256": "40eec7945feaf368b83cc22204ef0fc52956167aa6e949a0dd8dca81c1cc0915",
-      "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
+      "sha256": "112725a39921945cafce5ca8b8cf3bb780552faba7fd16c6d23dc4fa9e909d53",
+      "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved. 已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
     },
     "apps/electron/src/renderer/components/app-shell/input/structured/AdminApprovalRequest.tsx": {
       "sha256": "f776e5e0aeef4db46418353ae34a0fd6f3eb2aa94b3c678f3bc243a10e1fc8ea",
@@ -671,20 +671,20 @@
       "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
     },
     "apps/electron/src/renderer/event-processor/handlers/session.ts": {
-      "sha256": "7b3fe1c2707fc8706ed511e07cef9d43b5acfe3e913ba85efdd46f886620de76",
-      "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
+      "sha256": "47692fa2d5cfc362b8fd143c3e5d5b5e46c6ab29298bd079c08dfd69345a9c11",
+      "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved. 已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
     },
     "apps/electron/src/renderer/event-processor/index.ts": {
       "sha256": "3c9851ae97b468c3d2c4cf9fe6c357ad516f2b20c0b09bc0b4f71868a527ec8e",
       "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
     },
     "apps/electron/src/renderer/event-processor/processor.ts": {
-      "sha256": "4528cede36ff89eee87b8ba77a0c24557f8d522a039b14cac28bb40a81732f19",
-      "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
+      "sha256": "69cbce2ee63f8febb57f461b7392c5b730381fee311c6623aa475c7b0686c510",
+      "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved. 已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
     },
     "apps/electron/src/renderer/event-processor/types.ts": {
-      "sha256": "ebe800cb4deef45a3bf3c5983a7631684b4ae0929d92ce26570e47e1946d3c67",
-      "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
+      "sha256": "2a5ff13f52ae8ab31034c64729de848e47ce019024144cf4ca47a9eae7585439",
+      "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved. 已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
     },
     "apps/electron/src/renderer/hooks/__tests__/useOnboarding.test.ts": {
       "sha256": "49771d81805ba7cd65fc7ef1e2fed71c1f6a101b7f0f709a3332d22a689b3cf8",
@@ -755,8 +755,8 @@
       "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
     },
     "apps/electron/src/renderer/pages/ChatPage.tsx": {
-      "sha256": "a345be4a96f4cff99ab791d947e32efca4e88467f95a1bb15a7b971f600fcbcf",
-      "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved."
+      "sha256": "ebb8da9e37142c9450db3ee22e37ac0d8250ff90bdd69d49829d17e7a4326977",
+      "reason": "Craft Sources desktop integration restored with OPC Agent renderer state, routes, Browser behavior, and product branding preserved. 已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
     },
     "apps/electron/src/renderer/pages/index.ts": {
       "sha256": "ec1e30ec73b9e7d8794cc20fcfb3d446884cf0844235a438bcd3d9f8204b2c94",
@@ -839,7 +839,7 @@
       "reason": "Craft file reviewed and adapted for the locked OPC Agent Lite product boundary"
     },
     "apps/webui/package.json": {
-      "sha256": "1883bcf6036d9b67396613fa0409f90d5c4f3ad489c82b372b17dd5660f69029",
+      "sha256": "b3735955f24067c33739526891e26eeb05eab8312f8857465d06e72eae7c50e3",
       "reason": "Craft Sources WebUI protocol support restored through the existing OPC Agent web adapter."
     },
     "apps/webui/src/adapter/web-api.ts": {
@@ -891,19 +891,19 @@
       "reason": "Craft Sources WebUI protocol support restored through the existing OPC Agent web adapter."
     },
     "bun.lock": {
-      "sha256": "d6d0150ebee4da2141b6926cc8fc39797f5e6254d323e33516a32d8b875692a1",
-      "reason": "Craft Sources runtime dependencies and validation scripts restored within the existing OPC Agent package layout."
+      "sha256": "d09de0c6b74df9852fe577401dd85f186f429259b33ef28ceba6a7c2d33db4f5",
+      "reason": "保留既有 OPC Agent 工作区与依赖锁定；与原已审查哈希对照确认 253aba1 仅统一 @types/bun 和 bun-types 为 1.3.14 并去掉 CLI 重复类型记录。"
     },
     "NOTICE": {
       "sha256": "bc021ffccf486b0e55bc79bfaf9fb43c5d1803093d2e9113c8ec67251b8eab04",
       "reason": "Craft file reviewed and adapted for the locked OPC Agent Lite product boundary"
     },
     "package.json": {
-      "sha256": "dba14495f264587f2897ac513019d4ea365fb427503078f58a20150e1e961343",
-      "reason": "Craft Sources runtime dependencies and validation scripts restored within the existing OPC Agent package layout."
+      "sha256": "d6ae42efd85c75e177bc43a9a97fe339c3e4e416f028073733c848dd9979ba68",
+      "reason": "保留 OPC Agent 构建、测试、消息渠道与发布脚本；与原已审查哈希对照确认 253aba1 仅将根 @types/bun 固定为 1.3.14。"
     },
     "packages/core/package.json": {
-      "sha256": "04aacec423cac7b6d15cb657a46d6363b793a7b2f3004116eb0e7906067ea8bc",
+      "sha256": "07680e6a2e4d43e24ea1abc136dcf0641d86a07fd5b5c516c1a9e79d005675b8",
       "reason": "Craft Sources event and message contracts restored while retaining OPC Agent core session types."
     },
     "packages/core/README.md": {
@@ -935,12 +935,12 @@
       "reason": "Craft Sources event and message contracts restored while retaining OPC Agent core session types."
     },
     "packages/pi-agent-server/package.json": {
-      "sha256": "258c45f8cf3f6f19c2120ec21ac95465a0f557f3a586695cbf1c914860789cc3",
+      "sha256": "8d7338c42cb1cd5fad67d9d98239c559802881d2c224765c79fad69f838c60f6",
       "reason": "Craft Pi subprocess adapted to the retained provider and session-tool contract"
     },
     "packages/pi-agent-server/src/index.ts": {
-      "sha256": "4566f1088909be4da9fd67a52d306aebb7bdd1cff0b81d4055c95b87f4850c5b",
-      "reason": "Craft Pi subprocess preserves Pi request identity for custom Anthropic-compatible endpoints while retaining OPC Agent instructions"
+      "sha256": "454c88ebbe6180d173c37aebd779e8765db6145793db7f5b07690608e039d90b",
+      "reason": "Craft Pi subprocess preserves Pi request identity for custom Anthropic-compatible endpoints while retaining OPC Agent instructions 已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
     },
     "packages/pi-agent-server/src/model-resolution.test.ts": {
       "sha256": "5c48a4a535eca639d9bcd7d1823d4abf1643c5830a034331c199f342cc1dc805",
@@ -999,7 +999,7 @@
       "reason": "Craft Pi subprocess adapted to the retained provider and session-tool contract"
     },
     "packages/server-core/package.json": {
-      "sha256": "586244c633b31e58e6b07ee5ce72e6f43a0f1e7141d8259d3e67e6e9de23987a",
+      "sha256": "d61e09bfbfa8f1d89569a9e5f2a54b35c7c5e81dc36d9f385596e6548b9c3e6d",
       "reason": "Craft Sources server integration restored with OPC Agent Pi sessions, RPC transport, Browser, and queued-message behavior preserved."
     },
     "packages/server-core/src/bootstrap/headless-start.ts": {
@@ -1155,8 +1155,8 @@
       "reason": "Craft OAuth refresh regression restored against the OPC Agent Pi session runtime."
     },
     "packages/server-core/src/sessions/SessionManager.ts": {
-      "sha256": "227cc1032d1df908adb38edd56a08bc20787e3e47a421eb7564288c23564793b",
-      "reason": "Craft Sources server integration restored with OPC Agent Pi sessions, RPC transport, Browser, and queued-message behavior preserved."
+      "sha256": "aff35a9ccf4208cc7d92d96ae7dc4883df43858b2bd8d0a2822800e5c70d6f78",
+      "reason": "Craft Sources server integration restored with OPC Agent Pi sessions, RPC transport, Browser, and queued-message behavior preserved. 已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
     },
     "packages/server-core/src/sessions/source-activated-auto-retry.test.ts": {
       "sha256": "c71afcaab0d3a3492c6c55077f039af634b3d497e1a4e80e09ad7c9f843cf756",
@@ -1187,7 +1187,7 @@
       "reason": "Craft WebUI source and OAuth exports restored while retaining OPC Agent server composition."
     },
     "packages/server/package.json": {
-      "sha256": "67b4e8a8ef3cc95c43d0b0dff02d6212c11ac2388e5f128c8be95a2f3620d48c",
+      "sha256": "0a70952a01b0f1b09b6de2699523a999981c336b1c347e4efea75086b32c31ed",
       "reason": "Craft server module reduced to retained local workspace, session, and WebUI behavior"
     },
     "packages/server/src/__tests__/smoke.test.ts": {
@@ -1199,7 +1199,7 @@
       "reason": "Craft Sources server integration restored with OPC Agent Pi sessions, RPC transport, Browser, and queued-message behavior preserved."
     },
     "packages/session-tools-core/package.json": {
-      "sha256": "71f30890a554089ff57c243146498668dd0b34d1bac0fa6d4407a0b4b3542a1e",
+      "sha256": "5705003a5e6ed589d7f4c03489e71bb1fbcb874b23f9ad27060a7eb6a7802cd3",
       "reason": "Craft source session tools restored with OPC Agent package names and retained Browser and session-management contracts."
     },
     "packages/session-tools-core/src/context.ts": {
@@ -1331,7 +1331,7 @@
       "reason": "Craft shared module reduced to retained Pi, session, configuration, Skill, and UI behavior"
     },
     "packages/shared/package.json": {
-      "sha256": "3697bb224c1e663e2876695c55eb8d596120ddda47e6923d4e39e05fde2dcdb8",
+      "sha256": "26a5d6f5d8a3195c40694a3a28164bcab93e405c9afa00ef4adc6277b260b4fb",
       "reason": "Craft Sources runtime dependencies are restored with narrow OAuth exports required by the Electron preload boundary."
     },
     "packages/shared/src/__tests__/feature-flags.test.ts": {
@@ -1395,8 +1395,8 @@
       "reason": "Craft test adapted to the retained Lite feature set or strengthened for retained behavior"
     },
     "packages/shared/src/agent/__tests__/pi-agent-branching-capability.test.ts": {
-      "sha256": "4487f7cb10f32899f7005cea8b80ab7441aa926a2e8e93cc4a6718fe35fc5b5b",
-      "reason": "Craft test adapted to the retained Lite feature set or strengthened for retained behavior"
+      "sha256": "4580ce0fdb6c6f06f00b89ef6302013b4e830c5aac99f3e481a4d340845db610",
+      "reason": "Craft test adapted to the retained Lite feature set or strengthened for retained behavior 已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
     },
     "packages/shared/src/agent/__tests__/pi-agent-error-handling.test.ts": {
       "sha256": "9ecea8090d5bf40d611d21f7a529ab4a3f8bb84791fa2cd95884696e53ffc091",
@@ -1455,7 +1455,7 @@
       "reason": "Craft test adapted to the retained Lite feature set or strengthened for retained behavior"
     },
     "packages/shared/src/agent/backend/__tests__/runtime-resolver.test.ts": {
-      "sha256": "3356ff674f5bd82581ec0755c1d6939f57369a0a892d6462952916b6608e404d",
+      "sha256": "98b60f4daac413cb6da8eecdd83c5feb23673c80c822e56d42e309541bc05c92",
       "reason": "Craft test adapted to the retained Lite feature set or strengthened for retained behavior"
     },
     "packages/shared/src/agent/backend/base-event-adapter.ts": {
@@ -1471,7 +1471,7 @@
       "reason": "Craft connection testing uses the full Pi path and compatible timeout for custom Anthropic endpoints"
     },
     "packages/shared/src/agent/backend/index.ts": {
-      "sha256": "0dec544ca1a8c403b08a6ff20e77bb9ef19e6bbd727f41ba415f1fc0c58d9485",
+      "sha256": "4c3a9be6d687efaa347488442631a21a4a439a695b6a817dfe1ef2ed00aaaf4d",
       "reason": "Craft Sources agent runtime restored with minimal OPC Agent Pi, Browser, branch-session, permission, and background-task compatibility adaptations."
     },
     "packages/shared/src/agent/backend/internal/driver-types.ts": {
@@ -1487,7 +1487,7 @@
       "reason": "Craft shared module reduced to retained Pi, session, configuration, Skill, and UI behavior"
     },
     "packages/shared/src/agent/backend/internal/runtime-resolver.ts": {
-      "sha256": "1f6a59ddd33d1327b3c463d198962143a20ed71f5f7845ae7b6864c156921412",
+      "sha256": "9363bfede872eb7a8c8647384b96414d5a721d4370dec2202427b660ae667c15",
       "reason": "Craft shared module reduced to retained Pi, session, configuration, Skill, and UI behavior"
     },
     "packages/shared/src/agent/backend/pi/constants.ts": {
@@ -1503,8 +1503,8 @@
       "reason": "Craft shared module reduced to retained Pi, session, configuration, Skill, and UI behavior"
     },
     "packages/shared/src/agent/backend/types.ts": {
-      "sha256": "5646e083be5495fc3e81321cc03c65583d382529a2950a8da7f912b688b4203a",
-      "reason": "Craft Sources agent runtime restored with minimal OPC Agent Pi, Browser, branch-session, permission, and background-task compatibility adaptations."
+      "sha256": "54b5e00c03a7eb23d02746ef761dcf837ffbbda241628ea12f84a2e11608527d",
+      "reason": "Craft Sources agent runtime restored with minimal OPC Agent Pi, Browser, branch-session, permission, and background-task compatibility adaptations. 已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
     },
     "packages/shared/src/agent/base-agent.ts": {
       "sha256": "863ed6894f897f69e63731c0ed2b3148b98d6da9c671fe0e42dba82bcaff90ac",
@@ -1603,8 +1603,8 @@
       "reason": "Craft Sources agent runtime restored with minimal OPC Agent Pi, Browser, branch-session, permission, and background-task compatibility adaptations."
     },
     "packages/shared/src/agent/pi-agent.ts": {
-      "sha256": "e96b269965ca4ce649dd0dd31e7b3e99d2d22010e957a63dbb8db90ead906890",
-      "reason": "Craft Sources agent runtime clears completed Pi RPC timeout handles while retaining existing session behavior."
+      "sha256": "1a78b790f1d4e1dd308813742fff41d2136812473aaa5aea7b13b151bc76fbbe",
+      "reason": "Craft Sources agent runtime clears completed Pi RPC timeout handles while retaining existing session behavior. 已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
     },
     "packages/shared/src/agent/powershell-parser.ps1": {
       "sha256": "6596e100c4edbdf5ae1a52419a551f5e337d0c78d3816e078e102f919eaf79d1",
@@ -1775,12 +1775,12 @@
       "reason": "Craft Sources locale strings restored and synchronized with OPC Agent product wording."
     },
     "packages/shared/src/i18n/locales/en.json": {
-      "sha256": "7dfc64279f60a0ddb4a4a76c189d50cecd39b02970f84cc88530dd01aa6b3f7b",
-      "reason": "Craft Sources locale strings restored and synchronized with OPC Agent product wording."
+      "sha256": "8835b1c2f37ce660daf2337db4eccf2a5b09b8fdb8af77c2a6e5fb5c2ee8056f",
+      "reason": "Craft Sources locale strings restored and synchronized with OPC Agent product wording. 已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
     },
     "packages/shared/src/i18n/locales/zh-Hans.json": {
-      "sha256": "098a23097e4a8caa47b81b736357d93988030b0432c44013fad79b7c5a4eb36a",
-      "reason": "Craft Sources locale strings restored and synchronized with OPC Agent product wording."
+      "sha256": "f1d987e2c009a4e6c86f0def2212ad94a0f6636795ef86c2ad697e8d3fca323f",
+      "reason": "Craft Sources locale strings restored and synchronized with OPC Agent product wording. 已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
     },
     "packages/shared/src/i18n/registry.ts": {
       "sha256": "5bf86ce6907bafe09bf69f6c41e40b04e641035a6e82d84f4071b042176e1d82",
@@ -1823,8 +1823,8 @@
       "reason": "Craft Sources protocol channels and DTOs restored while preserving OPC Agent transport naming and existing session events."
     },
     "packages/shared/src/protocol/dto.ts": {
-      "sha256": "6d26c889bd59b7a11c558b74f8517ae9fe0120a628f8c5eff9b9f2fb9d71feb6",
-      "reason": "Craft Sources protocol channels and DTOs restored while preserving OPC Agent transport naming and existing session events."
+      "sha256": "e24cf6875c5afa2e12b8cc39de31bd996ce71ae3cf492730c7b0b9df2abb65ef",
+      "reason": "Craft Sources protocol channels and DTOs restored while preserving OPC Agent transport naming and existing session events. 已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
     },
     "packages/shared/src/protocol/events.ts": {
       "sha256": "bd2657105087341b33b08c545a2d09572b9c6dfb046ca22acd87d047535ec87b",
@@ -1875,8 +1875,8 @@
       "reason": "Craft Sources persistence fields restored within OPC Agent session and workspace storage contracts."
     },
     "packages/shared/src/sessions/types.ts": {
-      "sha256": "b785603a447e7dcc218fc9dabdf03371669ab427bc254aa14de4d0c5a1aeed83",
-      "reason": "Craft Sources persistence fields restored within OPC Agent session and workspace storage contracts."
+      "sha256": "4b0675e408a12716c145cd762e9ec4863248bd5b5c7fce6153c702c46fad6df8",
+      "reason": "Craft Sources persistence fields restored within OPC Agent session and workspace storage contracts. 已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
     },
     "packages/shared/src/skills/__tests__/storage.test.ts": {
       "sha256": "9064e4432531228f3bd3eb9467631db27837c245593ac7d0e9568ffc921b9fb7",
@@ -1999,7 +1999,7 @@
       "reason": "Craft source activation event handling restored in the retained OPC Agent shared chat UI."
     },
     "packages/ui/package.json": {
-      "sha256": "1a6d05b9cda9eb58adc9c8a11a32d8642b432e5106050802675ba30f0a545e09",
+      "sha256": "bc58c7ad3b47923f1f11e136d9def13972309dd17331424b374b07732729fe9b",
       "reason": "Craft source activation event handling restored in the retained OPC Agent shared chat UI."
     },
     "packages/ui/src/components/annotations/block-markers.ts": {
@@ -2095,8 +2095,8 @@
       "reason": "Craft source activation event handling restored in the retained OPC Agent shared chat UI."
     },
     "README.md": {
-      "sha256": "2960f07e6d5fbf2564adf0bf0139c2690098a6bd13541a26dd0e12be739e62ac",
-      "reason": "Craft documentation adapted to the retained OPC Agent feature set and product identifiers"
+      "sha256": "c365a9a9605aa66f1aa2c66545b955b82eeda2c84cb9d7f32ef53a944abb2c8d",
+      "reason": "保留 OPC Agent 品牌、功能边界及来源署名；已审查 253aba1 将当前版本说明更新为 0.1.10 图标和 Windows 通知修复。"
     },
     "scripts/browser-tool.ts": {
       "sha256": "6c150f203ae994e3b3bc8970e6d2e5cd8ce5d697d30bb0a06655bf296ce627b9",
@@ -2129,6 +2129,18 @@
     "scripts/install-app.sh": {
       "sha256": "358103464f53353ae43475916507b7dc7cb3b5b103bc8e5197ee5e1e1ceb99cd",
       "reason": "Craft build or quality automation adapted to OPC Agent targets and the pinned lineage checks"
+    },
+    "apps/electron/src/renderer/components/app-shell/input/__tests__/picker-mode.test.ts": {
+      "sha256": "51b99d6c1c89788f844893068fbfcb803010c7a7e7a3b6f1326c4b6bc9b0332e",
+      "reason": "已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
+    },
+    "apps/electron/src/renderer/components/app-shell/input/picker-mode.ts": {
+      "sha256": "8de72b67f92084e86163052e693604013532a317bd54dc4b4a89911da0a497dc",
+      "reason": "已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
+    },
+    "packages/shared/src/utils/paths.ts": {
+      "sha256": "542b426ab9f632d084764fb2ce84f6ee53945652340adc70c4d8995b3c26850d",
+      "reason": "会话切换完整链路及 Windows 分支持久化路径的实现和回归证据。"
     }
   },
   "mkOnly": {
@@ -2209,7 +2221,7 @@
       "reason": "Regression test for retained OPC Agent behavior not covered at the same Craft path"
     },
     "CHANGELOG.md": {
-      "sha256": "e5d5513e6df1352bc42931d1f527158bab2062fc132fb404ff724493e086eae1",
+      "sha256": "5fec8792383d1cb294f99f79618c36ec97b0eb57ff258a6a2665d25aa86c1358",
       "reason": "OPC-Agent-specific release metadata required by the public artifact workflow"
     },
     "packages/pi-agent-server/src/opcagent-metadata-schema.test.ts": {
@@ -2233,7 +2245,7 @@
       "reason": "Regression test for retained OPC Agent behavior not covered at the same Craft path"
     },
     "packages/server-core/src/sessions/session-branching.test.ts": {
-      "sha256": "afbb051b52df4cb0232f341033c134fd758eb5e27b5bf790ff93ec449705e7e8",
+      "sha256": "d1249bce1a2752ba0e6451dc31d84112416cfe6adcc97afd32a6b4b4dbeff661",
       "reason": "Regression test for retained OPC Agent behavior not covered at the same Craft path"
     },
     "packages/session-tools-core/src/skill-helpers.test.ts": {
@@ -2341,8 +2353,8 @@
       "reason": "OPC Agent lineage, build, or validation guard required by the derivative release workflow"
     },
     "scripts/craft-ui-overrides.json": {
-      "sha256": "14d58456e5161f08af7c5392831d06a881951126202f440babe7d9de33db6d2d",
-      "reason": "OPC Agent lineage, build, or validation guard required by the derivative release workflow"
+      "sha256": "fdeca525522e39f5077cf62f9751bef225d8157a1bfb0c37723c946acb23f2d0",
+      "reason": "OPC Agent lineage, build, or validation guard required by the derivative release workflow 已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
     },
     "scripts/electron-build.test.ts": {
       "sha256": "484a10a18e4e678fa219282175f4cf5abf9a3f15299da417a5ef44d9d2fafe76",
@@ -2473,8 +2485,8 @@
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "apps/electron/src/main/notifications.ts": {
-      "sha256": "c2d7b57aec671f6efda09f3b75594733abac87ec8f1b8f9ec146b51df99f57fb",
-      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+      "sha256": "1304afc6418bbb537e06819375704784a90d07eca13b75ebc2e4a2e3fbcfc745",
+      "reason": "保留 OPC Agent 通知路由与品牌；已审查 ad63b76 仅在 Linux 显式传入通知图标，Windows 依靠应用标识展示标题栏小图标，避免重复大图。"
     },
     "apps/electron/src/main/power-manager.ts": {
       "sha256": "eacc012b7a9c108d90b9f6364624c9f136a035f6ed750dc830537d3de7145d0d",
@@ -2505,8 +2517,8 @@
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "apps/electron/src/renderer/components/app-shell/input/CompactModelSelector.tsx": {
-      "sha256": "af70acb61ab8139b53f03341966fd7c8193237327594c06fd52de190196e16f5",
-      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+      "sha256": "4e0c0763c1ade0768e8690d30835d0f54bc6fe953178b171e2ce3f494453c174",
+      "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration. 已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
     },
     "apps/electron/src/renderer/components/app-shell/input/CompactPermissionModeSelector.tsx": {
       "sha256": "65f450e0f5500fa9080a729ed11b85a3e784e967d2a3fc7793ab3674384472aa",
@@ -3045,7 +3057,7 @@
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "packages/messaging-gateway/package.json": {
-      "sha256": "88c309e18a981256b4ded11040bf5e77728b24b732d5fcdca5590ec1cddc552a",
+      "sha256": "d23347d5e209a6029e028b0cd05225232712b6574fb7d90143350dbe096fc25d",
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "packages/messaging-gateway/src/__tests__/binding-access-router.test.ts": {
@@ -3089,7 +3101,7 @@
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "packages/messaging-whatsapp-worker/package.json": {
-      "sha256": "9897a033512a1250758ba80878aadd114b8beac24799358e1662036ae996996f",
+      "sha256": "59b122c26ce5cbbcb12bce6416b66ecfb75fffb294e4da4a69906854cb85a402",
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
     },
     "packages/messaging-whatsapp-worker/src/media.ts": {
@@ -4841,8 +4853,8 @@
       "reason": "OPC-Agent-specific release metadata required by the release workflow"
     },
     "apps/electron/resources/release-notes/0.1.10.md": {
-      "sha256": "ce5aecd4d0be247655f34e0bb54ff581c4c93bf7f495b71e37a7441d758262f9",
-      "reason": "OPC-Agent-specific release metadata required by the release workflow"
+      "sha256": "341ce6d12510e8a1f26cac3352f32a5b7d881ce55958f38568c786a4c456536c",
+      "reason": "已审查 0.1.10 简体中文发布说明，包含多尺寸安装图标与 ad63b76 Windows 通知去重复 logo 的实际修复。"
     },
     "apps/electron/resources/OPC_Agent_icon.png": {
       "sha256": "9ff4522d8644b7d610739330939578a6318a7d3082d60c6f49d6419eee224316",
@@ -5143,6 +5155,78 @@
     "docs/assets/OPC-Agent-icons/windows/app.ico": {
       "sha256": "7a87f783826e33e5d36c597f81dd06206075566230aa114474e3c14fae71b805",
       "reason": "Reviewed OPC Agent brand, namespace, packaging, and release migration."
+    },
+    "apps/electron/src/renderer/event-processor/handlers/__tests__/session-model-changed.test.ts": {
+      "sha256": "0afff58cbde46eac7ce8c10a674dc128a5674c0e8ac818fe8c41401a7fddac46",
+      "reason": "已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
+    },
+    "packages/pi-agent-server/src/connection-history.ts": {
+      "sha256": "1a3464758837f512cef366a50009c080361f47e941aad7a0dbcb88ddea2934bd",
+      "reason": "已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
+    },
+    "packages/pi-agent-server/src/connection-history.test.ts": {
+      "sha256": "9cc642568d8c7551836afaae4ef3845d391698b6919db3b4a3c44880cd374545",
+      "reason": "已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
+    },
+    "packages/pi-agent-server/src/session-resume.ts": {
+      "sha256": "6a245cf58ad947b747b003130755613fa5e348ca12608876c5435d057872c8b1",
+      "reason": "已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
+    },
+    "packages/pi-agent-server/src/session-resume.test.ts": {
+      "sha256": "8ac3fcecada28a8eea526d2e5840fa620a7802404fb1672ef47fbfd622534c1c",
+      "reason": "已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
+    },
+    "packages/server-core/src/sessions/automation-route-isolation.test.ts": {
+      "sha256": "3b03844fa71c77d48d4ba1b918b3bb545de1aae7db95f08e02037f89a2c953b9",
+      "reason": "已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
+    },
+    "packages/server-core/src/sessions/session-model-switch.isolated.ts": {
+      "sha256": "d14fded8adb1bc8c89dfe64ee7b07b79667d7e60011b07341e67b88ac61af863",
+      "reason": "已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
+    },
+    "packages/shared/src/agent/__tests__/pi-channel-switch.integration.isolated.ts": {
+      "sha256": "e66cb264e3c4fa50e778d2cb5fb643d1e3fbdc2faa58d83366db8b685d251992",
+      "reason": "已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
+    },
+    "tasks/goal-session-channel-model-switching.md": {
+      "sha256": "54fc834670c165d93b36a0c02fe49e7aad7eb859b94221644b7503cf63d0eee0",
+      "reason": "本轮用户要求的会话渠道模型切换 Goal、范围约束、自动化隔离与验证证据。"
+    },
+    "packages/server-core/src/sessions/session-channel-switch.integration.isolated.ts": {
+      "sha256": "8101ce597a36338009b41ab9a54280dac450c4d5985dcace00c1ac53e20b7322",
+      "reason": "会话切换完整链路及 Windows 分支持久化路径的实现和回归证据。"
+    },
+    "packages/shared/src/utils/__tests__/portable-session-paths.test.ts": {
+      "sha256": "0d8b49985c6f267bca7a152d27e8470ed267d846a62810f834a3ab2cbf860eea",
+      "reason": "会话切换完整链路及 Windows 分支持久化路径的实现和回归证据。"
+    },
+    ".gitattributes": {
+      "sha256": "bb25f7d5f16b158b3cd946c4f88e224c039a75926012aa2a2f10e1ef24cb18e8",
+      "reason": "已审查 253aba1 工程基线：统一文本 LF、Windows 脚本 CRLF 和二进制规则，避免跨平台打包脚本行尾失效。"
+    },
+    "CLAUDE.md": {
+      "sha256": "87bce8c14c6f467b8ab9018a41f779322aa42241f8af590e3f7b639f9bb26b2a",
+      "reason": "已审查 253aba1 新增的 OPC Agent 项目约定，记录 Bun、隔离 CONFIG_DIR、双语文案、Craft 审计和正式验证入口。"
+    },
+    "docs/DEVLOG.md": {
+      "sha256": "730f1b21e8e25c77b2c490f1f7c1fce036b273d60a157367b58d119cc2e2bfe6",
+      "reason": "已审查工程基线与上游 dialog 回退链的历史开发记录；保留验证结果、失败对照及未解决边界，不作为新的运行时配置。"
+    },
+    "tasks/lessons.md": {
+      "sha256": "43f7b7f04da7d0b394776538d929ac786a7214a174ef9080923ff4dee3e8f0cc",
+      "reason": "已审查行尾、依赖隔离、验证证据和上游融合的历史教训；内容属于开发记录，不引入运行时代码或用户配置变更。"
+    },
+    "tasks/todo.md": {
+      "sha256": "f8c936216ac105551151d86bd8f96c4f7774a368de1357af78b80000ba6fd639",
+      "reason": "已审查 253aba1 工程基线任务及结果复盘，记录已完成验证和 Windows 既有问题，作为历史工作记录保留。"
+    },
+    "docs/开发及迭代方案调研报告/2026-08-26-上游mkagent增量比对报告.md": {
+      "sha256": "75044e07062e969931e735ac81738d489bb1a7ff68182e364b849e383e37d962",
+      "reason": "已审查 2026-08-26 上游增量调查存档，说明仅吸收 dialog 窗口回退链并保留 OPC Agent 品牌与功能边界；后续实施结论以 DEVLOG 为准。"
+    },
+    "apps/electron/resources/release-notes/0.1.11.md": {
+      "sha256": "3a56913c24ec59667496284f27f033ad22952c0f3c736e68c8ad2c98d59b4545",
+      "reason": "OPC-Agent-specific release metadata required by the release workflow"
     }
   },
   "deleted": {

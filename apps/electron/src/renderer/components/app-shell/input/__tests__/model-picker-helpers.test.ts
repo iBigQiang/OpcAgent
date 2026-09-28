@@ -8,6 +8,7 @@
 import { describe, test, expect } from 'bun:test'
 import type { LlmConnection } from '@opcagent/shared/config/llm-connections'
 import {
+  canSelectSessionConnection,
   formatTokenCount,
   groupConnectionsByProvider,
   stripPiPrefixForDisplay,
@@ -149,5 +150,49 @@ describe('groupConnectionsByProvider', () => {
       ['Local', ['ollama']],
       ['Pi Backend', ['or', 'p']],
     ])
+  })
+})
+
+describe('会话渠道切换资格', () => {
+  const a = conn('a', 'pi')
+  const b = conn('b', 'pi_compat')
+  const cli = conn('cli', 'pi_compat', { platformProfile: 'anyrouter' })
+  const anotherCli = conn('another-cli', 'pi_compat', { platformProfile: 'anyrouter' })
+  const brandedPi = conn('branded', 'pi_compat', { platformProfile: 'anyrouter_pi' })
+
+  test('空会话允许所有合法引擎，首条消息前可以重新选择', () => {
+    expect(canSelectSessionConnection(cli, a, true, 'pi')).toBe(true)
+    expect(canSelectSessionConnection(b, cli, true, 'anthropic')).toBe(true)
+  })
+
+  test('已有 Pi 会话支持 A→B→A 及 Pi 品牌渠道', () => {
+    expect(canSelectSessionConnection(b, a, false)).toBe(true)
+    expect(canSelectSessionConnection(a, b, false, 'pi')).toBe(true)
+    expect(canSelectSessionConnection(brandedPi, a, false)).toBe(true)
+    expect(canSelectSessionConnection(cli, a, false)).toBe(false)
+  })
+
+  test('已有 Claude CLI 会话保留原渠道内换模型，拒绝跨渠道', () => {
+    expect(canSelectSessionConnection(cli, cli, false)).toBe(true)
+    expect(canSelectSessionConnection(anotherCli, cli, false)).toBe(false)
+    expect(canSelectSessionConnection(a, cli, false)).toBe(false)
+  })
+
+  test('原渠道删除后允许 Pi 恢复，禁止已确认的 Claude CLI 历史迁移', () => {
+    expect(canSelectSessionConnection(b, null, false, 'pi')).toBe(true)
+    expect(canSelectSessionConnection(b, null, false, 'anthropic')).toBe(false)
+    expect(canSelectSessionConnection(cli, null, false, 'pi')).toBe(false)
+  })
+
+  test('未知旧会话可尝试 Pi 恢复，最终由服务端检查历史引擎', () => {
+    expect(canSelectSessionConnection(b, null, false)).toBe(true)
+    expect(canSelectSessionConnection(cli, null, false)).toBe(false)
+  })
+
+  test('会话已知引擎优先于被编辑后的当前渠道配置', () => {
+    expect(canSelectSessionConnection(b, cli, false, 'pi')).toBe(true)
+    expect(canSelectSessionConnection(cli, cli, false, 'pi')).toBe(false)
+    expect(canSelectSessionConnection(b, a, false, 'anthropic')).toBe(false)
+    expect(canSelectSessionConnection(a, a, false, 'anthropic')).toBe(false)
   })
 })

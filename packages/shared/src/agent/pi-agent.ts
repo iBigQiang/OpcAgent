@@ -29,7 +29,7 @@ import { AbortReason } from './backend/types.ts';
 import { getBackendRuntime } from './backend/internal/driver-types.ts';
 
 import type { PermissionMode } from './mode-manager.ts';
-import type { ThinkingLevel } from './thinking-levels.ts';
+import { normalizeThinkingLevel, type ThinkingLevel } from './thinking-levels.ts';
 
 // Import models from centralized registry
 import { getModelById } from '../config/models.ts';
@@ -250,6 +250,8 @@ export class PiAgent extends BaseAgent {
     resolve: (sessionId: string | null) => void;
     reject: (error: Error) => void;
   }> = new Map();
+
+  private readyModelCapabilities: { thinkingLevel?: ThinkingLevel; contextWindow?: number } = {};
 
   // Pending compact requests (manual compaction RPC)
   private pendingCompactions: Map<string, {
@@ -479,6 +481,8 @@ export class PiAgent extends BaseAgent {
       thinkingLevel: this._thinkingLevel,
       workspaceRootPath: this.config.workspace.rootPath,
       sessionId,
+      connectionSlug: this.config.connectionSlug,
+      requireExistingSession: this.config.requireExistingSession,
       sessionPath,
       workingDirectory,
       plansFolderPath,
@@ -1419,6 +1423,20 @@ export class PiAgent extends BaseAgent {
     if (!pending) return;
 
     this.pendingEnsureSessionReady.delete(id);
+    if (msg.errorMessage) {
+      pending.reject(new Error(String(msg.errorMessage)));
+      return;
+    }
+    this.readyModelCapabilities = {
+      thinkingLevel: normalizeThinkingLevel(msg.thinkingLevel === 'minimal' ? 'low' : msg.thinkingLevel),
+      contextWindow: typeof msg.contextWindow === 'number' ? msg.contextWindow : undefined,
+    };
+    if (this.readyModelCapabilities.thinkingLevel) {
+      this._thinkingLevel = this.readyModelCapabilities.thinkingLevel;
+    }
+    if (this.readyModelCapabilities.contextWindow) {
+      this.adapter.setContextWindow(this.readyModelCapabilities.contextWindow);
+    }
     if (sessionId && this.piSessionId !== sessionId) {
       this.piSessionId = sessionId;
       this.config.onSdkSessionIdUpdate?.(sessionId);
@@ -1728,6 +1746,12 @@ export class PiAgent extends BaseAgent {
     }
   }
 
+  async ensureSessionReady(): Promise<{ thinkingLevel?: ThinkingLevel; contextWindow?: number }> {
+    const sessionId = await this.requestEnsureSessionReady();
+    if (!sessionId) throw new Error('无法恢复 Pi 会话上下文');
+    return this.readyModelCapabilities;
+  }
+
   // ============================================================
   // Chat (AsyncGenerator backed by the subprocess event queue)
   // ============================================================
@@ -2022,7 +2046,7 @@ export class PiAgent extends BaseAgent {
   // ============================================================
 
   isProcessing(): boolean {
-    return this._isProcessing;
+    return this._isProcessing || this.pendingPermissions.size > 0 || this.pendingCompactions.size > 0;
   }
 
   async abort(reason?: string): Promise<void> {

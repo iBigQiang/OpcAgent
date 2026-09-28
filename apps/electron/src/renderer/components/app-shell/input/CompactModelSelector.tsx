@@ -38,6 +38,7 @@ import {
 import { ConnectionIcon } from '@/components/icons/ConnectionIcon'
 import { derivePickerMode } from './picker-mode'
 import {
+  canSelectSessionConnection,
   formatTokenCount,
   groupConnectionsByProvider,
   stripPiPrefixForDisplay,
@@ -48,7 +49,8 @@ interface CompactModelSelectorProps {
   currentModel: string
   currentConnection?: string
   onModelChange: (model: string, connection?: string) => void
-  onConnectionChange?: (connectionSlug: string) => void
+  modelSelectionDisabled?: boolean
+  agentProvider?: 'pi' | 'anthropic'
   thinkingLevel?: ThinkingLevel
   onThinkingLevelChange?: (level: ThinkingLevel) => void
   isEmptySession?: boolean
@@ -64,7 +66,8 @@ export function CompactModelSelector({
   currentModel,
   currentConnection,
   onModelChange,
-  onConnectionChange,
+  modelSelectionDisabled = false,
+  agentProvider,
   thinkingLevel = 'medium',
   onThinkingLevelChange,
   isEmptySession = false,
@@ -74,6 +77,9 @@ export function CompactModelSelector({
   const { t } = useTranslation()
   const [open, setOpen] = React.useState(false)
   const [expandedConnection, setExpandedConnection] = React.useState<string | null>(null)
+  React.useEffect(() => {
+    if (modelSelectionDisabled) setOpen(false)
+  }, [modelSelectionDisabled])
 
   const appShellCtx = useOptionalAppShellContext()
   const llmConnections = appShellCtx?.llmConnections ?? []
@@ -103,7 +109,6 @@ export function CompactModelSelector({
   const pickerMode = derivePickerMode({
     connectionUnavailable,
     connectionDefaultModel,
-    isEmptySession,
     connectionCount: llmConnections.length,
   })
 
@@ -147,29 +152,29 @@ export function CompactModelSelector({
 
   const handlePickFlatModel = React.useCallback(
     (modelId: string) => {
+      if (modelSelectionDisabled) return
       onModelChange(modelId, effectiveConnection)
       setOpen(false)
     },
-    [onModelChange, effectiveConnection],
+    [onModelChange, effectiveConnection, modelSelectionDisabled],
   )
 
   const handlePickSwitcherModel = React.useCallback(
     (connSlug: string, modelId: string) => {
-      const isCurrentConnection = effectiveConnection === connSlug
-      if (!isCurrentConnection && onConnectionChange) {
-        onConnectionChange(connSlug)
-      }
+      if (modelSelectionDisabled) return
       onModelChange(modelId, connSlug)
       setOpen(false)
     },
-    [onModelChange, onConnectionChange, effectiveConnection],
+    [onModelChange, modelSelectionDisabled],
   )
 
   return (
-    <Drawer open={open} onOpenChange={setOpen}>
+    <Drawer open={open && !modelSelectionDisabled} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
         <button
           type="button"
+          disabled={modelSelectionDisabled}
+          title={modelSelectionDisabled ? t('chat.modelPicker.busy') : undefined}
           aria-label={connectionUnavailable
             ? t('common.unavailable')
             : `${t('common.model')}: ${currentModelDisplayName}`}
@@ -206,6 +211,9 @@ export function CompactModelSelector({
         </DrawerHeader>
 
         <div className="px-2 pb-4 flex flex-col gap-0.5 max-h-[55vh] overflow-y-auto">
+          {connectionUnavailable && pickerMode === 'switcher' && (
+            <div className="px-3 py-2 text-xs text-destructive">{t('chat.connectionUnavailableDescription')}</div>
+          )}
           {/* === Models section === */}
           {pickerMode === 'unavailable' ? (
             <div className="flex flex-col items-center justify-center py-6 px-4 text-center">
@@ -244,19 +252,21 @@ export function CompactModelSelector({
                 {connections.map(conn => {
                   const isCurrentConnection = effectiveConnection === conn.slug
                   const isAuthenticated = conn.isAuthenticated
+                  const isCompatible = canSelectSessionConnection(conn, effectiveConnectionDetails, isEmptySession, agentProvider)
+                  const isSelectable = isAuthenticated && isCompatible
                   const isExpanded = expandedConnection === conn.slug
                   return (
                     <React.Fragment key={conn.slug}>
                       <button
                         type="button"
-                        disabled={!isAuthenticated}
+                        disabled={!isSelectable || modelSelectionDisabled}
                         onClick={() =>
                           setExpandedConnection(prev => (prev === conn.slug ? null : conn.slug))
                         }
                         className={cn(
                           'flex items-center gap-2 w-full px-3 py-2 rounded-lg text-left transition-colors',
-                          !isAuthenticated && 'opacity-50 cursor-not-allowed',
-                          isAuthenticated && 'hover:bg-foreground/5',
+                          !isSelectable && 'opacity-50 cursor-not-allowed',
+                          isSelectable && 'hover:bg-foreground/5',
                           isCurrentConnection && !isExpanded && 'bg-foreground/5',
                         )}
                       >
@@ -268,11 +278,14 @@ export function CompactModelSelector({
                               {t('settings.ai.notAuthenticated')}
                             </div>
                           )}
+                          {!isCompatible && (
+                            <div className="text-xs text-muted-foreground">{t('chat.modelPicker.engineSwitchUnavailable')}</div>
+                          )}
                         </div>
                         {isCurrentConnection && (
                           <Check className="h-3 w-3 text-foreground/60 shrink-0" />
                         )}
-                        {isAuthenticated && (
+                        {isSelectable && (
                           <ChevronRight
                             className={cn(
                               'h-3 w-3 opacity-60 shrink-0 transition-transform',
@@ -281,7 +294,7 @@ export function CompactModelSelector({
                           />
                         )}
                       </button>
-                      {isAuthenticated && isExpanded && (
+                      {isSelectable && isExpanded && (
                         <div className="pl-6 flex flex-col gap-0.5">
                           {(conn.models || ANTHROPIC_MODELS).map(model => {
                             const modelId = typeof model === 'string' ? model : model.id
@@ -296,6 +309,7 @@ export function CompactModelSelector({
                               <DrawerClose asChild key={modelId}>
                                 <button
                                   type="button"
+                                  disabled={modelSelectionDisabled}
                                   onClick={() => handlePickSwitcherModel(conn.slug, modelId)}
                                   className={cn(
                                     'flex items-center justify-between w-full px-3 py-2 rounded-lg text-left transition-colors',
@@ -357,6 +371,7 @@ export function CompactModelSelector({
                 <DrawerClose asChild key={modelId}>
                   <button
                     type="button"
+                    disabled={modelSelectionDisabled}
                     onClick={() => handlePickFlatModel(modelId)}
                     className={cn(
                       'flex items-center justify-between w-full px-3 py-2 rounded-lg text-left transition-colors',
@@ -408,7 +423,7 @@ export function CompactModelSelector({
                   <DrawerClose asChild key={id}>
                     <button
                       type="button"
-                      disabled={thinkingDisabled}
+                      disabled={thinkingDisabled || modelSelectionDisabled}
                       onClick={() => onThinkingLevelChange?.(id)}
                       className={cn(
                         'flex items-center justify-between w-full px-3 py-2 rounded-lg text-left transition-colors',

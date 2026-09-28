@@ -2,8 +2,8 @@
   "version": 2,
   "files": {
     "apps/electron/src/renderer/App.tsx": {
-      "sha256": "7cf56aeed12bbaf007a527b34e614ce61937e1d31d437fd4b3c660aadb639f08",
-      "reason": "Craft app event plumbing restores source change notifications and credential responses while retaining Pi OAuth and browser flows and omitting excluded product surfaces"
+      "sha256": "72d4224c56921873c01469224cac370614136ebf7bf0af054fa9eb4113fe95d1",
+      "reason": "Craft app event plumbing restores source change notifications and credential responses while retaining Pi OAuth and browser flows and omitting excluded product surfaces 已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
     },
     "apps/electron/src/renderer/assets/opcagent_app_icon.png": {
       "sha256": "8ef2d656c2eb9bbef8d0d8abb646e1ded0e4143046434866d541aaf9e3da6dc5",
@@ -42,8 +42,8 @@
       "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or OPC Agent branding"
     },
     "apps/electron/src/renderer/atoms/sessions.ts": {
-      "sha256": "919ed8b93d39d160984be32bbd51b39d5cc8c9eea3559bcaa3ff5c901188659d",
-      "reason": "Craft session atoms restore enabled source slugs and source activation metadata while retaining the Lite session model"
+      "sha256": "ede976d932dbd104d40372a6f739b7ac70a1a6f667f606c58bfc0d9508f7352e",
+      "reason": "Craft session atoms restore enabled source slugs and source activation metadata while retaining the Lite session model 已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
     },
     "apps/electron/src/renderer/browser-empty-state.html": {
       "sha256": "1b4ca821f16f50506a42a0b27a5a9e7d4ca761f55a01801618bcd3ce37f72d21",
@@ -90,8 +90,8 @@
       "reason": "Craft application shell adapted only to remove excluded product surfaces"
     },
     "apps/electron/src/renderer/components/app-shell/ChatDisplay.tsx": {
-      "sha256": "65036722f9ef0bb6183bf98ca7c0eac17c20c65f31aff868b15d74c719e8861b",
-      "reason": "Craft chat display restores Source authentication cards and enabled-source input state while retaining OPC Agent timestamp and copy-footer fixes"
+      "sha256": "ae7f20dac6a4e0f82791f1b72e72b515dfee428bf2074b4c3cdaa093ccfe0650",
+      "reason": "Craft chat display restores Source authentication cards and enabled-source input state while retaining OPC Agent timestamp and copy-footer fixes 已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
     },
     "apps/electron/src/renderer/components/app-shell/CompactSessionMenu.tsx": {
       "sha256": "924b1c6d4fd0a871d145a3b496e14808102d2aa10e819c83bef4ad942f286353",
@@ -102,24 +102,24 @@
       "reason": "Craft application shell adapted only to remove excluded product surfaces"
     },
     "apps/electron/src/renderer/components/app-shell/input/__tests__/model-picker-helpers.test.ts": {
-      "sha256": "a0bc8c5ee8e91280733905d54c71226694793a7e7496928339b68eaf532854c2",
-      "reason": "Craft renderer test adapted to retained Lite behavior"
+      "sha256": "af6bd1f758bc1dc447577060fb2a6d5d8cf891c26bdb26bb22a4b9d8bcb04506",
+      "reason": "Craft renderer test adapted to retained Lite behavior 已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
     },
     "apps/electron/src/renderer/components/app-shell/input/ChatInputZone.tsx": {
       "sha256": "03baeb18259f88126e65447a8ba7f28107586ccb2cb359627d0152f38a1ef25e",
       "reason": "Craft application shell adapted only to remove excluded product surfaces"
     },
     "apps/electron/src/renderer/components/app-shell/input/FreeFormInput.tsx": {
-      "sha256": "ddbcceb7a15723f653e4c495b49b094fbf288e27c3550bf3f482b7ba251ef3fd",
-      "reason": "Craft free-form input restores Source selection and mentions while retaining OPC Agent model, browser, attachment, and input behavior and omitting excluded label controls"
+      "sha256": "ade31d85e7af14587aa8647ea402811f8039c1fc7d02aa4e45c5da953a40f0d9",
+      "reason": "Craft free-form input restores Source selection and mentions while retaining OPC Agent model, browser, attachment, and input behavior and omitting excluded label controls 已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
     },
     "apps/electron/src/renderer/components/app-shell/input/FreeFormInputContextBadge.tsx": {
       "sha256": "e2a36c060df1d1c99ff0096449924f26fcb2a09bffc5902230199aea6dc426c7",
       "reason": "Craft application shell adapted only to remove excluded product surfaces"
     },
     "apps/electron/src/renderer/components/app-shell/input/model-picker-helpers.ts": {
-      "sha256": "40eec7945feaf368b83cc22204ef0fc52956167aa6e949a0dd8dca81c1cc0915",
-      "reason": "Craft application shell adapted only to remove excluded product surfaces"
+      "sha256": "112725a39921945cafce5ca8b8cf3bb780552faba7fd16c6d23dc4fa9e909d53",
+      "reason": "Craft application shell adapted only to remove excluded product surfaces 已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
     },
     "apps/electron/src/renderer/components/app-shell/input/structured/AdminApprovalRequest.tsx": {
       "sha256": "f776e5e0aeef4db46418353ae34a0fd6f3eb2aa94b3c678f3bc243a10e1fc8ea",
@@ -318,20 +318,20 @@
       "reason": "Craft renderer test adapted to retained Lite behavior"
     },
     "apps/electron/src/renderer/event-processor/handlers/session.ts": {
-      "sha256": "d160c7f0da0509e2a0294e4fed1cae48c5a3fac701741ab729dda6abe4af6828",
-      "reason": "Craft session event handlers restore source activation, source list updates, and credential state while retaining Lite session semantics"
+      "sha256": "47692fa2d5cfc362b8fd143c3e5d5b5e46c6ab29298bd079c08dfd69345a9c11",
+      "reason": "Craft session event handlers restore source activation, source list updates, and credential state while retaining Lite session semantics 已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
     },
     "apps/electron/src/renderer/event-processor/index.ts": {
       "sha256": "3c9851ae97b468c3d2c4cf9fe6c357ad516f2b20c0b09bc0b4f71868a527ec8e",
       "reason": "Craft event processor barrel restores source activation and credential event exports without excluded product exports"
     },
     "apps/electron/src/renderer/event-processor/processor.ts": {
-      "sha256": "05112e1f6e1d3eb3905dd27ce68934927c4c41cd5c6fcca09d52693bd7c65642",
-      "reason": "Craft event processor restores source activation and credential request routing while excluded product event handlers remain removed"
+      "sha256": "69cbce2ee63f8febb57f461b7392c5b730381fee311c6623aa475c7b0686c510",
+      "reason": "Craft event processor restores source activation and credential request routing while excluded product event handlers remain removed 已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
     },
     "apps/electron/src/renderer/event-processor/types.ts": {
-      "sha256": "f66e744e56af4409b4d6b070ef538de5797f9e5373691e550b5a8be95244f11a",
-      "reason": "Craft renderer event state restores pending source credentials and enabled source slugs while retaining the Lite event surface"
+      "sha256": "2a5ff13f52ae8ab31034c64729de848e47ce019024144cf4ca47a9eae7585439",
+      "reason": "Craft renderer event state restores pending source credentials and enabled source slugs while retaining the Lite event surface 已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
     },
     "apps/electron/src/renderer/hooks/__tests__/useOnboarding.test.ts": {
       "sha256": "49771d81805ba7cd65fc7ef1e2fed71c1f6a101b7f0f709a3332d22a689b3cf8",
@@ -398,8 +398,8 @@
       "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or OPC Agent branding"
     },
     "apps/electron/src/renderer/pages/ChatPage.tsx": {
-      "sha256": "84920dbc183bc253e947926cc4a66757bee4e305e856bc471167cf7f86c7f856",
-      "reason": "Craft chat page restores enabled Sources and credential response plumbing while retaining the Lite page layout and Pi session behavior"
+      "sha256": "ebb8da9e37142c9450db3ee22e37ac0d8250ff90bdd69d49829d17e7a4326977",
+      "reason": "Craft chat page restores enabled Sources and credential response plumbing while retaining the Lite page layout and Pi session behavior 已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
     },
     "apps/electron/src/renderer/pages/index.ts": {
       "sha256": "ec1e30ec73b9e7d8794cc20fcfb3d446884cf0844235a438bcd3d9f8204b2c94",
@@ -444,6 +444,22 @@
     "apps/electron/src/renderer/utils/session.ts": {
       "sha256": "0e2d6faa76622ecbe1ab438304dc0987eb8486e4f9ac4d43a0cbbd514974771a",
       "reason": "Craft renderer file adapted for retained Lite behavior, removed product branches, or OPC Agent branding"
+    },
+    "apps/electron/src/renderer/components/app-shell/input/CompactModelSelector.tsx": {
+      "sha256": "4e0c0763c1ade0768e8690d30835d0f54bc6fe953178b171e2ce3f494453c174",
+      "reason": "已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
+    },
+    "apps/electron/src/renderer/components/app-shell/input/__tests__/picker-mode.test.ts": {
+      "sha256": "51b99d6c1c89788f844893068fbfcb803010c7a7e7a3b6f1326c4b6bc9b0332e",
+      "reason": "已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
+    },
+    "apps/electron/src/renderer/components/app-shell/input/picker-mode.ts": {
+      "sha256": "8de72b67f92084e86163052e693604013532a317bd54dc4b4a89911da0a497dc",
+      "reason": "已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
+    },
+    "apps/electron/src/renderer/event-processor/handlers/__tests__/session-model-changed.test.ts": {
+      "sha256": "0afff58cbde46eac7ce8c10a674dc128a5674c0e8ac818fe8c41401a7fddac46",
+      "reason": "已审查本轮会话内 Pi 渠道与模型切换、上下文恢复及自动化隔离变更。"
     }
   }
 }

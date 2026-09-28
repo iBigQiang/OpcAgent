@@ -9,7 +9,7 @@ import { describe, it, expect, afterEach } from 'bun:test';
 import { mkdirSync, writeFileSync, rmSync, chmodSync, copyFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { resolveBackendRuntimePaths, resolveClaudeExecutable, validateClaudeExecutablePath } from '../internal/runtime-resolver.ts';
+import { resolveBackendRuntimePaths, resolveBundledRuntimePath, resolveClaudeExecutable, validateClaudeExecutablePath } from '../internal/runtime-resolver.ts';
 import { resolveBackendHostTooling } from '../factory.ts';
 import type { BackendHostRuntimeContext } from '../types.ts';
 
@@ -235,6 +235,34 @@ describe('resolveBundledRuntimePath', () => {
 
     const paths = resolveBackendRuntimePaths({ appRootPath: appRoot, resourcesPath, isPackaged: true });
     expect(paths.bundledRuntimePath).toBe(bundled);
+  });
+
+  it('桌面启动与会话共用解析器，优先使用 Electron extraResources 中的 Bun', () => {
+    const resourcesPath = join(tmpBase, 'resources');
+    const appRootPath = join(resourcesPath, 'app');
+    const binary = process.platform === 'win32' ? 'bun.exe' : 'bun';
+    const expected = join(resourcesPath, 'vendor', 'bun', binary);
+    const oldLayout = join(appRootPath, 'vendor', 'bun', binary);
+    mkdirSync(join(resourcesPath, 'vendor', 'bun'), { recursive: true });
+    mkdirSync(join(appRootPath, 'vendor', 'bun'), { recursive: true });
+    writeFileSync(expected, '当前打包运行时');
+    writeFileSync(oldLayout, '旧布局运行时');
+
+    const hostRuntime = { appRootPath, resourcesPath, isPackaged: true };
+    expect(resolveBundledRuntimePath(hostRuntime)).toBe(expected);
+    expect(resolveBackendRuntimePaths(hostRuntime).nodeRuntimePath).toBe(expected);
+  });
+
+  it('打包资源缺失时不会借助开发机 OPCAGENT_BUN 掩盖错误', () => {
+    const previousBun = process.env.OPCAGENT_BUN;
+    process.env.OPCAGENT_BUN = process.execPath;
+    try {
+      expect(resolveBundledRuntimePath({ appRootPath: join(tmpBase, 'missing', 'app'),
+        resourcesPath: join(tmpBase, 'missing'), isPackaged: true })).toBeUndefined();
+    } finally {
+      if (previousBun === undefined) delete process.env.OPCAGENT_BUN;
+      else process.env.OPCAGENT_BUN = previousBun;
+    }
   });
 
   it('honors OPCAGENT_BUN when PATH lookup is unavailable', () => {

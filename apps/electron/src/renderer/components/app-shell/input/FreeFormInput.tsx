@@ -81,6 +81,7 @@ import { WorkingDirectorySelector, formatPathForDisplay } from './WorkingDirecto
 import { CompactPermissionModeSelector } from './CompactPermissionModeSelector'
 import { CompactModelSelector } from './CompactModelSelector'
 import {
+  canSelectSessionConnection,
   formatTokenCount,
   groupConnectionsByProvider,
   stripPiPrefixForDisplay,
@@ -223,11 +224,11 @@ export interface FreeFormInputProps {
    */
   enableCompactModelPicker?: boolean
   // Connection selection (hierarchical connection → model selector)
-  /** Current LLM connection slug (locked after first message) */
+  /** 当前会话使用的渠道。 */
   currentConnection?: string
-  /** Callback when connection changes (only works when session is empty) */
-  onConnectionChange?: (connectionSlug: string) => void
-  /** When true, the session's locked connection has been removed */
+  modelSelectionDisabled?: boolean
+  agentProvider?: 'pi' | 'anthropic'
+  /** 当前会话使用的渠道已被删除。 */
   connectionUnavailable?: boolean
   /**
    * True when the input is collapsed because the agent is processing in
@@ -291,12 +292,14 @@ export function FreeFormInput({
   compactMode = false,
   enableCompactModelPicker = false,
   currentConnection,
-  onConnectionChange,
+  modelSelectionDisabled = false,
+  agentProvider,
   connectionUnavailable = false,
   isCollapsedInCompact = false,
   onRequestExpand,
 }: FreeFormInputProps) {
   const { t } = useTranslation()
+  const pickerDisabled = modelSelectionDisabled || isProcessing || disabled || !!contextStatus?.isCompacting
 
   // Default rotating placeholders for onboarding/empty state (i18n-aware)
   const defaultPlaceholders = React.useMemo(() => [
@@ -329,13 +332,10 @@ export function FreeFormInput({
     return conn.defaultModel ?? null
   }, [currentConnection, workspaceDefaultConnection, llmConnections])
 
-  // Decide which of the four picker UIs to render. The `switcher` branch
-  // wins over `locked-single` so users with a single-model pi_compat default
-  // can still reach the connection list on a fresh session (#727).
+  // 渠道列表优先于单模型展示，已有历史及删除原渠道后仍可切换。
   const pickerMode = derivePickerMode({
     connectionUnavailable,
     connectionDefaultModel,
-    isEmptySession,
     connectionCount: llmConnections.length,
   })
 
@@ -388,18 +388,10 @@ export function FreeFormInput({
     [llmConnections],
   )
 
-  // Find current connection details for display
-  const currentConnectionDetails = React.useMemo(() => {
-    if (!currentConnection) return null
-    return llmConnections.find(c => c.slug === currentConnection) ?? null
-  }, [llmConnections, currentConnection])
-
   // Effective connection: canonical fallback chain (session → workspace default → global default → first)
   const effectiveConnection = resolveEffectiveConnectionSlug(currentConnection, workspaceDefaultConnection, llmConnections)
 
-  // Effective connection details (with fallbacks) for model list
-  // Unlike currentConnectionDetails which is null when no explicit connection is set,
-  // this resolves to the actual connection being used (including workspace default)
+  // 按会话显式选择及默认值优先级解析当前渠道，供模型显示和引擎校验使用。
   const effectiveConnectionDetails = React.useMemo(() => {
     if (!effectiveConnection) return null
     return llmConnections.find(c => c.slug === effectiveConnection) ?? null
@@ -546,6 +538,9 @@ export function FreeFormInput({
   const [isFocused, setIsFocused] = React.useState(false)
   const [inputMaxHeight, setInputMaxHeight] = React.useState(540)
   const [modelDropdownOpen, setModelDropdownOpen] = React.useState(false)
+  React.useEffect(() => {
+    if (pickerDisabled) setModelDropdownOpen(false)
+  }, [pickerDisabled])
 
   // Input settings (loaded from config)
   const [autoCapitalisation, setAutoCapitalisation] = React.useState(true)
@@ -1684,7 +1679,8 @@ export function FreeFormInput({
               currentModel={currentModel}
               currentConnection={currentConnection}
               onModelChange={onModelChange}
-              onConnectionChange={onConnectionChange}
+              modelSelectionDisabled={pickerDisabled}
+              agentProvider={agentProvider}
               thinkingLevel={thinkingLevel}
               onThinkingLevelChange={onThinkingLevelChange}
               isEmptySession={isEmptySession}
@@ -1917,12 +1913,14 @@ export function FreeFormInput({
           <div className="flex items-center shrink-0">
           {/* 5. Model/Connection Selector - Hidden in compact mode (EditPopover embedding) */}
           {!compactMode && (
-          <DropdownMenu open={modelDropdownOpen} onOpenChange={setModelDropdownOpen}>
+          <DropdownMenu open={modelDropdownOpen && !pickerDisabled} onOpenChange={setModelDropdownOpen}>
             <Tooltip>
               <TooltipTrigger asChild>
                 <DropdownMenuTrigger asChild>
                   <button
                     type="button"
+                    disabled={pickerDisabled}
+                    title={pickerDisabled ? t('chat.modelPicker.busy') : undefined}
                     className={cn(
                       "input-toolbar-btn inline-flex items-center h-7 px-1.5 gap-0.5 text-[13px] shrink-0 rounded-[6px] hover:bg-foreground/5 transition-colors select-none",
                       modelDropdownOpen && "bg-foreground/5",
@@ -1945,10 +1943,13 @@ export function FreeFormInput({
                 </DropdownMenuTrigger>
               </TooltipTrigger>
               <TooltipContent side="top">
-                {t('common.model')}
+                {pickerDisabled ? t('chat.modelPicker.busy') : t('common.model')}
               </TooltipContent>
             </Tooltip>
             <StyledDropdownMenuContent side="top" align="end" sideOffset={8} className="min-w-[260px]">
+              {connectionUnavailable && pickerMode === 'switcher' && (
+                <div className="px-2 py-2 text-xs text-destructive">{t('chat.connectionUnavailableDescription')}</div>
+              )}
               {/* Connection unavailable message */}
               {pickerMode === 'unavailable' ? (
                 <div className="flex flex-col items-center justify-center py-6 px-4 text-center">
@@ -1960,10 +1961,7 @@ export function FreeFormInput({
                 </div>
               ) : pickerMode === 'locked-single' && connectionDefaultModel ? (
                 (() => {
-                  // Single-model pi_compat connection on a non-empty session (or
-                  // when there's only one connection, so no switcher to show).
-                  // Model row is disabled (locked to this session); vision toggle
-                  // remains interactive.
+                  // 只有一个渠道和模型时保留展示行及图片能力开关。
                   const showVisionToggle =
                     !!effectiveConnectionDetails && isCompatProvider(effectiveConnectionDetails.providerType)
                   const visionOn = showVisionToggle && modelSupportsImages(effectiveConnectionDetails!, connectionDefaultModel)
@@ -2019,7 +2017,7 @@ export function FreeFormInput({
                   )
                 })()
               ) : pickerMode === 'switcher' ? (
-                /* Hierarchical view: Provider → Connection → Models (empty session with multiple connections — lets the user switch BEFORE the first message locks the connection) */
+                /* 按提供商、渠道、模型分层展示，统一校验已有会话的引擎边界。 */
                 connectionsByProvider.map(([providerName, connections], index) => (
                   <React.Fragment key={providerName}>
                     {/* Provider group label */}
@@ -2031,10 +2029,12 @@ export function FreeFormInput({
                     {connections.map((conn) => {
                       const isCurrentConnection = effectiveConnection === conn.slug
                       const isAuthenticated = conn.isAuthenticated
+                      const isCompatible = canSelectSessionConnection(conn, effectiveConnectionDetails, isEmptySession, agentProvider)
+                      const isSelectable = isAuthenticated && isCompatible
                       return (
                         <DropdownMenuSub key={conn.slug}>
                           <StyledDropdownMenuSubTrigger
-                            disabled={!isAuthenticated}
+                            disabled={!isSelectable || pickerDisabled}
                             className={cn(
                               "flex items-center justify-between px-2 py-2 rounded-lg",
                               isCurrentConnection && "bg-foreground/5"
@@ -2049,9 +2049,12 @@ export function FreeFormInput({
                               {!isAuthenticated && (
                                 <div className="text-xs text-muted-foreground">{t('settings.ai.notAuthenticated')}</div>
                               )}
+                              {!isCompatible && (
+                                <div className="text-xs text-muted-foreground">{t('chat.modelPicker.engineSwitchUnavailable')}</div>
+                              )}
                             </div>
                           </StyledDropdownMenuSubTrigger>
-                          {isAuthenticated && (
+                          {isSelectable && (
                             <StyledDropdownMenuSubContent className="min-w-[220px]">
                               {/* Show models for this connection - use provider-specific models as fallback */}
                               {(conn.models || ANTHROPIC_MODELS).map((model) => {
@@ -2065,12 +2068,9 @@ export function FreeFormInput({
                                 return (
                                   <StyledDropdownMenuItem
                                     key={modelId}
+                                    disabled={pickerDisabled}
                                     onSelect={() => {
-                                      // If selecting a different connection, update both connection and model
-                                      if (!isCurrentConnection && onConnectionChange) {
-                                        onConnectionChange(conn.slug)
-                                      }
-                                      // Always pass connection with model for proper persistence
+                                      if (pickerDisabled) return
                                       onModelChange(modelId, conn.slug)
                                     }}
                                     className="flex items-center justify-between px-2 py-2 rounded-lg cursor-pointer"
@@ -2131,17 +2131,8 @@ export function FreeFormInput({
                   </React.Fragment>
                 ))
               ) : (
-                /* Flat model list (single connection or session started) */
+                /* 仅有一个渠道时直接展示模型。 */
                 <>
-                  {/* Indicator showing which connection is being used */}
-                  {!isEmptySession && currentConnectionDetails && llmConnections.length > 1 && (
-                    <>
-                      <div className="flex items-center gap-2 px-2 py-1.5 text-xs select-none text-muted-foreground">
-                        <span>{t('chat.usingConnection', { name: currentConnectionDetails.name })}</span>
-                      </div>
-                      <StyledDropdownMenuSeparator className="my-1" />
-                    </>
-                  )}
                   {/* Model options based on effective connection's provider type */}
                   {availableModels.map((model) => {
                     const modelId = typeof model === 'string' ? model : model.id
@@ -2157,6 +2148,7 @@ export function FreeFormInput({
                     return (
                       <StyledDropdownMenuItem
                         key={modelId}
+                        disabled={pickerDisabled}
                         onSelect={() => onModelChange(modelId, effectiveConnection)}
                         className="flex items-center justify-between px-2 py-2 rounded-lg cursor-pointer"
                       >

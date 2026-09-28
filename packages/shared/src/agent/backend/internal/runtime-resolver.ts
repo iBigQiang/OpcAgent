@@ -50,7 +50,7 @@ function resolveUpwards(base: string, relativePath: string, maxLevels = 4): stri
   return undefined;
 }
 
-function resolveBundledRuntimePath(hostRuntime: BackendHostRuntimeContext): string | undefined {
+export function resolveBundledRuntimePath(hostRuntime: BackendHostRuntimeContext): string | undefined {
   const binary = process.platform === 'win32' ? 'bun.exe' : 'bun';
   const bundled = firstExistingBunPath([
     ...(hostRuntime.resourcesPath ? [join(hostRuntime.resourcesPath, 'vendor', 'bun', binary)] : []),

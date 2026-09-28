@@ -8,6 +8,24 @@ All notable changes to OPC Agent are documented in this file. The format follows
 
 Add user-visible changes here before running `bun run release:prepare <version>`.
 
+## [0.1.11] - 2026-09-28
+
+### 新增
+
+- 新建及已有 Pi 会话支持在不同渠道和模型之间切换，沿用原会话上下文、压缩摘要、历史工具结果和已启用工具。
+- 渠道与模型作为一次完整选择保存，支持跨窗口同步；原渠道删除后可选择其他有效 Pi 渠道继续对话。
+
+### 优化
+
+- 会话执行中暂停模型切换；切换失败保留原选择和输入草稿，重启后恢复已保存的渠道与模型。
+- 自动化定时任务继续使用任务中保存的渠道与模型，聊天选择和默认模型调整不会改变任务绑定。
+
+### 修复
+
+- 修复部分助手回复缺少 Pi 分支切点，以及 Windows 工作区路径重复转换导致分支持久化位置错误的问题。
+- 统一 Windows 安装版的内置 Bun 定位，确保会话和脚本工具都使用安装包携带的运行时。
+- 修复原窗口在关闭过程中弹出确认框或文件选择框时对话框不显示的问题：现会依次回退到当前聚焦窗口、任一存活窗口，全部窗口都已关闭时以无父窗口方式显示。
+
 ## [0.1.10] - 2026-08-17
 
 ### 修复
@@ -130,6 +148,7 @@ Internal test build; not published to GitHub. All changes are included in 0.1.6.
 - Local session search, flags, archives, import, export, and branching.
 
 [Unreleased]: https://github.com/iBigQiang/OpcAgent/releases
+[0.1.11]: https://github.com/iBigQiang/OpcAgent/releases/tag/v0.1.11
 [0.1.10]: https://github.com/iBigQiang/OpcAgent/releases/tag/v0.1.10
 [0.1.9]: https://github.com/iBigQiang/OpcAgent/releases/tag/v0.1.9
 [0.1.8]: https://github.com/iBigQiang/OpcAgent/releases/tag/v0.1.8

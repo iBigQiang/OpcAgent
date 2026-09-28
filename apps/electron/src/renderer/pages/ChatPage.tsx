@@ -274,24 +274,34 @@ const ChatPage = React.memo(function ChatPage({ sessionId }: ChatPageProps) {
     onAttachmentsChange(sessionId, attachments)
   }, [sessionId, onAttachmentsChange])
 
-  // Session model change handler - persists per-session model and connection
-  const handleModelChange = React.useCallback((model: string, connection?: string) => {
-    if (activeWorkspaceId) {
-      window.electronAPI.setSessionModel(sessionId, activeWorkspaceId, model, connection)
-    }
-  }, [sessionId, activeWorkspaceId])
+  const [pendingModelSelections, setPendingModelSelections] = React.useState<Set<string>>(() => new Set())
+  const pendingModelSelectionsRef = React.useRef(new Set<string>())
+  const modelSelectionPending = pendingModelSelections.has(sessionId)
+    || !!(session?.isModelSwitching ?? sessionMeta?.isModelSwitching)
 
-  // Session connection change handler - can only change before first message
-  const handleConnectionChange = React.useCallback(async (connectionSlug: string) => {
+  // 渠道与模型只提交一次；等待服务端事件同步，失败保留当前选择和草稿。
+  const handleModelChange = React.useCallback(async (model: string, connection?: string) => {
+    if (!activeWorkspaceId || !session || !messageLoadState.messagesReady || session.isModelSwitching || pendingModelSelectionsRef.current.has(sessionId)) return
+    if (session.isProcessing || pendingPermission || pendingCredential
+      || session.currentStatus?.statusType === 'compacting') {
+      toast.error(t('chat.modelPicker.busy'))
+      return
+    }
+    pendingModelSelectionsRef.current.add(sessionId)
+    setPendingModelSelections(new Set(pendingModelSelectionsRef.current))
     try {
-      await window.electronAPI.sessionCommand(sessionId, { type: 'setConnection', connectionSlug })
+      await window.electronAPI.setSessionModel(sessionId, activeWorkspaceId, model, connection)
     } catch (error) {
-      // Connection change may fail if session already started or connection is invalid
-      console.error('Failed to change connection:', error)
+      toast.error(t('chat.modelPicker.switchFailed'), {
+        description: error instanceof Error ? error.message : String(error),
+      })
+    } finally {
+      pendingModelSelectionsRef.current.delete(sessionId)
+      setPendingModelSelections(new Set(pendingModelSelectionsRef.current))
     }
-  }, [sessionId])
+  }, [sessionId, activeWorkspaceId, session, messageLoadState.messagesReady, pendingPermission, pendingCredential, t])
 
-  // Check if session's locked connection has been removed
+  // 原渠道删除后禁止发送，仍允许从选择器选择其他兼容渠道恢复。
   const connectionUnavailable = React.useMemo(() =>
     isSessionConnectionUnavailable(session?.llmConnection, llmConnections),
     [session?.llmConnection, llmConnections]
@@ -548,6 +558,7 @@ const ChatPage = React.memo(function ChatPage({ sessionId }: ChatPageProps) {
         lastMessageAt: sessionMeta.lastMessageAt || 0,
         messages: [],
         isProcessing: sessionMeta.isProcessing || false,
+        isModelSwitching: sessionMeta.isModelSwitching,
         isFlagged: sessionMeta.isFlagged,
         workingDirectory: sessionMeta.workingDirectory,
         enabledSourceSlugs: sessionMeta.enabledSourceSlugs,
@@ -566,7 +577,7 @@ const ChatPage = React.memo(function ChatPage({ sessionId }: ChatPageProps) {
                 onOpenUrl={handleOpenUrl}
                 currentModel={effectiveModel}
                 onModelChange={handleModelChange}
-                onConnectionChange={handleConnectionChange}
+                modelSelectionPending={modelSelectionPending}
                 pendingPermission={undefined}
                 onRespondToPermission={onRespondToPermission}
                 pendingCredential={undefined}
@@ -641,7 +652,7 @@ const ChatPage = React.memo(function ChatPage({ sessionId }: ChatPageProps) {
             onOpenUrl={handleOpenUrl}
             currentModel={effectiveModel}
             onModelChange={handleModelChange}
-            onConnectionChange={handleConnectionChange}
+            modelSelectionPending={modelSelectionPending}
             pendingPermission={pendingPermission}
             onRespondToPermission={onRespondToPermission}
             pendingCredential={pendingCredential}

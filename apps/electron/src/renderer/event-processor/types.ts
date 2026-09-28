@@ -305,10 +305,21 @@ export interface PermissionModeChangedEvent {
 /**
  * Session model changed event
  */
+export interface SessionModelSwitchingEvent {
+  type: 'session_model_switching'
+  sessionId: string
+  isSwitching: boolean
+}
+
 export interface SessionModelChangedEvent {
   type: 'session_model_changed'
   sessionId: string
   model: string | null
+  connectionSlug?: string
+  agentProvider?: 'pi' | 'anthropic'
+  supportsBranching?: boolean
+  thinkingLevel?: Session['thinkingLevel']
+  contextWindow?: number | null
 }
 
 /**
@@ -488,6 +499,7 @@ export type AgentEvent =
   | WorkingDirectoryErrorEvent
   | PermissionModeChangedEvent
   | SessionModelChangedEvent
+  | SessionModelSwitchingEvent
   | LLMConnectionChangedEvent
   | TaskBackgroundedEvent
   | ShellBackgroundedEvent

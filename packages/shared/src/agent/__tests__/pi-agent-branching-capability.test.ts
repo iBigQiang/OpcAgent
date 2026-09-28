@@ -53,4 +53,27 @@ describe('PiAgent branching capability', () => {
 
     agent.destroy()
   })
+
+  it('普通会话预热同步实际模型能力和 SDK 身份', async () => {
+    const agent = new PiAgent(createConfig())
+    ;(agent as any).ensureSubprocess = async () => {}
+    ;(agent as any).send = (message: { id: string }) => {
+      ;(agent as any).handleEnsureSessionReadyResult({ id: message.id, sessionId: 'pi-restored', thinkingLevel: 'high', contextWindow: 64000 })
+    }
+    await expect(agent.ensureSessionReady()).resolves.toEqual({ thinkingLevel: 'high', contextWindow: 64000 })
+    expect(agent.getSessionId()).toBe('pi-restored')
+    expect(agent.getThinkingLevel()).toBe('high')
+    agent.destroy()
+  })
+
+  it('预热错误直接拒绝请求，不等待超时也不更新 SDK 身份', async () => {
+    const agent = new PiAgent(createConfig({ sdkSessionId: 'pi-original' }))
+    ;(agent as any).ensureSubprocess = async () => {}
+    ;(agent as any).send = (message: { id: string }) => {
+      ;(agent as any).handleEnsureSessionReadyResult({ id: message.id, sessionId: null, errorMessage: '历史不可恢复' })
+    }
+    await expect(agent.ensureSessionReady()).rejects.toThrow('历史不可恢复')
+    expect(agent.getSessionId()).toBe('pi-original')
+    agent.destroy()
+  })
 })

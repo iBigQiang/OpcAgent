@@ -1,180 +1,29 @@
-/**
- * Truth table for `derivePickerMode`. The helper is small but its behavior
- * has been wrong before (issue #727 was a precedence ordering bug) — pinning
- * each row of the matrix here so future renames / reshufflings can't
- * silently regress to the trapped state.
- */
-
 import { describe, test, expect } from 'bun:test'
-import { derivePickerMode, type PickerModeInput } from '../picker-mode'
+import { derivePickerMode } from '../picker-mode'
 
-function input(overrides: Partial<PickerModeInput> = {}): PickerModeInput {
-  return {
-    connectionUnavailable: false,
-    connectionDefaultModel: null,
-    isEmptySession: false,
-    connectionCount: 1,
-    ...overrides,
-  }
-}
-
-describe('derivePickerMode', () => {
-  // -------------------------------------------------------------------------
-  // Precedence: unavailable wins
-  // -------------------------------------------------------------------------
-
-  test('connectionUnavailable beats every other flag', () => {
-    expect(
-      derivePickerMode(
-        input({
-          connectionUnavailable: true,
-          connectionDefaultModel: 'mistral-7b',
-          isEmptySession: true,
-          connectionCount: 5,
-        }),
-      ),
-    ).toBe('unavailable')
+describe('会话渠道选择器显示模式', () => {
+  test('无其他渠道时，已删除渠道显示恢复说明', () => {
+    expect(derivePickerMode({ connectionUnavailable: true, connectionDefaultModel: null, connectionCount: 0 })).toBe('unavailable')
   })
 
-  // -------------------------------------------------------------------------
-  // The #727 regression: switcher must win over locked-single on empty session
-  // -------------------------------------------------------------------------
-
-  test('empty session + ≥2 connections + single-model pi_compat default → switcher (#727)', () => {
-    expect(
-      derivePickerMode(
-        input({
-          connectionDefaultModel: 'mistral-7b',
-          isEmptySession: true,
-          connectionCount: 2,
-        }),
-      ),
-    ).toBe('switcher')
+  test('删除原渠道后，即使只有一个存活渠道也能打开列表恢复', () => {
+    expect(derivePickerMode({ connectionUnavailable: true, connectionDefaultModel: null, connectionCount: 1 })).toBe('switcher')
   })
 
-  test('empty session + many connections + single-model pi_compat default → switcher', () => {
-    expect(
-      derivePickerMode(
-        input({
-          connectionDefaultModel: 'llama3',
-          isEmptySession: true,
-          connectionCount: 7,
-        }),
-      ),
-    ).toBe('switcher')
+  test('多个渠道优先显示渠道列表，不受当前只有一个模型限制', () => {
+    expect(derivePickerMode({ connectionUnavailable: false, connectionDefaultModel: 'mistral', connectionCount: 2 })).toBe('switcher')
+    expect(derivePickerMode({ connectionUnavailable: false, connectionDefaultModel: null, connectionCount: 3 })).toBe('switcher')
   })
 
-  test('empty session + ≥2 connections + multi-model default → switcher', () => {
-    expect(
-      derivePickerMode(
-        input({
-          connectionDefaultModel: null,
-          isEmptySession: true,
-          connectionCount: 3,
-        }),
-      ),
-    ).toBe('switcher')
+  test('一个单模型渠道保留只读模型行', () => {
+    expect(derivePickerMode({ connectionUnavailable: false, connectionDefaultModel: 'mistral', connectionCount: 1 })).toBe('locked-single')
   })
 
-  // -------------------------------------------------------------------------
-  // Mid-session lock preserved: switcher off, locked-single still rendered
-  // -------------------------------------------------------------------------
-
-  test('non-empty session + single-model pi_compat default → locked-single (lock preserved)', () => {
-    expect(
-      derivePickerMode(
-        input({
-          connectionDefaultModel: 'mistral-7b',
-          isEmptySession: false,
-          connectionCount: 5,
-        }),
-      ),
-    ).toBe('locked-single')
+  test('一个多模型渠道直接列出模型', () => {
+    expect(derivePickerMode({ connectionUnavailable: false, connectionDefaultModel: null, connectionCount: 1 })).toBe('flat')
   })
 
-  test('empty session + only 1 connection + single-model pi_compat default → locked-single (no switcher possible)', () => {
-    // No other connection to switch to, so the picker stays in the disabled
-    // single-row UI even on a fresh session. That's correct.
-    expect(
-      derivePickerMode(
-        input({
-          connectionDefaultModel: 'mistral-7b',
-          isEmptySession: true,
-          connectionCount: 1,
-        }),
-      ),
-    ).toBe('locked-single')
-  })
-
-  // -------------------------------------------------------------------------
-  // Flat list: the unremarkable "list models for the active connection" case
-  // -------------------------------------------------------------------------
-
-  test('non-empty session + multi-model connection → flat', () => {
-    expect(
-      derivePickerMode(
-        input({
-          connectionDefaultModel: null,
-          isEmptySession: false,
-          connectionCount: 3,
-        }),
-      ),
-    ).toBe('flat')
-  })
-
-  test('empty session + only 1 multi-model connection → flat', () => {
-    expect(
-      derivePickerMode(
-        input({
-          connectionDefaultModel: null,
-          isEmptySession: true,
-          connectionCount: 1,
-        }),
-      ),
-    ).toBe('flat')
-  })
-
-  test('non-empty session + 1 connection + multi-model → flat', () => {
-    expect(
-      derivePickerMode(
-        input({
-          connectionDefaultModel: null,
-          isEmptySession: false,
-          connectionCount: 1,
-        }),
-      ),
-    ).toBe('flat')
-  })
-
-  // -------------------------------------------------------------------------
-  // Boundary: connectionCount > 1 vs == 1 on an empty session
-  // -------------------------------------------------------------------------
-
-  test('connectionCount=2 on empty session triggers switcher (lower bound for >1)', () => {
-    expect(
-      derivePickerMode(
-        input({ connectionDefaultModel: 'm', isEmptySession: true, connectionCount: 2 }),
-      ),
-    ).toBe('switcher')
-  })
-
-  test('connectionCount=1 on empty session never triggers switcher', () => {
-    expect(
-      derivePickerMode(
-        input({ connectionDefaultModel: 'm', isEmptySession: true, connectionCount: 1 }),
-      ),
-    ).toBe('locked-single')
-  })
-
-  // -------------------------------------------------------------------------
-  // connectionCount=0 — defensive: should never panic, falls through to flat
-  // -------------------------------------------------------------------------
-
-  test('connectionCount=0 (no connections configured) → flat (defensive fallthrough)', () => {
-    expect(
-      derivePickerMode(
-        input({ connectionDefaultModel: null, isEmptySession: true, connectionCount: 0 }),
-      ),
-    ).toBe('flat')
+  test('尚未加载渠道时不崩溃', () => {
+    expect(derivePickerMode({ connectionUnavailable: false, connectionDefaultModel: null, connectionCount: 0 })).toBe('flat')
   })
 })

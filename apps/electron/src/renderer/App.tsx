@@ -991,6 +991,11 @@ export default function App() {
         // Update atom directly (UI sees update immediately)
         updateSessionDirect(sessionId, () => updatedSession)
 
+        // 同步服务端规范化后的思考等级，仅更新本地选项，不再发起设置请求。
+        if (event.type === 'session_model_changed' && event.thinkingLevel !== undefined) {
+          syncSessionOptionsFromSession(updatedSession)
+        }
+
         // Handle side effects
         handleEffects(effects, sessionId, event.type)
 
@@ -1055,6 +1060,11 @@ export default function App() {
 
       // Update per-session atom
       updateSessionDirect(sessionId, () => updatedSession)
+
+      // 同步服务端规范化后的思考等级，保持其他窗口的输入栏一致。
+      if (event.type === 'session_model_changed' && event.thinkingLevel !== undefined) {
+        syncSessionOptionsFromSession(updatedSession)
+      }
 
       // Update metadata map
       const metaMap = store.get(sessionMetaMapAtom)

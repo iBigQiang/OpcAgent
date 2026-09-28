@@ -25,6 +25,8 @@ export interface SessionMeta {
   workspaceId: string
   lastMessageAt?: number
   isProcessing?: boolean
+  /** 服务端正在原子切换渠道与模型，供重新进入会话和其他窗口同步。 */
+  isModelSwitching?: boolean
   isFlagged?: boolean
   labels?: string[]
   projectId?: string

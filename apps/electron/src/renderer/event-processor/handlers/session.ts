@@ -30,6 +30,7 @@ import type {
   WorkingDirectoryChangedEvent,
   PermissionModeChangedEvent,
   SessionModelChangedEvent,
+  SessionModelSwitchingEvent,
   LLMConnectionChangedEvent,
   UserMessageEvent,
   MessageAnnotationsUpdatedEvent,
@@ -458,9 +459,21 @@ export function handlePermissionModeChanged(
   }
 }
 
-/**
- * Handle session_model_changed - update session model
- */
+/** 广播的切换状态只控制交互，不触碰历史、草稿或当前模型选择。 */
+export function handleSessionModelSwitching(
+  state: SessionState,
+  event: SessionModelSwitchingEvent,
+): ProcessResult {
+  return {
+    state: {
+      ...state,
+      session: { ...state.session, isModelSwitching: event.isSwitching },
+    },
+    effects: [],
+  }
+}
+
+/** 一次应用服务端确认的渠道、模型和能力；旧事件缺少字段时保留已有值。 */
 export function handleSessionModelChanged(
   state: SessionState,
   event: SessionModelChangedEvent
@@ -469,7 +482,25 @@ export function handleSessionModelChanged(
 
   return {
     state: {
-      session: { ...session, model: event.model ?? undefined },
+      session: {
+        ...session,
+        model: event.model ?? undefined,
+        ...(event.connectionSlug !== undefined && { llmConnection: event.connectionSlug }),
+        ...(event.agentProvider !== undefined && { agentProvider: event.agentProvider }),
+        ...(event.supportsBranching !== undefined && { supportsBranching: event.supportsBranching }),
+        ...(event.thinkingLevel !== undefined && { thinkingLevel: event.thinkingLevel }),
+        ...(event.contextWindow !== undefined && {
+          tokenUsage: {
+            inputTokens: 0,
+            outputTokens: 0,
+            totalTokens: 0,
+            contextTokens: 0,
+            costUsd: 0,
+            ...session.tokenUsage,
+            contextWindow: event.contextWindow ?? undefined,
+          },
+        }),
+      },
       streaming,
     },
     effects: [],

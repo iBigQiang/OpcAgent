@@ -17,7 +17,7 @@
 import http from 'node:http';
 import { createInterface } from 'node:readline';
 import { join } from 'node:path';
-import { mkdirSync, readdirSync, statSync, existsSync } from 'node:fs';
+import { mkdirSync } from 'node:fs';
 import { homedir } from 'node:os';
 
 // Pi SDK
@@ -75,6 +75,8 @@ import {
   resolveCustomEndpointProviderId,
 } from './custom-endpoint-provider.ts';
 import { setInterceptorApiHints as applyInterceptorApiHints } from './interceptor-api-hints.ts';
+import { installConnectionHistory } from './connection-history.ts';
+import { restorePiSession } from './session-resume.ts';
 
 // Direct source imports from shared (bundled by bun build)
 import { handleLargeResponse, estimateTokens, tokenLimitFor } from '../../shared/src/utils/large-response.ts';
@@ -114,6 +116,8 @@ interface InitMessage {
   type: 'init';
   apiKey: string;
   model: string;
+  connectionSlug?: string;
+  requireExistingSession?: boolean;
   cwd: string;
   thinkingLevel: string;
   workspaceRootPath: string;
@@ -212,7 +216,14 @@ interface OutboundLlmQueryResult {
    */
   errorCode?: string;
 }
-interface OutboundEnsureSessionReadyResult { type: 'ensure_session_ready_result'; id: string; sessionId: string | null }
+interface OutboundEnsureSessionReadyResult {
+  type: 'ensure_session_ready_result';
+  id: string;
+  sessionId: string | null;
+  thinkingLevel?: string;
+  contextWindow?: number;
+  errorMessage?: string;
+}
 interface OutboundCompactResult {
   type: 'compact_result';
   id: string;
@@ -356,21 +367,6 @@ function send(msg: OutboundMessage): void {
 function debugLog(message: string): void {
   // Write debug messages to stderr so they don't interfere with JSONL protocol
   process.stderr.write(`[pi-server] ${message}\n`);
-}
-
-/** Find the most recent .jsonl session file in a directory. */
-function findMostRecentSessionFile(sessionDir: string): string | null {
-  if (!existsSync(sessionDir)) return null;
-  let best: { path: string; mtime: number } | null = null;
-  for (const entry of readdirSync(sessionDir)) {
-    if (!entry.endsWith('.jsonl')) continue;
-    const fullPath = join(sessionDir, entry);
-    const mtime = statSync(fullPath).mtimeMs;
-    if (!best || mtime > best.mtime) {
-      best = { path: fullPath, mtime };
-    }
-  }
-  return best?.path ?? null;
 }
 
 // ============================================================
@@ -708,76 +704,37 @@ async function ensureSession(): Promise<AgentSession> {
     if (shellPath) settingsManager.applyOverrides({ shellPath });
     sessionOptions.settingsManager = settingsManager;
 
-    // Session resume: use a per-OPCAgent-session directory so the Pi SDK can
-    // persist and resume its own session across subprocess restarts.
-    // continueRecent() loads the existing session if one exists, otherwise
-    // creates a new one — so this handles both first-run and resume.
-    const sessionDir = join(initConfig.sessionPath, '.pi-sessions');
-    mkdirSync(sessionDir, { recursive: true });
-
-    if (initConfig.branchFromSessionPath) {
-      // Branching: fork from the parent session's Pi session file.
-      // Branches must not silently degrade to fresh sessions.
-      const parentPiSessionDir = join(initConfig.branchFromSessionPath, '.pi-sessions');
-      const parentPiSessionFile = findMostRecentSessionFile(parentPiSessionDir);
-      if (!parentPiSessionFile) {
-        throw new Error(`Pi branch preflight failed: no parent Pi session file found in ${parentPiSessionDir}`);
-      }
-
-      debugLog(`Forking Pi session from parent: ${parentPiSessionFile}`);
-      const forkedSessionManager = PiSessionManager.forkFrom(parentPiSessionFile, cwd, sessionDir);
-
-      // Strict branch cutoff: move leaf to the selected parent entry if provided.
-      // This is Pi's equivalent of Claude resumeSessionAt.
-      if (initConfig.branchFromSdkTurnId) {
-        const anchorId = initConfig.branchFromSdkTurnId;
-        const anchorEntry = forkedSessionManager.getEntry(anchorId);
-        if (!anchorEntry) {
-          throw new Error(`Pi branch preflight failed: branch anchor not found: ${anchorId}`);
-        }
-        forkedSessionManager.branch(anchorId);
-        debugLog(`Applied Pi branch cutoff at entry: ${anchorId}`);
-      }
-
-      sessionOptions.sessionManager = forkedSessionManager;
-    } else {
-      sessionOptions.sessionManager = PiSessionManager.continueRecent(cwd, sessionDir);
-    }
-
   }
 
   // Set model if specified
   if (initConfig.model) {
-    try {
-      const piModel = resolvePiModel(
-        modelRegistry,
-        initConfig.model,
-        resolvedPiAuthProvider(),
-        shouldPreferCustomEndpoint(),
-        resolvedCustomEndpointProviderId(),
-      );
-      if (piModel) {
-        // Verify resolved model's provider is compatible with the authenticated provider.
-        // Without this, a model that resolves to a different provider would
-        // cause "No API key found" at runtime.
-        const resolvedProvider = (piModel as any)?.provider;
-        const isCompatible = !initConfig.piAuth || isCompatibleResolvedModelProvider(resolvedProvider);
-        if (isCompatible) {
-          sessionOptions.model = piModel;
-          setInterceptorApiHints(piModel as { api?: string; provider?: string; baseUrl?: string });
-        } else {
-          debugLog(`Model ${initConfig.model} resolved to incompatible provider ${resolvedProvider} (expected ${resolvedPiAuthProvider()}), skipping`);
-          setInterceptorApiHints(undefined);
-        }
-      } else {
-        setInterceptorApiHints(undefined);
-      }
-    } catch {
-      debugLog(`Could not resolve Pi model: ${initConfig.model}`);
-      setInterceptorApiHints(undefined);
+    const piModel = resolvePiModel(
+      modelRegistry,
+      initConfig.model,
+      resolvedPiAuthProvider(),
+      shouldPreferCustomEndpoint(),
+      resolvedCustomEndpointProviderId(),
+    );
+    if (!piModel) throw new Error(`无法解析所选 Pi 模型：${initConfig.model}`);
+    if (initConfig.piAuth && !isCompatibleResolvedModelProvider(piModel.provider)) {
+      throw new Error(`所选模型与渠道不兼容：${piModel.provider}/${piModel.id}`);
     }
+    if (!modelRegistry.hasConfiguredAuth(piModel)) throw new Error(`所选 Pi 模型缺少认证：${initConfig.model}`);
+    sessionOptions.model = piModel;
+    setInterceptorApiHints(piModel);
   } else {
     setInterceptorApiHints(undefined);
+  }
+
+  // 先验证目标模型，再恢复或派生历史，失败时不创建多余的分支文件。
+  if (initConfig.sessionPath) {
+    sessionOptions.sessionManager = restorePiSession({
+      cwd,
+      sessionPath: initConfig.sessionPath,
+      branchFromSessionPath: initConfig.branchFromSessionPath,
+      branchFromSdkTurnId: initConfig.branchFromSdkTurnId,
+      requireExistingSession: initConfig.requireExistingSession,
+    });
   }
 
   // Set thinking level
@@ -788,6 +745,13 @@ async function ensureSession(): Promise<AgentSession> {
 
   // Create the session — tools flow through customTools + allowlist (see comment above).
   const { session } = await createAgentSession(sessionOptions);
+  // SDK 会使用显式模型，但恢复旧历史时不会自动保存这次模型变化。
+  const persistedModel = session.sessionManager.buildSessionContext().model;
+  if (sessionOptions.model && (persistedModel?.provider !== sessionOptions.model.provider
+    || persistedModel.modelId !== sessionOptions.model.id)) {
+    await session.setModel(sessionOptions.model);
+  }
+  installConnectionHistory(session, initConfig.connectionSlug);
   piSession = session;
 
   toolsChanged = false;
@@ -1272,49 +1236,31 @@ function handleSessionEvent(event: AgentSessionEvent): void {
     }
 
     if (msg?.role === 'assistant' && piSession) {
-      // CRITICAL: do NOT read `getLeafId()` here.
-      //
-      // The Pi SDK fires `message_end` synchronously BEFORE calling
-      // `appendMessage(event.message)` (see `agent-session.js:_processAgentEvent`).
-      // At this moment the assistant entry does not yet exist in the
-      // SessionManager — `leafId` still points at the *previous* leaf, which for
-      // a plain text turn is the user message that triggered the response.
-      // Recording that wrong anchor and using it for `branch()` makes the next
-      // turn a sibling of the assistant message, dropping the assistant reply
-      // from the LLM's view of history (mkagent-oss#782).
-      //
-      // Instead, attach the SDK's message id to the forwarded event so the main
-      // process can correlate this turn, then queue a microtask to read the
-      // correct leaf AFTER `appendMessage` has run. The microtask drains before
-      // any subsequent SDK event is dispatched, so the follow-up
-      // `pi_turn_anchor` event is delivered to the main process in the right
-      // order (after this `message_end`, before the next event).
-      const sdkMessageId = (msg as { id?: string }).id;
-      if (sdkMessageId) {
-        forwardedEvent = {
-          ...(event as Record<string, unknown>),
-          sdkMessageId,
-        } as unknown as OutboundAgentEvent;
+      // SDK 在 appendMessage 之前同步发出事件，此刻 leaf 仍是上一条消息。
+      // AssistantMessage 不保证有 id；为转发事件生成关联 ID，而不改写 SDK 消息或请求。
+      // 微任务在 SDK 完成本条落盘后读取真正锚点，主进程据此关联界面消息与分支切点。
+      const sdkMessageId = (msg as { id?: string }).id || crypto.randomUUID();
+      forwardedEvent = {
+        ...(event as Record<string, unknown>),
+        sdkMessageId,
+      } as unknown as OutboundAgentEvent;
 
-        const sessionManagerSnapshot = piSession.sessionManager;
-        queueMicrotask(() => {
-          // Defensive: session may have been disposed between the message_end
-          // emit and the microtask drain.
-          if (!piSession || piSession.sessionManager !== sessionManagerSnapshot) {
-            return;
-          }
-          const sdkTurnAnchor = sessionManagerSnapshot.getLeafId();
-          if (!sdkTurnAnchor) return;
-          send({
-            type: 'event',
-            event: {
-              type: 'pi_turn_anchor',
-              sdkMessageId,
-              sdkTurnAnchor,
-            } as unknown as OutboundAgentEvent,
-          });
+      const sessionManagerSnapshot = piSession.sessionManager;
+      queueMicrotask(() => {
+        if (!piSession || piSession.sessionManager !== sessionManagerSnapshot) {
+          return;
+        }
+        const sdkTurnAnchor = sessionManagerSnapshot.getLeafId();
+        if (!sdkTurnAnchor) return;
+        send({
+          type: 'event',
+          event: {
+            type: 'pi_turn_anchor',
+            sdkMessageId,
+            sdkTurnAnchor,
+          } as unknown as OutboundAgentEvent,
         });
-      }
+      });
 
       // Speculative prefetch: if the assistant message contains 2+ prefetchable tool calls,
       // fire all requests to the main process in parallel NOW, before executeToolCalls
@@ -1591,12 +1537,19 @@ async function handleLlmQuery(msg: Extract<InboundMessage, { type: 'llm_query' }
 }
 
 async function handleEnsureSessionReady(msg: Extract<InboundMessage, { type: 'ensure_session_ready' }>): Promise<void> {
-  const session = await ensureSession();
-  send({
-    type: 'ensure_session_ready_result',
-    id: msg.id,
-    sessionId: session.sessionId || null,
-  });
+  try {
+    const session = await ensureSession();
+    send({
+      type: 'ensure_session_ready_result',
+      id: msg.id,
+      sessionId: session.sessionId || null,
+      thinkingLevel: session.thinkingLevel,
+      contextWindow: session.model?.contextWindow,
+    });
+  } catch (error) {
+    send({ type: 'ensure_session_ready_result', id: msg.id, sessionId: null,
+      errorMessage: error instanceof Error ? error.message : String(error) });
+  }
 }
 
 async function handleCompact(msg: Extract<InboundMessage, { type: 'compact' }>): Promise<void> {
@@ -1756,6 +1709,7 @@ async function handleSetModel(msg: Extract<InboundMessage, { type: 'set_model' }
   }
   try {
     await piSession.setModel(piModel);
+    if (initConfig) initConfig.model = msg.model;
     setInterceptorApiHints(piModel as { api?: string; provider?: string; baseUrl?: string });
     debugLog(`[set_model] Model changed to: ${msg.model} (resolved: ${piModel.provider}/${piModel.id})`);
   } catch (error) {

@@ -33,9 +33,9 @@ export function expandPath(inputPath: string, basePath?: string): string {
     return home;
   }
 
-  // Handle ~/ prefix
-  if (expanded.startsWith('~/')) {
-    expanded = join(home, expanded.slice(2));
+  // 兼容已保存的 Windows 波浪号路径，避免将其解析到当前工作目录。
+  if (expanded.startsWith('~/') || expanded.startsWith('~\\')) {
+    expanded = join(home, normalizePath(expanded.slice(2)));
   }
 
   // Handle ${HOME} and $HOME variables
@@ -65,6 +65,11 @@ export function expandPath(inputPath: string, basePath?: string): string {
  */
 export function toPortablePath(absolutePath: string): string {
   if (!absolutePath) return absolutePath;
+  // 会话队列和 JSONL 文件头都会调用此函数；已转换的路径必须保持幂等。
+  if (absolutePath === '~') return '~';
+  if (absolutePath.startsWith('~/') || absolutePath.startsWith('~\\')) {
+    return '~/' + normalizePath(absolutePath.slice(2));
+  }
 
   const home = homedir();
   const normalized = normalize(absolutePath);
@@ -83,7 +88,7 @@ export function toPortablePath(absolutePath: string): string {
   }
 
   if (normalized.startsWith(homePrefixWin)) {
-    return '~/' + normalized.slice(homePrefixWin.length);
+    return '~/' + normalizePath(normalized.slice(homePrefixWin.length));
   }
 
   // Path is outside home directory, keep as absolute

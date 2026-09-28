@@ -6,6 +6,85 @@
 
 ---
 
+## 2026-09-28 · Pi 会话跨渠道续聊与 0.1.11 收尾
+
+完整需求、设计、修改清单及验收矩阵见 `tasks/goal-session-channel-model-switching.md`。渠道和模型现由 SessionManager 作为单次事务提交，Pi 执行实例按目标连接重建，沿用原 SDK 日志、分支切点、压缩摘要和授权工具。自动化定义及调度代码未变，明确保存的任务绑定不会被普通聊天或默认模型变更覆盖。Pi 与 Claude CLI 迁移仍留待下一阶段。
+
+首阶段七组聚焦测试共 142 项、719 个断言通过。收尾另修复既有分支测试的持久化字段及 Windows 路径夹具，增加缺少指定锚点时不创建分支的验证，相邻 27 项、69 个断言通过。剩余 13 个 Craft 审计路径已逐项追溯原提交后登记，没有通过全量重算掩盖未审查差异。
+
+Windows 打包准备时发现启动环境只查 app/vendor 下的 Bun，与 resources/vendor 的标准布局不一致。现在复用既有运行时解析器，和会话实例使用同一定位规则；不改变正常会话的引擎与渠道逻辑。7 项相关测试、12 个断言及 shared/Electron 类型检查通过。
+
+真实 DeepSeek → Gemini → DeepSeek 续聊、两次只读会话工具调用及服务重启已通过；只使用合成测试口令和隔离会话。OpenCode Go、Kimi Code 的先行请求均返回订阅权限不足，没有改动其配置。实际凭据副本已删除，最终验证原配置和凭据文件哈希不变。首次准备脚本曾在 Bun preload 后才设 CONFIG_DIR，导致两条测试 Key 按读取值写回原加密库；已如实告知用户，后续改为启动进程前注入隔离目录并核对已加载常量，禁止隔离检查未通过时访问凭据。发布验收不能忽略 preload 的加载顺序。
+
+0.1.11 沿用本地已有 Bun 1.3.9 和 uv 0.10.6，版本准备只改变 workspace 版本，锁文件无依赖升级。安装包写入独立 `apps/electron/release/v0.1.11`，保留旧版本。中文说明同时内置于应用资源。本次用户授权本地打包及推送当前 GitHub 分支，不创建公开 Release 或替换 Latest；最终桌面验收、校验和与推送结果继续记录在 Goal 文档。
+
+---
+
+## 2026-08-26 · 上游 MkAgent 增量比对与 dialog 回退链融合（基于 v0.1.10，未发版）
+
+### 背景
+
+OPC Agent 由上游 `MkThingsHQ/mkagent` 二开而来，需要定期确认上游有无值得吸收的更新，同时**不能让品牌、图标、通知、Sources/MCP 等二开成果被回退**。本轮只做只读比对 + 一处最小融合。
+
+完整比对报告落在 `docs/开发及迭代方案调研报告/2026-08-26-上游mkagent增量比对报告.md`。
+
+### 比对过程中差点造成误判的一件事
+
+首次 `git fetch upstream --tags` **退出码 0、无输出**，此时 `merge-base HEAD upstream/main` 恰好等于 `upstream/main`，表面结论是「上游零更新」。实际是沙箱阻断了网络且**失败是静默的**，`upstream/main` 用的是 14 天前的缓存 —— `FETCH_HEAD` 的 mtime 停在 `08-12`，而当天是 `08-26`。
+
+改用 `git ls-remote upstream refs/heads/main` 直连查询才拿到权威 SHA：上游是 `242306a`，本地缓存是 `8b660e0`，**上游实际有 3 个提交**。另外发现 `FETCH_HEAD` 在共享 `.git` 的 worktree 下会被并发会话覆写（`cat` 与 `git log` 两个读数互相矛盾），不可作判据。已固化为 `tasks/lessons.md` 的 L10。
+
+### 上游增量的判定
+
+3 个提交 / 5 个文件 / +597 行，其中**只有 1 处触及运行时代码**：
+
+| 上游提交 | 性质 | 判定 |
+|---|---|---|
+| `2c22a07` dialog 桥接对齐 Craft | 运行时代码 | **部分融合**（只取窗口回退链） |
+| `2b8b858` 新增 `README.zh.md` | 上游品牌文档 | 跳过 |
+| `242306a` 新增 `docs/architecture.html` | 上游品牌资产 | 跳过 |
+
+两个文档提交跳过的理由：我方已有完整 `docs/zh/`（20 个文件），覆盖面远超上游那个单文件 README；`architecture.html` 画的是上游 Lite 边界，与我方含 Sources/MCP 的架构已有实质差异，且两者都会带回 MkAgent 品牌字样。
+
+`2c22a07` 拆开看是**两个独立变更**，只有一半对我们有价值：
+
+- **窗口回退链** —— 我方确实缺。原写法 `BrowserWindow.fromWebContents(event.sender)!` 用非空断言掩盖了返回 `null` 的可能，此时 `dialog.showMessageBox(null, spec)` 会抛错、对话框不显示。
+- **返回值收窄**（`showOpenDialog` 由返回数组改为 `{canceled, filePaths}`）—— **我方已在 `dd078875`（08-11）独立修过**，改成返回完整 Electron result，结构上已满足 `packages/server-core/src/transport/capabilities.ts` 声明的 `Promise<{canceled: boolean; filePaths: string[]}>` 契约。上游这半段是整洁度改进而非 bug 修复，零收益，不取。
+
+### 缺陷真实触发面的核查
+
+没有照抄上游 commit message 的口径。查证结果：注册 dialog capability 的 `bootstrap-preload.cjs`（`apps/electron/src/preload/bootstrap.ts:39-40`）只挂载在 `window-manager.ts:258` 的正规 BrowserWindow 上；Browser pane 用的是独立的 `browser-toolbar-preload.cjs`（`browser-pane-manager.ts:449`），**不注册 dialog**。
+
+所以不存在「从 BrowserView/webview 发起 dialog」这条高频路径，真实触发面收窄为：**窗口正在销毁 / 已销毁，而 agent 侧的 dialog IPC 仍在飞行中的竞态**。低频但真实，改动极小且正常路径行为完全不变，值得补。
+
+### 实施
+
+`apps/electron/src/main/index.ts`：抽出模块级 `resolveDialogParent()`（两个 handler 共用，避免重复），用 `??` 三级回退取代非空断言。
+
+保留我方现有返回值形状，只替换窗口解析表达式。额外处理了上游没管的边界：`getAllWindows()[0]` 在全部窗口关闭时是 `undefined`，此时显式走 `dialog.showMessageBox(options)` 单参重载，而不是依赖 Electron 对 falsy 首参的内部嗅探。
+
+`scripts/craft-source-overrides.json`：用 `scripts/audit-craft-reuse.ts` 里 `fileSha256()` 的同一套逻辑（含 CRLF 归一为 LF）自算新 sha，**未抄上游的 sha 值** —— 我方该文件含二开内容，sha 必然不同。reason 在保留我方品牌表述的前提下追加了 dialog 说明。
+
+一个坑：该文件里多个条目共用同一句 reason 描述，按 reason 文本全局替换会打到别的条目上，靠 `assert count == 1` 才拦下；正确做法是定位唯一的 sha256、再改其紧邻的下一行。已固化为 L11。
+
+### 验证
+
+- `typecheck:all` 退出码 0（另单独确认 electron 包被检查，非 `&&` 链提前短路）
+- `lint` 退出码 0，含 `lint:craft-ui-sync` + `lint:craft-test-coverage`（72 个 warning 全为既有，0 error）
+- `validate:ci` 退出码 0
+- `audit:craft-reuse` **与改动前基线逐行一致**。该脚本是纯只读检查（无 `writeFileSync`，唯一参数 `--json`），不会自动写回清单；基线本身已有 18 项既有漂移（`notifications.ts`、`bun.lock`、`package.json`、`release-notes/0.1.10.md`、`docs/DEVLOG.md`、`tasks/*` 等），与本次改动无关。判定方式是**改动前后的漂移集合 diff**，不是绝对数字（L7）。
+- 回退链四条分支路径逐一验证：发起方存活 / 回退聚焦窗口 / 回退首个存活窗口 / 全窗口关闭走单参重载，另加一组对照复现原缺陷（旧写法在第二种场景得到 `null`）。
+
+### 遗留
+
+**`resolveDialogParent` 没有仓库内单测。** 它是 `index.ts` 内的模块级函数且未导出，而 import `index.ts` 会触发主进程副作用，无法直接单测 —— 本项目可测逻辑的既有模式是抽独立模块（如 `deep-link.ts` 之于 `deep-link-routing.test.ts`）。本轮按「最小方案」交付，上面的分支验证是逻辑复刻而非仓库内回归测试，**未来若有人把回退链改回 `!` 断言，没有测试拦得住**。
+
+若要补齐：把 `resolveDialogParent` 抽到独立模块并导出，新增 `__tests__` 用例，同时把新文件登记进 `craft-source-overrides.json` 的 `mkOnly` 段。
+
+另注：`check-i18n-parity.ts` 报告 `1 locales, 1530 keys each`，而 `CLAUDE.md` 铁律第 4 条描述的是 `en.json` 与 `zh-Hans.json` 双 locale。与本次改动无关（本轮未动任何文案），但值得单独查一次。
+
+---
+
 ## 2026-08-26 · 工程基线整理（基于 v0.1.10，未发版）
 
 ### 背景

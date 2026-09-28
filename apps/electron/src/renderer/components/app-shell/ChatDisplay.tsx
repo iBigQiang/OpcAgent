@@ -142,9 +142,8 @@ interface ChatDisplayProps {
   // Model selection
   currentModel: string
   onModelChange: (model: string, connection?: string) => void
-  // Connection selection (locked after first message)
-  /** Callback when LLM connection changes (only works when session is empty) */
-  onConnectionChange?: (connectionSlug: string) => void
+  /** 渠道和模型正在作为一个完整选择提交。 */
+  modelSelectionPending?: boolean
   /** Ref for the input, used for external focus control */
   textareaRef?: React.RefObject<RichTextInputHandle>
   /** When true, disables input (e.g., when agent needs activation) */
@@ -437,7 +436,7 @@ export const ChatDisplay = React.forwardRef<ChatDisplayHandle, ChatDisplayProps>
   onOpenUrl,
   currentModel,
   onModelChange,
-  onConnectionChange,
+  modelSelectionPending = false,
   textareaRef: externalTextareaRef,
   disabled = false,
   pendingPermission,
@@ -486,6 +485,7 @@ export const ChatDisplay = React.forwardRef<ChatDisplayHandle, ChatDisplayProps>
   connectionUnavailable = false,
 }, ref) {
   const { t } = useTranslation()
+  const isModelSwitching = modelSelectionPending || !!session?.isModelSwitching
 
   // Panel focus state (for multi-panel auto-scroll behavior)
   const appShellContext = useAppShellContext()
@@ -1297,7 +1297,7 @@ export const ChatDisplay = React.forwardRef<ChatDisplayHandle, ChatDisplayProps>
   }) => {
     if (!session) return
 
-    if (isInputDisabled || disableSend || connectionUnavailable) {
+    if (isInputDisabled || disableSend || connectionUnavailable || isModelSwitching) {
       toast.error(t('toast.cannotSendRightNow'), {
         description: t('chat.sendingDisabledDescription'),
       })
@@ -1310,7 +1310,7 @@ export const ChatDisplay = React.forwardRef<ChatDisplayHandle, ChatDisplayProps>
         detail: { sessionId: session.id },
       }))
     }, 0)
-  }, [session, isInputDisabled, disableSend, connectionUnavailable, t])
+  }, [session, isInputDisabled, disableSend, connectionUnavailable, isModelSwitching, t])
 
   // Handle stop request from InputContainer
   // silent=true when redirecting (sending new message), silent=false when user clicks Stop button
@@ -1978,11 +1978,12 @@ export const ChatDisplay = React.forwardRef<ChatDisplayHandle, ChatDisplayProps>
               sessionLabels: session.labels,
               labels,
               onLabelsChange: handleLabelsChange,
-              disableSend: disableSend || connectionUnavailable,
+              disableSend: disableSend || connectionUnavailable || isModelSwitching,
+              modelSelectionDisabled: isModelSwitching || messagesLoading || messagesRetrying || !!messagesLoadError || session.isProcessing || !!pendingPermission || !!pendingCredential || session.currentStatus?.statusType === 'compacting',
+              agentProvider: session.agentProvider,
               connectionUnavailable,
               isEmptySession: session.messages.length === 0,
               currentConnection: session.llmConnection,
-              onConnectionChange,
               contextStatus: {
                 isCompacting: session.currentStatus?.statusType === 'compacting',
                 inputTokens: session.tokenUsage?.inputTokens,

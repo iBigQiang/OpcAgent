@@ -48,6 +48,7 @@ export { EventQueue } from './event-queue.ts';
 export { PiEventAdapter } from './pi/event-adapter.ts';
 export {
   isClaudeExecutablePath,
+  resolveBundledRuntimePath,
   resolveClaudeExecutable,
   validateClaudeExecutablePath,
   type ClaudeExecutableSource,

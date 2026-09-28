@@ -27,6 +27,21 @@ export function stripPiPrefixForDisplay(value: string): string {
 
 export type ConnectionGroup = [groupName: string, connections: LlmConnection[]]
 
+/** 普通和紧凑选择器共用引擎边界，未知旧会话最终由服务端确认历史类型。 */
+export function canSelectSessionConnection(
+  target: LlmConnection,
+  currentConnection: LlmConnection | null,
+  isEmptySession: boolean,
+  agentProvider?: 'pi' | 'anthropic',
+): boolean {
+  if (isEmptySession) return true
+  const provider = agentProvider ?? (currentConnection
+    ? (currentConnection.platformProfile === 'anyrouter' ? 'anthropic' : 'pi')
+    : undefined)
+  if (provider === 'anthropic') return target.platformProfile === 'anyrouter' && target.slug === currentConnection?.slug
+  return target.platformProfile !== 'anyrouter'
+}
+
 /**
  * Group connections by provider type for hierarchical picker rendering.
  * Each provider section can contain multiple API-key connections.

@@ -13,7 +13,7 @@ export const SESSION_PERSISTENT_FIELDS = [
   'name', 'isFlagged', 'labels', 'hidden',
   'lastReadMessageId', 'hasUnread',
   'enabledSourceSlugs', 'permissionMode', 'previousPermissionMode', 'workingDirectory',
-  'model', 'llmConnection', 'connectionLocked', 'thinkingLevel',
+  'model', 'llmConnection', 'agentProvider', 'connectionLocked', 'thinkingLevel',
   'pendingPlanExecution',
   'triggeredBy', 'projectId',
   'isArchived', 'archivedAt',
@@ -65,6 +65,8 @@ export interface SessionConfig {
   sdkCwd?: string;
   model?: string;
   llmConnection?: string;
+  /** 保留历史执行引擎，原渠道删除后仍能判断是否可接续。 */
+  agentProvider?: 'pi' | 'anthropic';
   connectionLocked?: boolean;
   thinkingLevel?: ThinkingLevel;
   pendingPlanExecution?: PendingPlanExecution;

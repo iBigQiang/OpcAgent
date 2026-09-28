@@ -169,3 +169,51 @@ bun install --frozen-lockfile                    # 必须退出码 0，这才算
 5. 排查环境相关问题要在**实际运行时**里测。我一开始在交互 shell 里跑 `bun -e "os.tmpdir()"` 得到正常值，据此差点判定「环境没问题」—— 正确做法是照抄真实调用链起探针。
 6. **`.gitignore` 里出现「为绕开某个现象而写」的规则，本身就是根因未处理的信号**，值得回头查一次而不是接着容忍。
 7. 用 Python 处理含 Windows 路径的文本时，非 raw 字符串里的 `\U`（如 `C:\Users`）会被当 unicode 转义炸掉 —— 和 L6 里 `preferences-ui-language.test.ts` 那个失败是同一个坑。改用 heredoc 落盘 + Python 只做拼接。
+
+---
+
+## L10 · 判断「上游有没有更新」，不能信 remote-tracking ref —— 沙箱会让 `git fetch` 静默失败
+
+**现象**：比对上游 `MkThingsHQ/mkagent` 时，`git fetch upstream --tags` **退出码 0、无任何输出**，紧接着 `git merge-base HEAD upstream/main` 恰好等于 `upstream/main` 的值。表面结论干净利落：上游零更新，无需融合。
+
+**根因**：那次 fetch 跑在沙箱里，网络被阻断，但**失败是静默的**——退出码仍为 0。`upstream/main` 用的是 14 天前的缓存引用。查证方式是看 `FETCH_HEAD` 的 mtime：停在 `2026-08-12`，而当天是 `08-26`。改用 `dangerouslyDisableSandbox` 重跑，才出现 `POST git-upload-pack` 与 `8b660e0..242306a main -> upstream/main`。上游实际有 3 个提交。
+
+**附带发现**：`FETCH_HEAD` 自身也不可信。本仓库是 worktree（`git-common-dir` = `D:/AiCode/MkAgent/.git`），该文件与主检出及其它 worktree 共享。比对期间 `cat .git/FETCH_HEAD` 显示的是 `a148f98 craft-sources-mcp of iBigQiang/OpcAgent`（我们自己的仓库），而同一时刻 `git log -1 FETCH_HEAD` 解析出 `242306a` —— 两个读数互相矛盾，说明有别的会话在并发写它。
+
+**规则**：
+
+1. **判断上游是否有更新，只认 `git ls-remote`**，它直连远端、不依赖任何本地状态：
+   ```bash
+   git ls-remote upstream refs/heads/main   # 权威 SHA
+   git rev-parse upstream/main              # 本地缓存，可能是几周前的
+   ```
+   两者不一致就说明本地 ref 过期。
+2. **需要联网的 git 操作走 `dangerouslyDisableSandbox`**，并且**不要用退出码判断 fetch 是否真的联网了** —— 沙箱下的失败是静默的。要验证就看 `FETCH_HEAD` 的 mtime 有没有更新到当前时间。
+3. **更新 remote-tracking ref 用显式 refspec**，`git fetch upstream main` 只写 `FETCH_HEAD`、不更新 `refs/remotes/upstream/main`：
+   ```bash
+   git fetch upstream '+refs/heads/*:refs/remotes/upstream/*' --tags
+   ```
+4. **`FETCH_HEAD` 一律不作判据**（共享 `.git` 下会被并发会话覆写），与 stash 栈是同一类隐患，见 `CLAUDE.md` 的 worktree 注意事项。
+5. 「上游无更新」这种**否定性结论**尤其要交叉验证 —— 它会直接终止后续调查，错了没有任何下游环节能把它纠回来。
+
+---
+
+## L11 · 融合上游改动前，先分清哪部分我们已经独立修过了
+
+**现象**：上游 `2c22a07 "fix: enhance dialog handling and align native dialog bridge with Craft"` 看起来是一个整体的 bug 修复，直觉是整段搬过来。
+
+**实际**：拆开看是**两个独立变更**，价值完全不同。
+
+- **窗口回退链**（`fromWebContents() ?? getFocusedWindow() ?? getAllWindows()[0]`）—— 我们确实缺，值得补。原写法 `fromWebContents(event.sender)!` 用非空断言掩盖了返回 `null` 的可能。
+- **返回值收窄**（`showOpenDialog` 从返回数组改为返回 `{canceled, filePaths}`）—— **我们在 `dd078875`（08-11）已经独立修过**，改成返回完整 Electron result，结构上已满足 `capabilities.ts` 的契约声明。上游这半段对我们是零收益。
+
+如果无脑整段覆盖，等于把我们已有的修复原地重写一遍，还会顺带把 `craft-source-overrides.json` 里我们的品牌 reason 表述冲掉。
+
+**规则**：
+
+1. **上游一个 commit 不等于一个变更。** 融合前按 hunk 拆开逐条判定，`git log -1 -p <sha> -- <file>` 只是起点，要读懂每个 hunk 各自在修什么。
+2. **对每个 hunk 先查我方是否已修过**：`git blame -L <start>,<end> <file>` 看作者与日期。看到 `iBigQiang` 就说明是我们二开的，别覆盖。
+3. **先找契约再判对错。** 这次的判据是 `packages/server-core/src/transport/capabilities.ts` 里的返回类型声明（`Promise<{canceled: boolean; filePaths: string[]}>`），有它才能断定"上游修复前返回数组"是真 bug、而"我们返回完整 result"已经合规。没有契约就只是在比较两种写法的观感。
+4. **评估 bug 的真实触发面，不要照抄 commit message 的口径。** 这次核查了 dialog capability 只注册在 `bootstrap-preload.cjs`（挂正规 BrowserWindow），Browser pane 用的是独立的 `browser-toolbar-preload.cjs` 且不注册 dialog —— 所以不存在"从 BrowserView 发起 dialog"这条高频路径，真实触发面收窄到"窗口销毁竞态"。结论仍是值得补，但**优先级与风险叙述都要按实际触发面写**。
+5. **`craft-source-overrides.json` 里的 sha256 绝不能抄上游**（铁律第 5 条的具体化）。我方受管文件含二开内容，sha 必然不同。正确做法是用 `scripts/audit-craft-reuse.ts` 里 `fileSha256()` 的同一套逻辑自己算（注意它会先把 `\r\n` 归一为 `\n`），并且**只改目标条目那一行**。
+6. **改 `reason` 字段要防误替换。** 该文件里多个条目共用同一句 reason 描述，按 reason 文本做全局替换会打到别的条目上 —— 这次靠 `assert count == 1` 才拦下来。正确做法是先定位唯一的 sha256、再改它紧邻的下一行。

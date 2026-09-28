@@ -33,6 +33,7 @@ import { messageToStored, storedToMessage } from '@opcagent/core/types'
 import {
   AbortReason,
   createBackendFromResolvedContext,
+  providerTypeToAgentProvider,
   resolveBackendContext,
   type AgentBackend,
 } from '@opcagent/shared/agent/backend'
@@ -44,6 +45,8 @@ import {
 import {
   ConfigWatcher,
   getMiniModel,
+  getLlmConnection,
+  getModelsForProviderType,
   getClaudeExecutablePath,
   getWorkspaces,
   resolveTitleLanguageName,
@@ -113,6 +116,7 @@ import type { PermissionMode } from '@opcagent/shared/agent/mode-types'
 import { buildBackendRuntimeSignature, buildRestartRequiredSignature } from './runtime-config'
 import { rollbackFailedBranchCreation, sanitizeForTitle } from '@opcagent/server-core/domain'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
+import { closeSync, openSync, readSync, readdirSync } from 'node:fs'
 import { basename, join } from 'node:path'
 
 let platform: PlatformServices | null = null
@@ -345,6 +349,10 @@ interface ManagedSession extends SessionConfig {
   lastFinalMessageId?: string
   lastMessageRole?: Session['lastMessageRole']
   pendingExternalHeader?: SessionHeader
+  activeRuntimeOperations?: number
+  selectionSwitching?: boolean
+  selectionSwitchPromise?: Promise<void>
+  selectionSnapshot?: Pick<ManagedSession, 'model' | 'llmConnection' | 'agentProvider' | 'sdkSessionId' | 'thinkingLevel' | 'tokenUsage'>
 }
 
 export interface ExecutePromptAutomationInput {
@@ -490,6 +498,7 @@ export function createManagedSession(
     sdkSessionId: session.sdkSessionId,
     model: session.model,
     llmConnection: session.llmConnection,
+    agentProvider: session.agentProvider,
     connectionLocked: session.connectionLocked,
     thinkingLevel: normalizeThinkingLevel(session.thinkingLevel),
     labels: session.labels,
@@ -636,7 +645,7 @@ export class SessionManager implements ISessionManager {
     managed.messagesLoaded = true
   }
 
-  private toStored(managed: ManagedSession): StoredSession {
+  private toStored(managed: ManagedSession, commitSelection = false): StoredSession {
     const { workspace: _workspace, agent: _agent, messageQueue: _queue,
       messagesLoaded: _loaded, isProcessing: _processing,
       backgroundShellCommands: _backgroundShellCommands,
@@ -649,11 +658,15 @@ export class SessionManager implements ISessionManager {
       preview: _preview, messageCount: _messageCount,
       lastFinalMessageId: _lastFinalMessageId, lastMessageRole: _lastMessageRole,
       pendingExternalHeader: _pendingExternalHeader,
+      activeRuntimeOperations: _activeRuntimeOperations, selectionSwitching: _selectionSwitching,
+      selectionSwitchPromise: _selectionSwitchPromise,
+      selectionSnapshot,
       messages, tokenUsage, ...config } = managed
-    return { ...config, messages: messages.map(messageToStored), tokenUsage }
+    return { ...config, messages: messages.map(messageToStored), tokenUsage, ...(!commitSelection ? selectionSnapshot : undefined) }
   }
 
   private persistSession(managed: ManagedSession): void {
+    if (managed.selectionSwitching) return
     this.ensureMessagesLoaded(managed)
     sessionPersistenceQueue.enqueue(this.toStored(managed))
   }
@@ -661,6 +674,7 @@ export class SessionManager implements ISessionManager {
   async flushSession(sessionId: string): Promise<void> {
     const managed = this.sessions.get(sessionId)
     if (!managed) return
+    if (managed.selectionSwitching) return
     this.ensureMessagesLoaded(managed)
     sessionPersistenceQueue.enqueue(this.toStored(managed))
     await sessionPersistenceQueue.flush(sessionId)
@@ -687,6 +701,8 @@ export class SessionManager implements ISessionManager {
 
   private toSession(managed: ManagedSession, includeMessages: boolean): Session {
     const messages = includeMessages ? managed.messages : []
+    const selection = managed.selectionSnapshot ?? managed
+    const agentProvider = selection.agentProvider ?? this.detectSessionAgentProvider(managed)
     return {
       id: managed.id,
       workspaceId: managed.workspace.id,
@@ -696,6 +712,7 @@ export class SessionManager implements ISessionManager {
       lastMessageAt: managed.lastMessageAt ?? managed.lastUsedAt,
       messages,
       isProcessing: managed.isProcessing,
+      isModelSwitching: managed.selectionSwitching,
       isFlagged: managed.isFlagged,
       permissionMode: managed.permissionMode,
       lastReadMessageId: managed.lastReadMessageId,
@@ -703,19 +720,20 @@ export class SessionManager implements ISessionManager {
       enabledSourceSlugs: managed.enabledSourceSlugs,
       workingDirectory: managed.workingDirectory,
       sessionFolderPath: getSessionStoragePath(managed.workspace.rootPath, managed.id),
-      model: managed.model,
-      llmConnection: managed.llmConnection,
-      thinkingLevel: managed.thinkingLevel,
+      model: selection.model,
+      llmConnection: selection.llmConnection,
+      agentProvider,
+      thinkingLevel: selection.thinkingLevel,
       lastMessageRole: managed.lastMessageRole,
       lastFinalMessageId: managed.lastFinalMessageId,
       currentStatus: managed.currentStatus,
       createdAt: managed.createdAt,
       messageCount: managed.messageCount ?? managed.messages.length,
-      tokenUsage: managed.tokenUsage,
+      tokenUsage: selection.tokenUsage,
       hidden: managed.hidden,
       isArchived: managed.isArchived,
       archivedAt: managed.archivedAt,
-      supportsBranching: managed.agent?.supportsBranching ?? true,
+      supportsBranching: agentProvider !== 'anthropic',
       parentSessionId: managed.parentSessionId,
       labels: managed.labels,
       projectId: managed.projectId,
@@ -762,6 +780,9 @@ export class SessionManager implements ISessionManager {
 
       const sourcePath = getSessionStoragePath(workspace.rootPath, options.branchFromSessionId)
       branchFromSdkTurnId = (await loadPiTurnAnchors(sourcePath)).anchors[options.branchFromMessageId]
+      if (!branchFromSdkTurnId) {
+        throw new Error('所选消息缺少可恢复的 Pi 分支切点，请在新的助手回复处创建分支')
+      }
     }
 
     const stored = await createStoredSession(workspace.rootPath, {
@@ -921,6 +942,28 @@ export class SessionManager implements ISessionManager {
   ): Promise<void> {
     const managed = this.sessions.get(sessionId)
     if (!managed) throw new Error(`Session not found: ${sessionId}`)
+    // 另一窗口的发送等待当前选择提交或回滚，避免清空草稿后直接拒绝消息。
+    while (managed.selectionSwitchPromise) await managed.selectionSwitchPromise
+    managed.activeRuntimeOperations = (managed.activeRuntimeOperations ?? 0) + 1
+    try {
+      await this.sendMessageWithSelection(sessionId, message, attachments, storedAttachments, options, existingMessageId, _isRetry, onAck)
+    } finally {
+      managed.activeRuntimeOperations -= 1
+    }
+  }
+
+  private async sendMessageWithSelection(
+    sessionId: string,
+    message: string,
+    attachments?: FileAttachment[],
+    storedAttachments?: StoredAttachment[],
+    options?: SendMessageOptions,
+    existingMessageId?: string,
+    _isRetry?: boolean,
+    onAck?: (messageId: string) => void,
+  ): Promise<void> {
+    const managed = this.sessions.get(sessionId)
+    if (!managed) throw new Error(`Session not found: ${sessionId}`)
     if (claimAutoRetryPending(managed, message) === 'drop') {
       log.info(`Dropped duplicate source-activation retry for ${sessionId}`)
       return
@@ -1056,37 +1099,46 @@ export class SessionManager implements ISessionManager {
       return
     }
 
-    await this.flushSession(sessionId)
-    if (!existingMessageId) {
-      onAck?.(userMessage.id)
-      this.emit(managed.workspace.id, {
-        type: 'user_message',
-        sessionId,
-        message: userMessage,
-        status: 'accepted',
-        optimisticMessageId: options?.optimisticMessageId,
-      })
+    // 持久化之前预占本轮，屏障放行的多个窗口继续使用原有消息队列。
+    managed.isProcessing = true
+    try {
+      await this.flushSession(sessionId)
+      if (!existingMessageId) {
+        onAck?.(userMessage.id)
+        this.emit(managed.workspace.id, {
+          type: 'user_message',
+          sessionId,
+          message: userMessage,
+          status: 'accepted',
+          optimisticMessageId: options?.optimisticMessageId,
+        })
 
-      const isFirstUserMessage = managed.messages.filter(item => item.role === 'user').length === 1
-      if (isFirstUserMessage && !managed.name && !options?.hidden) {
-        let titleSource = message
-        for (const badge of options?.badges ?? []) {
-          if (badge.rawText && badge.label) titleSource = titleSource.replace(badge.rawText, badge.label)
-        }
-        const initialTitle = createFallbackTitle(titleSource)
-        if (initialTitle) {
-          managed.name = initialTitle
-          await this.flushSession(managed.id)
-          this.emit(managed.workspace.id, { type: 'title_generated', sessionId, title: initialTitle })
-          shouldGenerateTitle = true
+        const isFirstUserMessage = managed.messages.filter(item => item.role === 'user').length === 1
+        if (isFirstUserMessage && !managed.name && !options?.hidden) {
+          let titleSource = message
+          for (const badge of options?.badges ?? []) {
+            if (badge.rawText && badge.label) titleSource = titleSource.replace(badge.rawText, badge.label)
+          }
+          const initialTitle = createFallbackTitle(titleSource)
+          if (initialTitle) {
+            managed.name = initialTitle
+            await this.flushSession(managed.id)
+            this.emit(managed.workspace.id, { type: 'title_generated', sessionId, title: initialTitle })
+            shouldGenerateTitle = true
+          }
         }
       }
+      await this.runTurn(managed, message, attachments)
+    } catch (error) {
+      managed.isProcessing = false
+      throw error
     }
-    await this.runTurn(managed, message, attachments)
     if (shouldGenerateTitle) void this.generateTitle(managed, message)
   }
 
   private async generateTitle(managed: ManagedSession, userMessage: string): Promise<void> {
+    if (managed.selectionSwitching) return
+    managed.activeRuntimeOperations = (managed.activeRuntimeOperations ?? 0) + 1
     try {
       const agent = await this.getOrCreateAgent(managed)
       const title = await agent.generateTitle(userMessage, { language: resolveTitleLanguageName() })
@@ -1095,6 +1147,7 @@ export class SessionManager implements ISessionManager {
       await this.flushSession(managed.id)
       this.emit(managed.workspace.id, { type: 'title_generated', sessionId: managed.id, title })
     } catch { return }
+    finally { managed.activeRuntimeOperations -= 1 }
   }
 
   private async runTurn(
@@ -1317,6 +1370,8 @@ export class SessionManager implements ISessionManager {
         this.emit(managed.workspace.id, { type: 'task_progress', sessionId, toolUseId: event.toolUseId, elapsedSeconds: event.elapsedSeconds, turnId: event.turnId })
         break
       case 'task_completed': {
+        // Bash 的 backgroundTaskId 同时用作 shellId，终态须释放其切换阻塞。
+        managed.backgroundShellCommands.delete(event.taskId)
         const task = managed.backgroundTaskRegistry.get(event.taskId)
           ?? [...managed.backgroundTaskRegistry.values()].find(item => item.workflowId === event.taskId)
         const wasAlreadyTerminal = task ? task.status !== 'running' : false
@@ -1347,6 +1402,7 @@ export class SessionManager implements ISessionManager {
         break
       }
       case 'shell_killed':
+        managed.backgroundShellCommands.delete(event.shellId)
         this.emit(managed.workspace.id, { type: 'shell_killed', sessionId, shellId: event.shellId })
         break
       case 'permission_request':
@@ -1452,6 +1508,9 @@ export class SessionManager implements ISessionManager {
   }
 
   private async getOrCreateAgent(managed: ManagedSession): Promise<AgentBackend> {
+    if ((managed.agentProvider || managed.sdkSessionId) && managed.llmConnection && !getLlmConnection(managed.llmConnection)) {
+      throw new Error('当前渠道已被删除，请选择其他可用渠道后继续会话')
+    }
     if (managed.agent) {
       await this.refreshManagedRuntime(managed)
       if (managed.agent) {
@@ -1466,6 +1525,12 @@ export class SessionManager implements ISessionManager {
       workspaceDefaultConnectionSlug: workspaceConfig?.defaults?.defaultLlmConnection,
       managedModel: managed.model,
     })
+    if (managed.selectionSwitching && (context.connection?.slug !== managed.llmConnection || context.resolvedModel !== managed.model)) {
+      throw new Error('切换期间目标渠道或模型配置发生变化，请重新选择')
+    }
+    if (managed.agentProvider && managed.agentProvider !== context.provider && (managed.messages.length > 0 || managed.branchFromMessageId)) {
+      throw new Error('当前渠道执行引擎与会话历史不兼容，请选择原执行引擎的渠道')
+    }
     const allSources = loadAllSources(managed.workspace.rootPath)
     const enabledSources = getSourcesBySlugs(
       managed.workspace.rootPath,
@@ -1493,7 +1558,10 @@ export class SessionManager implements ISessionManager {
       },
       coreConfig: {
         workspace: managed.workspace,
-        session: this.toStored(managed),
+        session: this.toStored(managed, true),
+        requireExistingSession: managed.branchFromMessageId
+          ? Boolean(managed.sdkSessionId)
+          : managed.messages.some(message => message.role === 'assistant' || message.role === 'tool'),
         model: context.resolvedModel,
         miniModel: context.connection ? getMiniModel(context.connection) : undefined,
         thinkingLevel: managed.thinkingLevel,
@@ -1697,16 +1765,22 @@ export class SessionManager implements ISessionManager {
       })
     }
     agent.setBackgroundEventSink?.(event => { void this.processEvent(managed, event) })
-    const result = await agent.postInit()
-    if (result.authWarning) log.warn(result.authWarning)
-    managed.mcpPool.setSummarizeCallback(agent.getSummarizeCallback())
-    agent.setAllSources(allSources)
-    await agent.setSourceServers(
-      mcpServers,
-      apiServers,
-      enabledSources.map(source => source.config.slug),
-    )
+    try {
+      const result = await agent.postInit()
+      if (result.authWarning) log.warn(result.authWarning)
+      managed.mcpPool.setSummarizeCallback(agent.getSummarizeCallback())
+      agent.setAllSources(allSources)
+      await agent.setSourceServers(
+        mcpServers,
+        apiServers,
+        enabledSources.map(source => source.config.slug),
+      )
+    } catch (error) {
+      agent.dispose()
+      throw error
+    }
     managed.agent = agent
+    managed.agentProvider = context.provider
     managed.backendRuntimeSignature = buildBackendRuntimeSignature({ connection: context.connection, provider: context.provider, authType: context.authType, resolvedModel: context.resolvedModel })
     managed.backendRestartSignature = buildRestartRequiredSignature({ connection: context.connection, provider: context.provider, authType: context.authType, resolvedModel: context.resolvedModel })
     return agent
@@ -1787,6 +1861,7 @@ export class SessionManager implements ISessionManager {
   }
 
   private async refreshManagedRuntime(managed: ManagedSession): Promise<void> {
+    if (managed.selectionSwitching) return
     if (managed.runtimeRefreshPromise) return managed.runtimeRefreshPromise
     managed.runtimeRefreshPromise = this.performRuntimeRefresh(managed).finally(() => {
       managed.runtimeRefreshPromise = undefined
@@ -2113,20 +2188,154 @@ export class SessionManager implements ISessionManager {
   async setSessionConnection(sessionId: string, connectionSlug: string): Promise<void> {
     const managed = this.sessions.get(sessionId)
     if (!managed) return
-    if (managed.connectionLocked) throw new Error('Connection cannot be changed after the first message')
-    managed.llmConnection = connectionSlug
-    await this.flushSession(sessionId)
-    this.emit(managed.workspace.id, { type: 'connection_changed', sessionId, connectionSlug })
+    await this.updateSessionModel(sessionId, managed.workspace.id, null, connectionSlug)
   }
 
   async updateSessionModel(sessionId: string, _workspaceId: string, model: string | null, connection?: string): Promise<void> {
     const managed = this.sessions.get(sessionId)
     if (!managed) return
-    managed.model = model ?? undefined
-    if (connection) managed.llmConnection = connection
-    if (model && managed.agent) managed.agent.setModel(model)
-    await this.flushSession(sessionId)
-    this.emit(managed.workspace.id, { type: 'session_model_changed', sessionId, model })
+    if (managed.selectionSwitching || managed.activeRuntimeOperations || managed.isProcessing
+      || managed.agent?.isProcessing() || managed.runtimeRefreshPromise || managed.pendingAuthRequest
+      || managed.messageQueue.length || managed.backgroundShellCommands.size
+      || [...managed.backgroundTaskRegistry.values()].some(task => task.status === 'running')) {
+      throw new Error('会话正在处理消息、审批或后台任务，请先完成或停止任务再切换渠道和模型')
+    }
+    this.ensureMessagesLoaded(managed)
+    // 在首个异步操作前占用会话，避免发送和两个窗口的切换交错。
+    managed.selectionSwitching = true
+    let finishSelection!: () => void
+    managed.selectionSwitchPromise = new Promise<void>(resolve => { finishSelection = resolve })
+    const previous = {
+      model: managed.model,
+      llmConnection: managed.llmConnection,
+      agentProvider: managed.agentProvider ?? this.detectSessionAgentProvider(managed),
+      sdkSessionId: managed.sdkSessionId,
+      thinkingLevel: managed.thinkingLevel,
+      tokenUsage: { ...managed.tokenUsage },
+    }
+    managed.selectionSnapshot = previous
+    let runtimeReplaced = false
+    let committed = false
+    try {
+      this.emit(managed.workspace.id, { type: 'session_model_switching', sessionId, isSwitching: true })
+      const workspaceConfig = loadWorkspaceConfig(managed.workspace.rootPath)
+      const targetSlug = connection ?? managed.llmConnection
+      const target = targetSlug !== undefined
+        ? getLlmConnection(targetSlug)
+        : resolveBackendContext({ workspaceDefaultConnectionSlug: workspaceConfig?.defaults?.defaultLlmConnection }).connection
+      if (!target) throw new Error('所选渠道不存在，请重新选择可用渠道')
+      const targetProvider = providerTypeToAgentProvider(target.providerType, target.platformProfile)
+      const hasHistory = managed.messages.length > 0 || Boolean(managed.branchFromMessageId)
+      if (hasHistory && (previous.agentProvider !== targetProvider
+        || (previous.agentProvider === 'anthropic' && previous.llmConnection !== target.slug))) {
+        throw new Error(previous.agentProvider
+          ? '已有会话目前只支持 Pi 渠道之间切换；Claude CLI 会话请保留原渠道'
+          : '无法确定旧会话的执行引擎，不能安全切换渠道')
+      }
+      const models = target.models?.length ? target.models : getModelsForProviderType(target.providerType, target.piAuthProvider)
+      const modelIds = models.map(item => typeof item === 'string' ? item : item.id)
+      const targetModel = model ?? target.defaultModel ?? modelIds[0]
+      if (!targetModel || !modelIds.includes(targetModel)) throw new Error('所选模型不属于目标渠道，请重新选择模型')
+      const resolved = resolveBackendContext({ sessionConnectionSlug: target.slug, managedModel: targetModel })
+      if (resolved.connection?.slug !== target.slug || resolved.resolvedModel !== targetModel) {
+        throw new Error('所选模型无法按原配置解析，请更新渠道中的模型配置')
+      }
+      if (!(await getCredentialManager().hasLlmCredentials(target.slug, target.authType))) {
+        throw new Error('目标渠道尚未配置认证信息，请先完成渠道认证')
+      }
+      if (previous.llmConnection === target.slug && previous.model === targetModel) return
+
+      // 先落盘原状态；预热回调不得把尚未成功的目标选择写入会话。
+      await sessionPersistenceQueue.flush(sessionId)
+      const oldAgent = managed.agent
+      runtimeReplaced = true
+      managed.agent = null
+      if (oldAgent) {
+        try { await oldAgent.disposeForRestart?.() }
+        finally { oldAgent.dispose() }
+      }
+      managed.backendRuntimeSignature = undefined
+      managed.backendRestartSignature = undefined
+      managed.llmConnection = target.slug
+      managed.model = targetModel
+      managed.agentProvider = targetProvider
+      if (!hasHistory && previous.agentProvider !== targetProvider) managed.sdkSessionId = undefined
+      managed.tokenUsage = { ...previous.tokenUsage }
+      delete managed.tokenUsage.contextWindow
+
+      if (targetProvider === 'pi') {
+        const agent = await this.getOrCreateAgent(managed)
+        if (!agent.ensureSessionReady) throw new Error('当前运行时不支持安全恢复会话')
+        const capabilities = await agent.ensureSessionReady()
+        if (capabilities.thinkingLevel) managed.thinkingLevel = capabilities.thinkingLevel
+        if (capabilities.contextWindow) managed.tokenUsage.contextWindow = capabilities.contextWindow
+      }
+
+      sessionPersistenceQueue.enqueue(this.toStored(managed, true))
+      await sessionPersistenceQueue.flush(sessionId)
+      const saved = loadStoredSession(managed.workspace.rootPath, sessionId)
+      if (saved?.llmConnection !== target.slug || saved.model !== targetModel || saved.agentProvider !== targetProvider) {
+        log.error('会话选择落盘校验失败', { sessionId, expected: { connection: target.slug, model: targetModel, provider: targetProvider },
+          actual: saved && { connection: saved.llmConnection, model: saved.model, provider: saved.agentProvider } })
+        throw new Error('会话选择未能保存，请检查存储目录后重试')
+      }
+      committed = true
+      managed.selectionSnapshot = undefined
+      this.emit(managed.workspace.id, {
+        type: 'session_model_changed', sessionId, model: targetModel, connectionSlug: target.slug,
+        agentProvider: targetProvider, supportsBranching: targetProvider === 'pi',
+        thinkingLevel: managed.thinkingLevel, contextWindow: managed.tokenUsage.contextWindow ?? null,
+      })
+    } catch (error) {
+      if (runtimeReplaced && managed.agent) {
+        try { await managed.agent.disposeForRestart?.() } catch { /* 回滚仍须释放失败实例。 */ }
+        managed.agent.dispose()
+        managed.agent = null
+      }
+      Object.assign(managed, previous)
+      if (runtimeReplaced) {
+        managed.backendRuntimeSignature = undefined
+        managed.backendRestartSignature = undefined
+      }
+      throw error
+    } finally {
+      managed.selectionSnapshot = undefined
+      try {
+        // 保持发送屏障，直到成功选择或回滚后的原选择都已完成持久化。
+        if (runtimeReplaced || committed) {
+          sessionPersistenceQueue.enqueue(this.toStored(managed, true))
+          await sessionPersistenceQueue.flush(sessionId)
+        }
+      } finally {
+        managed.selectionSwitching = false
+        managed.selectionSwitchPromise = undefined
+        try { this.emit(managed.workspace.id, { type: 'session_model_switching', sessionId, isSwitching: false }) }
+        finally { finishSelection() }
+      }
+    }
+  }
+
+  private detectSessionAgentProvider(managed: ManagedSession): SessionConfig['agentProvider'] {
+    if (managed.agentProvider) return managed.agentProvider
+    if (managed.agent) return managed.agent.supportsBranching ? 'pi' : 'anthropic'
+    // 优先依据 SDK 文件确认旧会话来源，避免渠道配置变动后误判执行引擎。
+    const directory = join(getSessionStoragePath(managed.workspace.rootPath, managed.id), '.pi-sessions')
+    try {
+      for (const file of readdirSync(directory)) {
+        if (!file.endsWith('.jsonl')) continue
+        const fd = openSync(join(directory, file), 'r')
+        try {
+          const buffer = Buffer.alloc(4096)
+          const count = readSync(fd, buffer, 0, buffer.length, 0)
+          const header = JSON.parse(buffer.toString('utf8', 0, count).split('\n')[0] ?? '{}')
+          if (header.type === 'session' && typeof header.id === 'string' && typeof header.version === 'number'
+            && (!managed.sdkSessionId || header.id === managed.sdkSessionId)) return 'pi'
+        } catch { /* 忽略非 SDK 或损坏的文件，继续检查其他历史。 */ }
+        finally { closeSync(fd) }
+      }
+    } catch { /* 无可核验的历史时保持未知，不执行跨引擎迁移。 */ }
+    const connection = managed.llmConnection ? getLlmConnection(managed.llmConnection) : null
+    return connection ? providerTypeToAgentProvider(connection.providerType, connection.platformProfile) : undefined
   }
 
   setActiveViewingSession(sessionId: string | null, workspaceId: string): void {
@@ -2372,6 +2581,8 @@ export class SessionManager implements ISessionManager {
   async refreshTitle(sessionId: string): Promise<{ success: boolean; title?: string; error?: string }> {
     const managed = this.sessions.get(sessionId)
     if (!managed) return { success: false, error: 'Session not found' }
+    if (managed.selectionSwitching) return { success: false, error: '正在切换渠道和模型，请稍后重试' }
+    managed.activeRuntimeOperations = (managed.activeRuntimeOperations ?? 0) + 1
     try {
       const agent = await this.getOrCreateAgent(managed)
       const recentUsers = managed.messages.filter(item => item.role === 'user').slice(-3).map(item => item.content)
@@ -2382,6 +2593,8 @@ export class SessionManager implements ISessionManager {
       return { success: true, title }
     } catch (error) {
       return { success: false, error: error instanceof Error ? error.message : String(error) }
+    } finally {
+      managed.activeRuntimeOperations -= 1
     }
   }
 

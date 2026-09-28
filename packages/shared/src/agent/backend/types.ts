@@ -141,6 +141,8 @@ export interface CoreBackendConfig {
 
   /** Session configuration (for resume) */
   session?: Session;
+  /** 会话已含实际 SDK 历史时，恢复失败不能退化成空上下文。 */
+  requireExistingSession?: boolean;
 
   /** Initial model ID */
   model?: string;
@@ -380,6 +382,9 @@ export interface AgentBackend {
    * Default behavior can be a no-op for providers that don't need preflight.
    */
   ensureBranchReady(): Promise<void>;
+
+  /** 不发送消息，恢复当前会话并返回目标模型实际生效的能力。 */
+  ensureSessionReady?(): Promise<{ thinkingLevel?: ThinkingLevel; contextWindow?: number }>;
 
   /**
    * Check if currently processing a query.

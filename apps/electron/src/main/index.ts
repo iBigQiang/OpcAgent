@@ -25,7 +25,7 @@ import { getCredentialManager } from '@opcagent/shared/credentials'
 import { initializeDocs } from '@opcagent/shared/docs'
 import { setupI18n, i18n, SUPPORTED_LANGUAGE_CODES, type LanguageCode } from '@opcagent/shared/i18n'
 import { ensureDefaultPermissions } from '@opcagent/shared/agent/permissions-config'
-import { initializeBackendHostRuntime } from '@opcagent/shared/agent/backend'
+import { initializeBackendHostRuntime, resolveBundledRuntimePath } from '@opcagent/shared/agent/backend'
 import { initializeReleaseNotes } from '@opcagent/shared/release-notes'
 import { getAllPiModels, getPiModelsForAuthProvider } from '@opcagent/shared/config'
 import { getDefaultWorkspacesDir, ensureDefaultWorkspace } from '@opcagent/shared/workspaces'
@@ -117,16 +117,18 @@ function configureBundledTools() {
   const binDir = join(resources, 'bin')
   const scriptsDir = join(resources, 'scripts')
   const uv = join(uvDir, process.platform === 'win32' ? 'uv.exe' : 'uv')
-  const bun = join(root, 'vendor', 'bun', process.platform === 'win32' ? 'bun.exe' : 'bun')
   process.env.OPCAGENT_IS_PACKAGED = app.isPackaged ? '1' : '0'
   process.env.OPCAGENT_RESOURCES_BASE = root
   process.env.OPCAGENT_APP_ROOT = app.isPackaged ? app.getAppPath() : process.cwd()
   process.env.OPCAGENT_UV = existsSync(uv) ? uv : 'uv'
-  if (existsSync(bun)) process.env.OPCAGENT_BUN = bun
+  // Windows 的 Bun 位于 resources/vendor；复用会话运行时解析，兼容 app/vendor 布局。
+  const hostRuntime = { appRootPath: process.env.OPCAGENT_APP_ROOT, resourcesPath: app.isPackaged ? process.resourcesPath : root, isPackaged: app.isPackaged }
+  const bun = resolveBundledRuntimePath(hostRuntime)
+  if (bun) process.env.OPCAGENT_BUN = bun
   process.env.OPCAGENT_SCRIPTS = scriptsDir
   process.env.PATH = `${binDir}${delimiter}${uvDir}${delimiter}${process.env.PATH ?? ''}`
   setBundledAssetsRoot(app.isPackaged ? join(root, 'dist') : join(root, 'apps', 'electron'))
-  initializeBackendHostRuntime({ hostRuntime: { appRootPath: process.env.OPCAGENT_APP_ROOT, resourcesPath: root, isPackaged: app.isPackaged } })
+  initializeBackendHostRuntime({ hostRuntime })
 }
 
 function ensureLocalWorkspace() {
@@ -137,6 +139,15 @@ function ensureLocalWorkspace() {
     rootPath: join(getDefaultWorkspacesDir(), 'default'),
     lastAccessedAt: Date.now(),
   })
+}
+
+// 对话框父窗口解析：发起方窗口在关闭竞态中可能已销毁（fromWebContents 返回 null，
+// 或返回的窗口已进入销毁），此时回退到 WindowManager 的存活窗口解析，
+// 该方法已按全项目惯例过滤 isDestroyed 并兜底任一存活窗口。
+function resolveDialogParent(sender: Electron.WebContents): BrowserWindow | undefined {
+  const senderWindow = BrowserWindow.fromWebContents(sender)
+  if (senderWindow && !senderWindow.isDestroyed()) return senderWindow
+  return windowManager?.getLastActiveWindow() ?? undefined
 }
 
 async function start() {
@@ -259,8 +270,14 @@ async function start() {
   ipcMain.on('__get-workspace-id', event => { event.returnValue = windowManager!.getWorkspaceForWindow(event.sender.id) ?? getWorkspaces()[0]!.id })
   ipcMain.on('__get-ws-port', event => { event.returnValue = instance.port })
   ipcMain.on('__get-ws-token', event => { event.returnValue = instance.token })
-  ipcMain.handle('__dialog:showMessageBox', (event, options) => dialog.showMessageBox(BrowserWindow.fromWebContents(event.sender)!, options))
-  ipcMain.handle('__dialog:showOpenDialog', (event, options) => dialog.showOpenDialog(BrowserWindow.fromWebContents(event.sender)!, options))
+  ipcMain.handle('__dialog:showMessageBox', (event, options) => {
+    const parent = resolveDialogParent(event.sender)
+    return parent ? dialog.showMessageBox(parent, options) : dialog.showMessageBox(options)
+  })
+  ipcMain.handle('__dialog:showOpenDialog', (event, options) => {
+    const parent = resolveDialogParent(event.sender)
+    return parent ? dialog.showOpenDialog(parent, options) : dialog.showOpenDialog(options)
+  })
   ipcMain.handle('__i18n:changeLanguage', async (_event, language: unknown) => {
     if (typeof language === 'string' && SUPPORTED_LANGUAGE_CODES.includes(language as LanguageCode)) {
       await i18n.changeLanguage(language)

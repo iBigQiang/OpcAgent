@@ -27,6 +27,7 @@ export interface Session {
   lastMessageAt: number;
   messages: Message[];
   isProcessing: boolean;
+  isModelSwitching?: boolean;
   isFlagged?: boolean;
   permissionMode?: PermissionMode;
   lastReadMessageId?: string;
@@ -36,6 +37,7 @@ export interface Session {
   sessionFolderPath?: string;
   model?: string;
   llmConnection?: string;
+  agentProvider?: 'pi' | 'anthropic';
   thinkingLevel?: ThinkingLevel;
   lastMessageRole?: 'user' | 'assistant' | 'plan' | 'tool' | 'error';
   lastFinalMessageId?: string;
@@ -126,7 +128,8 @@ export type SessionEvent =
   | { type: 'session_archived'; sessionId: string }
   | { type: 'session_unarchived'; sessionId: string }
   | { type: 'name_changed'; sessionId: string; name?: string }
-  | { type: 'session_model_changed'; sessionId: string; model: string | null }
+  | { type: 'session_model_changed'; sessionId: string; model: string | null; connectionSlug?: string; agentProvider?: 'pi' | 'anthropic'; supportsBranching?: boolean; thinkingLevel?: ThinkingLevel; contextWindow?: number | null }
+  | { type: 'session_model_switching'; sessionId: string; isSwitching: boolean }
   | { type: 'session_deleted'; sessionId: string }
   | { type: 'session_created'; sessionId: string }
   | { type: 'auth_request'; sessionId: string; message: Message; request: SharedAuthRequest }
