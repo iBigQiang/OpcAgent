@@ -2095,7 +2095,7 @@
       "reason": "Craft source activation event handling restored in the retained OPC Agent shared chat UI."
     },
     "README.md": {
-      "sha256": "c365a9a9605aa66f1aa2c66545b955b82eeda2c84cb9d7f32ef53a944abb2c8d",
+      "sha256": "bf38c0f57463df4ce26499fe1b63d6a9f4fa849cb665e93f754f6ad51a23b506",
       "reason": "保留 OPC Agent 品牌、功能边界及来源署名；已审查 253aba1 将当前版本说明更新为 0.1.10 图标和 Windows 通知修复。"
     },
     "scripts/browser-tool.ts": {

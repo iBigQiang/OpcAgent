@@ -30,6 +30,30 @@ Skills, browser and document tools, Sources, projects, automations, and optional
 Application data stays under `~/.opcagent` by default. API keys and tokens are kept in a local
 AES-256-GCM encrypted credential store rather than written into configuration or session files.
 
+<!-- opcagent:ci-build:start -->
+## 最新验证构建
+
+源码版本：**0.1.11**；分支：`craft-sources-auto`；提交：[46ce629](https://github.com/iBigQiang/OpcAgent/commit/46ce629b9662750c1c58dc65338a50e4bddc207f)。
+
+构建时间：2026-09-28T11:51:56.678Z；[CI #36416806387 · 第 1 次运行](https://github.com/iBigQiang/OpcAgent/actions/runs/36416806387/attempts/1)。
+
+| 平台 | 验证构建下载 |
+| --- | --- |
+| Windows x64 | [下载 Artifact](https://github.com/iBigQiang/OpcAgent/actions/runs/36416806387/artifacts/10967443111) |
+| macOS Apple Silicon | [下载 Artifact](https://github.com/iBigQiang/OpcAgent/actions/runs/36416806387/artifacts/10967852728) |
+| Linux x64 | [下载 Artifact](https://github.com/iBigQiang/OpcAgent/actions/runs/36416806387/artifacts/10967722327) |
+
+本版用户改动：
+
+- 新建及已有 Pi 会话支持在不同渠道和模型之间切换，沿用原会话上下文、压缩摘要、历史工具结果和已启用工具。
+- 渠道与模型作为一次完整选择保存，支持跨窗口同步；原渠道删除后可选择其他有效 Pi 渠道继续对话。
+- 会话执行中暂停模型切换；切换失败保留原选择和输入草稿，重启后恢复已保存的渠道与模型。
+- 自动化定时任务继续使用任务中保存的渠道与模型，聊天选择和默认模型调整不会改变任务绑定。
+- 修复部分助手回复缺少 Pi 分支切点，以及 Windows 工作区路径重复转换导致分支持久化位置错误的问题。
+
+下载 Artifact 需要登录 GitHub。Artifact 保留期为 **30 天**，到期后下载链接可能失效。此处为 CI 验证构建；正式版本及长期下载请查看 [GitHub Releases](https://github.com/iBigQiang/OpcAgent/releases/latest)。
+<!-- opcagent:ci-build:end -->
+
 ## Current release
 
 Version **0.1.10** completes the brand icon refresh that began in 0.1.9. Every icon surface —
